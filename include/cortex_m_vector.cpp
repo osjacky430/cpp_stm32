@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-11-20T13:44:04+08:00
+ * @Last modified time: 2019-11-20T14:21:06+08:00
  */
 
 #include "include/cortex_m_vector.hpp"
@@ -19,14 +19,17 @@ void blocking_handler();
 	mem_manage_fault_handler,
 	bus_fault_handler,
 	usage_fault_handler,
-
-	IrqVector::IrqReserved<4>{},
-
+	{
+		IrqVector::Reserved{},
+		IrqVector::Reserved{},
+		IrqVector::Reserved{},
+		IrqVector::Reserved{},
+	},
 	service_call_handler,
 	debug_monitor_handler,
-
-	IrqVector::IrqReserved<1>{},
-
+	{
+		IrqVector::Reserved{},
+	},
 	pending_service_call_handler,
 	system_clock_tick_handler,
 };

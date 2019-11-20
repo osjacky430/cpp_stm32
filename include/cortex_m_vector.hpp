@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T13:55:25+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.hpp
- * @Last modified time: 2019-11-20T13:54:18+08:00
+ * @Last modified time: 2019-11-20T14:20:55+08:00
  */
 
 #ifndef CORTEX_M_VECTOR_HPP_
@@ -13,11 +13,7 @@
 
 struct IrqVector {
 	using IrqFuncPtr = void (*)();
-
-	template <std::size_t num>
-	struct IrqReserved {
-		IrqFuncPtr reserved[num];
-	};
+	using Reserved = std::nullptr_t;
 
 	std::uint32_t *initialStackPtr;	 //
 	IrqFuncPtr reset;				 // reset handler
@@ -27,12 +23,12 @@ struct IrqVector {
 	IrqFuncPtr busFault;			 // bus fault handler
 	IrqFuncPtr usageFault;			 // usage fault handler
 
-	IrqReserved<4> exception7To10IsReserved;
+	IrqFuncPtr exception7To10IsReserved[4];
 
 	IrqFuncPtr serviceCall;	  // service call (SV) handler
 	IrqFuncPtr debugMonitor;  // debug monitor handler
 
-	IrqReserved<1> exception13IsReserved;
+	IrqFuncPtr exception13IsReserved[1];
 
 	IrqFuncPtr pendServiceCall;	 // pending service call handler
 	IrqFuncPtr sysTick;			 // system tick handler
