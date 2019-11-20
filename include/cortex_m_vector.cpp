@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-11-20T14:21:06+08:00
+ * @Last modified time: 2019-11-20T14:52:48+08:00
  */
 
 #include "include/cortex_m_vector.hpp"
@@ -11,7 +11,7 @@ int main();
 void null_handler();
 void blocking_handler();
 
-[[gnu::section((".IrqVector"))]] IrqVector irq_vector_table{
+[[gnu::section((".IrqVector"))]] constexpr IrqVector irq_vector_table{
 	&STACK,
 	reset_handler,
 	nmi_handler,
