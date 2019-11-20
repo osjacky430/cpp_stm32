@@ -1,0 +1,16 @@
+# osx file
+.DS_Store
+
+# build folder
+build/
+
+# ignore my own build shell script
+build.sh
+
+# eclipse project settings
+Debug
+.cproject
+.settings
+.mxproject
+.osx.project
+.project
