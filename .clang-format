@@ -1,7 +1,7 @@
 # @Date:   2019-11-20T03:30:18+08:00
 # @Email:  osjacky430@gmail.com
 # @Filename: .clang-format
-# @Last modified time: 2019-11-20T05:16:17+08:00
+# @Last modified time: 2019-11-20T17:33:31+08:00
 
 
 
@@ -64,7 +64,7 @@ IncludeCategories:
     Priority:        3
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
-IndentWidth:     4
+IndentWidth:     2
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
@@ -96,6 +96,6 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard:        Auto
-TabWidth:        4
+TabWidth:        2
 UseTab:          Always
 ...

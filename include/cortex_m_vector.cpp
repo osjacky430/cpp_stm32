@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-11-20T14:52:48+08:00
+ * @Last modified time: 2019-11-23T22:04:44+08:00
  */
 
 #include "include/cortex_m_vector.hpp"
@@ -12,31 +12,49 @@ void null_handler();
 void blocking_handler();
 
 [[gnu::section((".IrqVector"))]] constexpr IrqVector irq_vector_table{
-	&STACK,
-	reset_handler,
-	nmi_handler,
-	hard_fault_handler,
-	mem_manage_fault_handler,
-	bus_fault_handler,
-	usage_fault_handler,
-	{
-		IrqVector::Reserved{},
-		IrqVector::Reserved{},
-		IrqVector::Reserved{},
-		IrqVector::Reserved{},
-	},
-	service_call_handler,
-	debug_monitor_handler,
-	{
-		IrqVector::Reserved{},
-	},
-	pending_service_call_handler,
-	system_clock_tick_handler,
+		&STACK,
+		reset_handler,
+		nmi_handler,
+		hard_fault_handler,
+		mem_manage_fault_handler,
+		bus_fault_handler,
+		usage_fault_handler,
+		{
+				IrqVector::Reserved{},
+		},
+		service_call_handler,
+		debug_monitor_handler,
+		{
+				IrqVector::Reserved{},
+		},
+		pending_service_call_handler,
+		system_clock_tick_handler,
 };
 
 void reset_handler() {
+	using FuncPtr = void (*)();
+
+	extern FuncPtr __preinit_array_start, __preinit_array_end;
+	extern FuncPtr __init_array_start, __init_array_end;
+	extern FuncPtr __fini_array_start, __fini_array_end;
+
+	//
+	for (FuncPtr* p_fp = &__preinit_array_start; p_fp < &__preinit_array_end; ++p_fp) {
+		(*p_fp)();
+	}
+
+	// constructor
+	for (FuncPtr* p_fp = &__init_array_start; p_fp < &__init_array_end; ++p_fp) {
+		(*p_fp)();
+	}
+
+	//
 	main();
-	return;
+
+	// destructor
+	for (FuncPtr* p_fp = &__fini_array_start; p_fp < &__fini_array_end; ++p_fp) {
+		(*p_fp)();
+	}
 }
 
 void null_handler() { return; }
