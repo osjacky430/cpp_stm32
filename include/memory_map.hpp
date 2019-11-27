@@ -2,7 +2,7 @@
  * @Date:   2019-11-20T23:21:56+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: memory_map.hpp
- * @Last modified time: 2019-11-24T00:26:14+08:00
+ * @Last modified time: 2019-11-25T12:29:00+08:00
  */
 #ifndef MEMORY_MAP_HPP_
 #define MEMORY_MAP_HPP_
@@ -24,10 +24,12 @@ enum class MemoryMap : std::uint32_t {
 	Apb1Base = memory_at(PeriphBase, 0x00000U),
 	Apb2Base = memory_at(PeriphBase, 0x10000U),
 	Ahb1Base = memory_at(PeriphBase, 0x20000U),
+	Ahb2Base = memory_at(PeriphBase, 0x10000000U),
+	Ahb3Base = memory_at(PeriphBase, 0x20000000U),
 
-	InternalPeriphBase = 0xE0000000U,
-	IppbBase = memory_at(InternalPeriphBase, 0x00000U),
-	EppbBase = memory_at(InternalPeriphBase, 0x40000U),
+	PrivatePeriphBase = 0xE0000000U,
+	IppbBase = memory_at(PrivatePeriphBase, 0x00000U),
+	EppbBase = memory_at(PrivatePeriphBase, 0x40000U),
 };
 
 enum class Ippb : std::uint32_t {

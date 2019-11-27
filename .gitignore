@@ -4,8 +4,9 @@
 # build folder
 build/
 
-# ignore my own build shell script
-build.sh
+# ignore my own shell script
+*.sh
+.gdbinit
 
 # eclipse project settings
 Debug

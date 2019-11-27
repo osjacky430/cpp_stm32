@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-11-23T22:04:44+08:00
+ * @Last modified time: 2019-11-26T16:23:19+08:00
  */
 
 #include "include/cortex_m_vector.hpp"
@@ -11,7 +11,7 @@ int main();
 void null_handler();
 void blocking_handler();
 
-[[gnu::section((".IrqVector"))]] constexpr IrqVector irq_vector_table{
+[[gnu::section((".IrqVector"))]] const IrqVector irq_vector_table{
 		&STACK,
 		reset_handler,
 		nmi_handler,
@@ -29,6 +29,9 @@ void blocking_handler();
 		},
 		pending_service_call_handler,
 		system_clock_tick_handler,
+		{
+				IrqVector::Reserved{},	// @todo add the rest of interrupt handler
+		},
 };
 
 void reset_handler() {
@@ -38,6 +41,15 @@ void reset_handler() {
 	extern FuncPtr __init_array_start, __init_array_end;
 	extern FuncPtr __fini_array_start, __fini_array_end;
 
+	extern unsigned load_data_start_addr_, sdata_, edata_;
+	volatile unsigned* src = &load_data_start_addr_;
+	volatile unsigned* dest = &sdata_;
+
+	for (; dest < &edata_; ++src, ++dest) {
+		*dest = *src;
+	}
+
+	// while(dest < &)
 	//
 	for (FuncPtr* p_fp = &__preinit_array_start; p_fp < &__preinit_array_end; ++p_fp) {
 		(*p_fp)();

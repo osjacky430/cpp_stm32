@@ -111,11 +111,15 @@ SECTIONS
 
   .data :
   {
+    sdata_ = .;
     . = ALIGN(4);
     *(.data)
     *(.data*)
     . = ALIGN(4);
+    edata_ = .;
   } >ram AT >rom
+  load_data_start_addr_ = LOADADDR(.data);
+  /* load_data_end_addr__ = LOADADDR(.data)  */
 
   .bss :
   {
