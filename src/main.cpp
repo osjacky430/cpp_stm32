@@ -12,16 +12,15 @@
 #include "include/driver/digitalout.hpp"
 
 int main() {
-	RccPeriphController<RccPeriph::GPIOA>::enable();
+	// RCC_EN_PERIPH_CLK(RccPeriph::GPIOA);
 
 	DigitalOut<PinName::PA_5> led;
-	gpio_mode_setup(GpioPort::PortA, GpioMode::Output, GpioPupd::None, GpioPin::Pin5);
 
 	while (true) {
 		for (int i = 0; i < 1000000; ++i) {
 		}
 
-		gpio_toggle(GpioPort::PortA, GpioPin::Pin5);
+		led.toggle();
 	}
 
 	return 0;

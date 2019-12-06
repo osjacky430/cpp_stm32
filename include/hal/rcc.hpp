@@ -25,34 +25,29 @@ enum class RccPeriph : std::uint32_t {
 	GPIOA,
 };
 
+class RccPeriphClkReg {};
+
 static constexpr std::array RccPeriphRst{
-		set_offset_and_bit(0x10, 0),	// GPIOA
+	set_offset_and_bit(0x10, 0),	// GPIOA
 };
 
 static constexpr std::array RccPeriphEn{
-		set_offset_and_bit(0x30, 0),	// GPIOA
-		set_offset_and_bit(0x30, 1),	// GPIOB
+	set_offset_and_bit(0x30, 0),	// GPIOA
+	set_offset_and_bit(0x30, 1),	// GPIOB
 };
 
 static constexpr auto RCC_BASE = memory_at(to_underlying(MemoryMap::Ahb1Base), 0x3800U);
 static constexpr auto RCC_CR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x00U); };
-static constexpr auto RCC_PLLCFGR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x04U); };
-
-template <RccPeriph PeriphClk>
-class RccPeriphController {
- private:
-	static constexpr auto m_periphIndex = to_underlying(PeriphClk);
-
- public:
-	static constexpr void enable() noexcept {
-		const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = get_offset_and_bit(RccPeriphEn[m_periphIndex]);
-		MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
-	}
-
-	static constexpr void reset() noexcept {
-		const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = get_offset_and_bit(RccPeriphRst[m_periphIndex]);
-		MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
-	}
+static constexpr auto RCC_EN_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
+	static_assert(std::is_same_v<decltype(t_periph_clk), const RccPeriph>);
+	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = get_offset_and_bit(RccPeriphEn[to_underlying(t_periph_clk)]);
+	MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
 };
+static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
+	static_assert(std::is_same_v<decltype(t_periph_clk), const RccPeriph>);
+	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = get_offset_and_bit(RccPeriphRst[to_underlying(t_periph_clk)]);
+	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
+};
+static constexpr auto RCC_PLLCFGR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x04U); };
 
 #endif	// RCC_HPP_

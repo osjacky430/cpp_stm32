@@ -14,10 +14,15 @@
 
 enum class PinName { PA_5 };
 
+constexpr auto gpio_enable_periph_clock = [](const GpioPort t_port) noexcept {
+	const auto periph_clk = static_cast<RccPeriph>(t_port);
+	RCC_EN_PERIPH_CLK(periph_clk);
+};
+
 class PinNameMap {
  private:
 	static constexpr std::array PinMap{
-			std::pair{GpioPort::PortA, GpioPin::Pin5},
+		std::pair{GpioPort::PortA, GpioPin::Pin5},
 	};
 
  public:
@@ -33,6 +38,7 @@ class PinNameMap {
 template <PinName... PinNames>
 class PinGroupingHelper {
  private:
+	// @todo need to solve duplicate elements
 	static constexpr auto portList = std::make_tuple(PinNameMap::getPortFromPinMap(PinNames)...);
 	static constexpr auto pinList = std::make_tuple(PinNameMap::getPinFromPinMap(PinNames)...);
 
@@ -54,6 +60,7 @@ template <PinName... PinNames>
 class GpioBase {
  private:
 	using PinGrouper = PinGroupingHelper<PinNames...>;
+	using PortIterator = std::make_index_sequence<PinGrouper::getUsedPortNum()>;
 
 	template <std::size_t PortIdx, std::size_t... PinIdx>
 	static constexpr auto groupPinByPort(ConstIndexType<PortIdx>, std::index_sequence<PinIdx...>) {
@@ -79,13 +86,17 @@ class GpioBase {
 		return std::make_tuple(IterateThruPorts(ConstIndexType<Idx>{})...);
 	}
 
+	template <std::size_t... Idx>
+	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...>) noexcept {
+		(gpio_enable_periph_clock(PinGrouper::getPort(ConstIndexType<Idx>{})), ...);
+	}
+
  protected:
 	static constexpr auto ALL_PIN_NAMES = std::tuple{PinNames...};
 
-	static constexpr auto makeGpioGroupList() {
-		using PortIterator = std::make_index_sequence<PinGrouper::getUsedPortNum()>;
-		return makeGpioGroupListImp(PortIterator{});
-	}
+	static constexpr auto makeGpioGroupList() noexcept { return makeGpioGroupListImp(PortIterator{}); }
+
+	static constexpr void enableAllGpioClk() noexcept { enableAllGpioClkImp(PortIterator{}); }
 };
 
 #endif	// DRIVER_UTILITY_HPP_
