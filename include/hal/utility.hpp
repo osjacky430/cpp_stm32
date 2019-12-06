@@ -2,11 +2,11 @@
  * @Date:   2019-11-20T17:34:25+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: utility.hpp
- * @Last modified time: 2019-11-25T23:01:43+08:00
+ * @Last modified time: 2019-12-06T12:57:37+08:00
  */
 
-#ifndef UTILITY_HPP_
-#define UTILITY_HPP_
+#ifndef HAL_UTILITY_HPP_
+#define HAL_UTILITY_HPP_
 
 #include <cstdint>
 #include <type_traits>
@@ -29,4 +29,4 @@ constexpr auto operator"" _MHz(std::uint64_t freq) noexcept { return freq * 1000
 constexpr auto operator"" _MHz(long double freq) noexcept { return freq * 1000ULL; }
 constexpr auto operator"" _KHz(std::uint64_t freq) noexcept { return freq * 1000ULL; }
 
-#endif
+#endif	// HAL_UTILITY_HPP_

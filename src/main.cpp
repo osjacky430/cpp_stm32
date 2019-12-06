@@ -2,31 +2,26 @@
  * @Date:   2019-11-19T14:00:12+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: main.cpp
- * @Last modified time: 2019-11-27T22:03:19+08:00
+ * @Last modified time: 2019-12-05T18:57:33+08:00
  */
 
-#include "include/gpio.hpp"
-#include "include/nvic.hpp"
-#include "include/rcc.hpp"
-// [[gnu::constructor(101)]] void init_test() {}
+#include "include/hal/gpio.hpp"
+#include "include/hal/nvic.hpp"
+#include "include/hal/rcc.hpp"
 
-constexpr void set_rcc() noexcept {
-	// HseClk<HseClkSrc::Bypass>::setup();
-}
+#include "include/driver/digitalout.hpp"
 
 int main() {
-	set_rcc();
-	// Interrupt<IrqNum::WindowWatchDog>::enable();
 	RccPeriphController<RccPeriph::GPIOA>::enable();
 
-	GpioController<GpioPort::PortA, GpioPin::Pin5> led;
-	led.modeSetup(GpioMode::Output, GpioPupd::None);
+	DigitalOut<PinName::PA_5> led;
+	gpio_mode_setup(GpioPort::PortA, GpioMode::Output, GpioPupd::None, GpioPin::Pin5);
 
 	while (true) {
 		for (int i = 0; i < 1000000; ++i) {
 		}
 
-		led.toggle();
+		gpio_toggle(GpioPort::PortA, GpioPin::Pin5);
 	}
 
 	return 0;

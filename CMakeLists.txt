@@ -14,7 +14,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles ${LINKER_SCR
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-add_library(cpp_stm32 ${CMAKE_SOURCE_DIR}/include/cortex_m_vector.cpp)
+add_library(cpp_stm32 ${CMAKE_SOURCE_DIR}/include/hal/cortex_m_vector.cpp)
 add_executable(main.elf src/main.cpp)
 target_link_libraries(main.elf cpp_stm32)
 add_custom_target(main.bin ALL ${CMAKE_OBJCOPY} -Obinary main.elf main.bin DEPENDS main.elf)
