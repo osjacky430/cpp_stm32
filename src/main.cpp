@@ -12,8 +12,6 @@
 #include "include/driver/digitalout.hpp"
 
 int main() {
-	// RCC_EN_PERIPH_CLK(RccPeriph::GPIOA);
-
 	DigitalOut<PinName::PA_5> led;
 
 	while (true) {

@@ -44,16 +44,16 @@ class PinGroupingHelper {
 
  public:
 	template <std::size_t N>
-	static constexpr auto getPort(ConstIndexType<N>) {
+	static constexpr auto getPort(ConstIndexType<N>) noexcept {
 		return std::get<N>(portList);
 	}
 
 	template <std::size_t N>
-	static constexpr auto getPin(ConstIndexType<N>) {
+	static constexpr auto getPin(ConstIndexType<N>) noexcept {
 		return std::get<N>(pinList);
 	}
 
-	static constexpr auto getUsedPortNum() { return std::tuple_size<decltype(portList)>::value; }
+	static constexpr auto getUsedPortNum() noexcept { return std::tuple_size<decltype(portList)>::value; }
 };
 
 template <PinName... PinNames>
@@ -63,8 +63,8 @@ class GpioBase {
 	using PortIterator = std::make_index_sequence<PinGrouper::getUsedPortNum()>;
 
 	template <std::size_t PortIdx, std::size_t... PinIdx>
-	static constexpr auto groupPinByPort(ConstIndexType<PortIdx>, std::index_sequence<PinIdx...>) {
-		constexpr auto IterateThruPins = [](const auto t_pin_idx) {
+	static constexpr auto groupPinByPort(ConstIndexType<PortIdx>, std::index_sequence<PinIdx...>) noexcept {
+		constexpr auto IterateThruPins = [](const auto t_pin_idx) noexcept {
 			if constexpr (constexpr auto pin_name = std::get<t_pin_idx()>(ALL_PIN_NAMES);
 										PinGrouper::getPort(ConstIndexType<PortIdx>{}) == PinNameMap::getPortFromPinMap(pin_name)) {
 				return std::tuple{PinNameMap::getPinFromPinMap(pin_name)};
@@ -77,7 +77,7 @@ class GpioBase {
 	}
 
 	template <std::size_t... Idx>
-	static constexpr auto makeGpioGroupListImp(std::index_sequence<Idx...>) {
+	static constexpr auto makeGpioGroupListImp(std::index_sequence<Idx...>) noexcept {
 		constexpr auto IterateThruPorts = [](const auto t_port_iter) {
 			using pinIterator = std::make_index_sequence<sizeof...(PinNames)>;
 			return groupPinByPort(t_port_iter, pinIterator{});
