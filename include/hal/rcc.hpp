@@ -13,48 +13,48 @@
 #include "memory_map.hpp"
 #include "sys_info.hpp"
 
-constexpr auto set_offset_and_bit(const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
-	return t_offset << 5U + t_bit;
-}
-
-constexpr auto get_offset_and_bit(const std::uint32_t t_rcc_periph) noexcept -> std::array<std::uint32_t, 2> {
-	return {t_rcc_periph >> 5U, 1U << (t_rcc_periph & 0x1FU)};
-}
-
 enum class RccPeriph : std::uint32_t {
 	GPIOA,
 };
 
 class RccPeriphClk {
  private:
+	static constexpr auto setOffsetAndBit = [](const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
+		return t_offset << 5U + t_bit;
+	};
+
+	static constexpr auto getOffsetAndBit = [](const std::uint32_t t_rcc_periph) noexcept {
+		return std::array<std::uint32_t, 2>{t_rcc_periph >> 5U, 1U << (t_rcc_periph & 0x1FU)};
+	};
+
 	static constexpr std::array RccPeriphRst{
-		set_offset_and_bit(0x10, 0),	// GPIOA
+		setOffsetAndBit(0x10, 0),	// GPIOA
 	};
 
 	static constexpr std::array RccPeriphEn{
-		set_offset_and_bit(0x30, 0),	// GPIOA
-		set_offset_and_bit(0x30, 1),	// GPIOB
+		setOffsetAndBit(0x30, 0),	// GPIOA
+		setOffsetAndBit(0x30, 1),	// GPIOB
 	};
 
  public:
 	static constexpr auto getEnableReg(const RccPeriph t_periph_clk) noexcept {
-		return RccPeriphEn[to_underlying(t_periph_clk)];
+		return getOffsetAndBit(RccPeriphEn[to_underlying(t_periph_clk)]);
 	}
 
 	static constexpr auto getResetReg(const RccPeriph t_periph_clk) noexcept {
-		return RccPeriphRst[to_underlying(t_periph_clk)];
+		return getOffsetAndBit(RccPeriphRst[to_underlying(t_periph_clk)]);
 	}
 };
 
 static constexpr auto RCC_BASE = memory_at(to_underlying(MemoryMap::Ahb1Base), 0x3800U);
 static constexpr auto RCC_CR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x00U); };
 static constexpr auto RCC_EN_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = get_offset_and_bit(RccPeriphClk::getEnableReg(t_periph_clk));
+	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = RccPeriphClk::getEnableReg(t_periph_clk);
 	MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
 };
 static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
 	static_assert(std::is_same_v<decltype(t_periph_clk), const RccPeriph>);
-	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = get_offset_and_bit(RccPeriphClk::getResetReg(t_periph_clk));
+	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccPeriphClk::getResetReg(t_periph_clk);
 	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
 };
 static constexpr auto RCC_PLLCFGR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x04U); };
