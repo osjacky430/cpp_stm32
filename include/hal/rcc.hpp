@@ -9,6 +9,7 @@
 #define RCC_HPP_
 
 #include <array>
+#include <utility>
 
 #include "memory_map.hpp"
 #include "sys_info.hpp"
@@ -59,8 +60,43 @@ static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept 
 };
 static constexpr auto RCC_PLLCFGR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x04U); };
 
-class RccSysClkReg {
-	static constexpr std::array RccOscOn{1};
+enum class RccOsc {
+	HsiOsc,
+	HseOsc,
+	PllOsc,
+	PllSaiOsc,
 };
+
+class RccOscReg {
+ private:
+	static constexpr std::array RccOscOn{
+		std::pair{RCC_CR, 0},		// HSI
+		std::pair{RCC_CR, 16},	// HSE
+		std::pair{RCC_CR, 24},	// PLL
+		std::pair{RCC_CR, 26},	// PLLSAI
+	};
+
+	static constexpr std::array RccOscRdy{
+		std::pair{RCC_CR, 1},		// HSI
+		std::pair{RCC_CR, 17},	// HSE
+		std::pair{RCC_CR, 25},	// PLL
+		std::pair{RCC_CR, 27},	// PLLSAI
+	};
+
+ public:
+	static constexpr auto getOscOnReg(const RccOsc t_rcc_osc) noexcept { return RccOscOn[to_underlying(t_rcc_osc)]; }
+
+	static constexpr auto getOscRdyReg(const RccOsc t_rcc_osc) noexcept { return RccOscRdy[to_underlying(t_rcc_osc)]; }
+};
+
+static inline void rcc_enable_clk(const RccOsc t_rcc_osc) noexcept {
+	const auto& [CTL_REG, enable_bit_shift] = RccOscReg::getOscOnReg(t_rcc_osc);
+	CTL_REG() |= (1U << enable_bit_shift);
+}
+
+static inline bool rcc_is_osc_rdy(const RccOsc t_rcc_osc) noexcept {
+	const auto& [CTL_REG, rdy_bit_shift] = RccOscReg::getOscRdyReg(t_rcc_osc);
+	return (CTL_REG() & (1U << rdy_bit_shift));
+}
 
 #endif	// RCC_HPP_

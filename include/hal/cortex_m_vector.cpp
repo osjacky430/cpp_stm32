@@ -12,26 +12,26 @@ void null_handler();
 void blocking_handler();
 
 [[gnu::section((".IrqVector"))]] const IrqVector irq_vector_table{
-		&STACK,
-		reset_handler,
-		nmi_handler,
-		hard_fault_handler,
-		mem_manage_fault_handler,
-		bus_fault_handler,
-		usage_fault_handler,
-		{
-				IrqVector::Reserved{},
-		},
-		service_call_handler,
-		debug_monitor_handler,
-		{
-				IrqVector::Reserved{},
-		},
-		pending_service_call_handler,
-		system_clock_tick_handler,
-		{
-				IrqVector::Reserved{},	// @todo add the rest of interrupt handler
-		},
+	&STACK,
+	reset_handler,
+	nmi_handler,
+	hard_fault_handler,
+	mem_manage_fault_handler,
+	bus_fault_handler,
+	usage_fault_handler,
+	{
+		IrqVector::Reserved{},
+	},
+	service_call_handler,
+	debug_monitor_handler,
+	{
+		IrqVector::Reserved{},
+	},
+	pending_service_call_handler,
+	system_clock_tick_handler,
+	{
+		IrqVector::Reserved{},	// @todo add the rest of interrupt handler
+	},
 };
 
 void reset_handler() {

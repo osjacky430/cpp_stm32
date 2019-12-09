@@ -28,10 +28,10 @@ class DigitalOut : public GpioBase<PinNames...> {
 	using GpioGroupIterator = std::make_index_sequence<std::tuple_size<decltype(gpioGroupList)>::value>;
 
 	template <typename Tuple, std::size_t... Idx>
-	constexpr void modeSetupImp(const Tuple t_tup, std::index_sequence<Idx...>) const noexcept {
-		constexpr auto gpio_mode_setup_for_gpio_group = [](const auto t_tup, const auto num) constexpr noexcept {
-			auto param_list = std::tuple_cat(std::make_tuple(PinGrouper::getPort(num), GpioMode::Output, GpioPupd::None),
-																			 std::get<num()>(t_tup));
+	static constexpr void modeSetupImp(Tuple const& t_tup, std::index_sequence<Idx...>) noexcept {
+		constexpr auto gpio_mode_setup_for_gpio_group = [](const auto& t_tup, const auto num) constexpr noexcept {
+			const auto param_list = std::tuple_cat(
+				std::make_tuple(PinGrouper::getPort(num), GpioMode::Output, GpioPupd::None), std::get<num()>(t_tup));
 
 			std::apply([](auto&&... args) { gpio_mode_setup(std::forward<decltype(args)>(args)...); }, param_list);
 		};
@@ -40,9 +40,9 @@ class DigitalOut : public GpioBase<PinNames...> {
 	}
 
 	template <typename Tuple, std::size_t... Idx>
-	constexpr void toggleImp(const Tuple tup, std::index_sequence<Idx...>) const noexcept {
+	static constexpr void toggleImp(Tuple const tup, std::index_sequence<Idx...>) noexcept {
 		constexpr auto gpio_toggle_for_gpio_group = [](const auto t_tup, const auto num) constexpr noexcept {
-			auto param_list = std::tuple_cat(std::make_tuple(PinGrouper::getPort(num)), std::get<num()>(t_tup));
+			const auto param_list = std::tuple_cat(std::make_tuple(PinGrouper::getPort(num)), std::get<num()>(t_tup));
 
 			std::apply([](auto&&... args) { gpio_toggle(std::forward<decltype(args)>(args)...); }, param_list);
 		};
@@ -56,12 +56,12 @@ class DigitalOut : public GpioBase<PinNames...> {
 		GpioBase<PinNames...>::enableAllGpioClk();
 
 		// setup mode
-		this->modeSetup();
+		modeSetup();
 	}
 
-	constexpr void modeSetup() const noexcept { modeSetupImp(gpioGroupList, GpioGroupIterator{}); }
+	static constexpr void modeSetup() noexcept { modeSetupImp(gpioGroupList, GpioGroupIterator{}); }
 
-	constexpr void toggle() const noexcept { toggleImp(gpioGroupList, GpioGroupIterator{}); }
+	static constexpr void toggle() noexcept { toggleImp(gpioGroupList, GpioGroupIterator{}); }
 };
 
 #endif	// DIGITAL_OUT_HPP_

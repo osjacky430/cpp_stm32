@@ -15,23 +15,23 @@ struct IrqVector {
 	using IrqFuncPtr = void (*)();
 	using Reserved = std::nullptr_t;
 
-	std::uint32_t *initialStackPtr;	 //
-	IrqFuncPtr reset;								 // reset handler
-	IrqFuncPtr nmi;									 // non maskable interrupt handler
-	IrqFuncPtr hardFault;						 // hard fault handler
-	IrqFuncPtr memManFault;					 // memory manage fault handler
-	IrqFuncPtr busFault;						 // bus fault handler
-	IrqFuncPtr usageFault;					 // usage fault handler
+	std::uint32_t const* const initialStackPtr;	//
+	IrqFuncPtr const reset;											 // reset handler
+	IrqFuncPtr const nmi;												 // non maskable interrupt handler
+	IrqFuncPtr const hardFault;									 // hard fault handler
+	IrqFuncPtr const memManFault;								 // memory manage fault handler
+	IrqFuncPtr const busFault;									 // bus fault handler
+	IrqFuncPtr const usageFault;								 // usage fault handler
 
-	IrqFuncPtr exception7To10IsReserved[4];
+	IrqFuncPtr const exception7To10IsReserved[4];
 
-	IrqFuncPtr serviceCall;		// service call (SV) handler
-	IrqFuncPtr debugMonitor;	// debug monitor handler
+	IrqFuncPtr const serviceCall;		// service call (SV) handler
+	IrqFuncPtr const debugMonitor;	// debug monitor handler
 
-	IrqFuncPtr exception13IsReserved[1];
+	IrqFuncPtr const exception13IsReserved[1];
 
-	IrqFuncPtr pendServiceCall;	 // pending service call handler
-	IrqFuncPtr sysTick;					 // system tick handler
+	IrqFuncPtr const pendServiceCall;	// pending service call handler
+	IrqFuncPtr const sysTick;					 // system tick handler
 	IrqFuncPtr irq[91];
 };
 
