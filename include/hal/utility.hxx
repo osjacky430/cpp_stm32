@@ -2,11 +2,10 @@
  * @Date:   2019-11-20T17:34:25+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: utility.hpp
- * @Last modified time: 2019-12-06T12:57:37+08:00
+ * @Last modified time: 2019-12-11T16:50:03+08:00
  */
 
-#ifndef HAL_UTILITY_HPP_
-#define HAL_UTILITY_HPP_
+#pragma once
 
 #include <cstdint>
 #include <type_traits>
@@ -18,7 +17,7 @@ constexpr decltype(auto) MMIO(std::uint32_t addr, const std::uint16_t offset) no
 
 constexpr auto MMIO32 = MMIO<std::uint32_t>;
 constexpr auto MMIO16 = MMIO<std::uint16_t>;
-constexpr auto MMIO8 = MMIO<std::uint8_t>;
+constexpr auto MMIO8	= MMIO<std::uint8_t>;
 
 template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
 constexpr auto to_underlying(Enum t_e) noexcept {
@@ -28,5 +27,3 @@ constexpr auto to_underlying(Enum t_e) noexcept {
 constexpr auto operator"" _MHz(std::uint64_t freq) noexcept { return freq * 1000000ULL; }
 constexpr auto operator"" _MHz(long double freq) noexcept { return freq * 1000ULL; }
 constexpr auto operator"" _KHz(std::uint64_t freq) noexcept { return freq * 1000ULL; }
-
-#endif	// HAL_UTILITY_HPP_

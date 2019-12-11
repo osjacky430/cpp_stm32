@@ -2,13 +2,13 @@
  * @Date:   2019-11-23T16:40:20+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: gpio.hpp
- * @Last modified time: 2019-12-05T19:06:47+08:00
+ * @Last modified time: 2019-12-11T16:51:04+08:00
  */
 #ifndef GPIO_HPP_
 #define GPIO_HPP_
 
-#include "memory_map.hpp"
-#include "utility.hpp"
+#include "include/hal/register/memory_map.hpp"
+#include "include/hal/utility.hxx"
 
 enum class GpioPort { PortA, PortB, PortC, Total };
 
@@ -59,7 +59,7 @@ constexpr void gpio_mode_setup(const GpioPort t_port, const GpioMode t_mode, con
 template <typename... Pins>
 constexpr void gpio_toggle(const GpioPort t_port, Pins... t_all_of_pins) noexcept {
 	const auto pins = (... | (1U << to_underlying(t_all_of_pins)));
-	const auto odr = GPIO_ODR(t_port);
+	const auto odr	= GPIO_ODR(t_port);
 
 	GPIO_BSRR(t_port) = ((odr & pins) << 16U) | (~odr & pins);
 }

@@ -1,7 +1,7 @@
 # @Date:   2019-11-20T03:30:18+08:00
 # @Email:  osjacky430@gmail.com
 # @Filename: .clang-format
-# @Last modified time: 2019-11-20T17:33:31+08:00
+# @Last modified time: 2019-12-10T21:43:31+08:00
 
 
 
@@ -10,7 +10,7 @@ Language:        Cpp
 # BasedOnStyle:  Google
 AccessModifierOffset: -1
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
+AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlinesLeft: true
 AlignOperands:   true

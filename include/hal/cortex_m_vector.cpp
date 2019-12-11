@@ -2,10 +2,10 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-11-29T20:16:29+08:00
+ * @Last modified time: 2019-12-11T14:29:56+08:00
  */
 
-#include "cortex_m_vector.hpp"
+#include "include/hal/cortex_m_vector.hpp"
 
 int main();
 void null_handler();
@@ -42,7 +42,7 @@ void reset_handler() {
 	extern FuncPtr __fini_array_start, __fini_array_end;
 
 	extern unsigned load_data_start_addr_, sdata_, edata_;
-	volatile unsigned* src = &load_data_start_addr_;
+	volatile unsigned* src	= &load_data_start_addr_;
 	volatile unsigned* dest = &sdata_;
 
 	for (; dest < &edata_; ++src, ++dest) {
