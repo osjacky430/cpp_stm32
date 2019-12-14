@@ -2,12 +2,12 @@
  * @Date:   2019-11-23T16:40:20+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: gpio.hpp
- * @Last modified time: 2019-12-11T16:51:04+08:00
+ * @Last modified time: 2019-12-13T20:31:03+08:00
  */
 #ifndef GPIO_HPP_
 #define GPIO_HPP_
 
-#include "include/hal/register/memory_map.hpp"
+#include "include/hal/memory_map.hxx"
 #include "include/hal/utility.hxx"
 
 enum class GpioPort { PortA, PortB, PortC, Total };

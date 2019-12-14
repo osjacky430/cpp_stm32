@@ -2,7 +2,7 @@
  * @Date:   2019-11-29T20:17:17+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: digitalout.hpp
- * @Last modified time: 2019-12-06T13:38:32+08:00
+ * @Last modified time: 2019-12-14T00:03:59+08:00
  */
 
 #ifndef DIGITAL_OUT_HPP_
@@ -17,14 +17,14 @@
 #include "include/driver/utility.hpp"
 
 #include "include/hal/gpio.hpp"
-#include "include/hal/rcc.hpp"
+#include "include/hal/peripheral/rcc.hxx"
 
 template <PinName... PinNames>
 class DigitalOut : public GpioBase<PinNames...> {
  private:
 	static constexpr auto gpioGroupList = GpioBase<PinNames...>::makeGpioGroupList();
 
-	using PinGrouper = PinGroupingHelper<PinNames...>;
+	using PinGrouper				= PinGroupingHelper<PinNames...>;
 	using GpioGroupIterator = std::make_index_sequence<std::tuple_size<decltype(gpioGroupList)>::value>;
 
 	template <typename Tuple, std::size_t... Idx>

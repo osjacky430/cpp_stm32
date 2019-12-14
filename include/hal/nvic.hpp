@@ -2,12 +2,12 @@
  * @Date:   2019-11-20T17:17:14+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: nvic.hpp
- * @Last modified time: 2019-12-11T16:51:27+08:00
+ * @Last modified time: 2019-12-13T20:31:17+08:00
  */
 #ifndef NVIC_HPP_
 #define NVIC_HPP_
 
-#include "include/hal/register/memory_map.hpp"
+#include "include/hal/memory_map.hxx"
 #include "include/hal/utility.hxx"
 
 enum class IrqNum : std::uint8_t {

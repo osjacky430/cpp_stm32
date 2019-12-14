@@ -2,18 +2,19 @@
  * @Date:   2019-11-19T14:00:12+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: main.cpp
- * @Last modified time: 2019-12-11T00:50:51+08:00
+ * @Last modified time: 2019-12-14T02:51:36+08:00
  */
 
 #include "include/hal/gpio.hpp"
 #include "include/hal/nvic.hpp"
-#include "include/hal/rcc.hpp"
+#include "include/hal/peripheral/rcc.hxx"
 
 #include "include/driver/digitalout.hpp"
 
 int main() {
-	// rcc_enable_clk<RccOsc::HsiOsc>();
-	// rcc_is_osc_rdy<RccOsc::HsiOsc>();
+	// RCC_CR.setBit<RccCrReg::HsiOn>();
+	rcc_enable_clk<RccOsc::HsiOsc>();
+	// RCC_PLLCFGR.setBit<RccPllCfgBit::PLLM>(PllM{DivisionFactor_v<20U>});
 
 	DigitalOut<PinName::PA_5> led;
 

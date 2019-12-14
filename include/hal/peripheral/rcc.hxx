@@ -2,7 +2,7 @@
  * @Date:   2019-11-25T00:54:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc.hpp
- * @Last modified time: 2019-12-11T18:22:21+08:00
+ * @Last modified time: 2019-12-14T02:54:49+08:00
  */
 
 #ifndef RCC_HPP_
@@ -12,9 +12,8 @@
 #include <tuple>
 #include <utility>
 
-#include "register/memory_map.hpp"
-#include "register/rcc_reg.hpp"
-#include "register/utility.hpp"
+#include "include/hal/memory_map.hxx"
+#include "include/hal/peripheral/memory/rcc_reg.hxx"
 
 #include "sys_info.hpp"
 
@@ -80,37 +79,37 @@ struct ExtClk {
 class RccOscReg {
  private:
 	static constexpr std::tuple RccOscOn{
-		std::pair{RCC_CR, RccClkRegBit::HsiOn},			// HSI
-		std::pair{RCC_CR, RccClkRegBit::HseOn},			// HSE
-		std::pair{RCC_CR, RccClkRegBit::PllOn},			// PLL
-		std::pair{RCC_CR, RccClkRegBit::PllSaiOn},	// PLLSAI
+		std::pair{RCC_CR, RccCrReg::HsiOn},
+		std::pair{RCC_CR, RccCrReg::HseOn},
+		std::pair{RCC_CR, RccCrReg::PllOn},
+		std::pair{RCC_CR, RccCrReg::PllSaiOn},
 	};
 
 	static constexpr std::tuple RccOscRdy{
-		std::pair{RCC_CR, RccClkRegBit::HsiRdy},		 // HSI
-		std::pair{RCC_CR, RccClkRegBit::HseRdy},		 // HSE
-		std::pair{RCC_CR, RccClkRegBit::PllRdy},		 // PLL
-		std::pair{RCC_CR, RccClkRegBit::PllSaiRdy},	 // PLLSAI
+		std::pair{RCC_CR, RccCrReg::HsiRdy},
+		std::pair{RCC_CR, RccCrReg::HseRdy},
+		std::pair{RCC_CR, RccCrReg::PllRdy},
+		std::pair{RCC_CR, RccCrReg::PllSaiRdy},
 	};
 
 	static constexpr std::tuple ExtBypass{
-		std::pair{RCC_CR, RccClkRegBit::HseBypass},	 // HSE
-		std::pair{RCC_BDCR, 2},											 // LSE
+		std::pair{RCC_CR, RccCrReg::HseBypass},
+		std::pair{RCC_BDCR, 2},
 	};
 
  public:
 	template <RccOsc Clk>
-	static constexpr auto getOscOnReg() noexcept {
+	static constexpr auto const getOscOnReg() noexcept {
 		return std::get<to_underlying(Clk)>(RccOscOn);
 	}
 
 	template <RccOsc Clk>
-	static constexpr auto getOscRdyReg() noexcept {
+	static constexpr auto const getOscRdyReg() noexcept {
 		return std::get<to_underlying(Clk)>(RccOscRdy);
 	}
 
 	template <RccOsc Clk>
-	static constexpr auto getExtBypassReg(ExtClk<Clk> const) noexcept {
+	static constexpr auto const& getExtBypassReg(ExtClk<Clk> const) noexcept {
 		if constexpr (Clk == RccOsc::HseOsc) {
 			return std::get<0>(ExtBypass);
 		} else if constexpr (Clk == RccOsc::LseOsc) {
@@ -121,26 +120,28 @@ class RccOscReg {
 
 template <RccOsc Clk>
 static constexpr void rcc_enable_clk() noexcept {
-	const auto& [CTL_REG, enable_bit] = RccOscReg::getOscOnReg<Clk>();
-	CTL_REG |= enable_bit;
+	constexpr auto const reg_bit_pair = RccOscReg::getOscOnReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<enable_bit>();
 }
-
-template <RccOsc Clk>
-static constexpr bool rcc_is_osc_rdy() noexcept {
-	const auto& [CTL_REG, rdy_bit] = RccOscReg::getOscRdyReg<Clk>();
-	return (CTL_REG & rdy_bit);
-}
-
-template <RccOsc Clk>
-static constexpr void rcc_bypass_clksrc() noexcept {
-	const auto& [CTL_REG, bypass_bit_shift] = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
-	(CTL_REG() |= (1U << bypass_bit_shift));
-}
-
-template <RccOsc Clk>
-static constexpr void rcc_no_bypass() noexcept {
-	const auto& [CTL_REG, bypass_bit_shift] = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
-	(CTL_REG() &= ~(1U << bypass_bit_shift));
-}
+//
+// template <RccOsc Clk>
+// static constexpr bool rcc_is_osc_rdy() noexcept {
+// 	const auto& [CTL_REG, rdy_bit] = RccOscReg::getOscRdyReg<Clk>();
+// 	return (CTL_REG & rdy_bit);
+// }
+//
+// template <RccOsc Clk>
+// static constexpr void rcc_bypass_clksrc() noexcept {
+// 	const auto& [CTL_REG, bypass_bit_shift] = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
+// 	(CTL_REG() |= (1U << bypass_bit_shift));
+// }
+//
+// template <RccOsc Clk>
+// static constexpr void rcc_no_bypass() noexcept {
+// 	const auto& [CTL_REG, bypass_bit_shift] = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
+// 	(CTL_REG() &= ~(1U << bypass_bit_shift));
+// }
 
 #endif	// RCC_HPP_

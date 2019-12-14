@@ -2,10 +2,9 @@
  * @Date:   2019-11-20T23:21:56+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: memory_map.hpp
- * @Last modified time: 2019-12-11T16:50:37+08:00
+ * @Last modified time: 2019-12-13T20:30:58+08:00
  */
-#ifndef MEMORY_MAP_HPP_
-#define MEMORY_MAP_HPP_
+#pragma once
 
 #include <type_traits>
 
@@ -49,5 +48,3 @@ enum class Scs : std::uint32_t {
 	FpuBase	 = memory_at(Ippb::ScsBase, 0xD88),
 	MpuBase	 = memory_at(Ippb::ScsBase, 0xD90),
 };
-
-#endif
