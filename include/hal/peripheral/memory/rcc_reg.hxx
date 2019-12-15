@@ -2,7 +2,7 @@
  * @Date:   2019-12-10T21:40:38+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc_reg.hpp
- * @Last modified time: 2019-12-14T01:04:11+08:00
+ * @Last modified time: 2019-12-15T14:56:14+08:00
  */
 
 #pragma once
@@ -31,12 +31,15 @@ class RccCrBitList {
 
  private:
 	static constexpr std::tuple BIT_LIST{
-		Bit<1>{BitPos_t(0)},	// HsiOn
-		Bit<1>{BitPos_t(1)},	// HsiRdy
+		Bit<1>{BitPos_t(0)},	 // HsiOn
+		Bit<1>{BitPos_t(1)},	 // HsiRdy
+		Bit<1>{BitPos_t(16)},	 // HseOn
+		Bit<1>{BitPos_t(17)},	 // HseRdy
+		Bit<1>{BitPos_t(18)},	 // HseBypass
 	};
 };
 
-enum class RccCrReg {
+enum class RccCrBit {
 	HsiOn,
 	HsiRdy,
 	HseOn,
@@ -49,7 +52,7 @@ enum class RccCrReg {
 	PllSaiRdy,
 };
 
-static constexpr Register<RccCrBitList, RccCrReg> RCC_CR{RCC_BASE, 0};
+static constexpr Register<RccCrBitList, RccCrBit> RCC_CR{RCC_BASE, 0};
 
 /** @}*/
 
@@ -59,13 +62,40 @@ static constexpr Register<RccCrBitList, RccCrReg> RCC_CR{RCC_BASE, 0};
  * @{
  */
 
+struct PllM {
+ private:
+	std::uint32_t const m_pllmDivisionFactor;
+
+ public:
+	template <std::uint32_t Val>
+	constexpr PllM(DivisionFactor_t<Val> const&) : m_pllmDivisionFactor(Val) {
+		static_assert(2 <= Val && Val <= 63);
+	}
+
+	constexpr auto get() const noexcept { return m_pllmDivisionFactor; };
+};
+
+struct PllN {
+ private:
+	std::uint32_t const m_pllnDivisionFactor;
+
+ public:
+	template <std::uint32_t Val>
+	constexpr PllN(DivisionFactor_t<Val> const&) : m_pllnDivisionFactor(Val) {
+		static_assert(50 <= Val && Val <= 432);
+	}
+
+	constexpr auto get() const noexcept { return m_pllnDivisionFactor; };
+};
+
 class RccPllcfgrBitList {
 	template <typename BitList, std::size_t Idx>
 	friend constexpr auto get_bit() noexcept;
 
  private:
 	static constexpr std::tuple BIT_LIST{
-		Bit<6>{BitPos_t(0)},
+		Bit<6, PllM>{BitPos_t{0}},
+		Bit<9, PllN>{BitPos_t{6}},
 	};
 };
 
@@ -74,22 +104,11 @@ enum class RccPllCfgBit {
 	PLLN,
 };
 
-struct PllM {
- private:
-	std::uint32_t const m_plllmDivisionFactor;
-
- public:
-	template <std::uint32_t Val>
-	constexpr PllM(DivisionFactor_t<Val> const&) : m_plllmDivisionFactor(Val) {
-		static_assert(2 <= Val && Val <= 63);
-	}
-
-	constexpr auto get() const noexcept { return m_plllmDivisionFactor; };
-};
-
-static constexpr Register<RccPllcfgrBitList, RccPllCfgBit, PllM> RCC_PLLCFGR{RCC_BASE, 0x04U};
+static constexpr Register<RccPllcfgrBitList, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE, 0x04U};
 
 /** @}0*/
+
+enum class SysClk : std::uint32_t;
 
 enum class RccCfgBit {
 	SW,
@@ -98,3 +117,16 @@ enum class RccCfgBit {
 	PPRE1,
 	PPRE2,
 };
+
+class RccCfgBitList {
+	template <typename BitList, std::size_t Idx>
+	friend constexpr auto get_bit() noexcept;
+
+ private:
+	static constexpr std::tuple BIT_LIST{
+		Bit<2, SysClk>{BitPos_t(0)},	// SW
+		Bit<2, SysClk>{BitPos_t(2)},	// SWS
+	};
+};
+
+static constexpr Register<RccCfgBitList, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};

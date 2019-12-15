@@ -2,7 +2,7 @@
  * @Date:   2019-12-10T21:40:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: register.hpp
- * @Last modified time: 2019-12-14T01:36:56+08:00
+ * @Last modified time: 2019-12-15T14:52:42+08:00
  */
 
 #pragma once
@@ -19,7 +19,7 @@ static constexpr auto get_bit() noexcept {
 	return std::get<Idx>(BitList::BIT_LIST);
 }
 
-template <typename BitList, typename BitListIdx, typename... Args>
+template <typename BitList, typename BitListIdx>
 class Register {
  private:
 	std::uint32_t const m_base;
@@ -29,14 +29,6 @@ class Register {
 	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset) : m_base(base), m_offset(offset) {}
 
  public:
-	template <std::size_t Idx>
-	using ListOfAvailableType = typename std::tuple_element<Idx, std::tuple<Args...>>::type;
-
-	template <typename T, std::size_t... Idx>
-	static constexpr bool isTypeAvailable(T const &, std::index_sequence<Idx...>) noexcept {
-		return (std::is_same_v<ListOfAvailableType<Idx>, T> | ...);
-	}
-
 	template <BitListIdx BitIdx>
 	constexpr void setBit() const noexcept {
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
@@ -47,12 +39,24 @@ class Register {
 
 	template <BitListIdx BitIdx, typename ValueType>
 	constexpr void setBit(ValueType const &t_param) const noexcept {
-		static_assert(isTypeAvailable(t_param, std::make_index_sequence<sizeof...(Args)>{}));
-
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
-		const auto val		 = t_param.get();
+
+		static_assert(std::is_same_v<ValueType, typename decltype(bit)::AbstractType>);
+
+		MMIO32(m_base, m_offset) |= bit(t_param);
 	}
 
 	template <BitListIdx BitIdx>
-	constexpr auto read_bit() const noexcept {}
+	constexpr auto readBit() const noexcept {
+		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
+		using Ret_t				 = typename decltype(bit)::AbstractType;
+
+		return Ret_t{MMIO32(m_base, m_offset) & bit.mask};
+	}
+
+	template <BitListIdx BitIdx>
+	constexpr void clearBit() const noexcept {
+		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
+		MMIO32(m_base, m_offset) &= (~bit.mask);
+	}
 };

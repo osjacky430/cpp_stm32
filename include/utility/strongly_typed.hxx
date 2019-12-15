@@ -2,7 +2,7 @@
  * @Date:   2019-12-12T01:26:14+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: strongly_typed.hxx
- * @Last modified time: 2019-12-14T00:43:30+08:00
+ * @Last modified time: 2019-12-14T15:42:39+08:00
  */
 
 #pragma once
