@@ -2,7 +2,7 @@
  * @Date:   2019-12-10T21:40:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: register.hpp
- * @Last modified time: 2019-12-15T14:52:42+08:00
+ * @Last modified time: 2019-12-17T16:43:07+08:00
  */
 
 #pragma once
@@ -51,7 +51,7 @@ class Register {
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
 		using Ret_t				 = typename decltype(bit)::AbstractType;
 
-		return Ret_t{MMIO32(m_base, m_offset) & bit.mask};
+		return static_cast<Ret_t>(MMIO32(m_base, m_offset) & bit.mask);
 	}
 
 	template <BitListIdx BitIdx>

@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T14:00:12+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: main.cpp
- * @Last modified time: 2019-12-15T14:54:13+08:00
+ * @Last modified time: 2019-12-17T18:16:19+08:00
  */
 
 #include "include/hal/gpio.hpp"
@@ -10,14 +10,17 @@
 #include "include/hal/peripheral/rcc.hxx"
 
 #include "include/driver/digitalout.hpp"
+#include "include/hal/sys_info.hxx"
 
-constexpr void init_rcc() {
+constexpr void init_rcc() noexcept {
 	rcc_bypass_clksrc<RccOsc::HseOsc>();
 	rcc_set_sysclk<SysClk::Hse>();
 }
 
 int main() {
-	init_rcc();
+	// init_rcc();
+	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	// auto a = HPRE{DivisionFactor_v<4U>};
 	// RCC_CR.setBit<RccCrReg::HsiOn>();
 	// rcc_enable_clk<RccOsc::HsiOsc>();
 	// RCC_PLLCFGR.setBit<RccPllCfgBit::PLLM>(PllM{DivisionFactor_v<20U>});

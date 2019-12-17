@@ -2,7 +2,7 @@
  * @Date:   2019-11-25T00:54:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc.hpp
- * @Last modified time: 2019-12-15T15:10:12+08:00
+ * @Last modified time: 2019-12-17T14:24:12+08:00
  */
 
 #pragma once
@@ -14,8 +14,6 @@
 #include "include/hal/memory_map.hxx"
 #include "include/hal/peripheral/memory/rcc_reg.hxx"
 
-#include "sys_info.hpp"
-
 enum class RccPeriph : std::uint32_t {
 	GPIOA,
 };
@@ -23,7 +21,7 @@ enum class RccPeriph : std::uint32_t {
 class RccPeriphClk {
  private:
 	static constexpr auto setOffsetAndBit = [](const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
-		return t_offset << 5U + t_bit;
+		return (t_offset << 5U) + t_bit;
 	};
 
 	static constexpr auto getOffsetAndBit = [](const std::uint32_t t_rcc_periph) noexcept {
@@ -60,7 +58,7 @@ static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept 
 
 static constexpr auto RCC_BDCR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x70U); };
 
-enum class RccOsc {
+enum class RccOsc : std::uint32_t {
 	HsiOsc,
 	HseOsc,
 	PllOsc,
@@ -75,6 +73,11 @@ template <RccOsc Clk>
 struct ExtClk {
 	// something like integral constant, used for static assertion
 	static_assert(Clk == RccOsc::HseOsc || Clk == RccOsc::LseOsc);
+};
+
+template <RccOsc Clk>
+struct PllClkSrc {
+	static_assert(Clk == RccOsc::HseOsc || Clk == RccOsc::HsiOsc);
 };
 
 class RccOscReg {
@@ -128,12 +131,26 @@ static constexpr void rcc_enable_clk() noexcept {
 }
 
 template <RccOsc Clk>
+static constexpr void rcc_disable_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccOscReg::getOscOnReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<enable_bit>();
+}
+
+template <RccOsc Clk>
 static constexpr bool rcc_is_osc_rdy() noexcept {
 	constexpr auto const reg_bit_pair = RccOscReg::getOscRdyReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const rdy_bit			= std::get<1>(reg_bit_pair);
 
 	return CTL_REG.template readBit<rdy_bit>();
+}
+
+template <RccOsc Clk>
+static constexpr void rcc_wait_osc_rdy() noexcept {
+	while (!rcc_is_osc_rdy<Clk>()) {
+	}
 }
 
 template <RccOsc Clk>
@@ -158,5 +175,35 @@ static constexpr void rcc_set_sysclk() noexcept {
 }
 
 static constexpr SysClk rcc_sysclk_in_use() noexcept {
-	return RCC_CFGR.template readBit<RccCfgBit::SWS>();	 //
+	return RCC_CFGR.readBit<RccCfgBit::SWS>();	//
+}
+
+template <SysClk Clk>
+static constexpr void rcc_wait_sysclk_rdy() noexcept {
+	while (rcc_sysclk_in_use() != Clk) {
+	}
+}
+
+// shouldnt these constraints set in the beginning? (in rcc_reg.hxx)
+// consider abstracting the clock src, e.g. class Hse, class Hsi etc.
+// and use sfinae to ensure the availability, however, doing so maybe requires other functions
+// become template function even if there are no special requirements
+template <RccOsc Clk>
+static constexpr void rcc_set_pllsrc(PllClkSrc<Clk> const&) {
+	RCC_PLLCFGR.template setBit<RccPllCfgBit::PLLSRC>(Clk);
+}
+
+static constexpr void rcc_config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
+																										 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLM>(t_pllm);
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLN>(t_plln);
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLP>(t_pllp);
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLQ>(t_pllq);
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLR>(t_pllr);
+}
+
+static constexpr void rcc_config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
+	RCC_CFGR.setBit<RccCfgBit::HPRE>(t_hpre);
+	RCC_CFGR.setBit<RccCfgBit::PPRE1>(t_ppre1);
+	RCC_CFGR.setBit<RccCfgBit::PPRE2>(t_ppre2);
 }

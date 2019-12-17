@@ -2,19 +2,19 @@
  * @Date:   2019-12-11T18:51:06+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: bit.hxx
- * @Last modified time: 2019-12-15T14:53:19+08:00
+ * @Last modified time: 2019-12-15T19:57:41+08:00
  */
 
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "include/utility/strongly_typed.hxx"
 
 using BitPos_t		= StrongType<std::uint32_t, struct BitPosition>;
 using BitLength_t = StrongType<std::uint32_t, struct BitLength>;
 
-// maybe use underlying type for type constraint
 template <std::uint32_t L, typename DataType = bool>
 class Bit {
  public:
