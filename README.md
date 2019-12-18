@@ -11,3 +11,5 @@ Since there are alot of things going on here, I need to make a list of recent id
 - Add "Access" flag to `Register` to ensure correct MMIO operation.
 - Attach interrupt by assigning function pointer to extern variable `irq_vector_table`
 - Using `std::byte` for MMIO operation
+## Compiler in use
+I'm using two versions of compiler on different computers, one is arm-none-eabi-g++ 20190703 release, and arm-none-eabi-g++ 20180622 release, currently, formal compiler works pretty well, the later seems to have some issues and are still resolving.

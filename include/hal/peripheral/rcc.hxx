@@ -2,7 +2,7 @@
  * @Date:   2019-11-25T00:54:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc.hpp
- * @Last modified time: 2019-12-18T20:08:28+08:00
+ * @Last modified time: 2019-12-18T20:39:54+08:00
  */
 
 #pragma once
@@ -41,16 +41,8 @@ struct PllClkSrc {
 
 class RccAuxiliaryReg {
  private:
-	static constexpr auto setOffsetAndBit = [](const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
-		return (t_offset << 5U) + t_bit;
-	};
-
-	static constexpr auto getOffsetAndBit = [](const std::uint32_t t_rcc_periph) noexcept {
-		return std::array<std::uint32_t, 2>{t_rcc_periph >> 5U, 1U << (t_rcc_periph & 0x1FU)};
-	};
-
 	static constexpr std::array RccPeriphRst{
-		setOffsetAndBit(0x10, 0),	 // GPIOA
+		std::pair{RCC_AHB1RST, RccAhb1RstBit::GpioARst},
 	};
 
 	static constexpr std::tuple RccPeriphEn{
@@ -83,8 +75,9 @@ class RccAuxiliaryReg {
 		return std::get<to_underlying(PeriphClk)>(RccPeriphEn);
 	}
 
-	static constexpr auto getResetReg(const RccPeriph t_periph_clk) noexcept {
-		return getOffsetAndBit(RccPeriphRst[to_underlying(t_periph_clk)]);
+	template <RccPeriph PeriphClk>
+	static constexpr auto getResetReg() noexcept {
+		return std::get<to_underlying(PeriphClk)>(RccPeriphRst);
 	}
 
 	template <RccOsc Clk>
@@ -107,13 +100,16 @@ class RccAuxiliaryReg {
 	}
 };
 
-static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccAuxiliaryReg::getResetReg(t_periph_clk);
-	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
-};
-
 template <RccPeriph PeriphClk>
 static constexpr void rcc_enable_periph_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getEnableReg<PeriphClk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<enable_bit>();
+}
+
+template <RccPeriph PeriphClk>
+static constexpr void rcc_reset_periph_clk() noexcept {
 	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getEnableReg<PeriphClk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
