@@ -2,7 +2,7 @@
  * @Date:   2019-12-11T14:39:29+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: sys_info.hxx
- * @Last modified time: 2019-12-17T18:16:17+08:00
+ * @Last modified time: 2019-12-17T22:40:28+08:00
  */
 
 #pragma once
@@ -90,6 +90,8 @@ class SysClock {
 
 		rcc_disable_clk<RccOsc::PllOsc>();
 		rcc_set_pllsrc(PllClkSrc<PllSrc>{});
+
+		// @todo consider pllq and pllr according to sys_info.hpp
 		rcc_config_pll_division_factor(PllM{DivisionFactor_v<pllm>}, PllN{DivisionFactor_v<plln>},
 																	 PllP{DivisionFactor_v<pllp>}, PllQ{DivisionFactor_v<2U>},
 																	 PllR{DivisionFactor_v<2U>});

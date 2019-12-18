@@ -2,7 +2,7 @@
  * @Date:   2019-11-25T00:54:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc.hpp
- * @Last modified time: 2019-12-17T14:24:12+08:00
+ * @Last modified time: 2019-12-18T19:39:19+08:00
  */
 
 #pragma once
@@ -18,46 +18,6 @@ enum class RccPeriph : std::uint32_t {
 	GPIOA,
 };
 
-class RccPeriphClk {
- private:
-	static constexpr auto setOffsetAndBit = [](const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
-		return (t_offset << 5U) + t_bit;
-	};
-
-	static constexpr auto getOffsetAndBit = [](const std::uint32_t t_rcc_periph) noexcept {
-		return std::array<std::uint32_t, 2>{t_rcc_periph >> 5U, 1U << (t_rcc_periph & 0x1FU)};
-	};
-
-	static constexpr std::array RccPeriphRst{
-		setOffsetAndBit(0x10, 0),	 // GPIOA
-	};
-
-	static constexpr std::array RccPeriphEn{
-		setOffsetAndBit(0x30, 0),	 // GPIOA
-		setOffsetAndBit(0x30, 1),	 // GPIOB
-	};
-
- public:
-	static constexpr auto getEnableReg(const RccPeriph t_periph_clk) noexcept {
-		return getOffsetAndBit(RccPeriphEn[to_underlying(t_periph_clk)]);
-	}
-
-	static constexpr auto getResetReg(const RccPeriph t_periph_clk) noexcept {
-		return getOffsetAndBit(RccPeriphRst[to_underlying(t_periph_clk)]);
-	}
-};
-
-static constexpr auto RCC_EN_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = RccPeriphClk::getEnableReg(t_periph_clk);
-	MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
-};
-static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccPeriphClk::getResetReg(t_periph_clk);
-	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
-};
-
-static constexpr auto RCC_BDCR = []() noexcept -> decltype(auto) { return MMIO32(RCC_BASE, 0x70U); };
-
 enum class RccOsc : std::uint32_t {
 	HsiOsc,
 	HseOsc,
@@ -71,7 +31,6 @@ enum class SysClk : std::uint32_t { Hse, Hsi, Pllp, Pllr };
 
 template <RccOsc Clk>
 struct ExtClk {
-	// something like integral constant, used for static assertion
 	static_assert(Clk == RccOsc::HseOsc || Clk == RccOsc::LseOsc);
 };
 
@@ -80,8 +39,25 @@ struct PllClkSrc {
 	static_assert(Clk == RccOsc::HseOsc || Clk == RccOsc::HsiOsc);
 };
 
-class RccOscReg {
+class RccAuxiliaryReg {
  private:
+	static constexpr auto setOffsetAndBit = [](const std::uint32_t t_offset, const std::uint32_t t_bit) noexcept {
+		return (t_offset << 5U) + t_bit;
+	};
+
+	static constexpr auto getOffsetAndBit = [](const std::uint32_t t_rcc_periph) noexcept {
+		return std::array<std::uint32_t, 2>{t_rcc_periph >> 5U, 1U << (t_rcc_periph & 0x1FU)};
+	};
+
+	static constexpr std::array RccPeriphRst{
+		setOffsetAndBit(0x10, 0),	 // GPIOA
+	};
+
+	static constexpr std::tuple RccPeriphEn{
+		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioAEn},
+		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioBEn},
+	};
+
 	static constexpr std::tuple RccOscOn{
 		std::pair{RCC_CR, RccCrBit::HsiOn},
 		std::pair{RCC_CR, RccCrBit::HseOn},
@@ -97,11 +73,29 @@ class RccOscReg {
 	};
 
 	static constexpr std::tuple ExtBypass{
-		std::pair{RCC_CR, RccCrBit::HseBypass},
-		std::pair{RCC_BDCR, 2},
+		std::pair{RCC_CR, RccCrBit::HseByp},
+		std::pair{RCC_BDCR, RccBdcrBit::LseByp},
 	};
 
  public:
+	static constexpr std::array RccPeriphEn1{
+		setOffsetAndBit(0x30, 0),	 // GPIOA
+		setOffsetAndBit(0x30, 1),	 // GPIOB
+	};
+
+	static constexpr auto getEnableReg1(RccPeriph const t_periph_clk) noexcept {
+		return getOffsetAndBit(RccPeriphEn1[to_underlying(t_periph_clk)]);
+	}
+
+	template <RccPeriph PeriphClk>
+	static constexpr auto getEnableReg() noexcept {
+		return std::get<to_underlying(PeriphClk)>(RccPeriphEn);
+	}
+
+	static constexpr auto getResetReg(const RccPeriph t_periph_clk) noexcept {
+		return getOffsetAndBit(RccPeriphRst[to_underlying(t_periph_clk)]);
+	}
+
 	template <RccOsc Clk>
 	static constexpr auto const getOscOnReg() noexcept {
 		return std::get<to_underlying(Clk)>(RccOscOn);
@@ -122,9 +116,26 @@ class RccOscReg {
 	}
 };
 
+static constexpr auto RCC_EN_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
+	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = RccAuxiliaryReg::getEnableReg1(t_periph_clk);
+	MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
+};
+static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
+	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccAuxiliaryReg::getResetReg(t_periph_clk);
+	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
+};
+
+template <RccPeriph PeriphClk>
+static constexpr void rcc_enable_periph_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getEnableReg<PeriphClk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<enable_bit>();
+}
+
 template <RccOsc Clk>
 static constexpr void rcc_enable_clk() noexcept {
-	constexpr auto const reg_bit_pair = RccOscReg::getOscOnReg<Clk>();
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getOscOnReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<enable_bit>();
@@ -132,7 +143,7 @@ static constexpr void rcc_enable_clk() noexcept {
 
 template <RccOsc Clk>
 static constexpr void rcc_disable_clk() noexcept {
-	constexpr auto const reg_bit_pair = RccOscReg::getOscOnReg<Clk>();
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getOscOnReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<enable_bit>();
@@ -140,7 +151,7 @@ static constexpr void rcc_disable_clk() noexcept {
 
 template <RccOsc Clk>
 static constexpr bool rcc_is_osc_rdy() noexcept {
-	constexpr auto const reg_bit_pair = RccOscReg::getOscRdyReg<Clk>();
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getOscRdyReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const rdy_bit			= std::get<1>(reg_bit_pair);
 
@@ -155,7 +166,7 @@ static constexpr void rcc_wait_osc_rdy() noexcept {
 
 template <RccOsc Clk>
 static constexpr void rcc_bypass_clksrc() noexcept {
-	constexpr auto const reg_bit_pair = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getExtBypassReg(ExtClk<Clk>{});
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<bypass_bit>();
@@ -163,7 +174,7 @@ static constexpr void rcc_bypass_clksrc() noexcept {
 
 template <RccOsc Clk>
 static constexpr void rcc_no_bypass() noexcept {
-	constexpr auto const reg_bit_pair = RccOscReg::getExtBypassReg(ExtClk<Clk>{});
+	constexpr auto const reg_bit_pair = RccAuxiliaryReg::getExtBypassReg(ExtClk<Clk>{});
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<bypass_bit>();

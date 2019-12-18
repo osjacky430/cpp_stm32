@@ -2,7 +2,7 @@
  * @Date:   2019-12-10T21:40:38+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc_reg.hpp
- * @Last modified time: 2019-12-17T17:21:45+08:00
+ * @Last modified time: 2019-12-18T19:09:23+08:00
  */
 
 #pragma once
@@ -14,6 +14,15 @@
 #include "include/hal/memory_map.hxx"
 #include "include/hal/register/register.hpp"
 #include "include/utility/constexpr_algo.hxx"
+
+#define SETUP_REGISTER_INFO(Name, ...)                 \
+	class Name {                                         \
+		template <typename BitList, std::size_t Idx>       \
+		friend constexpr auto get_bit() noexcept;          \
+                                                       \
+	 private:                                            \
+		static constexpr std::tuple BIT_LIST{__VA_ARGS__}; \
+	};
 
 static constexpr auto RCC_BASE = memory_at(to_underlying(MemoryMap::Ahb1Base), 0x3800U);
 
@@ -31,33 +40,17 @@ enum class RccOsc : std::uint32_t;
  * @{
  */
 
-class RccCrBitList {
-	template <typename BitList, std::size_t Idx>
-	friend constexpr auto get_bit() noexcept;
-
- private:
-	static constexpr std::tuple BIT_LIST{
-		Bit<1>{BitPos_t(0)},	 // HsiOn
-		Bit<1>{BitPos_t(1)},	 // HsiRdy
-		Bit<1>{BitPos_t(16)},	 // HseOn
-		Bit<1>{BitPos_t(17)},	 // HseRdy
-		Bit<1>{BitPos_t(18)},	 // HseBypass
-		Bit<1>{BitPos_t(19)},	 // CssOn
-		Bit<1>{BitPos_t(24)},	 // PllOn
-		Bit<1>{BitPos_t(25)},	 // PllRdy
-		Bit<1>{BitPos_t(26)},	 // PllI2SOn
-		Bit<1>{BitPos_t(27)},	 // PllI2SRdy
-		Bit<1>{BitPos_t(28)},	 // PllSAIOn
-		Bit<1>{BitPos_t(29)},	 // PllSAIRdy
-	};
-};
+SETUP_REGISTER_INFO(RccCrBitInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(16)}, Bit<1>{BitPos_t(17)},
+										Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(19)}, Bit<1>{BitPos_t(24)}, Bit<1>{BitPos_t(25)},
+										Bit<1>{BitPos_t(26)}, Bit<1>{BitPos_t(27)}, Bit<1>{BitPos_t(28)}, Bit<1>{BitPos_t(29)})
 
 enum class RccCrBit {
 	HsiOn,
 	HsiRdy,
 	HseOn,
 	HseRdy,
-	HseBypass,
+	HseByp,
 	CssOn,
 	PllOn,
 	PllRdy,
@@ -65,7 +58,7 @@ enum class RccCrBit {
 	PllSaiRdy,
 };
 
-static constexpr Register<RccCrBitList, RccCrBit> RCC_CR{RCC_BASE, 0};
+static constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
 
 /** @}*/
 
@@ -142,21 +135,13 @@ struct PllR {
 	constexpr auto get() const noexcept { return m_pllrDivisionFactor; }
 };
 
-class RccPllcfgrBitList {
-	template <typename BitList, std::size_t Idx>
-	friend constexpr auto get_bit() noexcept;
-
- private:
-	static constexpr std::tuple BIT_LIST{
-		Bit<6, PllM>{BitPos_t{0}},		Bit<9, PllN>{BitPos_t{6}},	Bit<2, PllP>{BitPos_t{16}},
-		Bit<1, RccOsc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}},
-	};
-};
+SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
+										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
+										Bit<1, RccOsc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}})
 
 enum class RccPllCfgBit { PLLM, PLLN, PLLP, PLLSRC, PLLQ, PLLR };
 
-static constexpr Register<RccPllcfgrBitList, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE, 0x04U};
-
+static constexpr Register<RccPllcfgrBitInfo, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE, 0x04U};
 /** @}*/
 
 /**
@@ -166,14 +151,6 @@ static constexpr Register<RccPllcfgrBitList, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE,
  */
 
 enum class SysClk : std::uint32_t;
-
-enum class RccCfgBit {
-	SW,
-	SWS,
-	HPRE,
-	PPRE1,
-	PPRE2,
-};
 
 struct HPRE {
  private:
@@ -219,17 +196,99 @@ struct PPRE {
 	constexpr auto get() const noexcept { return m_ppreDivisionFactor; }
 };
 
-class RccCfgBitList {
-	template <typename BitList, std::size_t Idx>
-	friend constexpr auto get_bit() noexcept;
+SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
+										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
+										Bit<3, PPRE>{BitPos_t(10)}, Bit<3, PPRE>{BitPos_t(13)})
 
- private:
-	static constexpr std::tuple BIT_LIST{
-		Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
-		Bit<3, PPRE>{BitPos_t(10)},	 Bit<3, PPRE>{BitPos_t(13)},
-	};
+enum class RccCfgBit {
+	SW,
+	SWS,
+	HPRE,
+	PPRE1,
+	PPRE2,
 };
 
-static constexpr Register<RccCfgBitList, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};
-
+static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};
 /**@} */
+
+/**
+ * @defgroup	RCC_AHB1RST_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccAhb1RstInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)},
+										Bit<1>{BitPos_t(4)}, Bit<1>{BitPos_t(5)}, Bit<1>{BitPos_t(6)}, Bit<1>{BitPos_t(7)},
+										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(21)}, Bit<1>{BitPos_t(22)},
+										Bit<1>{BitPos_t(29)}, Bit<1>{BitPos_t(30)})
+
+enum class RccAhb1RstBit {
+	GpioARst,
+	GpioBRst,
+	GpioCRst,
+	GpioDRst,
+	GpioERst,
+	GpioFRst,
+	GpioGRst,
+	GpioHRst,
+	CrcRst,
+	BkpSRAMRst,
+	Dma1Rst,
+	Dma2Rst,
+	OtgHsRst
+};
+
+static constexpr Register<RccAhb1RstInfo, RccAhb1RstBit> RCC_AHB1RST{RCC_BASE, 0x10U};
+/**@}*/
+
+/**
+ * @defgroup	RCC_AHB1ENR_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccAhb1EnrInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)},
+										Bit<1>{BitPos_t(4)}, Bit<1>{BitPos_t(5)}, Bit<1>{BitPos_t(6)}, Bit<1>{BitPos_t(7)},
+										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(21)}, Bit<1>{BitPos_t(22)},
+										Bit<1>{BitPos_t(29)}, Bit<1>{BitPos_t(30)})
+
+enum class RccAhb1EnrBit {
+	GpioAEn,
+	GpioBEn,
+	GpioCEn,
+	GpioDEn,
+	GpioEEn,
+	GpioFEn,
+	GpioGEn,
+	GpioHEn,
+	CrcEn,
+	BkpSRAMEn,
+	Dma1En,
+	Dma2En,
+	OtgHsEn,
+	OtgHsULPIEn
+};
+
+static constexpr Register<RccAhb1EnrInfo, RccAhb1EnrBit> RCC_AHB1ENR{RCC_BASE, 0x30U};
+
+/**@}*/
+
+/**
+ * @defgroup	RCC_BDCR_GROUP
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccBdcrBitInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)})
+
+enum class RccBdcrBit {
+	LSEON,
+	LSERDY,
+	LseByp,
+	LSEMOD,
+};
+
+static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x70U};
+
+/**@}*/

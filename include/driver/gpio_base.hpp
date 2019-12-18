@@ -2,7 +2,7 @@
  * @Date:   2019-12-06T12:48:41+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: gpio_base.hpp
- * @Last modified time: 2019-12-06T13:18:53+08:00
+ * @Last modified time: 2019-12-18T19:45:01+08:00
  */
 
 #ifndef GPIO_BASE_HPP_
@@ -11,6 +11,8 @@
 #include <tuple>
 
 #include "include/driver/utility.hpp"
+#include "include/hal/gpio.hxx"
+#include "include/hal/peripheral/rcc.hxx"
 
 enum class PinName { PA_5 };
 
@@ -40,7 +42,7 @@ class PinGroupingHelper {
  private:
 	// @todo need to solve duplicate elements
 	static constexpr auto portList = std::make_tuple(PinNameMap::getPortFromPinMap(PinNames)...);
-	static constexpr auto pinList = std::make_tuple(PinNameMap::getPinFromPinMap(PinNames)...);
+	static constexpr auto pinList	 = std::make_tuple(PinNameMap::getPinFromPinMap(PinNames)...);
 
  public:
 	template <std::size_t N>
@@ -59,7 +61,7 @@ class PinGroupingHelper {
 template <PinName... PinNames>
 class GpioBase {
  private:
-	using PinGrouper = PinGroupingHelper<PinNames...>;
+	using PinGrouper	 = PinGroupingHelper<PinNames...>;
 	using PortIterator = std::make_index_sequence<PinGrouper::getUsedPortNum()>;
 
 	template <std::size_t PortIdx, std::size_t... PinIdx>

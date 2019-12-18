@@ -2,15 +2,14 @@
  * @Date:   2019-11-19T14:00:12+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: main.cpp
- * @Last modified time: 2019-12-17T18:16:19+08:00
+ * @Last modified time: 2019-12-18T19:44:51+08:00
  */
 
-#include "include/hal/gpio.hpp"
 #include "include/hal/nvic.hpp"
 #include "include/hal/peripheral/rcc.hxx"
 
 #include "include/driver/digitalout.hpp"
-#include "include/hal/sys_info.hxx"
+#include "include/hal/sys_init.hxx"
 
 constexpr void init_rcc() noexcept {
 	rcc_bypass_clksrc<RccOsc::HseOsc>();
@@ -19,7 +18,8 @@ constexpr void init_rcc() noexcept {
 
 int main() {
 	// init_rcc();
-	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	// RCC_AHB1RST.setBit<RccAhb1RstBit::GpioARst>();
+	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
 	// auto a = HPRE{DivisionFactor_v<4U>};
 	// RCC_CR.setBit<RccCrReg::HsiOn>();
 	// rcc_enable_clk<RccOsc::HsiOsc>();
@@ -28,7 +28,7 @@ int main() {
 	DigitalOut<PinName::PA_5> led;
 
 	while (true) {
-		for (int i = 0; i < 1000000; ++i) {
+		for (int i = 0; i < 10000000; ++i) {
 		}
 
 		led.toggle();
