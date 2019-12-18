@@ -2,7 +2,7 @@
  * @Date:   2019-11-29T20:17:17+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: digitalout.hpp
- * @Last modified time: 2019-12-18T19:26:09+08:00
+ * @Last modified time: 2019-12-18T20:06:03+08:00
  */
 
 #ifndef DIGITAL_OUT_HPP_

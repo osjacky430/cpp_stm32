@@ -2,7 +2,7 @@
  * @Date:   2019-12-06T12:48:41+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: gpio_base.hpp
- * @Last modified time: 2019-12-18T19:45:01+08:00
+ * @Last modified time: 2019-12-18T20:09:30+08:00
  */
 
 #ifndef GPIO_BASE_HPP_
@@ -15,11 +15,6 @@
 #include "include/hal/peripheral/rcc.hxx"
 
 enum class PinName { PA_5 };
-
-constexpr auto gpio_enable_periph_clock = [](const GpioPort t_port) noexcept {
-	const auto periph_clk = static_cast<RccPeriph>(t_port);
-	RCC_EN_PERIPH_CLK(periph_clk);
-};
 
 class PinNameMap {
  private:
@@ -90,7 +85,7 @@ class GpioBase {
 
 	template <std::size_t... Idx>
 	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...>) noexcept {
-		(gpio_enable_periph_clock(PinGrouper::getPort(ConstIndexType<Idx>{})), ...);
+		(rcc_enable_periph_clk<static_cast<RccPeriph>(PinGrouper::getPort(ConstIndexType<Idx>{}))>(), ...);
 	}
 
  protected:

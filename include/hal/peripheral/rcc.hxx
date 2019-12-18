@@ -2,7 +2,7 @@
  * @Date:   2019-11-25T00:54:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc.hpp
- * @Last modified time: 2019-12-18T19:39:19+08:00
+ * @Last modified time: 2019-12-18T20:08:28+08:00
  */
 
 #pragma once
@@ -78,15 +78,6 @@ class RccAuxiliaryReg {
 	};
 
  public:
-	static constexpr std::array RccPeriphEn1{
-		setOffsetAndBit(0x30, 0),	 // GPIOA
-		setOffsetAndBit(0x30, 1),	 // GPIOB
-	};
-
-	static constexpr auto getEnableReg1(RccPeriph const t_periph_clk) noexcept {
-		return getOffsetAndBit(RccPeriphEn1[to_underlying(t_periph_clk)]);
-	}
-
 	template <RccPeriph PeriphClk>
 	static constexpr auto getEnableReg() noexcept {
 		return std::get<to_underlying(PeriphClk)>(RccPeriphEn);
@@ -116,12 +107,8 @@ class RccAuxiliaryReg {
 	}
 };
 
-static constexpr auto RCC_EN_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto& [RCC_ENR_OFFSET, ENR_BIT_POS] = RccAuxiliaryReg::getEnableReg1(t_periph_clk);
-	MMIO32(RCC_BASE, RCC_ENR_OFFSET) |= ENR_BIT_POS;
-};
 static constexpr auto RCC_RST_PERIPH_CLK = [](const auto t_periph_clk) noexcept {
-	const auto& [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccAuxiliaryReg::getResetReg(t_periph_clk);
+	const auto [RCC_RSTR_OFFSET, RSTR_BIT_POS] = RccAuxiliaryReg::getResetReg(t_periph_clk);
 	MMIO32(RCC_BASE, RCC_RSTR_OFFSET) |= RSTR_BIT_POS;
 };
 
