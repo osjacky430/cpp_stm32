@@ -2,7 +2,6 @@
  * @Date:   2019-12-06T12:48:41+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: gpio_base.hpp
- * @Last modified time: 2019-12-18T20:09:30+08:00
  */
 
 #ifndef GPIO_BASE_HPP_

@@ -2,7 +2,6 @@
  * @Date:   2019-12-10T21:40:38+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: rcc_reg.hpp
- * @Last modified time: 2019-12-18T19:09:23+08:00
  */
 
 #pragma once
@@ -12,17 +11,9 @@
 
 #include "include/hal/bit/bit.hxx"
 #include "include/hal/memory_map.hxx"
+#include "include/hal/peripheral/memory/utility.hxx"
 #include "include/hal/register/register.hpp"
 #include "include/utility/constexpr_algo.hxx"
-
-#define SETUP_REGISTER_INFO(Name, ...)                 \
-	class Name {                                         \
-		template <typename BitList, std::size_t Idx>       \
-		friend constexpr auto get_bit() noexcept;          \
-                                                       \
-	 private:                                            \
-		static constexpr std::tuple BIT_LIST{__VA_ARGS__}; \
-	};
 
 static constexpr auto RCC_BASE = memory_at(to_underlying(MemoryMap::Ahb1Base), 0x3800U);
 

@@ -2,7 +2,6 @@
  * @Date:   2019-12-10T21:40:46+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: register.hpp
- * @Last modified time: 2019-12-17T16:43:07+08:00
  */
 
 #pragma once
@@ -25,10 +24,15 @@ class Register {
 	std::uint32_t const m_base;
 	std::uint32_t const m_offset;
 
+	template <BitListIdx BitIdx, typename ValueType>
+	static constexpr auto IS_TYPE_AVAILABLE = []() {
+		using BitType = decltype(get_bit<BitList, to_underlying(BitIdx)>());
+		return std::is_same_v<ValueType, typename BitType::AbstractType>;
+	};
+
  public:
 	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset) : m_base(base), m_offset(offset) {}
 
- public:
 	template <BitListIdx BitIdx>
 	constexpr void setBit() const noexcept {
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
@@ -37,13 +41,16 @@ class Register {
 		MMIO32(m_base, m_offset) |= bit.mask;
 	}
 
-	template <BitListIdx BitIdx, typename ValueType>
-	constexpr void setBit(ValueType const &t_param) const noexcept {
-		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
+	template <BitListIdx... BitIdx, typename ValueType>
+	constexpr void setBit(ValueType const& t_param) const noexcept {
+		static_assert((IS_TYPE_AVAILABLE<BitIdx, ValueType>() & ...));
 
-		static_assert(std::is_same_v<ValueType, typename decltype(bit)::AbstractType>);
+		const auto current_val = MMIO32(m_base, m_offset);
 
-		MMIO32(m_base, m_offset) |= bit(t_param);
+		const auto mod_val		= (... | get_bit<BitList, to_underlying(BitIdx)>()(t_param));
+		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
+
+		MMIO32(m_base, m_offset) = (current_val & clear_mask) | mod_val;
 	}
 
 	template <BitListIdx BitIdx>

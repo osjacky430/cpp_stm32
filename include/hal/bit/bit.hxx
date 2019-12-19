@@ -2,7 +2,6 @@
  * @Date:   2019-12-11T18:51:06+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: bit.hxx
- * @Last modified time: 2019-12-15T19:57:41+08:00
  */
 
 #pragma once
@@ -25,15 +24,17 @@ class Bit {
 	std::uint32_t const mask;
 
  public:
-	constexpr Bit(BitPos_t const t_pos) : pos(t_pos.get()), mask(((1U << LENGTH) - 1U) << pos) {}
+	constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1U << LENGTH) - 1U) << pos) {}
 
+	// currently support only integral type and struct that implement get() method
+	// @todo change get() to operator() so that it support lambda(?)
 	constexpr auto operator()(DataType const& t_val) const noexcept {
 		if constexpr (std::is_enum_v<DataType>) {
-			return (to_underlying(t_val) & mask) << pos;
+			return (to_underlying(t_val) << pos) & mask;
 		} else if constexpr (std::is_integral_v<DataType>) {
-			return (t_val & mask) << pos;
+			return (t_val << pos) & mask;
 		} else {
-			return (t_val.get() & mask) << pos;
+			return (t_val.get() << pos) & mask;
 		}
 	}
 };
