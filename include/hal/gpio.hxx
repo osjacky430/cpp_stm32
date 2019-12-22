@@ -32,14 +32,13 @@ constexpr void gpio_mode_setup(GpioMode const& t_mode, GpioPupd const& t_pupd) n
 	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
-// @todo needs to change so that it conform to the Register and Bit method,
-//  		 since BSRR is a write only register, it needs extra consideration
 template <GpioPort Port, GpioPin... Pins>
 constexpr void gpio_toggle() noexcept {
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
 	auto const m_odr	 = GPIO_ODR<Port>.template readBit<Pins...>(ValueOnly);
 	auto const mod_val = bit_group_cat(~m_odr, m_odr);
+	// this is a bit hacky IMO, but can't come up with a better idea
 	GPIO_BSRR_<Port>.template setBit<Pins..., GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 

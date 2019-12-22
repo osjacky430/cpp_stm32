@@ -8,8 +8,8 @@ The thoughts above change rapidly cause I'm trying all kinds of things that come
 Since there are alot of things going on here, I need to make a list of recent ideas in order to remember the though process and current progress.
 - using hxx for library header: since the library needs user configuration header files, in order not have header file name collisions, adopting this idea may solve this problem.
 - Using two classes `Register` and `Bit` as the abstraction of real register and bit: To exploit the advantage of type safety profile of c++, class `Register` is a templated class that takes a list of type as the available input for bitwise operation, by doing so, there is no way to set bit in register wrong. This is currently implemented by scoped enum, which leads to some problems since it carries a little information. Therefore, I am considering using second class `Bit` to carry the information of the bit, not sure what problem will encouter though.
-- Add "Access" flag to `Register` to ensure correct MMIO operation.
+- Add "Access" flag to `Register` to ensure correct MMIO operation, furthermore, using suitable MMIO op can reduce binary file size.
 - Attach interrupt by assigning function pointer to extern variable `irq_vector_table`
 - Using `std::byte` for MMIO operation
 ## Compiler in use
-I'm using two versions of compiler on different computers, one is arm-none-eabi-g++ 20190703 release, and arm-none-eabi-g++ 20180622 release, currently, formal compiler works pretty well, the later seems to have some issues and are still resolving.
+I'm using two versions of compiler on different computers, one is arm-none-eabi-g++ 20190703 release, and arm-none-eabi-g++ <del>20180622 release</del> 20191025 release, currently, formal compiler works pretty well, the later seems to have some issues <del>and are still resolving</del> (I give up 20180622 release, due to the internal compiler error).
