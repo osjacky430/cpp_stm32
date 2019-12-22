@@ -6,13 +6,11 @@
 #ifndef GPIO_HPP_
 #define GPIO_HPP_
 
+#include <tuple>
+
 #include "include/hal/memory_map.hxx"
 #include "include/hal/peripheral/memory/gpio_reg.hxx"
 #include "include/hal/utility.hxx"
-
-constexpr auto GPIO_ODR = [](const GpioPort t_port) noexcept -> decltype(auto) {
-	return MMIO32(GPIO_BASE(t_port), 0x14U);
-};
 
 constexpr auto GPIO_BSRR = [](const GpioPort t_port) noexcept -> decltype(auto) {
 	return MMIO32(GPIO_BASE(t_port), 0x18U);
@@ -34,19 +32,15 @@ constexpr void gpio_mode_setup(GpioMode const& t_mode, GpioPupd const& t_pupd) n
 	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
+// @todo needs to change so that it conform to the Register and Bit method,
+//  		 since BSRR is a write only register, it needs extra consideration
 template <GpioPort Port, GpioPin... Pins>
 constexpr void gpio_toggle() noexcept {
-	const auto odr = GPIO_ODR_<Port>.readBit();
+	constexpr auto HALF_WORD_OFFSET = 16U;
 
-	// GPIO_BSRR(Port) = ((odr & pins) << 16U) | (~odr & pins);
-}
-
-template <typename... Pins>
-constexpr void gpio_toggle(const GpioPort t_port, Pins... t_all_of_pins) noexcept {
-	const auto pins = (... | (1U << to_underlying(t_all_of_pins)));
-	const auto odr	= GPIO_ODR(t_port);
-
-	GPIO_BSRR(t_port) = ((odr & pins) << 16U) | (~odr & pins);
+	auto const m_odr	 = GPIO_ODR<Port>.template readBit<Pins...>(ValueOnly);
+	auto const mod_val = bit_group_cat(~m_odr, m_odr);
+	GPIO_BSRR_<Port>.template setBit<Pins..., GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
 #endif

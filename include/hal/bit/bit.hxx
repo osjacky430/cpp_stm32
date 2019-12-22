@@ -7,18 +7,27 @@
 #pragma once
 
 #include <cstdint>
+#include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include "include/utility/strongly_typed.hxx"
 
 using BitPos_t		= StrongType<std::uint32_t, struct BitPosition>;
 using BitLength_t = StrongType<std::uint32_t, struct BitLength>;
 
-template <std::uint32_t L, typename DataType = bool>
+enum class BitMod {
+	ReadOnly	= 0x100,
+	WriteOnly = 0x010,
+	ReadWrite = 0x110,
+};
+
+template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::ReadWrite>
 class Bit {
  public:
 	using AbstractType = DataType;
 
+	static constexpr auto MOD		 = Mod;
 	static constexpr auto LENGTH = L;
 	std::uint32_t const pos;
 	std::uint32_t const mask;
@@ -38,3 +47,54 @@ class Bit {
 		}
 	}
 };
+
+template <BitMod Mod = BitMod::ReadWrite>
+using BinaryBit = Bit<1, std::uint8_t, Mod>;
+
+template <typename... Args>
+class BitGroup {
+	// to somehow suppress strange warning
+	template <std::size_t Idx>
+	friend constexpr std::tuple_element_t<Idx, std::tuple<Args...>> get(BitGroup<Args...> const& t_bit_group) noexcept {
+		return std::get<Idx>(t_bit_group.m_tup);
+	}
+
+	template <typename... BitGroups>
+	friend constexpr auto bit_group_cat(BitGroups&&... t_bit_groups) noexcept;
+
+ private:
+	std::tuple<Args...> m_tup;
+
+	template <std::size_t Idx>
+	constexpr auto is_nand_operable() const noexcept {
+		if constexpr (auto const tup_elem = std::get<Idx>(m_tup); std::is_integral_v<decltype(tup_elem)>) {
+			return static_cast<decltype(tup_elem)>(~tup_elem);
+		} else {
+			return tup_elem;
+		}
+	}
+
+	template <std::size_t... Idx>
+	constexpr auto nand_op(std::index_sequence<Idx...> /*unused*/) const noexcept {
+		return std::tuple{is_nand_operable<Idx>()...};
+	}
+
+ public:
+	constexpr BitGroup(Args&&... t_args) noexcept : m_tup{t_args...} {}
+	constexpr BitGroup(std::tuple<Args...> const& t_tup) noexcept : m_tup{t_tup} {}
+
+	constexpr auto operator~() const noexcept {
+		return BitGroup<Args...>{nand_op(std::make_index_sequence<sizeof...(Args)>{})};
+	}
+};
+
+template <std::size_t Idx, typename... Args>
+static constexpr std::tuple_element_t<Idx, std::tuple<Args...>> get(BitGroup<Args...> const& t_bit_group) noexcept {
+	return std::get<Idx>(t_bit_group.m_tup);
+}
+
+template <typename... BitGroups>
+static constexpr auto bit_group_cat(BitGroups&&... t_bit_groups) noexcept {
+	const auto tup = std::tuple_cat((t_bit_groups.m_tup)...);
+	return BitGroup{tup};
+}

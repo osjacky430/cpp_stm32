@@ -13,11 +13,12 @@
 #include "include/hal/gpio.hxx"
 #include "include/hal/peripheral/rcc.hxx"
 
-enum class PinName { PA_5 };
+enum class PinName { PA_1, PA_5 };
 
 class PinNameMap {
  private:
 	static constexpr std::array PinMap{
+		std::pair{GpioPort::PortA, GpioPin::Pin1},
 		std::pair{GpioPort::PortA, GpioPin::Pin5},
 	};
 

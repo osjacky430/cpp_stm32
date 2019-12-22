@@ -52,15 +52,17 @@ class DigitalOut : public GpioBase<PinNames...> {
 		(modeSetupIdxThruPin(ConstIndexType<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
 	}
 
-	template <typename Tuple, std::size_t... Idx>
-	static constexpr void toggleImp(Tuple const tup, std::index_sequence<Idx...>) noexcept {
-		constexpr auto gpio_toggle_for_gpio_group = [](const auto t_tup, const auto num) constexpr noexcept {
-			const auto param_list = std::tuple_cat(std::make_tuple(PinGrouper::getPort(num)), std::get<num()>(t_tup));
+	template <std::size_t Num, std::size_t... Idx>
+	static constexpr void toggleIdxThruPin(ConstIndexType<Num> /*unused*/,
+																				 std::index_sequence<Idx...> /*unused*/) noexcept {
+		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
+		constexpr auto gpio_pin_group = std::get<Num>(gpioGroupList);
+		gpio_toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
+	}
 
-			std::apply([](auto&&... args) { gpio_toggle(std::forward<decltype(args)>(args)...); }, param_list);
-		};
-
-		(gpio_toggle_for_gpio_group(tup, ConstIndexType<Idx>{}), ...);
+	template <std::size_t... Idx>
+	static constexpr void toggleIdxThruPort(std::index_sequence<Idx...>) noexcept {
+		(toggleIdxThruPin(ConstIndexType<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
 	}
 
  public:
@@ -74,7 +76,7 @@ class DigitalOut : public GpioBase<PinNames...> {
 
 	static constexpr void modeSetup() noexcept { modeSetupIdxThruPort(GpioGroupListIdxSeq{}); }
 
-	static constexpr void toggle() noexcept { toggleImp(gpioGroupList, GpioGroupListIdxSeq{}); }
+	static constexpr void toggle() noexcept { toggleIdxThruPort(GpioGroupListIdxSeq{}); }
 };
 
 #endif	// DIGITAL_OUT_HPP_

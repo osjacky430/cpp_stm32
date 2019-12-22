@@ -130,7 +130,7 @@ static constexpr bool rcc_is_osc_rdy() noexcept {
 	constexpr auto const reg_bit_pair = RccRegTable::getOscRdyReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const rdy_bit			= std::get<1>(reg_bit_pair);
-	return CTL_REG.template readBit<rdy_bit>();
+	return get<0>(CTL_REG.template readBit<rdy_bit>(ValueOnly));
 }
 
 template <RccOsc Clk>
@@ -161,7 +161,7 @@ static constexpr void rcc_set_sysclk() noexcept {
 }
 
 static constexpr SysClk rcc_sysclk_in_use() noexcept {
-	return RCC_CFGR.readBit<RccCfgBit::SWS>();	//
+	return get<0>(RCC_CFGR.readBit<RccCfgBit::SWS>(ValueOnly));	 //
 }
 
 template <SysClk Clk>

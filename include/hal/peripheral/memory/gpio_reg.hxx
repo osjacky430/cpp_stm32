@@ -78,6 +78,11 @@ static constexpr Register<GpioPupdInfo, GpioPin> GPIO_PUPDR{GPIO_BASE(Port), 0x0
 
 /**@}*/
 
+/**
+ * @defgroup GPIO_ODR_GROUP
+ * @{
+ */
+
 SETUP_REGISTER_INFO(GpioOdrInfo, /**/
 										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)},
 										Bit<1>{BitPos_t(4)}, Bit<1>{BitPos_t(5)}, Bit<1>{BitPos_t(6)}, Bit<1>{BitPos_t(7)},
@@ -85,4 +90,60 @@ SETUP_REGISTER_INFO(GpioOdrInfo, /**/
 										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(13)}, Bit<1>{BitPos_t(14)}, Bit<1>{BitPos_t(15)})
 
 template <GpioPort Port>
-static constexpr Register<GpioOdrInfo, GpioPin> GPIO_ODR_{GPIO_BASE(Port), 0x14U};
+static constexpr Register<GpioOdrInfo, GpioPin> GPIO_ODR{GPIO_BASE(Port), 0x14U};
+
+/**@}*/
+
+/**
+ * @defgroup GPIO_BSRR_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(GpioBsrInfo, /**/
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(0)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(1)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(2)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(3)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(4)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(5)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(6)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(7)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(8)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(9)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(10)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(11)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(12)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(13)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(14)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(15)})
+
+template <GpioPort Port>
+static constexpr Register<GpioBsrInfo, GpioPin> GPIO_BSR{GPIO_BASE(Port), 0x18U};
+
+SETUP_REGISTER_INFO(GpioBrrInfo, /**/
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(16)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(17)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(18)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(19)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(20)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(21)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(22)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(23)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(24)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(25)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(26)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(27)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(28)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(29)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(30)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(31)})
+
+template <GpioPort Port>
+static constexpr Register<GpioBrrInfo, GpioPin> GPIO_BRR{GPIO_BASE(Port), 0x18U};
+
+SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(0)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(1)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(2)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(3)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(4)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(5)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(6)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(7)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(8)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(9)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(10)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(11)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(12)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(13)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(14)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(15)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(16)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(17)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(18)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(19)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(20)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(21)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(22)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(23)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(24)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(25)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(26)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(27)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(28)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(29)},
+										BinaryBit<BitMod::WriteOnly>{BitPos_t(30)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(31)})
+
+template <GpioPort Port>
+static constexpr Register<GpioBsrrInfo, GpioPin> GPIO_BSRR_{GPIO_BASE(Port), 0x18U};
+
+/**@}*/
