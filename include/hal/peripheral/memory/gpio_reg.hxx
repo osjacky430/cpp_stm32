@@ -9,7 +9,7 @@
 #include "include/hal/bit/bit.hxx"
 #include "include/hal/memory_map.hxx"
 #include "include/hal/peripheral/memory/utility.hxx"
-#include "include/hal/register/register.hpp"
+#include "include/hal/register/register.hxx"
 
 enum class GpioPort { PortA, PortB, PortC, Total };
 
@@ -144,6 +144,6 @@ SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
 										BinaryBit<BitMod::WriteOnly>{BitPos_t(30)}, BinaryBit<BitMod::WriteOnly>{BitPos_t(31)})
 
 template <GpioPort Port>
-static constexpr Register<GpioBsrrInfo, GpioPin> GPIO_BSRR_{GPIO_BASE(Port), 0x18U};
+static constexpr Register<GpioBsrrInfo, GpioPin> GPIO_BSRR{GPIO_BASE(Port), 0x18U};
 
 /**@}*/

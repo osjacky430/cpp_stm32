@@ -15,7 +15,7 @@
 #include "include/driver/gpio_base.hpp"
 #include "include/driver/utility.hpp"
 
-#include "include/hal/gpio.hxx"
+#include "include/hal/peripheral/gpio.hxx"
 #include "include/hal/peripheral/rcc.hxx"
 
 template <PinName... PinNames>

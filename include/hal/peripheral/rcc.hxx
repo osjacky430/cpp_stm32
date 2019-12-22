@@ -15,6 +15,9 @@
 
 enum class RccPeriph : std::uint32_t {
 	GpioA,
+	GpioB,
+	/*GpioC ~ GpioF*/
+	Pwr,
 };
 
 enum class RccOsc : std::uint32_t { HsiOsc, HseOsc, PllOsc, PllI2cOsc, PllSaiOsc, LseOsc, LsiOsc };
@@ -36,11 +39,13 @@ class RccRegTable {
 	static constexpr std::tuple RccPeriphRst{
 		std::pair{RCC_AHB1RST, RccAhb1RstBit::GpioARst},
 		std::pair{RCC_AHB1RST, RccAhb1RstBit::GpioBRst},
+		std::pair{RCC_APB1RST, RccApb1RstBit::PwrRst},
 	};
 
 	static constexpr std::tuple RccPeriphEn{
 		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioAEn},
 		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioBEn},
+		std::pair{RCC_APB1ENR, RccApb1EnrBit::PwrEn},
 	};
 
 	static constexpr std::tuple RccOscOn{

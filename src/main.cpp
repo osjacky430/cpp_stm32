@@ -14,11 +14,11 @@ int main() {
 	constexpr auto SOME_PERIOD = 1000000;
 	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
 	DigitalOut<PinName::PA_5> led;
+
 	while (true) {
 		for (int i = 0; i < SOME_PERIOD; ++i) {
 		}
 
-		// gpio_toggle(GpioPort::PortA, GpioPin::Pin5);
 		led.toggle();
 	}
 

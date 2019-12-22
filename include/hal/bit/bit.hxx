@@ -51,6 +51,9 @@ class Bit {
 template <BitMod Mod = BitMod::ReadWrite>
 using BinaryBit = Bit<1, std::uint8_t, Mod>;
 
+template <std::uint32_t L>
+using StatusBit = Bit<L, std::uint8_t, BitMod::ReadOnly>;
+
 template <typename... Args>
 class BitGroup {
 	// to somehow suppress strange warning

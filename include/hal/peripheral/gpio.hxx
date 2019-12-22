@@ -12,10 +12,6 @@
 #include "include/hal/peripheral/memory/gpio_reg.hxx"
 #include "include/hal/utility.hxx"
 
-constexpr auto GPIO_BSRR = [](const GpioPort t_port) noexcept -> decltype(auto) {
-	return MMIO32(GPIO_BASE(t_port), 0x18U);
-};
-
 template <GpioPort Port, GpioPin... Pins>
 constexpr void gpio_set_mode(GpioMode const& t_mode) noexcept {
 	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
@@ -39,7 +35,7 @@ constexpr void gpio_toggle() noexcept {
 	auto const m_odr	 = GPIO_ODR<Port>.template readBit<Pins...>(ValueOnly);
 	auto const mod_val = bit_group_cat(~m_odr, m_odr);
 	// this is a bit hacky IMO, but can't come up with a better idea
-	GPIO_BSRR_<Port>.template setBit<Pins..., GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
+	GPIO_BSRR<Port>.template setBit<Pins..., GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
 #endif

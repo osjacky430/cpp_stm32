@@ -2,13 +2,14 @@
  * @Date:   2019-12-11T14:39:29+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: sys_info.hxx
- * @Last modified time: 2019-12-17T22:40:28+08:00
+ * @Last modified time: 2019-12-23T04:24:09+08:00
  */
 
 #pragma once
 
 #include <cmath>
 
+#include "include/hal/peripheral/pwr.hxx"
 #include "include/hal/peripheral/rcc.hxx"
 #include "include/hal/utility.hxx"
 #include "include/utility/constexpr_algo.hxx"
@@ -26,14 +27,31 @@
 #define HSE_BYPASS_CLK_SRC false
 #endif
 
+static constexpr auto MAX_APB1_CLK_FREQ = 45_MHz;
+static constexpr auto MAX_APB2_CLK_FREQ = 90_MHz;
+
 static_assert(4_MHz <= HSE_CLK_FREQ && HSE_CLK_FREQ <= 26_MHz);
 static_assert(HSI_CLK_FREQ == 16_MHz);
 
 class SysClock {
  private:
  public:
+	static constexpr auto NEED_OVERDRIVE =
+		(APB1_CLK_FREQ >= 42_MHz || APB2_CLK_FREQ >= 84_MHz || AHB_CLK_FREQ >= 168_MHz);
+
+	static constexpr auto VOLTAGE_SCALE = []() {
+		if constexpr (NEED_OVERDRIVE || AHB_CLK_FREQ >= 144_MHz) {
+			return VoltageScale::Scale1Mode;
+		} else if constexpr (AHB_CLK_FREQ >= 120_MHz) {
+			return VoltageScale::Scale2Mode;
+		} else {
+			return VoltageScale::Scale3Mode;
+		}
+	}();
+
 	static constexpr auto SYS_CLK_SRC = []() {
 		if constexpr (SYS_CLK_FREQ != HSE_CLK_FREQ && SYS_CLK_FREQ != HSI_CLK_FREQ) {
+			// maybe its Pllr, @todo add this into consideration
 			return SysClk::Pllp;
 		} else if constexpr (SYS_CLK_FREQ == HSE_CLK_FREQ) {
 			return SysClk::Hse;
@@ -46,7 +64,6 @@ class SysClock {
 	static constexpr auto MAX_VCO_OUTPUT_FREQ			 = 432_MHz;
 	static constexpr auto RECOMMEND_VCO_INPUT_FREQ = 2_MHz;
 
- public:
 	template <SysClk SystemClock = SYS_CLK_SRC>
 	static constexpr void init() noexcept {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
@@ -81,6 +98,9 @@ class SysClock {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
 			rcc_bypass_clksrc<RccOsc::HseOsc>();
 		}
+
+		rcc_enable_periph_clk<RccPeriph::Pwr>();
+		pwr_set_voltage_scale(VOLTAGE_SCALE);
 
 		rcc_enable_clk<PllSrc>();
 		rcc_wait_osc_rdy<PllSrc>();

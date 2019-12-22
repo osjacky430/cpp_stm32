@@ -10,7 +10,7 @@
 #include <tuple>
 
 #include "include/driver/utility.hpp"
-#include "include/hal/gpio.hxx"
+#include "include/hal/peripheral/gpio.hxx"
 #include "include/hal/peripheral/rcc.hxx"
 
 enum class PinName { PA_1, PA_5 };

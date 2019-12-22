@@ -12,10 +12,10 @@
 #include "include/hal/bit/bit.hxx"
 #include "include/hal/memory_map.hxx"
 #include "include/hal/peripheral/memory/utility.hxx"
-#include "include/hal/register/register.hpp"
+#include "include/hal/register/register.hxx"
 #include "include/utility/constexpr_algo.hxx"
 
-static constexpr auto RCC_BASE = memory_at(to_underlying(MemoryMap::Ahb1Base), 0x3800U);
+static constexpr auto RCC_BASE = memory_at(MemoryMap::Ahb1Base, 0x3800U);
 
 template <std::uint32_t Val>
 using DivisionFactor_t = std::integral_constant<std::uint32_t, Val>;
@@ -233,6 +233,19 @@ static constexpr Register<RccAhb1RstInfo, RccAhb1RstBit> RCC_AHB1RST{RCC_BASE, 0
 /**@}*/
 
 /**
+ * @defgroup	RCC_APB1RST_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb1RstInfo, BinaryBit<>{BitPos_t{28}})
+
+enum class RccApb1RstBit { PwrRst };
+
+static constexpr Register<RccApb1RstInfo, RccApb1RstBit> RCC_APB1RST{RCC_BASE, 0x20U};
+
+/**@}*/
+
+/**
  * @defgroup	RCC_AHB1ENR_GROUP
  * @{
  */
@@ -261,6 +274,20 @@ enum class RccAhb1EnrBit {
 };
 
 static constexpr Register<RccAhb1EnrInfo, RccAhb1EnrBit> RCC_AHB1ENR{RCC_BASE, 0x30U};
+
+/**@}*/
+
+/**
+ * @defgroup	RCC_APB1ENR_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb1EnrInfo, /**/
+										BinaryBit<>{BitPos_t{28}})
+
+enum class RccApb1EnrBit { PwrEn };
+
+static constexpr Register<RccApb1EnrInfo, RccApb1EnrBit> RCC_APB1ENR{RCC_BASE, 0x40U};
 
 /**@}*/
 
