@@ -24,11 +24,12 @@ static constexpr auto PWR_BASE = memory_at(MemoryMap::Apb1Base, 0x7000U);
 enum class VoltageScale;
 
 SETUP_REGISTER_INFO(PwrCrInfo, /**/
-										Bit<2, VoltageScale>{BitPos_t{14}}, BinaryBit<>{BitPos_t{17}}, )
+										Bit<2, VoltageScale>{BitPos_t{14}}, BinaryBit<>{BitPos_t{16}}, BinaryBit<>{BitPos_t{17}}, )
 
 enum class PwrCrBit {
 	Vos,
-	Oden,
+	OdEn,
+	OdSEn,
 };
 
 static constexpr Register<PwrCrInfo, PwrCrBit> PWR_CR{PWR_BASE, 0x00U};

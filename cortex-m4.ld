@@ -123,10 +123,12 @@ SECTIONS
 
   .bss :
   {
+    sbss_ = .;
     *(.bss)
     *(.bss*)
     *(COMMON)
     . = ALIGN(4);
+    ebss_ = .;
   } >ram
 
   . = ALIGN(4);

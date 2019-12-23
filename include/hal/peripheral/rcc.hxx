@@ -22,7 +22,7 @@ enum class RccPeriph : std::uint32_t {
 
 enum class RccOsc : std::uint32_t { HsiOsc, HseOsc, PllOsc, PllI2cOsc, PllSaiOsc, LseOsc, LsiOsc };
 
-enum class SysClk : std::uint32_t { Hse, Hsi, Pllp, Pllr };
+enum class SysClk : std::uint32_t { Hsi, Hse, Pllp, Pllr };
 
 template <RccOsc Clk>
 struct ExtClk {
@@ -186,6 +186,7 @@ static constexpr void rcc_set_pllsrc(PllClkSrc<Clk> const&) {
 
 static constexpr void rcc_config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																										 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
+	// @todo change to the other set bit method
 	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLM>(t_pllm);
 	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLN>(t_plln);
 	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLP>(t_pllp);

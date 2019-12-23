@@ -11,11 +11,12 @@
 #include "include/hal/sys_init.hxx"
 
 int main() {
-	constexpr auto SOME_PERIOD = 1000000;
-	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+
 	DigitalOut<PinName::PA_5> led;
 
 	while (true) {
+		constexpr auto SOME_PERIOD = 1000000;
 		for (int i = 0; i < SOME_PERIOD; ++i) {
 		}
 
