@@ -52,11 +52,30 @@ struct FlashWaitTable {
 	}
 };
 
-template <std::uint8_t Val>
-constexpr void flash_set_latency() noexcept {
-	FLASH_ACR.template setBit<FlashAcrBit::Latency>(FlashLatency{CpuWaitState_v<Val>});
+enum class ARTAccel { InstructCache = 1, DataCache = 2, InstructPrefetch = 3 };
+
+constexpr void flash_set_latency(FlashLatency const& t_cpu) noexcept {
+	FLASH_ACR.template setBit<FlashAcrBit::Latency>(t_cpu);
 }
 
 constexpr void flash_enable_dcache() noexcept { FLASH_ACR.setBit<FlashAcrBit::DCEn>(); }
 
 constexpr void flash_enable_icache() noexcept { FLASH_ACR.setBit<FlashAcrBit::ICEn>(); }
+
+template <ARTAccel... Setting>
+constexpr void flash_config_access_ctl(FlashLatency const& t_cpu) noexcept {
+	constexpr auto register_to_set = [](ARTAccel const& t_setting) {
+		switch (t_setting) {
+			case ARTAccel::InstructCache:
+				return FlashAcrBit::ICEn;
+			case ARTAccel::DataCache:
+				return FlashAcrBit::DCEn;
+			case ARTAccel::InstructPrefetch:
+				return FlashAcrBit::PrftEn;
+		}
+	};
+
+	const auto val_to_set =
+		BitGroup{t_cpu, static_cast<std::uint8_t>(to_underlying(Setting) != 0)...};	 // fill the rest with 1
+	FLASH_ACR.template setBit<FlashAcrBit::Latency, register_to_set(Setting)...>(val_to_set);
+}

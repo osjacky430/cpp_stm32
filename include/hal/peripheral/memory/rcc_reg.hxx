@@ -86,18 +86,30 @@ struct PllN {
 };
 
 struct PllP {
+ public:
+	static constexpr std::array AVAIL_DIVISION_FACTOR{
+		std::pair{2, 0b00},
+		std::pair{4, 0b01},
+		std::pair{6, 0b10},
+		std::pair{8, 0b11},
+	};
+
+	template <std::uint32_t Val>
+	constexpr PllP(DivisionFactor_t<Val> const&) noexcept : m_pllpDivisionFactor(find_division_factor<Val>()) {}
+
+	constexpr auto get() const noexcept { return m_pllpDivisionFactor; }
+
  private:
 	std::uint32_t const m_pllpDivisionFactor;
 
- public:
-	static constexpr std::array AVAIL_PLLP_DIV_FACTOR{2, 4, 6, 8};
-
 	template <std::uint32_t Val>
-	constexpr PllP(DivisionFactor_t<Val> const&) noexcept : m_pllpDivisionFactor(Val) {
-		static_assert(2 <= Val && Val <= 8 && Val % 2 == 0);
-	}
-
-	constexpr auto get() const noexcept { return m_pllpDivisionFactor; }
+	static constexpr auto find_division_factor = []() {
+		constexpr auto iter_pos = constexpr_std_find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
+																										[](auto const& t_pair) { return t_pair.first == Val; });
+		// even though we dont need this line, since this is constexpr. This line may help debugging somehow.
+		static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
+		return AVAIL_DIVISION_FACTOR[iter_pos - AVAIL_DIVISION_FACTOR.begin()].second;
+	};
 };
 
 struct PllQ {
@@ -237,11 +249,24 @@ static constexpr Register<RccAhb1RstInfo, RccAhb1RstBit> RCC_AHB1RST{RCC_BASE, 0
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb1RstInfo, BinaryBit<>{BitPos_t{28}})
+SETUP_REGISTER_INFO(RccApb1RstInfo, Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
 
-enum class RccApb1RstBit { PwrRst };
+enum class RccApb1RstBit { Usart2Rst, PwrRst };
 
 static constexpr Register<RccApb1RstInfo, RccApb1RstBit> RCC_APB1RST{RCC_BASE, 0x20U};
+
+/**@}*/
+
+/**
+ * @defgroup RCC_APB2RST_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}})
+
+enum class RccApb2RstBit { Usart1Rst };
+
+static constexpr Register<RccApb2RstInfo, RccApb2RstBit> RCC_APB2RST{RCC_BASE, 0x24U};
 
 /**@}*/
 
@@ -283,11 +308,24 @@ static constexpr Register<RccAhb1EnrInfo, RccAhb1EnrBit> RCC_AHB1ENR{RCC_BASE, 0
  */
 
 SETUP_REGISTER_INFO(RccApb1EnrInfo, /**/
-										BinaryBit<>{BitPos_t{28}})
+										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
 
-enum class RccApb1EnrBit { PwrEn };
+enum class RccApb1EnrBit { Usart2En, PwrEn };
 
 static constexpr Register<RccApb1EnrInfo, RccApb1EnrBit> RCC_APB1ENR{RCC_BASE, 0x40U};
+
+/**@}*/
+
+/**
+ * @defgroup RCC_APB2ENR_GROUP
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}})
+
+enum class RccApb2EnrBit { Usart1En };
+
+static constexpr Register<RccApb2EnrInfo, RccApb2EnrBit> RCC_APB2ENR{RCC_BASE, 0x44U};
 
 /**@}*/
 

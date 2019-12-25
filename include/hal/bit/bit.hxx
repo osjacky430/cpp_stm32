@@ -49,7 +49,7 @@ class Bit {
 };
 
 template <BitMod Mod = BitMod::ReadWrite>
-using BinaryBit = Bit<1, std::uint8_t, Mod>;
+using Binary = Bit<1, std::uint8_t, Mod>;
 
 template <std::uint32_t L>
 using StatusBit = Bit<L, std::uint8_t, BitMod::ReadOnly>;
@@ -84,6 +84,7 @@ class BitGroup {
 
  public:
 	constexpr BitGroup(Args&&... t_args) noexcept : m_tup{t_args...} {}
+	constexpr BitGroup(Args const&... t_args) noexcept : m_tup{t_args...} {}
 	constexpr BitGroup(std::tuple<Args...> const& t_tup) noexcept : m_tup{t_tup} {}
 
 	constexpr auto operator~() const noexcept {

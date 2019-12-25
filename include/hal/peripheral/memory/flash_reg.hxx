@@ -40,8 +40,8 @@ struct FlashLatency {
 };
 
 SETUP_REGISTER_INFO(FlashAcrInfo, /**/
-										Bit<4, FlashLatency>{BitPos_t{0}}, BinaryBit<>{BitPos_t{8}}, BinaryBit<>{BitPos_t{9}},
-										BinaryBit<>{BitPos_t{10}}, BinaryBit<>{BitPos_t{11}}, BinaryBit<>{BitPos_t{12}})
+										Bit<4, FlashLatency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}},
+										Binary<>{BitPos_t{10}}, Binary<>{BitPos_t{11}}, Binary<>{BitPos_t{12}})
 
 enum class FlashAcrBit {
 	Latency,

@@ -14,10 +14,18 @@
 #include "include/hal/peripheral/memory/rcc_reg.hxx"
 
 enum class RccPeriph : std::uint32_t {
+	/*AHB1*/
 	GpioA,
 	GpioB,
 	/*GpioC ~ GpioF*/
+
+	/*APB1*/
+	Usart2,
 	Pwr,
+
+	/*APB2*/
+	Usart1,
+
 };
 
 enum class RccOsc : std::uint32_t { HsiOsc, HseOsc, PllOsc, PllI2cOsc, PllSaiOsc, LseOsc, LsiOsc };
@@ -37,15 +45,25 @@ struct PllClkSrc {
 class RccRegTable {
  private:
 	static constexpr std::tuple RccPeriphRst{
+		/*AHB1*/
 		std::pair{RCC_AHB1RST, RccAhb1RstBit::GpioARst},
 		std::pair{RCC_AHB1RST, RccAhb1RstBit::GpioBRst},
+		/*APB1*/
+		std::pair{RCC_APB1RST, RccApb1RstBit::Usart2Rst},
 		std::pair{RCC_APB1RST, RccApb1RstBit::PwrRst},
+		/*APB2*/
+		std::pair{RCC_APB2RST, RccApb2RstBit::Usart1Rst},
 	};
 
 	static constexpr std::tuple RccPeriphEn{
+		/*AHB1*/
 		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioAEn},
 		std::pair{RCC_AHB1ENR, RccAhb1EnrBit::GpioBEn},
+		/*APB1*/
+		std::pair{RCC_APB1ENR, RccApb1EnrBit::Usart2En},
 		std::pair{RCC_APB1ENR, RccApb1EnrBit::PwrEn},
+		/*APB2*/
+		std::pair{RCC_APB2ENR, RccApb2EnrBit::Usart1En},
 	};
 
 	static constexpr std::tuple RccOscOn{
@@ -98,6 +116,7 @@ class RccRegTable {
 	}
 };
 
+// extend en and rst so that it takes template param pack
 template <RccPeriph PeriphClk>
 static constexpr void rcc_enable_periph_clk() noexcept {
 	constexpr auto const reg_bit_pair = RccRegTable::getPeriphEnReg<PeriphClk>();
@@ -186,16 +205,22 @@ static constexpr void rcc_set_pllsrc(PllClkSrc<Clk> const&) {
 
 static constexpr void rcc_config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																										 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
-	// @todo change to the other set bit method
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLM>(t_pllm);
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLN>(t_plln);
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLP>(t_pllp);
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLQ>(t_pllq);
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLR>(t_pllr);
+	auto const val_to_set = BitGroup{t_pllm, t_plln, t_pllp, t_pllq, t_pllr};
+	RCC_PLLCFGR
+		.setBit<RccPllCfgBit::PLLM, RccPllCfgBit::PLLN, RccPllCfgBit::PLLP, RccPllCfgBit::PLLQ, RccPllCfgBit::PLLR>(
+			val_to_set);
+}
+
+template <RccOsc Clk>
+static constexpr void rcc_set_pllsrc_and_div_factor(PllClkSrc<Clk> const&, PllM const& t_pllm, PllN const& t_plln,
+																										PllP const& t_pllp, PllQ const& t_pllq,
+																										PllR const& t_pllr) noexcept {
+	auto const val_to_set = BitGroup{Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr};
+	RCC_PLLCFGR.setBit<RccPllCfgBit::PLLSRC, RccPllCfgBit::PLLM, RccPllCfgBit::PLLN, RccPllCfgBit::PLLP,
+										 RccPllCfgBit::PLLQ, RccPllCfgBit::PLLR>(val_to_set);
 }
 
 static constexpr void rcc_config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
-	RCC_CFGR.setBit<RccCfgBit::HPRE>(t_hpre);
-	RCC_CFGR.setBit<RccCfgBit::PPRE1>(t_ppre1);
-	RCC_CFGR.setBit<RccCfgBit::PPRE2>(t_ppre2);
+	auto const val_to_set = BitGroup{t_hpre, t_ppre1, t_ppre2};
+	RCC_CFGR.setBit<RccCfgBit::HPRE, RccCfgBit::PPRE1, RccCfgBit::PPRE2>(val_to_set);
 }

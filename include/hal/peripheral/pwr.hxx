@@ -16,7 +16,7 @@ constexpr auto pwr_is_vos_rdy() noexcept { return get<0>(PWR_CSR.readBit<PwrCsrB
 
 constexpr void pwr_enable_overdrive() noexcept { PWR_CR.setBit<PwrCrBit::OdEn>(); }
 
-constexpr void pwr_enable_overdrive_switch() noexcept { PWR_CR.setBit<PwrCrBit::OdSEn>(); }
+constexpr void pwr_enable_overdrive_switch() noexcept { PWR_CR.setBit<PwrCrBit::OdSwEn>(); }
 
 constexpr auto pwr_is_overdrive_rdy() noexcept { return get<0>(PWR_CSR.readBit<PwrCsrBit::OdrRdy>(ValueOnly)); }
 

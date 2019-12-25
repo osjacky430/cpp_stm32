@@ -69,6 +69,9 @@ class Register {
 		return constexpr_std_find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
 	}
 
+	template <BitListIdx Idx>
+	using ConstIdxType = std::integral_constant<BitListIdx, Idx>;
+
  public:
 	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset) : m_base(base), m_offset(offset) {}
 
@@ -99,11 +102,15 @@ class Register {
 		static_assert((IS_TYPE_AVAILABLE<BitIdx, ValueTypes>() && ...));
 		static_assert((IS_BIT_WRITABLE<BitIdx>() && ...));
 
+		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_param) {
+			constexpr auto bit		= get_bit<BitList, to_underlying(t_bit_idx())>();
+			const auto val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_param);
+			return bit(val_to_mod);
+		};
+
 		const auto current_val = ((IS_BIT_READABLE<BitIdx>() || ...) ? MMIO32(m_base, m_offset) : 0);
 
-		// well, this is a bit ugly.. LUL
-		const auto mod_val =
-			(... | get_bit<BitList, to_underlying(BitIdx)>()(get<bitIdxOrder<BitIdx, BitIdx...>()>(t_param)));
+		const auto mod_val		= (... | mod_val_for_each_bit(ConstIdxType<BitIdx>{}, t_param));
 		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
 
 		MMIO32(m_base, m_offset) = ((current_val & clear_mask) | mod_val);
