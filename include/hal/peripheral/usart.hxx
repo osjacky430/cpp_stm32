@@ -2,7 +2,7 @@
  * @Date:   2019-12-24T15:30:54+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: usart.hxx
- * @Last modified time: 2019-12-25T14:17:56+08:00
+ * @Last modified time: 2019-12-26T06:06:11+08:00
  */
 
 #pragma once

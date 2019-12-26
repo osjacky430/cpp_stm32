@@ -14,6 +14,8 @@
 #include "include/hal/bit/bit.hxx"
 #include "include/hal/utility.hxx"
 
+#include "include/utility/constexpr_algo.hxx"
+
 template <typename BitList, std::size_t Idx>
 static constexpr auto get_bit() noexcept {
 	return std::get<Idx>(BitList::BIT_LIST);
@@ -66,7 +68,7 @@ class Register {
 	template <BitListIdx BitIdx, BitListIdx... BitIdxList>
 	static constexpr auto bitIdxOrder() noexcept {
 		auto const bit_idx_list = std::array{BitIdxList...};
-		return constexpr_std_find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
+		return cstd::find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
 	}
 
 	template <BitListIdx Idx>

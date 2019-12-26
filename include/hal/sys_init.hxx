@@ -2,7 +2,7 @@
  * @Date:   2019-12-11T14:39:29+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: sys_info.hxx
- * @Last modified time: 2019-12-25T14:13:59+08:00
+ * @Last modified time: 2019-12-26T01:17:24+08:00
  */
 
 #pragma once
@@ -113,10 +113,10 @@ class SysClock {
 			return (min_plln <= plln && plln <= max_plln);
 		};
 
-		constexpr auto pllp_iter = constexpr_std_find_if(PllP::AVAIL_DIVISION_FACTOR.begin(),
-																										 PllP::AVAIL_DIVISION_FACTOR.end(), pllp_satisfy_constraint);
-		constexpr auto pllp			 = pllp_iter->first;
-		constexpr auto plln			 = static_cast<std::uint32_t>(plln_over_pllp * pllp);
+		constexpr auto pllp_iter =
+			cstd::find_if(PllP::AVAIL_DIVISION_FACTOR.begin(), PllP::AVAIL_DIVISION_FACTOR.end(), pllp_satisfy_constraint);
+		constexpr auto pllp = pllp_iter->first;
+		constexpr auto plln = static_cast<std::uint32_t>(plln_over_pllp * pllp);
 
 		// if constexpr (need to calculate pllq and pllr) {
 		//    ...

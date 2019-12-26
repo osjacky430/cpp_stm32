@@ -104,11 +104,11 @@ struct PllP {
 
 	template <std::uint32_t Val>
 	static constexpr auto find_division_factor = []() {
-		constexpr auto iter_pos = constexpr_std_find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																										[](auto const& t_pair) { return t_pair.first == Val; });
+		constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
+																						[](auto const& t_pair) { return t_pair.first == Val; });
 		// even though we dont need this line, since this is constexpr. This line may help debugging somehow.
 		static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-		return AVAIL_DIVISION_FACTOR[iter_pos - AVAIL_DIVISION_FACTOR.begin()].second;
+		return iter_pos->second;
 	};
 };
 
@@ -168,10 +168,10 @@ struct HPRE {
 	template <std::uint32_t Val>
 	constexpr HPRE(DivisionFactor_t<Val> const&) noexcept
 		: m_hpreDivisionFactor([]() {
-				constexpr auto iter_pos = constexpr_std_find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																												[](auto const& t_pair) { return t_pair.first == Val; });
+				constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
+																								[](auto const& t_pair) { return t_pair.first == Val; });
 				static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-				return AVAIL_DIVISION_FACTOR[iter_pos - AVAIL_DIVISION_FACTOR.begin()].second;
+				return iter_pos->second;
 			}()) {}
 
 	constexpr auto get() const noexcept { return m_hpreDivisionFactor; }
@@ -190,10 +190,10 @@ struct PPRE {
 	template <std::uint32_t Val>
 	constexpr PPRE(DivisionFactor_t<Val> const&) noexcept
 		: m_ppreDivisionFactor([]() {
-				constexpr auto iter_pos = constexpr_std_find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																												[](auto const& t_pair) { return t_pair.first == Val; });
+				constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
+																								[](auto const& t_pair) { return t_pair.first == Val; });
 				static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-				return AVAIL_DIVISION_FACTOR[iter_pos - AVAIL_DIVISION_FACTOR.begin()].second;
+				return iter_pos->second;
 			}()) {}
 
 	constexpr auto get() const noexcept { return m_ppreDivisionFactor; }
