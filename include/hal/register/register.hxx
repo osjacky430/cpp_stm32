@@ -32,11 +32,32 @@ struct ValWithPosType {
 };
 static constexpr ValWithPosType ValWithPos{};
 
-template <typename BitList, typename BitListIdx>
+enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
+constexpr auto operator|(Access const& lhs, Access const& rhs) {
+	return Access{to_underlying(lhs) | to_underlying(rhs)};
+}
+
+template <typename BitList, typename BitListIdx, Access IoOp = Access::Word>
 class Register {
  private:
 	std::uint32_t const m_base;
 	std::uint32_t const m_offset;
+
+	/**
+	 * This function handles MMIO operation according to Access flag
+	 *
+	 * @return register value
+	 * @note this is written in relatively easy way, can be extended if needed
+	 */
+	decltype(auto) readReg() const noexcept {
+		if constexpr ((to_underlying(IoOp) & to_underlying(Access::Word)) != 0) {
+			return MMIO32(m_base, m_offset);
+		} else if constexpr ((to_underlying(IoOp) & to_underlying(Access::HalfWord)) != 0) {
+			return MMIO16(m_base, m_offset);
+		} else if constexpr ((to_underlying(IoOp) & to_underlying(Access::Byte)) != 0) {
+			return MMIO8(m_base, m_offset);
+		}
+	}
 
 	template <BitListIdx BitIdx, typename ValueType>
 	static constexpr auto IS_TYPE_AVAILABLE = []() {
@@ -45,22 +66,28 @@ class Register {
 	};
 
 	template <BitListIdx BitIdx>
+	static constexpr auto CHECK_BIT_MOD = [](BitMod const& t_check) {
+		using BitType = decltype(get_bit<BitList, to_underlying(BitIdx)>());
+		return BitType::MOD == t_check;
+	};
+
+	template <BitListIdx BitIdx>
 	static constexpr auto IS_BIT_WRITABLE = []() {
 		using BitType = decltype(get_bit<BitList, to_underlying(BitIdx)>());
-		return (to_underlying(BitType::MOD) & to_underlying(BitMod::WriteOnly)) != 0;
+		return (to_underlying(BitType::MOD) & to_underlying(BitMod::WrOnly)) != 0;
 	};
 
 	template <BitListIdx BitIdx>
 	static constexpr auto IS_BIT_READABLE = []() {
 		using BitType = decltype(get_bit<BitList, to_underlying(BitIdx)>());
-		return (to_underlying(BitType::MOD) & to_underlying(BitMod::ReadOnly)) != 0;
+		return (to_underlying(BitType::MOD) & to_underlying(BitMod::RdOnly)) != 0;
 	};
 
 	template <BitListIdx BitIdx>
 	constexpr auto readSingleBit(ValueOnlyType /*unused*/) const noexcept {
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
 		using Ret_t				 = typename decltype(bit)::AbstractType;
-		auto const ret_val = (MMIO32(m_base, m_offset) & bit.mask) >> bit.pos;
+		auto const ret_val = (readReg() & bit.mask) >> bit.pos;
 
 		return static_cast<Ret_t>(ret_val);
 	}
@@ -74,6 +101,18 @@ class Register {
 	template <BitListIdx Idx>
 	using ConstIdxType = std::integral_constant<BitListIdx, Idx>;
 
+	template <BitListIdx... BitIdx>
+	constexpr decltype(auto) readCurrentVal() const noexcept {
+		constexpr auto need_to_read_current_val =
+			((!CHECK_BIT_MOD<BitIdx>(BitMod::WrOnly) && !CHECK_BIT_MOD<BitIdx>(BitMod::RdSet)) || ...);
+
+		if constexpr (need_to_read_current_val) {
+			return readReg();
+		} else {
+			return 0;
+		}
+	}
+
  public:
 	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset) : m_base(base), m_offset(offset) {}
 
@@ -82,7 +121,7 @@ class Register {
 		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
 
 		static_assert(bit.LENGTH == 1);
-		MMIO32(m_base, m_offset) |= bit.mask;
+		readReg() |= bit.mask;
 	}
 
 	template <BitListIdx... BitIdx, typename ValueType>
@@ -90,12 +129,12 @@ class Register {
 		static_assert((IS_TYPE_AVAILABLE<BitIdx, ValueType>() && ...));
 		static_assert((IS_BIT_WRITABLE<BitIdx>() && ...));
 
-		const auto current_val = ((IS_BIT_READABLE<BitIdx>() || ...) ? MMIO32(m_base, m_offset) : 0);
+		const auto current_val = readCurrentVal<BitIdx...>();
 
 		const auto mod_val		= (... | get_bit<BitList, to_underlying(BitIdx)>()(t_param));
 		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
 
-		MMIO32(m_base, m_offset) = (current_val & clear_mask) | mod_val;
+		readReg() = (current_val & clear_mask) | mod_val;
 	}
 
 	template <BitListIdx... BitIdx, typename... ValueTypes>
@@ -110,12 +149,12 @@ class Register {
 			return bit(val_to_mod);
 		};
 
-		const auto current_val = ((IS_BIT_READABLE<BitIdx>() || ...) ? MMIO32(m_base, m_offset) : 0);
+		const auto current_val = readCurrentVal<BitIdx...>();
 
 		const auto mod_val		= (... | mod_val_for_each_bit(ConstIdxType<BitIdx>{}, t_param));
 		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
 
-		MMIO32(m_base, m_offset) = ((current_val & clear_mask) | mod_val);
+		readReg() = ((current_val & clear_mask) | mod_val);
 	}
 
 	// Rethink, when do i really need this function, if really needed, maybe combine two function
@@ -124,7 +163,7 @@ class Register {
 	constexpr auto readBit(ValWithPosType /*unused*/) const noexcept {
 		static_assert((IS_BIT_READABLE<BitIdx>() && ...));
 		constexpr auto mask = (get_bit<BitList, to_underlying(BitIdx)>().mask | ...);
-		return MMIO32(m_base, m_offset) & mask;	 // perhaps return array of bit?, or creat a kind of data type?
+		return readReg() & mask;	// perhaps return array of bit?, or creat a kind of data type?
 	}
 
 	// using std::bitset?
@@ -134,11 +173,16 @@ class Register {
 		return BitGroup{readSingleBit<BitIdx>(ValueOnly)...};
 	}
 
+	/**
+	 * This function writes 0 to the register at bit at BitIdx
+	 *
+	 * @tparam BitIdx 	position of the bit
+	 */
 	template <BitListIdx BitIdx>
 	constexpr void clearBit() const noexcept {
-		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
-		MMIO32(m_base, m_offset) &= (~bit.mask);
-	}
+		static_assert(!CHECK_BIT_MOD<BitIdx>(BitMod::RdClrWr1));
 
-	decltype(auto) readReg() const noexcept { return MMIO32(m_base, m_offset); }
+		constexpr auto bit = get_bit<BitList, to_underlying(BitIdx)>();
+		readReg() &= (~bit.mask);
+	}
 };

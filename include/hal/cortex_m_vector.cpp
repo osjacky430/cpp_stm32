@@ -2,16 +2,16 @@
  * @Date:   2019-11-19T15:47:16+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.cpp
- * @Last modified time: 2019-12-23T16:16:30+08:00
  */
 
 #include "include/hal/cortex_m_vector.hpp"
+#include "include/hal/interrupt.hxx"
 
 int main();
 void null_handler();
 void blocking_handler();
 
-[[gnu::section((".IrqVector"))]] const IrqVector irq_vector_table{
+[[gnu::section((".IrqVector"))]] IrqVector const irq_vector_table{
 	&STACK,
 	reset_handler,
 	nmi_handler,
@@ -30,7 +30,7 @@ void blocking_handler();
 	pending_service_call_handler,
 	system_clock_tick_handler,
 	{
-		IrqVector::Reserved{},	// @todo add the rest of interrupt handler
+		NVIC_INTERRUPT,
 	},
 };
 

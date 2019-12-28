@@ -13,16 +13,15 @@
 
 #include "include/utility/strongly_typed.hxx"
 
-using BitPos_t		= StrongType<std::uint32_t, struct BitPosition>;
-using BitLength_t = StrongType<std::uint32_t, struct BitLength>;
-
 enum class BitMod {
-	ReadOnly	= 0x100,
-	WriteOnly = 0x010,
-	ReadWrite = 0x110,
+	RdOnly	 = 0x100,
+	WrOnly	 = 0x010,
+	RdWr		 = 0x110,
+	RdSet		 = 0x111,
+	RdClrWr1 = 0x112,
 };
 
-template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::ReadWrite>
+template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::RdWr>
 class Bit {
  public:
 	using AbstractType = DataType;
@@ -33,7 +32,7 @@ class Bit {
 	std::uint32_t const mask;
 
  public:
-	constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1U << LENGTH) - 1U) << pos) {}
+	constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1ULL << LENGTH) - 1U) << pos) {}
 
 	// currently support only integral type and struct that implement get() method
 	// @todo change get() to operator() so that it support lambda(?)
@@ -48,11 +47,11 @@ class Bit {
 	}
 };
 
-template <BitMod Mod = BitMod::ReadWrite>
+template <BitMod Mod = BitMod::RdWr>
 using Binary = Bit<1, std::uint8_t, Mod>;
 
 template <std::uint32_t L>
-using StatusBit = Bit<L, std::uint8_t, BitMod::ReadOnly>;
+using StatusBit = Bit<L, std::uint8_t, BitMod::RdOnly>;
 
 template <typename... Args>
 class BitGroup {

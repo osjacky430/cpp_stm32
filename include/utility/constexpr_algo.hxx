@@ -2,7 +2,7 @@
  * @Date:   2019-12-16T15:38:08+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: constexpr_algo.hxx
- * @Last modified time: 2019-12-26T02:55:30+08:00
+ * @Last modified time: 2019-12-27T16:08:46+08:00
  */
 
 #pragma once
@@ -43,6 +43,13 @@ constexpr ForwardIt unique(ForwardIt first, ForwardIt last) {
 		}
 	}
 	return ++result;
+}
+
+template <class ForwardIt, class T>
+constexpr void fill(ForwardIt first, ForwardIt last, T const& value) {
+	for (; first != last; ++first) {
+		*first = value;
+	}
 }
 
 /**

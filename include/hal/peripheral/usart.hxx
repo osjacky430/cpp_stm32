@@ -2,7 +2,7 @@
  * @Date:   2019-12-24T15:30:54+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: usart.hxx
- * @Last modified time: 2019-12-26T06:06:11+08:00
+ * @Last modified time: 2019-12-28T00:06:36+08:00
  */
 
 #pragma once
@@ -116,4 +116,17 @@ template <UsartNum Port>
 constexpr void usart_send_blocking(std::uint8_t const& t_data) noexcept {
 	usart_send<Port>(t_data);
 	usart_wait_tx_rdy<Port>();
+}
+
+template <UsartNum Port, UsartStopbit Stop>
+constexpr void usart_set_dps(DataBit const& t_d, UsartParity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
+	std::uint8_t const pe		= (t_p != UsartParity::None);
+	auto const val_to_write = BitGroup{t_d, pe, t_p};
+	USART_CR1<Port>.template setBit<UsartCr1Bit::M, UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_write);
+	USART_CR2<Port>.template setBit<UsartCr2Bit::Stop>(Stop);
+}
+
+template <UsartNum Port>
+constexpr void usart_enable_txe_irq() noexcept {
+	USART_CR1<Port>.template setBit<UsartCr1Bit::TxEIE>();
 }

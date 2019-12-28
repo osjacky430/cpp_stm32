@@ -2,7 +2,7 @@
  * @Date:   2019-12-12T01:26:14+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: strongly_typed.hxx
- * @Last modified time: 2019-12-23T15:05:38+08:00
+ * @Last modified time: 2019-12-27T18:00:27+08:00
  */
 
 #pragma once
@@ -22,3 +22,5 @@ class StrongType {
 };
 
 using DeviceVolt_t = StrongType<float, struct Vdd_t>;
+using BitPos_t		 = StrongType<std::uint32_t, struct BitPosition>;
+using BitLength_t	 = StrongType<std::uint32_t, struct BitLength>;
