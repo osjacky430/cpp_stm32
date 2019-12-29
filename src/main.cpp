@@ -4,14 +4,14 @@
  * @Filename: main.cpp
  */
 
-#include "include/driver/digitalout.hpp"
-#include "include/driver/usart.hxx"
+#include "include/hal/sys_init.hxx"
 
 #include "include/hal/peripheral/nvic.hxx"
 #include "include/hal/peripheral/rcc.hxx"
 #include "include/hal/peripheral/usart.hxx"
 
-#include "include/hal/sys_init.hxx"
+#include "include/driver/digitalout.hpp"
+#include "include/driver/usart.hxx"
 
 int main() {
 	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
@@ -34,3 +34,5 @@ int main() {
 
 	return 0;
 }
+
+// void usart2_isr() noexcept {}

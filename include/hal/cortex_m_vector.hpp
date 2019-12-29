@@ -2,7 +2,7 @@
  * @Date:   2019-11-19T13:55:25+08:00
  * @Email:  osjacky430@gmail.com
  * @Filename: cortex_m_vector.hpp
- * @Last modified time: 2019-12-28T01:07:39+08:00
+ * @Last modified time: 2019-12-30T00:40:56+08:00
  */
 
 #ifndef CORTEX_M_VECTOR_HPP_
@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <cstdint>
 
-struct IrqVector {
+struct [[gnu::packed]] IrqVector {
 	using IrqFuncPtr = void (*)();
 	using Reserved	 = std::nullptr_t;
 

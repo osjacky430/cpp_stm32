@@ -7,9 +7,24 @@
 #include "include/hal/cortex_m_vector.hpp"
 #include "include/hal/interrupt.hxx"
 
+/**
+ * [main description]
+ * @return [description]
+ */
 int main();
-void null_handler();
-void blocking_handler();
+
+/**
+ * [null_handler description]
+ */
+void null_handler() { return; }
+
+/**
+ * [blocking_handler description]
+ */
+void blocking_handler() {
+	while (true) {
+	}
+}
 
 [[gnu::section((".IrqVector"))]] IrqVector const irq_vector_table{
 	&STACK,
@@ -71,13 +86,6 @@ void reset_handler() {
 	}
 }
 
-void null_handler() { return; }
-
-void blocking_handler() {
-	while (true) {
-	}
-}
-
 /**/
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void nmi_handler();
 [[gnu::weak, gnu::alias("_Z16blocking_handlerv")]] void hard_fault_handler();
@@ -88,3 +96,5 @@ void blocking_handler() {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void debug_monitor_handler();
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pending_service_call_handler();
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void system_clock_tick_handler();
+
+#include "include/hal/interrupt.cxx"

@@ -7,52 +7,10 @@
 #pragma once
 
 #include "include/hal/bit/bit.hxx"
+#include "include/hal/interrupt.hxx"
 #include "include/hal/memory_map.hxx"
 #include "include/hal/peripheral/memory/utility.hxx"
 #include "include/hal/register/register.hxx"
-
-enum class IrqNum : std::uint8_t {
-	WindowWatchDog = 0,
-	ProgVoltDetector,
-	TampStamp,
-	RtcWakeUp,
-	FlashGlobal,
-	RccGlobal,
-	Exti0Global,
-	Exti1Global,
-	Exti2Global,
-	Exti3Global,
-	Exti4Global,
-	Dma1Stream0Global,
-	Dma1Stream1Global,
-	Dma1Stream2Global,
-	Dma1Stream3Global,
-	Dma1Stream4Global,
-	Dma1Stream5Global,
-	Dma1Stream6Global,
-	AdcGlobal,
-	Can1Tx,
-	Can1Rx0,
-	Can1Rx1,
-	Can1Sce,
-	Exti9_5,
-	Tim1BrkTim9Global,
-	Tim1UpTim10Global,
-	Tim1TrgComTim11Global,
-	Tim1CC,
-	Tim2Global,
-	Tim3Global,
-	Tim4Global,
-	I2c1Ev,
-	I2c1Er,
-	I2c2Ev,
-	I2c2Er,
-	Spi1Global,
-	Spi2Global,
-	Usart1Global,
-	Usart2Global,
-	NvicIrqTotal,
-};
 
 static constexpr auto NVIC_BASE = to_underlying(Scs::NvicBase);
 
