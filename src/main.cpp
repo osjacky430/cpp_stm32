@@ -4,23 +4,27 @@
  * @Filename: main.cpp
  */
 
-#include "include/hal/sys_init.hxx"
+#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
-#include "include/hal/peripheral/nvic.hxx"
-#include "include/hal/peripheral/rcc.hxx"
-#include "include/hal/peripheral/usart.hxx"
+#include "cpp_stm32/driver/digitalout.hxx"
+#include "cpp_stm32/driver/usart.hxx"
 
-#include "include/driver/digitalout.hpp"
-#include "include/driver/usart.hxx"
+struct DebugLogger {
+	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200};
+
+	constexpr DebugLogger() noexcept {
+		/**/
+		debugOut.setTxeInterrupt(Callback<&DebugLogger::log>(this));
+	}
+
+	constexpr void log() noexcept { debugOut << 'c'; }
+};
 
 int main() {
 	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
 
+	DebugLogger logger{};
 	DigitalOut<PinName::PA_5> led;
-	Usart debug(UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200);
-
-	// nvic_enable_irq<IrqNum::Usart2Global>();
-	// usart_enable_txe_irq<UsartNum::Usart2>();
 
 	while (true) {
 		constexpr auto SOME_PERIOD = 1000000;
@@ -29,10 +33,7 @@ int main() {
 		}
 
 		led.toggle();
-		debug << "string\n\r";
 	}
 
 	return 0;
 }
-
-// void usart2_isr() noexcept {}

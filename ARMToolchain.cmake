@@ -12,7 +12,7 @@ set(CMAKE_RANLIB        ${COMPILER_PREFIX}ranlib CACHE FILEPATH "")
 set(STM32F4_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mcpu=cortex-m4")
 set(WARNING_FLAGS "-Wall -Wextera -Wimplicit-function-declaration -Wredundant-decls \
                    -Wmissing-prototypes -Wstrict-prototypes -Wundef -Wshadow")
-set(OPTIMIZATION_FLAGS "-ffunction-sections -fno-common -fdata-sections")
+set(OPTIMIZATION_FLAGS "-ffunction-sections -fno-common -fdata-sections -flto")
 set(CXX_FUNCTION_FLAGS "-fno-exceptions -fno-rtti -std=c++17")
 set(NEWLIB_FLAGS "--specs=nano.specs --specs=nosys.specs")
 
