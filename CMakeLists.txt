@@ -17,7 +17,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles ${LINKER_SCR
 include_directories(${CMAKE_SOURCE_DIR}/include)  # cpp driver
 include_directories(${CMAKE_SOURCE_DIR}/src)  # sys info header
 
-add_library(cpp_stm32 ${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/cortex_m_vector.cpp)
+add_library(cpp_stm32 ${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/cortex_m_vector.cxx)
 add_executable(main.elf src/main.cpp)
 target_link_libraries(main.elf cpp_stm32)
 add_custom_target(main.bin ALL ${CMAKE_OBJCOPY} -Obinary main.elf main.bin DEPENDS main.elf)

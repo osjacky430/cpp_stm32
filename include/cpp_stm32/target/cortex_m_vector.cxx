@@ -4,7 +4,7 @@
  * @Filename: cortex_m_vector.cpp
  */
 
-#include "cpp_stm32/target/cortex_m_vector.hpp"
+#include "cpp_stm32/target/cortex_m_vector.hxx"
 // @todo change the including header according to device
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 
