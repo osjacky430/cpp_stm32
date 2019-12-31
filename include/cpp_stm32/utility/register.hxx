@@ -44,7 +44,7 @@ class Register {
 	 * @return register value
 	 * @note this is written in relatively easy way, can be extended if needed
 	 */
-	decltype(auto) readReg() const noexcept {
+	constexpr decltype(auto) readReg() const noexcept {
 		if constexpr ((to_underlying(IoOp) & to_underlying(Access::Word)) != 0) {
 			return MMIO32(m_base, m_offset);
 		} else if constexpr ((to_underlying(IoOp) & to_underlying(Access::HalfWord)) != 0) {
@@ -93,9 +93,6 @@ class Register {
 		return cstd::find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
 	}
 
-	template <BitListIdx Idx>
-	using ConstIdxType = std::integral_constant<BitListIdx, Idx>;
-
 	template <BitListIdx... BitIdx>
 	constexpr decltype(auto) readCurrentVal() const noexcept {
 		constexpr auto need_to_read_current_val =
@@ -139,14 +136,14 @@ class Register {
 		static_assert((IS_BIT_WRITABLE<BitIdx>() && ...));
 
 		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_param) {
-			constexpr auto bit		= get_bit<BitList, to_underlying(t_bit_idx())>();
-			const auto val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_param);
+			constexpr auto bit		= get_bit<BitList, t_bit_idx()>();
+			const auto val_to_mod = get<bitIdxOrder<BitListIdx{t_bit_idx()}, BitIdx...>()>(t_param);
 			return bit(val_to_mod);
 		};
 
 		const auto current_val = readCurrentVal<BitIdx...>();
 
-		const auto mod_val		= (... | mod_val_for_each_bit(ConstIdxType<BitIdx>{}, t_param));
+		const auto mod_val		= (... | mod_val_for_each_bit(ConstIndexType<to_underlying(BitIdx)>{}, t_param));
 		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
 
 		readReg() = ((current_val & clear_mask) | mod_val);

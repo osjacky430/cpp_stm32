@@ -9,6 +9,7 @@ set(GENERATE_MAP_FILE "-Xlinker -Map=linker_output.map")
 set(PRINT_MEM_USAGE "-Xlinker --print-memory-usage")
 set(OPTIMIZE_FOR_DEBUG "-Og")
 set(OPTIMIZE_FOR_SIZE "-Os")
+set(OPTIMIZE_MAX "-O3")
 set(OPTIMIZE_NONE "-O0")
 
 set(CMAKE_CXX_FLAGS "-v ${CMAKE_CXX_FLAGS} ${OPTIMIZE_FOR_SIZE}" CACHE STRING "" FORCE)
