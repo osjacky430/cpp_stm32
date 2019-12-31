@@ -7,11 +7,6 @@
 #ifndef DIGITAL_OUT_HPP_
 #define DIGITAL_OUT_HPP_
 
-#include <array>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"

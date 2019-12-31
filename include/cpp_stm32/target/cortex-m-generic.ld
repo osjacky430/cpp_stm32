@@ -1,12 +1,6 @@
 
 ENTRY(_Z13reset_handlerv)  /* needs to consider c++ name mangling */
 
-MEMORY
-{
-  rom (rx)  : ORIGIN = 0x08000000, LENGTH = 512K
-  ram (rwx) : ORIGIN = 0x20000000, LENGTH = 128K
-}
-
 SECTIONS
 {
   .IrqVector :            /* */

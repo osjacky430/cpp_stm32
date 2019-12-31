@@ -38,7 +38,10 @@ static constexpr void WRAP_TO_C_STYLE_FUNC(void* const /**/) noexcept {
 template <IrqNum IRQn>
 class Interrupt {
  private:
-	static std::pair<void*, void (*)(void* const) noexcept> m_callback;
+	using WrapperFuncPtr = void (*)(void* const) noexcept;
+	using CStyleThisPtr	 = void*;
+
+	static std::pair<CStyleThisPtr, WrapperFuncPtr> m_callback;
 
  public:
 	explicit constexpr Interrupt() noexcept {}

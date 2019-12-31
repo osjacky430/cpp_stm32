@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11.4 FATAL_ERROR)
 
-set(LINKER_SCRIPT "-T ${CMAKE_SOURCE_DIR}/cortex-m4.ld")
+set(LINKER_SCRIPT "-T ${CMAKE_SOURCE_DIR}/stm32f446xe.ld")
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
 
 project(CppForStm32 LANGUAGES CXX)
@@ -17,6 +17,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles ${LINKER_SCR
 
 include_directories(${CMAKE_SOURCE_DIR}/include)  # cpp driver
 include_directories(${CMAKE_SOURCE_DIR}/src)  # sys info header
+link_directories(${CMAKE_SOURCE_DIR}/include/cpp_stm32/target) # to link linker script
 
 add_library(cpp_stm32 ${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/cortex_m_vector.cxx)
 add_executable(main.elf src/main.cpp)
