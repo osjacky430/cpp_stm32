@@ -1,12 +1,22 @@
-/**
- * @Date:   2019-12-24T14:08:01+08:00
- * @Email:  osjacky430@gmail.com
- * @Filename: usart_reg.hxx
- */
+// Copyright (c) 2020 by osjacky430.
+// All Rights Reserved.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the Lesser GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Lesser GNU General Public License for more details.
+//
+// You should have received a copy of the Lesser GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "cpp_stm32/target/memory_map.hxx"
+#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
@@ -15,11 +25,11 @@ enum class UsartNum { Usart1, Usart2, Usart6 };
 static constexpr auto USART_BASE(UsartNum const& t_usart_num) {
 	switch (t_usart_num) {
 		case UsartNum::Usart1:
-			return memory_at(MemoryMap::Apb2Base, 0x1000U);
+			return memory_at(PeriphAddr::Apb2Base, 0x1000U);
 		case UsartNum::Usart2:
-			return memory_at(MemoryMap::Apb1Base, 0x4400U);
+			return memory_at(PeriphAddr::Apb1Base, 0x4400U);
 		case UsartNum::Usart6:
-			return memory_at(MemoryMap::Apb2Base, 0x1400U);
+			return memory_at(PeriphAddr::Apb2Base, 0x1400U);
 	}
 }
 

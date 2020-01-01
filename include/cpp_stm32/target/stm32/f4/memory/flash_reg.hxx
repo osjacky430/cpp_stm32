@@ -1,18 +1,28 @@
-/**
- * @Date:   2019-12-23T04:27:43+08:00
- * @Email:  osjacky430@gmail.com
- * @Filename: flash_reg.hxx
- */
+// Copyright (c) 2020 by osjacky430.
+// All Rights Reserved.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the Lesser GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Lesser GNU General Public License for more details.
+//
+// You should have received a copy of the Lesser GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
 #include <cstdint>
 
-#include "cpp_stm32/target/memory_map.hxx"
+#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
-static constexpr auto FLASH_BASE = memory_at(MemoryMap::Ahb1Base, 0x3C00U);
+static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3C00U);
 
 template <std::uint8_t Val>
 using CpuWaitState_t = std::integral_constant<std::uint8_t, Val>;

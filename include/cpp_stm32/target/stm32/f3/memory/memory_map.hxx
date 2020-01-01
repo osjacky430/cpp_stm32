@@ -16,14 +16,17 @@
 
 #pragma once
 
-#include <array>
-#include <cstddef>
+#include "cpp_stm32/target/memory_map.hxx"
 
-template <typename Derive>
-class Serializable {
- protected:
-	constexpr Serializable() noexcept {}
-
- public:
-	constexpr auto serialize() const noexcept { return static_cast<Derive const*>(this)->serialization(); }
+/**
+ * @enum  PeriphAddr
+ * @brief
+ */
+enum class PeriphAddr : std::uint32_t {
+	PeriphBase = 0x40000000U,
+	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
+	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
+	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
+	Ahb2Base	 = memory_at(PeriphBase, 0x08000000U),
+	Ahb3Base	 = memory_at(PeriphBase, 0x10000000U),
 };

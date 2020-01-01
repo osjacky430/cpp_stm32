@@ -16,14 +16,10 @@
 
 #pragma once
 
-#include <array>
-#include <cstddef>
+#include "cpp_stm32/target/stm32/f3/memory/memory_map.hxx"
 
-template <typename Derive>
-class Serializable {
- protected:
-	constexpr Serializable() noexcept {}
+enum class GpioPort {};
 
- public:
-	constexpr auto serialize() const noexcept { return static_cast<Derive const*>(this)->serialization(); }
-};
+constexpr auto GPIO_BASE(GpioPort const& t_port) noexcept {
+	return memory_at(PeriphAddr::Ahb2Base, 0x0400 * to_underlying(t_port));
+}

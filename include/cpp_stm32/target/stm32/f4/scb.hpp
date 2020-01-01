@@ -1,12 +1,22 @@
-/**
- * @Date:   2019-11-22T23:14:44+08:00
- * @Email:  osjacky430@gmail.com
- * @Filename: scb.hpp
- * @Last modified time: 2019-11-23T23:53:01+08:00
- */
+// Copyright (c) 2020 by osjacky430.
+// All Rights Reserved.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the Lesser GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Lesser GNU General Public License for more details.
+//
+// You should have received a copy of the Lesser GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SCB_HPP_
-#define SCB_HPP_
+#pragma once
+
+#include <cstdint>
 
 class [[gnu::packed]] ScbExceptionStackFrame {
 	std::uint32_t r0;
@@ -21,5 +31,3 @@ class [[gnu::packed]] ScbExceptionStackFrame {
 };
 
 constexpr void scb_set_priority_grouping() noexcept {}
-
-#endif SCB_HPP_

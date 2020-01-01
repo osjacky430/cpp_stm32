@@ -1,12 +1,20 @@
-/**
- * @Date:   2019-11-19T13:55:25+08:00
- * @Email:  osjacky430@gmail.com
- * @Filename: cortex_m_vector.hpp
- * @Last modified time: 2019-12-30T00:40:56+08:00
- */
+// Copyright (c) 2020 by osjacky430.
+// All Rights Reserved.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the Lesser GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Lesser GNU General Public License for more details.
+//
+// You should have received a copy of the Lesser GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CORTEX_M_VECTOR_HPP_
-#define CORTEX_M_VECTOR_HPP_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -48,5 +56,3 @@ void system_clock_tick_handler();
 
 extern std::uint32_t STACK;
 extern IrqVector const irq_vector_table;
-
-#endif	// CORTEX_M_VECTOR_HPP_

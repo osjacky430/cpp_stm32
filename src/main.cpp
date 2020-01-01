@@ -21,10 +21,10 @@ struct DebugLogger {
 };
 
 int main() {
-	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
-
-	DebugLogger logger{};
-	DigitalOut<PinName::PA_5> led;
+	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	//
+	// DebugLogger logger{};
+	// DigitalOut<PinName::PA_5> led;
 
 	while (true) {
 		constexpr auto SOME_PERIOD = 1000000;
