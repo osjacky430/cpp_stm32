@@ -17,9 +17,10 @@
 #pragma once
 
 #include "cpp_stm32/target/memory_map.hxx"
-#include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
+
+enum class IrqNum : std::uint8_t;
 
 static constexpr auto NVIC_BASE = to_underlying(Scs::NvicBase);
 

@@ -16,8 +16,8 @@
 
 #pragma once
 
+#include "cpp_stm32/processor/cortex_m4/memory/nvic_reg.hxx"
 #include "cpp_stm32/target/memory_map.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/nvic_reg.hxx"
 
 template <IrqNum IRQn>
 constexpr void nvic_enable_irq() noexcept {

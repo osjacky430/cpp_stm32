@@ -21,8 +21,8 @@
 #include <utility>
 
 #include "cpp_stm32/driver/gpio_base.hxx"
+#include "cpp_stm32/processor/cortex_m4/nvic.hxx"	 // @todo change
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/f4/nvic.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/usart.hxx"
 #include "cpp_stm32/utility/callback.hxx"
