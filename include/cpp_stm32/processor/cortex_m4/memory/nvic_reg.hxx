@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cpp_stm32/target/memory_map.hxx"
+#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 

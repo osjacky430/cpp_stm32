@@ -14,7 +14,7 @@
 // You should have received a copy of the Lesser GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "cpp_stm32/target/cortex_m_vector.hxx"
+#include "cpp_stm32/processor/cortex_m4/vector_table.hxx"
 // @todo change the including header according to device
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 

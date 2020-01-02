@@ -20,7 +20,6 @@
 #include <tuple>
 #include <utility>
 
-#include "cpp_stm32/target/memory_map.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 
 enum class RccPeriph : std::uint32_t {

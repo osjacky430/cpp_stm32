@@ -22,7 +22,7 @@
 #include "cpp_stm32/utility/utility.hxx"
 
 // @todo add hal gpio.hxx for unified interface
-#include "cpp_stm32/target/stm32/f4/gpio.hxx"
+
 #include "cpp_stm32/target/stm32/f4/pin_map.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 
