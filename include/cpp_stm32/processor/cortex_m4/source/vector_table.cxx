@@ -15,8 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cpp_stm32/processor/cortex_m4/vector_table.hxx"
-// @todo change the including header according to device
-#include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 
 /**
  * [main description]
@@ -108,5 +106,4 @@ void reset_handler() {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pending_service_call_handler();
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void system_clock_tick_handler();
 
-// @todo change to include difference c file according to device
-#include "cpp_stm32/target/stm32/f4/source/interrupt.cxx"
+#include "source/interrupt.cxx"

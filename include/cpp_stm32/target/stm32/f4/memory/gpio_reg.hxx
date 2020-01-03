@@ -21,6 +21,9 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+/**
+ * @enum GpioPort
+ */
 enum class GpioPort { PortA, PortB, PortC, PortD, PortE, PortF, PortG, PortH, Total };
 
 enum class GpioPin {
@@ -43,7 +46,16 @@ enum class GpioPin {
 	Total
 };
 
-enum class GpioMode { Input, Output, AltFunc, Analog };
+/**
+ * @enum GpioMode
+ */
+enum class GpioMode {
+	Input,	 /*!< Input mode */
+	Output,	 /*!< Output mode */
+	AltFunc, /*!< Alternate Function mode*/
+	Analog	 /*!< Analog mode*/
+};
+
 enum class GpioPupd { None, PullUp, PullDown };
 enum class GpioOutType { PushPull, OpenDrain };
 enum class GpioOutSpeed { Low2M, Medium25M, Fast50M, High100M };

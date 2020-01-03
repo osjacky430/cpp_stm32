@@ -21,10 +21,11 @@
 
 #include "cpp_stm32/utility/utility.hxx"
 
-// @todo add hal gpio.hxx for unified interface
+// target specific include
+#include "pin_map.hxx"
+#include "rcc.hxx"
 
-#include "cpp_stm32/target/stm32/f4/pin_map.hxx"
-#include "cpp_stm32/target/stm32/f4/rcc.hxx"
+namespace cpp_stm32::driver {
 
 /**
  * [genPortList description]
@@ -113,6 +114,13 @@ class PinGroupingHelper {
 	static constexpr auto GPIO_GROUP_LIST = makeGpioGroupList();
 };
 
+/**
+ * @class GpioUtil
+ * @brief This class provides a more advance gpio utility, this class is used for other
+ *        driver class.
+ *
+ * @tparam  PinNames @ref PinName
+ */
 template <PinName... PinNames>
 class GpioUtil {
  private:
@@ -129,9 +137,13 @@ class GpioUtil {
 	static constexpr auto GpioGroupTupIdxSeq = std::make_index_sequence<GpioGroupTupElemNum<Idx>>{};
 
 	/**
-	 * [modeSetupIdxThruPin description]
-	 * @param ConstIndexType<Num> [description]
-	 * @param [name]              [description]
+	 * @brief    This function handles the setup of gpio mode
+	 * @details  Since we aim to accept pin names, we need to group pins wth same port, and call
+	 *           gpio functions for each port, this is done by two std::index_sequence, first one
+	 *           index through all port, see @ref modeSetupIdxThruPort, second one index through
+	 *           pins, which is the purpose of this function
+	 * @param t_mode @ref GpioMode
+	 * @param t_pupd @ref GpioPupd
 	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void modeSetupIdxThruPin(ConstIndexType<Num> const& /*unused*/,
@@ -143,8 +155,12 @@ class GpioUtil {
 	}
 
 	/**
-	 * [modeSetupIdxThruPort description]
-	 * @param [name] [description]
+	 * @brief    This function handles the setup of gpio mode
+	 * @details  Since we aim to accept pin names, we need to group pins wth same port, and call
+	 *           gpio functions for each port, this is done by two std::index_sequence, first one
+	 *           index through all port, which is the purpose of this function
+	 * @param t_mode @ref GpioMode
+	 * @param t_pupd @ref GpioPupd
 	 */
 	template <std::size_t... Idx>
 	static constexpr void modeSetupIdxThruPort(std::index_sequence<Idx...> const& /*unused*/, GpioMode const& t_mode,
@@ -153,9 +169,7 @@ class GpioUtil {
 	}
 
 	/**
-	 * [toggleIdxThruPin description]
-	 * @param ConstIndexType<Num> [description]
-	 * @param [name]              [description]
+	 * @brief    This function handels gpio toggle, for implementation detail, see @ref modeSetupIdxThruPin
 	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void toggleIdxThruPin(ConstIndexType<Num> /*unused*/,
@@ -166,8 +180,7 @@ class GpioUtil {
 	}
 
 	/**
-	 * [toggleIdxThruPort description]
-	 * @param [name] [description]
+	 * @brief    This function handels gpio toggle, for implementation detail, see @ref modeSetupIdxThruPort
 	 */
 	template <std::size_t... Idx>
 	static constexpr void toggleIdxThruPort(std::index_sequence<Idx...>) noexcept {
@@ -175,14 +188,21 @@ class GpioUtil {
 	}
 
 	/**
-	 * [enableAllGpioClkImp description]
-	 * @param [name] [description]
+	 * @brief    This function handles enabling of RCC peripheral clock of @ref GpioPort
+	 * @note     This is done by static casting @ref GpioPort to @ref RccPeriph, this implies that
+	 *           if we want this to work, we need to ensure @ref GpioPort enum entries match to the
+	 *           correct @ref RccPeriph enum entries
 	 */
 	template <std::size_t... Idx>
-	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...>) noexcept {
+	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...> /*unused*/) noexcept {
 		(rcc_enable_periph_clk<static_cast<RccPeriph>(PinGrouper::getPort(ConstIndexType<Idx>{}))>(), ...);
 	}
 
+	/**
+	 * @brief    This function handles the setup of alternate function, for implementation
+	 *           detail, see @ref modeSetupIdxThruPin
+	 * @param    t_af   @ref GpioAltFunc
+	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void alternateFuncSteupThruPin(ConstIndexType<Num> const& /*unused*/,
 																									std::index_sequence<Idx...> const& /*unused*/,
@@ -193,7 +213,9 @@ class GpioUtil {
 	}
 
 	/**
-	 * [enableAllGpioClk description]
+	 * @brief    This function handles the setup of alternate function, for implementation detail,
+	 *           see @ref modeSetupIdxThruPort
+	 * @param    t_af  @ref GpioAltFunc
 	 */
 	template <std::size_t... Idx>
 	static constexpr void alternateFuncSetupThruPort(std::index_sequence<Idx...> const& /*unused*/,
@@ -202,15 +224,32 @@ class GpioUtil {
 	}
 
  public:
+	/**
+	 * @brief  This function is the public interface of enabling RCC gpio clock according to input pin names
+	 */
 	static constexpr void enableAllGpioClk() noexcept { enableAllGpioClkImp(IdxThruPort{}); }
 
+	/**
+	 * @brief  This function is the public interface of gpio mode setup
+	 * @param t_mode @ref GpioMode
+	 * @param t_pupd @ref GpioPupd
+	 */
 	static constexpr void modeSetup(GpioMode const& t_mode, GpioPupd const& t_pupd) noexcept {
 		modeSetupIdxThruPort(IdxThruPort{}, t_mode, t_pupd);
 	}
 
+	/**
+	 * @brief  This function is the public interface of gpio toggle
+	 */
 	static constexpr void toggle() noexcept { toggleIdxThruPort(IdxThruPort{}); }
 
+	/**
+	 * @brief  This function is the public interface of gpio set alternate function
+	 * @param t_af  @ref GpioAltFunc
+	 */
 	static constexpr void alternateFuncSetup(GpioAltFunc const& t_af) noexcept {
 		alternateFuncSetupThruPort(IdxThruPort{}, t_af);
 	}
 };
+
+}	 // namespace cpp_stm32::driver

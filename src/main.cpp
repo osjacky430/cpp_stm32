@@ -7,7 +7,9 @@
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
 #include "cpp_stm32/driver/digitalout.hxx"
-#include "cpp_stm32/driver/usart.hxx"
+#include "cpp_stm32/driver/usart_serial.hxx"
+
+using namespace cpp_stm32::driver;
 
 struct DebugLogger {
 	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200};

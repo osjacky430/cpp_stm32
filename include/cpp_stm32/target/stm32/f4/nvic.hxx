@@ -16,22 +16,4 @@
 
 #pragma once
 
-// @todo gpio.hxx and rcc.hxx include should change to hal/gpio.hxx, hal/rcc.hxx respectively
-#include "cpp_stm32/driver/gpio_base.hxx"
-#include "cpp_stm32/utility/utility.hxx"
-
-namespace cpp_stm32::driver {
-
-template <PinName... PinNames>
-class DigitalOut {
- private:
- public:
-	constexpr DigitalOut() {
-		GpioUtil<PinNames...>::enableAllGpioClk();
-		GpioUtil<PinNames...>::modeSetup(GpioMode::Output, GpioPupd::None);
-	}
-
-	constexpr void toggle() const noexcept { GpioUtil<PinNames...>::toggle(); }
-};
-
-}	 // namespace cpp_stm32::driver
+#include "cpp_stm32/processor/cortex_m4/nvic.hxx"

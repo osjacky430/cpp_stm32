@@ -19,6 +19,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "interrupt.hxx"
+
 struct [[gnu::packed]] IrqVector {
 	using IrqFuncPtr = void (*)();
 	using Reserved	 = std::nullptr_t;
@@ -40,7 +42,7 @@ struct [[gnu::packed]] IrqVector {
 
 	IrqFuncPtr const pendServiceCall;	 // pending service call handler
 	IrqFuncPtr const sysTick;					 // system tick handler
-	IrqFuncPtr const irq[91];
+	IrqFuncPtr const irq[NVIC_IRQ_NUM];
 };
 
 void reset_handler();

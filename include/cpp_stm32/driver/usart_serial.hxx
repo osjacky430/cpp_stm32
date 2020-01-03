@@ -21,13 +21,17 @@
 #include <utility>
 
 #include "cpp_stm32/driver/gpio_base.hxx"
-#include "cpp_stm32/processor/cortex_m4/nvic.hxx"	 // @todo change
-#include "cpp_stm32/target/stm32/f4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/f4/rcc.hxx"
-#include "cpp_stm32/target/stm32/f4/usart.hxx"
 #include "cpp_stm32/utility/callback.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/serial.hxx"
+
+// target specific include
+#include "interrupt.hxx"
+#include "nvic.hxx"
+#include "rcc.hxx"
+#include "usart.hxx"
+
+namespace cpp_stm32::driver {
 
 class UsartPinMap {
  private:
@@ -162,3 +166,5 @@ class Usart {
 		usart_enable_txe_irq<USART_PORT>();
 	}
 };
+
+}	 // namespace cpp_stm32::driver

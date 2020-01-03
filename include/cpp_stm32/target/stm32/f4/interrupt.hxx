@@ -45,6 +45,8 @@
 		Interrupt<IrqNum::Usart1Global>::interrupt, Interrupt<IrqNum::Usart2Global>::interrupt,                           \
 		Interrupt<IrqNum::Usart3Global>::interrupt, Interrupt<IrqNum::Exti5_10>::interrupt
 
+#define NVIC_IRQ_NUM 91
+
 void wwdg_isr() noexcept;
 void pvd_isr() noexcept;
 void tamp_stamp_isr() noexcept;
