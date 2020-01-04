@@ -21,6 +21,7 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32 {
 /**
  * @enum GpioPort
  */
@@ -159,3 +160,5 @@ template <GpioPort Port>
 static constexpr auto GPIO_AFRH = BASE_GPIO_AFRH<GPIO_BASE(Port), 0x24U>;
 
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32

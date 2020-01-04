@@ -26,6 +26,8 @@
 #include "cpp_stm32/utility/mmio.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
+namespace cpp_stm32 {
+
 template <typename BitList, std::size_t Idx>
 static constexpr auto get_bit() noexcept {
 	return std::get<Idx>(BitList::BIT_LIST);
@@ -189,11 +191,13 @@ class Register {
 	}
 };
 
-#define SETUP_REGISTER_INFO(Name, ...)                 \
-	class Name {                                         \
-		template <typename BitList, std::size_t Idx>       \
-		friend constexpr auto get_bit() noexcept;          \
-                                                       \
-	 private:                                            \
-		static constexpr std::tuple BIT_LIST{__VA_ARGS__}; \
+#define SETUP_REGISTER_INFO(Name, ...)                   \
+	class Name {                                           \
+		template <typename BitList, std::size_t Idx>         \
+		friend constexpr auto cpp_stm32::get_bit() noexcept; \
+                                                         \
+	 private:                                              \
+		static constexpr std::tuple BIT_LIST{__VA_ARGS__};   \
 	};
+
+}	 // namespace cpp_stm32

@@ -26,6 +26,8 @@
 
 #include "sys_info.hpp"
 
+namespace cpp_stm32::stm32::f4 {
+
 /**
  * @defgroup DEVICE_VOLTAGE_DEF
  * @{
@@ -213,3 +215,5 @@ class SysClock {
 		rcc_wait_sysclk_rdy<SystemClock>();
 	}
 };
+
+}	 // namespace cpp_stm32::stm32::f4

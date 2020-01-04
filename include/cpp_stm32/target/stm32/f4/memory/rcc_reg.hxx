@@ -24,6 +24,8 @@
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
 
 template <std::uint32_t Val>
@@ -357,3 +359,5 @@ enum class RccBdcrBit {
 static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x70U};
 
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32::f4

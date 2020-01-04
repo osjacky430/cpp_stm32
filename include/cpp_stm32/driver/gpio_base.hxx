@@ -22,19 +22,19 @@
 #include "cpp_stm32/utility/utility.hxx"
 
 // target specific include
-#include "pin_map.hxx"
-#include "rcc.hxx"
+#include "device.hxx"
 
 namespace cpp_stm32::driver {
 
-/**
- * [genPortList description]
- * @param  [name] [description]
- * @return        [description]
- */
 template <PinName... PinNames>
 class PinGroupingHelper {
  private:
+	using IdxThruPinNameList = std::make_index_sequence<sizeof...(PinNames)>;
+
+	/**
+	 * @brief    This function handles the generation of list of port used according to the input pin names
+	 * @return   List of gpio port used
+	 */
 	template <std::size_t... Idx>
 	static constexpr auto genPortList(std::index_sequence<Idx...> const& /*unused*/) noexcept {
 		auto port_list = std::array{PinNameMap::getPortFromPinMap(PIN_NAME_LIST[Idx])...};
@@ -44,11 +44,20 @@ class PinGroupingHelper {
 		return result_port_list;
 	}
 
+	/**
+	 * @brief    This function handles the generation of list of pin list, the generated list of pin list
+	 *           have same seqeunce as port list
+	 * @return   list of gpio pin list
+	 */
 	template <std::size_t... Idx>
 	static constexpr auto genPinList(std::index_sequence<Idx...> const& /*unused*/) noexcept {
 		return std::array{PinNameMap::getPinFromPinMap(PIN_NAME_LIST[Idx])...};
 	}
 
+	/**
+	 * @brief    This function calculate the number of port used
+	 * @return   The number of port used
+	 */
 	static constexpr auto calcPortNum() noexcept {
 		auto port_list = std::array{PinNameMap::getPortFromPinMap(PinNames)...};
 		cstd::sort(port_list, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
@@ -64,11 +73,17 @@ class PinGroupingHelper {
 		return pin_name_list;
 	}();
 
-	using IdxThruPinNameList = std::make_index_sequence<sizeof...(PinNames)>;
-
 	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{});
 	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});
 
+	/**
+	 * @brief    This function collect the pin with same port
+	 * @details  This is basically done by index through port list, if the port of pin name
+	 *           matches the port list, then return the pin number. Typically, it can be done by two
+	 *           for loops, but since we are dealing with non-type template, we use two
+	 *           std::index_sequence and fold expression instead.
+	 * @return   The tuple of pin number
+	 */
 	template <std::size_t PortIdx, std::size_t... PinIdx>
 	static constexpr auto groupPinByPort(ConstIndexType<PortIdx> const& /*unused*/,
 																			 std::index_sequence<PinIdx...> const& /*unused*/) noexcept {

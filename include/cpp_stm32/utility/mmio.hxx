@@ -20,6 +20,8 @@
 
 #include "cpp_stm32/utility/utility.hxx"
 
+namespace cpp_stm32 {
+
 // slightly binary file size overhead, due to "regVal"
 template <typename T>
 class MMIO_t {
@@ -108,3 +110,5 @@ enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
 constexpr auto operator|(Access const& lhs, Access const& rhs) {
 	return Access{to_underlying(lhs) | to_underlying(rhs)};
 }
+
+}	 // namespace cpp_stm32

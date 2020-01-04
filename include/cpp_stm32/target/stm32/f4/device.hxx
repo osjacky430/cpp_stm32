@@ -16,28 +16,16 @@
 
 #pragma once
 
-#include <functional>
+#include "cpp_stm32/target/stm32/f4/gpio.hxx"
+#include "cpp_stm32/target/stm32/f4/interrupt.hxx"
+#include "cpp_stm32/target/stm32/f4/nvic.hxx"
+#include "cpp_stm32/target/stm32/f4/pin_map.hxx"
+#include "cpp_stm32/target/stm32/f4/rcc.hxx"
+#include "cpp_stm32/target/stm32/f4/usart.hxx"
 
-namespace cpp_stm32 {
+namespace cpp_stm32::driver {
 
-template <auto F>
-struct Callback;
+using namespace cpp_stm32::stm32;
+using namespace cpp_stm32::stm32::f4;
 
-template <typename OwnerT, void (OwnerT::*F)()>
-struct Callback<F> {
-	using MethodHolder = OwnerT;
-
-	explicit constexpr Callback(OwnerT* const t_val) : thisPtr{t_val} {}
-
-	OwnerT* const thisPtr;
-	constexpr auto invoke() const noexcept { return thisPtr != nullptr ? std::invoke(F, thisPtr) : void(); }
-};
-
-template <typename Ret, Ret (*F)()>
-struct Callback<F> {
-	using MethodHolder = void;
-
-	constexpr auto invoke() const noexcept { return F(); }
-};
-
-}	 // namespace cpp_stm32
+}	 // namespace cpp_stm32::driver

@@ -106,6 +106,8 @@ static constexpr auto IRQ_FUNC_HANDLER = std::array{
 	usart3_isr,				 exti5_10_isr,
 };
 
+namespace cpp_stm32 {
+
 enum class IrqNum : std::uint8_t {
 	WindowWatchDog = 0,
 	ProgVoltDetector,
@@ -150,3 +152,5 @@ enum class IrqNum : std::uint8_t {
 	Exti5_10,
 	NvicIrqTotal
 };
+
+}	 // namespace cpp_stm32

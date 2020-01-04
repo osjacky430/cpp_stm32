@@ -19,7 +19,11 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace cpp_stm32 {
+
 constexpr auto operator"" _MHz(std::uint64_t freq) noexcept { return freq * 1000000ULL; }
 constexpr auto operator"" _KHz(long double freq) noexcept { return freq * 1000ULL; }
 constexpr auto operator"" _KHz(std::uint64_t freq) noexcept { return freq * 1000ULL; }
 constexpr auto operator"" _MBaud(std::uint64_t Baud) noexcept { return Baud * 1000000ULL; }
+
+}	 // namespace cpp_stm32

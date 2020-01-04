@@ -19,6 +19,8 @@
 #include <array>
 #include <cstddef>
 
+namespace cpp_stm32 {
+
 template <typename Derive>
 class Serializable {
  protected:
@@ -27,3 +29,5 @@ class Serializable {
  public:
 	constexpr auto serialize() const noexcept { return static_cast<Derive const*>(this)->serialization(); }
 };
+
+}	 // namespace cpp_stm32

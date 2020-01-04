@@ -35,6 +35,8 @@ void blocking_handler() {
 	}
 }
 
+using namespace cpp_stm32;
+
 [[gnu::section((".IrqVector"))]] IrqVector const irq_vector_table{
 	&STACK,
 	reset_handler,

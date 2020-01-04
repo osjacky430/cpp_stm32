@@ -23,6 +23,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 static constexpr auto PWR_BASE = memory_at(PeriphAddr::Apb1Base, 0x7000U);
 
 /**
@@ -57,3 +59,5 @@ enum class PwrCsrBit { VosRdy, OdrRdy, OdrSwRdy };
 
 static constexpr Register<PwrCsrInfo, PwrCsrBit> PWR_CSR{PWR_BASE, 0x04U};
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32::f4

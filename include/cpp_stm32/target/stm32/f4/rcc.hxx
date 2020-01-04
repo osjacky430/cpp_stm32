@@ -22,6 +22,8 @@
 
 #include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 enum class RccPeriph : std::uint32_t {
 	/*AHB1*/
 	GpioA,
@@ -233,3 +235,5 @@ static constexpr void rcc_config_adv_bus_division_factor(HPRE const& t_hpre, PPR
 	auto const val_to_set = BitGroup{t_hpre, t_ppre1, t_ppre2};
 	RCC_CFGR.setBit<RccCfgBit::HPRE, RccCfgBit::PPRE1, RccCfgBit::PPRE2>(val_to_set);
 }
+
+}	 // namespace cpp_stm32::stm32::f4

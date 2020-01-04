@@ -22,6 +22,9 @@
 #include <utility>
 
 #include "cpp_stm32/utility/strongly_typed.hxx"
+#include "cpp_stm32/utility/utility.hxx"
+
+namespace cpp_stm32 {
 
 enum class BitMod {
 	RdOnly	 = 0x100,
@@ -128,3 +131,5 @@ template <typename T, std::size_t... Pos>
 constexpr auto SETUP_BIT_LIST(BitPosSeq_t<Pos...> const& /*unused*/) noexcept {
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
+
+}	 // namespace cpp_stm32

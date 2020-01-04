@@ -18,9 +18,11 @@
 
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
 
+namespace cpp_stm32 {
+
 /**
- * @enum  PeriphAddr
- * @brief
+ * @enum  	PeriphAddr
+ * @brief		Device specific peripheral address
  */
 enum class PeriphAddr : std::uint32_t {
 	PeriphBase = 0x40000000U,
@@ -30,3 +32,5 @@ enum class PeriphAddr : std::uint32_t {
 	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
 	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
 };
+
+}	 // namespace cpp_stm32

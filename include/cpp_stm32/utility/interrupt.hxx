@@ -21,6 +21,8 @@
 #include "cpp_stm32/utility/callback.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
+namespace cpp_stm32 {
+
 enum class IrqNum : std::uint8_t;
 
 /**
@@ -83,3 +85,5 @@ class Interrupt {
 		std::get<1>(m_callback) = &WRAP_TO_C_STYLE_FUNC<Function>;
 	}
 };
+
+}	 // namespace cpp_stm32

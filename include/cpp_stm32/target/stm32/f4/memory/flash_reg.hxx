@@ -22,6 +22,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3C00U);
 
 template <std::uint8_t Val>
@@ -64,3 +66,5 @@ enum class FlashAcrBit {
 static constexpr Register<FlashAcrInfo, FlashAcrBit> FLASH_ACR{FLASH_BASE, 0x00U};
 
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32::f4

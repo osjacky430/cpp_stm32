@@ -18,6 +18,8 @@
 
 #include "cpp_stm32/target/stm32/f4/memory/pwr_reg.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 enum class VoltageScale { Scale1Mode = 0b11, Scale2Mode = 0b10, Scale3Mode = 0b01 };
 
 // only set with pll is enabled
@@ -50,3 +52,5 @@ constexpr void pwr_wait_overdrive_switch_rdy() noexcept {
 }
 
 constexpr void pwr_set_voltage_scale(VoltageScale const& t_val) noexcept { PWR_CR.setBit<PwrCrBit::Vos>(t_val); }
+
+}	 // namespace cpp_stm32::stm32::f4

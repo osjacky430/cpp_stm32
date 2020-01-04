@@ -21,6 +21,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32 {
+
 enum class GpioPort;
 enum class GpioPin;
 enum class GpioMode;
@@ -104,3 +106,5 @@ template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
 static constexpr Register<GpioBrrInfo, GpioPin> BASE_GPIO_BRR{BaseAddr, OffsetAddr};
 
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32

@@ -21,6 +21,8 @@
 #include <type_traits>
 #include <utility>
 
+namespace cpp_stm32 {
+
 /**
  *
  */
@@ -64,3 +66,5 @@ template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
 constexpr auto to_underlying(Enum t_e) noexcept {
 	return static_cast<std::underlying_type_t<Enum>>(t_e);
 }
+
+}	 // namespace cpp_stm32

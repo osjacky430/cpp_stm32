@@ -19,6 +19,8 @@
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/nvic_reg.hxx"
 
+namespace cpp_stm32 {
+
 template <IrqNum IRQn>
 constexpr void nvic_enable_irq() noexcept {
 	NVIC_ISER<IRQn>.template setBit<NVIC_IRQ_BIT_POS(IRQn)>();
@@ -66,3 +68,5 @@ constexpr void nvic_set_irq_priority(std::uint8_t const& t_priority) noexcept {
 		NVIC_IPR<IRQn>.setBit<NvicIprBit::Ip>(t_priority);
 	}
 }
+
+}	 // namespace cpp_stm32

@@ -19,6 +19,8 @@
 #include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 enum class OverSampling : std::uint8_t { OverSampling16, OverSampling8 };
 enum class DataBit : std::uint8_t { DataBit8, DataBit9 };
 enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
@@ -139,3 +141,5 @@ template <UsartNum Port>
 constexpr void usart_enable_txe_irq() noexcept {
 	USART_CR1<Port>.template setBit<UsartCr1Bit::TxEIE>();
 }
+
+}	 // namespace cpp_stm32::stm32::f4

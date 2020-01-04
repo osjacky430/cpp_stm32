@@ -20,6 +20,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32 {
+
 enum class IrqNum : std::uint8_t;
 
 static constexpr auto NVIC_BASE = to_underlying(Scs::NvicBase);
@@ -111,3 +113,5 @@ enum class NvicStirBit { IntId };
 // this is rather special cause nvic register are separated in two parts
 static constexpr Register<NvicStirInfo, NvicStirBit> NVIC_STIR{NVIC_BASE, 0xD00};
 /**@}*/
+
+}	 // namespace cpp_stm32

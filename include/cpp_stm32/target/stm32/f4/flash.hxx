@@ -23,6 +23,8 @@
 #include "cpp_stm32/utility/literal_op.hxx"
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 struct FlashWaitTable {
  private:
 	template <float const& Vdd>
@@ -90,3 +92,5 @@ constexpr void flash_config_access_ctl(FlashLatency const& t_cpu) noexcept {
 		BitGroup{t_cpu, static_cast<std::uint8_t>(to_underlying(Setting) != 0)...};	 // fill the rest with 1
 	FLASH_ACR.template setBit<FlashAcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
+
+}	 // namespace cpp_stm32::stm32::f4

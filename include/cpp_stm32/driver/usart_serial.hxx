@@ -26,10 +26,7 @@
 #include "cpp_stm32/utility/serial.hxx"
 
 // target specific include
-#include "interrupt.hxx"
-#include "nvic.hxx"
-#include "rcc.hxx"
-#include "usart.hxx"
+#include "device.hxx"
 
 namespace cpp_stm32::driver {
 

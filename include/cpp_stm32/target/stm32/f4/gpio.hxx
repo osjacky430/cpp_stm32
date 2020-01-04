@@ -21,7 +21,7 @@
 #include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
 
 // @todo add function to namespace
-namespace stm32::f4 {}
+namespace cpp_stm32::stm32::f4 {
 
 template <GpioPort Port, GpioPin... Pins>
 constexpr void gpio_set_mode(GpioMode const& t_mode) noexcept {
@@ -80,3 +80,5 @@ constexpr void gpio_set_af(GpioAltFunc const& t_af) noexcept {
 		GPIO_AFRH<Port>.template setBit<high_pin_group(Pins)...>(t_af);
 	}
 }
+
+}	 // namespace cpp_stm32::stm32::f4

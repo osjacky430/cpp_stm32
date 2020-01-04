@@ -20,6 +20,7 @@
 
 #include "cpp_stm32/utility/utility.hxx"
 
+namespace cpp_stm32 {
 /**
  * @brief  This function is a helper function that add base addr and offset
  * @param  b  Base address, can be scoped enum or integer
@@ -103,3 +104,5 @@ enum class Scs : std::uint32_t {
 };
 
 /**@}*/
+
+}	 // namespace cpp_stm32

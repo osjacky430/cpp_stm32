@@ -20,6 +20,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32::f4 {
+
 enum class UsartNum { Usart1, Usart2, Usart6 };
 
 static constexpr auto USART_BASE(UsartNum const& t_usart_num) {
@@ -147,3 +149,5 @@ template <UsartNum Port>
 static constexpr Register<UsartGtprInfo, UsartGtprBit> USART_GTPR{USART_BASE(Port), 0x18U};
 
 /**@}*/
+
+}	 // namespace cpp_stm32::stm32::f4

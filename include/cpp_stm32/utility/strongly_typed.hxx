@@ -18,6 +18,8 @@
 
 #include <cstdint>
 
+namespace cpp_stm32 {
+
 template <typename UnderlyingType, typename Tag>
 class StrongType {
  public:
@@ -35,3 +37,5 @@ using BitPos_t		 = StrongType<std::uint32_t, struct BitPosition>;
 using BitLength_t	 = StrongType<std::uint32_t, struct BitLength>;
 using BaseAddr_t	 = StrongType<std::uint32_t, struct BaseAddress>;
 using Offset_t		 = StrongType<std::uint16_t, struct Offset>;
+
+}	 // namespace cpp_stm32
