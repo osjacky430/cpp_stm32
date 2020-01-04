@@ -20,7 +20,6 @@
 
 #include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
 
-// @todo add function to namespace
 namespace cpp_stm32::stm32::f4 {
 
 template <GpioPort Port, GpioPin... Pins>
@@ -69,10 +68,8 @@ constexpr void gpio_set_af(GpioAltFunc const& t_af) noexcept {
 		constexpr auto high_pin_group = [](GpioPin t_pin) {
 			if (t_pin > GpioPin::Pin7) {
 				// use "to_underlying" will generate internal compiler error
-
 				// this is a bit hacky IMO, but can't come up with a better idea
 				// @todo perhap add index rule in register class
-
 				return GpioPin{static_cast<std::underlying_type_t<GpioPin>>(t_pin) - 8};
 			}
 		};

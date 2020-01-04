@@ -16,15 +16,15 @@
 
 #pragma once
 
-// @todo gpio.hxx and rcc.hxx include should change to hal/gpio.hxx, hal/rcc.hxx respectively
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/utility/utility.hxx"
+
+#include "device.hxx"
 
 namespace cpp_stm32::driver {
 
 template <PinName... PinNames>
 class DigitalOut {
- private:
  public:
 	constexpr DigitalOut() {
 		GpioUtil<PinNames...>::enableAllGpioClk();

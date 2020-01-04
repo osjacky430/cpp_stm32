@@ -26,6 +26,12 @@
 
 namespace cpp_stm32::driver {
 
+/**
+ * @class   PinGroupingHelper
+ * @brief   This class is a helper class that extracts pins and ports from input pin names, and provides some
+ *          useful information.
+ * @tparam  PinNames @ref PinName
+ */
 template <PinName... PinNames>
 class PinGroupingHelper {
  private:
@@ -64,24 +70,28 @@ class PinGroupingHelper {
 		return cstd::unique(port_list.begin(), port_list.end()) - port_list.begin();
 	}
 
-	static constexpr auto PORT_NUM = calcPortNum();
-
-	static constexpr auto PIN_NAME_LIST = []() {
+	/**
+	 * @brief    This function generate pin name list, it will remove duplicate pin name
+	 * @return   List of pin name
+	 */
+	static constexpr auto genPinNameList() noexcept {
 		auto pin_name_list = std::array{PinNames...};
 		cstd::sort(pin_name_list,
 							 [](auto const& lhs, auto const& rhs) { return (to_underlying(lhs) < to_underlying(rhs)); });
 		return pin_name_list;
-	}();
+	}
 
-	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{});
-	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});
+	static constexpr auto PORT_NUM			= calcPortNum();								 /*!< Number of port used */
+	static constexpr auto PIN_NAME_LIST = genPinNameList();							 /*!< List of pin name */
+	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{}); /*!< list of port according to pin name list */
+	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	 /*!< list of pin according to pin name list*/
+
+	using IdxThruPort = std::make_index_sequence<PORT_NUM>;
 
 	/**
-	 * @brief    This function collect the pin with same port
-	 * @details  This is basically done by index through port list, if the port of pin name
-	 *           matches the port list, then return the pin number. Typically, it can be done by two
-	 *           for loops, but since we are dealing with non-type template, we use two
-	 *           std::index_sequence and fold expression instead.
+	 * @brief    This function collect pins with same port
+	 * @details  This is basically done by index through port list and pin list, if the port of pin name matches current
+	 *           port in the port list, then return the pin number. This function handles pin list indexing.
 	 * @return   The tuple of pin number
 	 */
 	template <std::size_t PortIdx, std::size_t... PinIdx>
@@ -99,6 +109,11 @@ class PinGroupingHelper {
 		return std::tuple_cat(IterateThruPins(ConstIndexType<PinIdx>{})...);
 	}
 
+	/**
+	 * @brief    This function collect pins with same port, for implementation details, see @ref groupPinByPort,
+	 *           this function handles port list indexing.
+	 * @return   Return list of gpio pin list
+	 */
 	template <std::size_t... Idx>
 	static constexpr auto makeGpioGroupListImp(std::index_sequence<Idx...> const& /*unused*/) noexcept {
 		constexpr auto IterateThruPorts = [](const auto t_port_iter) {
@@ -109,29 +124,45 @@ class PinGroupingHelper {
 		return std::make_tuple(IterateThruPorts(ConstIndexType<Idx>{})...);
 	}
 
+	/**
+	 * @brief    This function wraps the implementation of makeing list of gpio list
+	 * @return   List of gpio pin list
+	 */
 	static constexpr auto makeGpioGroupList() noexcept { return makeGpioGroupListImp(IdxThruPort{}); }
 
  public:
-	using IdxThruPort = std::make_index_sequence<PORT_NUM>;
-
+	/**
+	 * @brief    This function is a getter function to get nth port in gpio port list
+	 * @todo     Is the order of GpioPort important in this case? Since we remove duplicate
+	 *           pin name, this means the number may not be the same as user expected
+	 * @return   @ref GpioPort
+	 */
 	template <std::size_t N>
 	[[nodiscard]] static constexpr auto getPort(ConstIndexType<N>) noexcept {
 		return std::get<N>(PORT_LIST);
 	}
 
+	/**
+	 * @brief   This function is a getter function to get nth pin in gpio pin list
+	 * @return  @ref GpioPin
+	 */
 	template <std::size_t N>
 	[[nodiscard]] static constexpr auto getPin(ConstIndexType<N>) noexcept {
 		return std::get<N>(PIN_LIST);
 	}
 
+	/**
+	 * @brief    This function is a getter function to get the number of port used
+	 * @return   The number of port used
+	 */
 	[[nodiscard]] static constexpr auto getPortNum() noexcept { return PORT_NUM; }
 
-	static constexpr auto GPIO_GROUP_LIST = makeGpioGroupList();
+	static constexpr auto GPIO_GROUP_LIST = makeGpioGroupList(); /*!< List of gpio pin list */
 };
 
 /**
  * @class GpioUtil
- * @brief This class provides a more advance gpio utility, this class is used for other
+ * @brief This class provides a more advance gpio utility, this class is used by other
  *        driver class.
  *
  * @tparam  PinNames @ref PinName

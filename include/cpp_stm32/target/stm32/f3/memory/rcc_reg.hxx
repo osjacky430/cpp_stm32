@@ -24,4 +24,8 @@
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+namespace cpp_stm32::stm32 {
+
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x1000);
+
+}

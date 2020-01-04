@@ -25,7 +25,42 @@
 
 namespace cpp_stm32::driver {
 
-using namespace cpp_stm32::stm32;
-using namespace cpp_stm32::stm32::f4;
+using cpp_stm32::stm32::GpioAltFunc;
+using cpp_stm32::stm32::GpioMode;
+using cpp_stm32::stm32::GpioPin;
+using cpp_stm32::stm32::GpioPort;
+using cpp_stm32::stm32::GpioPupd;
+using cpp_stm32::stm32::PinName;
+using cpp_stm32::stm32::PinNameMap;
+
+namespace TargetDevice = cpp_stm32::stm32::f4;
+
+using TargetDevice::rcc_enable_periph_clk;
+using TargetDevice::RccPeriph;
+
+using TargetDevice::gpio_mode_setup;
+using TargetDevice::gpio_set_af;
+using TargetDevice::gpio_toggle;
+
+using TargetDevice::DataBit;
+using TargetDevice::HardwareFlowControl;
+using TargetDevice::StopBit_v;
+using TargetDevice::UsartMode;
+using TargetDevice::UsartNum;
+using TargetDevice::UsartParity;
+using TargetDevice::UsartStopbit;
+
+using TargetDevice::usart_enable;
+using TargetDevice::usart_enable_txe_irq;
+using TargetDevice::usart_send;
+using TargetDevice::usart_send_blocking;
+using TargetDevice::usart_set_baudrate;
+using TargetDevice::usart_set_dps;
+using TargetDevice::usart_set_hardware_flow_ctl;
+using TargetDevice::usart_set_transfer_mode;
+
+using TargetDevice::PllClkSrc;
+using TargetDevice::RccOsc;
+using TargetDevice::SysClock;
 
 }	 // namespace cpp_stm32::driver
