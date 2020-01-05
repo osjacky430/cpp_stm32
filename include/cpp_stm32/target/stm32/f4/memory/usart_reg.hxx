@@ -16,13 +16,14 @@
 
 #pragma once
 
+#include "cpp_stm32/common/usart_common.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
 namespace cpp_stm32::stm32::f4 {
 
-enum class UsartNum { Usart1, Usart2, Usart6 };
+enum class UsartNum { Usart1, Usart2, Usart3, Uart4, Uart5, Usart6 };
 
 static constexpr auto USART_BASE(UsartNum const& t_usart_num) {
 	switch (t_usart_num) {
@@ -30,6 +31,12 @@ static constexpr auto USART_BASE(UsartNum const& t_usart_num) {
 			return memory_at(PeriphAddr::Apb2Base, 0x1000U);
 		case UsartNum::Usart2:
 			return memory_at(PeriphAddr::Apb1Base, 0x4400U);
+		case UsartNum::Usart3:
+			return memory_at(PeriphAddr::Apb1Base, 0x4800U);
+		case UsartNum::Uart4:
+			return memory_at(PeriphAddr::Apb1Base, 0x5000U);
+		case UsartNum::Uart5:
+			return memory_at(PeriphAddr::Apb1Base, 0x4C00U);
 		case UsartNum::Usart6:
 			return memory_at(PeriphAddr::Apb2Base, 0x1400U);
 	}
@@ -82,16 +89,12 @@ static constexpr Register<UsartBrrInfo, UsartBrrBit> USART_BRR{USART_BASE(Port),
  * @{
  */
 
-enum class OverSampling : std::uint8_t;
-enum class DataBit : std::uint8_t;
-enum class UsartParity : std::uint8_t;
-
 SETUP_REGISTER_INFO(UsartCr1Info, /**/
 										Binary<>{BitPos_t{0}}, Binary<>{BitPos_t{1}}, Binary<>{BitPos_t{2}}, Binary<>{BitPos_t{3}},
 										Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}}, Binary<>{BitPos_t{6}}, Binary<>{BitPos_t{7}},
-										Binary<>{BitPos_t{8}}, Bit<1, UsartParity>{BitPos_t{9}}, Binary<>{BitPos_t{10}},
-										Binary<>{BitPos_t{11}}, Bit<1, DataBit>{BitPos_t{12}}, Binary<>{BitPos_t{13}},
-										Bit<1, OverSampling>{BitPos_t{15}})
+										Binary<>{BitPos_t{8}}, Bit<1, common::UsartParity>{BitPos_t{9}}, Binary<>{BitPos_t{10}},
+										Binary<>{BitPos_t{11}}, Bit<1, common::DataBit>{BitPos_t{12}}, Binary<>{BitPos_t{13}},
+										Bit<1, common::OverSampling>{BitPos_t{15}})
 
 enum class UsartCr1Bit { SBk, RWu, RE, TE, IdleIE, RxNEIE, TCIE, TxEIE, PEIE, PS, PCE, Wake, M, UE, Over8 };
 
@@ -105,12 +108,10 @@ static constexpr Register<UsartCr1Info, UsartCr1Bit> USART_CR1{USART_BASE(Port),
  * @{
  */
 
-enum class UsartStopbit : std::uint8_t;
-
 SETUP_REGISTER_INFO(UsartCr2Info, /**/
 										Bit<4>{BitPos_t{0}}, Binary<>{BitPos_t{5}}, Binary<>{BitPos_t{6}}, Binary<>{BitPos_t{8}},
 										Binary<>{BitPos_t{9}}, Binary<>{BitPos_t{10}}, Binary<>{BitPos_t{11}},
-										Bit<2, UsartStopbit>{BitPos_t{12}}, Binary<>{BitPos_t{14}})
+										Bit<2, common::UsartStopbit>{BitPos_t{12}}, Binary<>{BitPos_t{14}})
 
 enum class UsartCr2Bit { Add, LBDL, LBDIE, LbCl, CPha, CPol, ClkEn, Stop, LINEn };
 

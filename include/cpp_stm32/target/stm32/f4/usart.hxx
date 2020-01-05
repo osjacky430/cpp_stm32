@@ -16,29 +16,45 @@
 
 #pragma once
 
+#include "cpp_stm32/common/usart_common.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::common {
 
-enum class OverSampling : std::uint8_t { OverSampling16, OverSampling8 };
+/**
+ * @enum OverSampling
+ */
+enum class OverSampling : std::uint8_t {
+	OverSampling16,
+	OverSampling8,
+};
+
+/**
+ * @enum 	DataBit
+ */
 enum class DataBit : std::uint8_t { DataBit8, DataBit9 };
+
 enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
 enum class UsartMode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
 enum class UsartParity : std::uint8_t { Even, Odd, None };
 enum class UsartStopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
 
-template <UsartStopbit StopBit>
-using StopBit_t = std::integral_constant<UsartStopbit, StopBit>;
+}	 // namespace cpp_stm32::common
 
-template <UsartStopbit StopBit>
+namespace cpp_stm32::stm32::f4 {
+
+template <common::UsartStopbit StopBit>
+using StopBit_t = std::integral_constant<decltype(StopBit), StopBit>;
+
+template <common::UsartStopbit StopBit>
 static constexpr StopBit_t<StopBit> StopBit_v{};
 
 template <UsartNum Port>
-constexpr auto usart_set_baudrate(std::uint64_t const& baud) noexcept {
+constexpr auto usart_set_baudrate(common::Baudrate_t const& t_baud) noexcept {
 	constexpr auto clk_freq = (Port == UsartNum::Usart1 || Port == UsartNum::Usart6 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
 
-	auto const usart_div				 = (clk_freq + baud / 2) / baud;	// round (avoiding floating point arithmetic)
+	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 	std::uint16_t const mantissa = usart_div >> 4;
 	std::uint8_t const fraction	 = usart_div & 0xF;
 	auto const val_to_write			 = BitGroup{fraction, mantissa};
@@ -46,14 +62,14 @@ constexpr auto usart_set_baudrate(std::uint64_t const& baud) noexcept {
 }
 
 template <UsartNum Port>
-constexpr void usart_set_databit(DataBit const& t_d_bit) noexcept {
+constexpr void usart_set_databit(common::DataBit const& t_d_bit) noexcept {
 	USART_CR1<Port>.template setBit<UsartCr1Bit::M>(t_d_bit);
 }
 
 template <UsartNum Port>
-constexpr void usart_set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noexcept {
+constexpr void usart_set_hardware_flow_ctl(common::HardwareFlowControl const& t_flow_ctl) noexcept {
 	// @todo : static_assert (UART4 and UART5)
-
+	using common::HardwareFlowControl;
 	// maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value
 	// so that t_flow_ctl & mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl & mask = 0 when
 	// t_flow_ctl = none, e.g. ctl = 1, rts = 3, none = 4
@@ -64,7 +80,9 @@ constexpr void usart_set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl
 }
 
 template <UsartNum Port>
-constexpr void usart_set_transfer_mode(UsartMode const& t_mode) noexcept {
+constexpr void usart_set_transfer_mode(common::UsartMode const& t_mode) noexcept {
+	using common::UsartMode;
+
 	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(UsartMode::TxOnly)) != 0;
 	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(UsartMode::RxOnly)) != 0;
 	auto const val_to_write = BitGroup{txe, rxe};
@@ -72,13 +90,15 @@ constexpr void usart_set_transfer_mode(UsartMode const& t_mode) noexcept {
 }
 
 template <UsartNum Port>
-constexpr void usart_set_parity(UsartParity const& t_parity) noexcept {
+constexpr void usart_set_parity(common::UsartParity const& t_parity) noexcept {
+	using common::UsartParity;
+
 	std::uint8_t const pe		= (t_parity != UsartParity::None);
 	auto const val_to_write = BitGroup{pe, t_parity};
 	USART_CR1<Port>.template setBit<UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_write);
 }
 
-template <UsartNum Port, UsartStopbit StopBit>
+template <UsartNum Port, common::UsartStopbit StopBit>
 constexpr void usart_set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
 	// static_assert()
 	USART_CR2<Port>.template setBit<UsartCr2Bit::Stop>(StopBit);
@@ -129,8 +149,13 @@ constexpr void usart_send_blocking(std::uint8_t const& t_data) noexcept {
 	usart_wait_tx_rdy<Port>();
 }
 
-template <UsartNum Port, UsartStopbit Stop>
-constexpr void usart_set_dps(DataBit const& t_d, UsartParity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
+// @todo this should be sfinae instead of static assert?
+// @todo the interface should unify, StopBit_t here makes it hard to do so.
+template <UsartNum Port, common::UsartStopbit Stop>
+constexpr void usart_set_dps(common::DataBit const& t_d, common::UsartParity const& t_p,
+														 StopBit_t<Stop> const& /*unused*/) noexcept {
+	using common::UsartParity;
+
 	std::uint8_t const pe		= (t_p != UsartParity::None);
 	auto const val_to_write = BitGroup{t_d, pe, t_p};
 	USART_CR1<Port>.template setBit<UsartCr1Bit::M, UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_write);

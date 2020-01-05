@@ -29,8 +29,8 @@ enum class PeriphAddr : std::uint32_t {
 	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
 	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
 	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x08000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x10000000U),
+	Ahb2Base	 = memory_at(PeriphBase, 0x0800'0000U),
+	Ahb3Base	 = memory_at(PeriphBase, 0x1000'0000U),
 };
 
 }	 // namespace cpp_stm32::stm32

@@ -18,27 +18,28 @@
 
 #include <tuple>
 
+#include "cpp_stm32/common/gpio_common.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
 
 namespace cpp_stm32::stm32::f4 {
 
-template <GpioPort Port, GpioPin... Pins>
-constexpr void gpio_set_mode(GpioMode const& t_mode) noexcept {
+template <common::GpioPort Port, common::GpioPin... Pins>
+constexpr void gpio_set_mode(common::GpioMode const& t_mode) noexcept {
 	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
 }
 
-template <GpioPort Port, GpioPin... Pins>
-constexpr void gpio_set_pupd(GpioPupd const& t_pupd) noexcept {
+template <common::GpioPort Port, common::GpioPin... Pins>
+constexpr void gpio_set_pupd(common::GpioPupd const& t_pupd) noexcept {
 	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
-template <GpioPort Port, GpioPin... Pins>
-constexpr void gpio_mode_setup(GpioMode const& t_mode, GpioPupd const& t_pupd) noexcept {
+template <common::GpioPort Port, common::GpioPin... Pins>
+constexpr void gpio_mode_setup(common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
 	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
 	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
-template <GpioPort Port, GpioPin... Pins>
+template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_toggle() noexcept {
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
@@ -49,14 +50,14 @@ constexpr void gpio_toggle() noexcept {
 	// @todo perhap add index rule in register class
 	// @todo maybe group bits in SETUP_REGISTER_INFO macro, e.g.
 	//			 SETUP_REGISTER_INFO(GpioBsrrInfo, {Bit<>{0}, Bit<>{16}, {...}})
-	GPIO_BSRR<Port>.template setBit<Pins..., GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
+	GPIO_BSRR<Port>.template setBit<Pins..., common::GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
-template <GpioPort Port, GpioPin... Pins>
-constexpr void gpio_set_af(GpioAltFunc const& t_af) noexcept {
-	if constexpr (((Pins <= GpioPin::Pin7) || ...)) {
-		constexpr auto low_pin_group = [](GpioPin t_pin) {
-			if (t_pin <= GpioPin::Pin7) {
+template <common::GpioPort Port, common::GpioPin... Pins>
+constexpr void gpio_set_af(common::GpioAltFunc const& t_af) noexcept {
+	if constexpr (((Pins <= common::GpioPin::Pin7) || ...)) {
+		constexpr auto low_pin_group = [](common::GpioPin t_pin) {
+			if (t_pin <= common::GpioPin::Pin7) {
 				return t_pin;
 			}
 		};
@@ -64,13 +65,13 @@ constexpr void gpio_set_af(GpioAltFunc const& t_af) noexcept {
 		GPIO_AFRL<Port>.template setBit<low_pin_group(Pins)...>(t_af);
 	}
 
-	if constexpr (((Pins > GpioPin::Pin7) || ...)) {
-		constexpr auto high_pin_group = [](GpioPin t_pin) {
-			if (t_pin > GpioPin::Pin7) {
+	if constexpr (((Pins > common::GpioPin::Pin7) || ...)) {
+		constexpr auto high_pin_group = [](common::GpioPin t_pin) {
+			if (t_pin > common::GpioPin::Pin7) {
 				// use "to_underlying" will generate internal compiler error
 				// this is a bit hacky IMO, but can't come up with a better idea
 				// @todo perhap add index rule in register class
-				return GpioPin{static_cast<std::underlying_type_t<GpioPin>>(t_pin) - 8};
+				return common::GpioPin{static_cast<std::underlying_type_t<common::GpioPin>>(t_pin) - 8};
 			}
 		};
 

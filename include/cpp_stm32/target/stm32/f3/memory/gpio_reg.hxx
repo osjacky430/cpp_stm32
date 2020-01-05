@@ -19,7 +19,7 @@
 #include "cpp_stm32/target/stm32/common/gpio_reg.hxx"
 #include "cpp_stm32/target/stm32/f3/memory/memory_map.hxx"
 
-namespace cpp_stm32::stm32 {
+namespace cpp_stm32::common {
 
 enum class GpioPort {
 	PortA,
@@ -56,7 +56,11 @@ enum class GpioOutType { PushPull, OpenDrain };
 enum class GpioOutSpeed { Low2M, Medium10M, High50M };
 enum class GpioAltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15 };
 
-constexpr auto GPIO_BASE(GpioPort const& t_port) noexcept {
+}	 // namespace cpp_stm32::common
+
+namespace cpp_stm32::stm32 {
+
+constexpr auto GPIO_BASE(common::GpioPort const& t_port) noexcept {
 	return memory_at(PeriphAddr::Ahb2Base, 0x0400 * to_underlying(t_port));
 }
 

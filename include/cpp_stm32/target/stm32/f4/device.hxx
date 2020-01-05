@@ -25,13 +25,13 @@
 
 namespace cpp_stm32::driver {
 
-using cpp_stm32::stm32::GpioAltFunc;
-using cpp_stm32::stm32::GpioMode;
-using cpp_stm32::stm32::GpioPin;
-using cpp_stm32::stm32::GpioPort;
-using cpp_stm32::stm32::GpioPupd;
-using cpp_stm32::stm32::PinName;
-using cpp_stm32::stm32::PinNameMap;
+// this is a bit messy
+namespace Manufacture = cpp_stm32::stm32;
+
+using Manufacture::PinName;
+using Manufacture::PinNameMap;
+
+using Manufacture::UsartPinMap;
 
 namespace TargetDevice = cpp_stm32::stm32::f4;
 
@@ -42,13 +42,8 @@ using TargetDevice::gpio_mode_setup;
 using TargetDevice::gpio_set_af;
 using TargetDevice::gpio_toggle;
 
-using TargetDevice::DataBit;
-using TargetDevice::HardwareFlowControl;
 using TargetDevice::StopBit_v;
-using TargetDevice::UsartMode;
 using TargetDevice::UsartNum;
-using TargetDevice::UsartParity;
-using TargetDevice::UsartStopbit;
 
 using TargetDevice::usart_enable;
 using TargetDevice::usart_enable_txe_irq;

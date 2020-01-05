@@ -18,18 +18,11 @@
 
 #include <cstdint>
 
+#include "cpp_stm32/common/gpio_common.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
 namespace cpp_stm32::stm32 {
-
-enum class GpioPort;
-enum class GpioPin;
-enum class GpioMode;
-enum class GpioPupd;
-enum class GpioOutType;
-enum class GpioOutSpeed;
-enum class GpioAltFunc;
 
 /**
  * @defgroup GPIO_MODER_GROUP
@@ -39,7 +32,7 @@ enum class GpioAltFunc;
 class GpioModerInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioModerInfo, GpioPin> BASE_GPIO_MODER{BaseAddr, OffsetAddr};
+static constexpr Register<GpioModerInfo, common::GpioPin> BASE_GPIO_MODER{BaseAddr, OffsetAddr};
 
 /**@}*/
 
@@ -51,7 +44,7 @@ static constexpr Register<GpioModerInfo, GpioPin> BASE_GPIO_MODER{BaseAddr, Offs
 class GpioPupdInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioPupdInfo, GpioPin> BASE_GPIO_PUPDR{BaseAddr, OffsetAddr};
+static constexpr Register<GpioPupdInfo, common::GpioPin> BASE_GPIO_PUPDR{BaseAddr, OffsetAddr};
 
 /**@}*/
 
@@ -63,7 +56,7 @@ static constexpr Register<GpioPupdInfo, GpioPin> BASE_GPIO_PUPDR{BaseAddr, Offse
 class GpioOdrInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioOdrInfo, GpioPin> BASE_GPIO_ODR{BaseAddr, OffsetAddr};
+static constexpr Register<GpioOdrInfo, common::GpioPin> BASE_GPIO_ODR{BaseAddr, OffsetAddr};
 
 /**@}*/
 
@@ -75,7 +68,7 @@ static constexpr Register<GpioOdrInfo, GpioPin> BASE_GPIO_ODR{BaseAddr, OffsetAd
 class GpioBsrrInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioBsrrInfo, GpioPin> BASE_GPIO_BSRR{BaseAddr, OffsetAddr};
+static constexpr Register<GpioBsrrInfo, common::GpioPin> BASE_GPIO_BSRR{BaseAddr, OffsetAddr};
 
 /**@}*/
 
@@ -87,10 +80,10 @@ static constexpr Register<GpioBsrrInfo, GpioPin> BASE_GPIO_BSRR{BaseAddr, Offset
 class GpioAfrInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioAfrInfo, GpioPin> BASE_GPIO_AFRL{BaseAddr, OffsetAddr};
+static constexpr Register<GpioAfrInfo, common::GpioPin> BASE_GPIO_AFRL{BaseAddr, OffsetAddr};
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioAfrInfo, GpioPin> BASE_GPIO_AFRH{BaseAddr, OffsetAddr};
+static constexpr Register<GpioAfrInfo, common::GpioPin> BASE_GPIO_AFRH{BaseAddr, OffsetAddr};
 
 /**@}*/
 
@@ -103,7 +96,7 @@ static constexpr Register<GpioAfrInfo, GpioPin> BASE_GPIO_AFRH{BaseAddr, OffsetA
 class GpioBrrInfo;
 
 template <std::uint32_t BaseAddr, std::uint32_t OffsetAddr>
-static constexpr Register<GpioBrrInfo, GpioPin> BASE_GPIO_BRR{BaseAddr, OffsetAddr};
+static constexpr Register<GpioBrrInfo, common::GpioPin> BASE_GPIO_BRR{BaseAddr, OffsetAddr};
 
 /**@}*/
 

@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "cpp_stm32/common/gpio_common.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
@@ -27,6 +28,8 @@ template <PinName... PinNames>
 class DigitalOut {
  public:
 	constexpr DigitalOut() {
+		using common::GpioMode, common::GpioPupd;
+
 		GpioUtil<PinNames...>::enableAllGpioClk();
 		GpioUtil<PinNames...>::modeSetup(GpioMode::Output, GpioPupd::None);
 	}

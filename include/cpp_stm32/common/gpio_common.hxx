@@ -16,14 +16,14 @@
 
 #pragma once
 
-#include <cstdint>
-#include <type_traits>
+namespace cpp_stm32::common {
 
-namespace cpp_stm32 {
+enum class GpioPort;
+enum class GpioPin;
+enum class GpioMode;
+enum class GpioPupd;
+enum class GpioOutType;
+enum class GpioOutSpeed;
+enum class GpioAltFunc;
 
-constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
-constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
-
-}	 // namespace cpp_stm32
+}	 // namespace cpp_stm32::common

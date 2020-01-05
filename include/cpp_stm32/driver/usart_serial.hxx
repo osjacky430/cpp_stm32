@@ -20,6 +20,7 @@
 #include <tuple>
 #include <utility>
 
+#include "cpp_stm32/common/usart_common.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/utility/callback.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
@@ -29,37 +30,7 @@
 #include "device.hxx"
 
 namespace cpp_stm32::driver {
-
-class UsartPinMap {
- private:
-	using UsartAltFuncGroup = std::tuple<UsartNum, GpioAltFunc, RccPeriph, IrqNum>;
-
-	// this is not the best way of doing it
-	static constexpr auto TX_PIN_MAP = std::array{
-		std::pair{PinName::PA_2,
-							UsartAltFuncGroup{UsartNum::Usart2, GpioAltFunc::AF7, RccPeriph::Usart2, IrqNum::Usart2Global}},
-	};
-
-	static constexpr auto RX_PIN_MAP = std::array{
-		std::pair{PinName::PA_3,
-							UsartAltFuncGroup{UsartNum::Usart2, GpioAltFunc::AF7, RccPeriph::Usart2, IrqNum::Usart2Global}},
-	};
-
-	static constexpr auto USART_PIN_MAP = std::tuple{TX_PIN_MAP, RX_PIN_MAP};
-
- public:
-	enum class PinInfo { Tx, Rx };
-
-	template <PinName Pin, PinInfo Idx>
-	static constexpr auto getPinInfo() noexcept {
-		constexpr auto PIN_MAP = std::get<to_underlying(Idx)>(USART_PIN_MAP);
-		const auto iter_pos =
-			cstd::find_if(PIN_MAP.begin(), PIN_MAP.end(), [](auto const& t_pair) { return (t_pair.first == Pin); });
-
-		return iter_pos->second;
-	};
-};
-
+/**/
 template <PinName TX>
 struct UsartTx {
 	static constexpr auto TX_USART_NUM = std::get<0>(UsartPinMap::getPinInfo<TX, UsartPinMap::PinInfo::Tx>());
@@ -96,7 +67,10 @@ class Usart {
 	explicit constexpr Usart(std::uint64_t const& t_baud) noexcept {}
 
 	explicit constexpr Usart(UsartTx<TX> const& /*unused*/, UsartRx<RX> const& /*unused*/,
-													 std::uint64_t const& t_baud) noexcept {
+													 common::Baudrate_t const& t_baud) noexcept {
+		using common::DataBit, common::UsartParity, common::UsartMode, common::HardwareFlowControl, common::UsartStopbit;
+		using common::GpioMode, common::GpioPupd;
+
 		rcc_enable_periph_clk<USART_RCC>();
 		//
 		GpioUtil<TX, RX>::enableAllGpioClk();

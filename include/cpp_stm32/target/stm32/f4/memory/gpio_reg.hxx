@@ -21,10 +21,8 @@
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
-namespace cpp_stm32::stm32 {
-/**
- * @enum GpioPort
- */
+namespace cpp_stm32::common {
+
 enum class GpioPort { PortA, PortB, PortC, PortD, PortE, PortF, PortG, PortH, Total };
 
 enum class GpioPin {
@@ -62,7 +60,11 @@ enum class GpioOutType { PushPull, OpenDrain };
 enum class GpioOutSpeed { Low2M, Medium25M, Fast50M, High100M };
 enum class GpioAltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7 };
 
-constexpr auto GPIO_BASE(GpioPort const& t_port) noexcept {
+}	 // namespace cpp_stm32::common
+
+namespace cpp_stm32::stm32 {
+
+constexpr auto GPIO_BASE(common::GpioPort const& t_port) noexcept {
 	return memory_at(PeriphAddr::Ahb1Base, 0x0400U * to_underlying(t_port));
 }
 
@@ -72,14 +74,16 @@ constexpr auto GPIO_BASE(GpioPort const& t_port) noexcept {
  */
 
 SETUP_REGISTER_INFO(GpioModerInfo, /**/
-										Bit<2, GpioMode>{BitPos_t(0)}, Bit<2, GpioMode>{BitPos_t(2)}, Bit<2, GpioMode>{BitPos_t(4)},
-										Bit<2, GpioMode>{BitPos_t(6)}, Bit<2, GpioMode>{BitPos_t(8)}, Bit<2, GpioMode>{BitPos_t(10)},
-										Bit<2, GpioMode>{BitPos_t(12)}, Bit<2, GpioMode>{BitPos_t(14)}, Bit<2, GpioMode>{BitPos_t(16)},
-										Bit<2, GpioMode>{BitPos_t(18)}, Bit<2, GpioMode>{BitPos_t(20)}, Bit<2, GpioMode>{BitPos_t(22)},
-										Bit<2, GpioMode>{BitPos_t(24)}, Bit<2, GpioMode>{BitPos_t(26)}, Bit<2, GpioMode>{BitPos_t(28)},
-										Bit<2, GpioMode>{BitPos_t(30)})
+										Bit<2, common::GpioMode>{BitPos_t(0)}, Bit<2, common::GpioMode>{BitPos_t(2)},
+										Bit<2, common::GpioMode>{BitPos_t(4)}, Bit<2, common::GpioMode>{BitPos_t(6)},
+										Bit<2, common::GpioMode>{BitPos_t(8)}, Bit<2, common::GpioMode>{BitPos_t(10)},
+										Bit<2, common::GpioMode>{BitPos_t(12)}, Bit<2, common::GpioMode>{BitPos_t(14)},
+										Bit<2, common::GpioMode>{BitPos_t(16)}, Bit<2, common::GpioMode>{BitPos_t(18)},
+										Bit<2, common::GpioMode>{BitPos_t(20)}, Bit<2, common::GpioMode>{BitPos_t(22)},
+										Bit<2, common::GpioMode>{BitPos_t(24)}, Bit<2, common::GpioMode>{BitPos_t(26)},
+										Bit<2, common::GpioMode>{BitPos_t(28)}, Bit<2, common::GpioMode>{BitPos_t(30)})
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_MODER = BASE_GPIO_MODER<GPIO_BASE(Port), 0x00U>;
 
 /**@}*/
@@ -90,14 +94,16 @@ static constexpr auto GPIO_MODER = BASE_GPIO_MODER<GPIO_BASE(Port), 0x00U>;
  */
 
 SETUP_REGISTER_INFO(GpioPupdInfo, /**/
-										Bit<2, GpioPupd>{BitPos_t(0)}, Bit<2, GpioPupd>{BitPos_t(2)}, Bit<2, GpioPupd>{BitPos_t(4)},
-										Bit<2, GpioPupd>{BitPos_t(6)}, Bit<2, GpioPupd>{BitPos_t(8)}, Bit<2, GpioPupd>{BitPos_t(10)},
-										Bit<2, GpioPupd>{BitPos_t(12)}, Bit<2, GpioPupd>{BitPos_t(14)}, Bit<2, GpioPupd>{BitPos_t(16)},
-										Bit<2, GpioPupd>{BitPos_t(18)}, Bit<2, GpioPupd>{BitPos_t(20)}, Bit<2, GpioPupd>{BitPos_t(22)},
-										Bit<2, GpioPupd>{BitPos_t(24)}, Bit<2, GpioPupd>{BitPos_t(26)}, Bit<2, GpioPupd>{BitPos_t(28)},
-										Bit<2, GpioPupd>{BitPos_t(30)})
+										Bit<2, common::GpioPupd>{BitPos_t(0)}, Bit<2, common::GpioPupd>{BitPos_t(2)},
+										Bit<2, common::GpioPupd>{BitPos_t(4)}, Bit<2, common::GpioPupd>{BitPos_t(6)},
+										Bit<2, common::GpioPupd>{BitPos_t(8)}, Bit<2, common::GpioPupd>{BitPos_t(10)},
+										Bit<2, common::GpioPupd>{BitPos_t(12)}, Bit<2, common::GpioPupd>{BitPos_t(14)},
+										Bit<2, common::GpioPupd>{BitPos_t(16)}, Bit<2, common::GpioPupd>{BitPos_t(18)},
+										Bit<2, common::GpioPupd>{BitPos_t(20)}, Bit<2, common::GpioPupd>{BitPos_t(22)},
+										Bit<2, common::GpioPupd>{BitPos_t(24)}, Bit<2, common::GpioPupd>{BitPos_t(26)},
+										Bit<2, common::GpioPupd>{BitPos_t(28)}, Bit<2, common::GpioPupd>{BitPos_t(30)})
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_PUPDR = BASE_GPIO_PUPDR<GPIO_BASE(Port), 0x0CU>;
 
 /**@}*/
@@ -113,7 +119,7 @@ SETUP_REGISTER_INFO(GpioOdrInfo, /**/
 										Bit<1>{BitPos_t(8)}, Bit<1>{BitPos_t(9)}, Bit<1>{BitPos_t(10)}, Bit<1>{BitPos_t(11)},
 										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(13)}, Bit<1>{BitPos_t(14)}, Bit<1>{BitPos_t(15)})
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_ODR = BASE_GPIO_ODR<GPIO_BASE(Port), 0x14U>;
 
 /**@}*/
@@ -137,7 +143,7 @@ SETUP_REGISTER_INFO(
 	Binary<BitMod::WrOnly>{BitPos_t(27)}, Binary<BitMod::WrOnly>{BitPos_t(28)}, Binary<BitMod::WrOnly>{BitPos_t(29)},
 	Binary<BitMod::WrOnly>{BitPos_t(30)}, Binary<BitMod::WrOnly>{BitPos_t(31)})
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_BSRR = BASE_GPIO_BSRR<GPIO_BASE(Port), 0x18U>;
 
 /**@}*/
@@ -148,15 +154,15 @@ static constexpr auto GPIO_BSRR = BASE_GPIO_BSRR<GPIO_BASE(Port), 0x18U>;
  */
 
 SETUP_REGISTER_INFO(GpioAfrInfo, /**/
-										Bit<4, GpioAltFunc>{BitPos_t{0}}, Bit<4, GpioAltFunc>{BitPos_t{4}},
-										Bit<4, GpioAltFunc>{BitPos_t{8}}, Bit<4, GpioAltFunc>{BitPos_t{12}},
-										Bit<4, GpioAltFunc>{BitPos_t{16}}, Bit<4, GpioAltFunc>{BitPos_t{20}},
-										Bit<4, GpioAltFunc>{BitPos_t{24}}, Bit<4, GpioAltFunc>{BitPos_t{28}})
+										Bit<4, common::GpioAltFunc>{BitPos_t{0}}, Bit<4, common::GpioAltFunc>{BitPos_t{4}},
+										Bit<4, common::GpioAltFunc>{BitPos_t{8}}, Bit<4, common::GpioAltFunc>{BitPos_t{12}},
+										Bit<4, common::GpioAltFunc>{BitPos_t{16}}, Bit<4, common::GpioAltFunc>{BitPos_t{20}},
+										Bit<4, common::GpioAltFunc>{BitPos_t{24}}, Bit<4, common::GpioAltFunc>{BitPos_t{28}})
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_AFRL = BASE_GPIO_AFRL<GPIO_BASE(Port), 0x20U>;
 
-template <GpioPort Port>
+template <common::GpioPort Port>
 static constexpr auto GPIO_AFRH = BASE_GPIO_AFRH<GPIO_BASE(Port), 0x24U>;
 
 /**@}*/

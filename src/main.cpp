@@ -10,10 +10,11 @@
 #include "cpp_stm32/driver/usart_serial.hxx"
 
 using namespace cpp_stm32::driver;
+using namespace cpp_stm32::common;
 using namespace cpp_stm32;
 
 struct DebugLogger {
-	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200};
+	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 
 	constexpr DebugLogger() noexcept {
 		/**/
