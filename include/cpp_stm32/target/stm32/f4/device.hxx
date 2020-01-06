@@ -58,4 +58,6 @@ using TargetDevice::PllClkSrc;
 using TargetDevice::RccOsc;
 using TargetDevice::SysClock;
 
+using TargetDevice::IRQ_FUNC_HANDLER;
+
 }	 // namespace cpp_stm32::driver

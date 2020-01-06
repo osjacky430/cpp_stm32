@@ -4,6 +4,9 @@
 # build folder
 build/
 
+# documentation folder
+documentation/
+
 # ignore my own shell script
 *.sh
 .gdbinit

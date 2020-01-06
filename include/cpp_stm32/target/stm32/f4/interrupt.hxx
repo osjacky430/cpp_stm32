@@ -47,6 +47,8 @@
 
 #define NVIC_IRQ_NUM 91
 
+namespace cpp_stm32::stm32::f4 {
+
 void wwdg_isr() noexcept;
 void pvd_isr() noexcept;
 void tamp_stamp_isr() noexcept;
@@ -105,6 +107,8 @@ static constexpr auto IRQ_FUNC_HANDLER = std::array{
 	spi2_isr,					 usart1_isr,				usart2_isr,
 	usart3_isr,				 exti5_10_isr,
 };
+
+}	 // namespace cpp_stm32::stm32::f4
 
 namespace cpp_stm32 {
 
