@@ -4,31 +4,31 @@
  * @Filename: main.cpp
  */
 
-#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
+// #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
-#include "cpp_stm32/driver/digitalout.hxx"
-#include "cpp_stm32/driver/usart_serial.hxx"
+// #include "cpp_stm32/driver/digitalout.hxx"
+// #include "cpp_stm32/driver/usart_serial.hxx"
 
-using namespace cpp_stm32::driver;
-using namespace cpp_stm32::common;
-using namespace cpp_stm32;
+// using namespace cpp_stm32::driver;
+// using namespace cpp_stm32::common;
+// using namespace cpp_stm32;
 
-struct DebugLogger {
-	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
-
-	constexpr DebugLogger() noexcept {
-		/**/
-		debugOut.setTxeInterrupt(Callback<&DebugLogger::log>(this));
-	}
-
-	constexpr void log() noexcept { debugOut << 'c'; }
-};
+// struct DebugLogger {
+// 	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
+//
+// 	constexpr DebugLogger() noexcept {
+// 		/**/
+// 		debugOut.setTxeInterrupt(Callback<&DebugLogger::log>(this));
+// 	}
+//
+// 	constexpr void log() noexcept { debugOut << 'c'; }
+// };
 
 int main() {
-	SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
 
-	DebugLogger logger{};
-	DigitalOut<PinName::PA_5> led;
+	// DebugLogger logger{};
+	// DigitalOut<PinName::PA_5> led;
 
 	while (true) {
 		constexpr auto SOME_PERIOD = 1000000;
@@ -36,7 +36,7 @@ int main() {
 			__asm__("nop");
 		}
 
-		led.toggle();
+		// led.toggle();
 	}
 
 	return 0;

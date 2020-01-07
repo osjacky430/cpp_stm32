@@ -27,12 +27,11 @@ namespace cpp_stm32 {
  * @brief		Device specific peripheral address
  */
 enum class PeriphAddr : std::uint32_t {
-	PeriphBase = 0x40000000U,
-	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
-	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
-	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
+	PeriphBase = 0x4000'0000U,
+	Apb1Base	 = memory_at(PeriphBase, 0x0'0000U),
+	Apb2Base	 = memory_at(PeriphBase, 0x1'0000U),
+	Ahb1Base	 = memory_at(PeriphBase, 0x2'0000U),
+	Ahb2Base	 = memory_at(PeriphBase, 0x0800'0000U),
 };
 
 }	 // namespace cpp_stm32
