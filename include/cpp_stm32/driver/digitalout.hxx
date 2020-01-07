@@ -22,18 +22,33 @@
 
 #include "device.hxx"
 
+/**
+ * @namespace   cpp_stm32::driver
+ * @brief       contains advance control class over peripheral
+ */
 namespace cpp_stm32::driver {
 
+/**
+ * @class   DigitalOut
+ * @brief   This class is a specialization of GpioUtil, it provides advance GPIO output control
+ */
 template <PinName... PinNames>
 class DigitalOut {
  public:
-	constexpr DigitalOut() {
+	/**
+	 * @brief  Default constructor, it enables rcc peripheral clock, and setup gpio mode to output, no pull
+	 */
+	constexpr DigitalOut() noexcept {
 		using common::GpioMode, common::GpioPupd;
 
 		GpioUtil<PinNames...>::enableAllGpioClk();
 		GpioUtil<PinNames...>::modeSetup(GpioMode::Output, GpioPupd::None);
 	}
 
+	/**
+	 * @brief   Toggle the input pin name
+	 * @todo    This can be extended to only toggle certain pins in input pin list
+	 */
 	constexpr void toggle() const noexcept { GpioUtil<PinNames...>::toggle(); }
 };
 

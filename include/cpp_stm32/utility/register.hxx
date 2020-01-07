@@ -34,7 +34,7 @@ namespace cpp_stm32 {
 enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
 
 /**
- * @brief		This function handles OR operator of enum @ref Access
+ * @brief		This function handles OR operator of #Access
  * @param  	lhs		Left hand side
  * @param 	rhs 	Right hand side
  * @return 	Numeric value of OR operation of lhs and rhs
@@ -65,7 +65,7 @@ static constexpr ValueOnlyType ValueOnly{};
 
 /**
  * @class 	ValueWithPosType
- * @brief		Tag dispatch for @ref Register::readBit() function, value only type indicate that the readbit function
+ * @brief		Tag dispatch for @ref Register::readBit() function, val with pos type indicate that the readbit function
  * 					should return not only the value, but also the position it is at in the register.
  */
 struct ValWithPosType {};
@@ -273,7 +273,9 @@ class Register {
 	 * 					not implemented yet
 	 */
 	template <BitListIdx... BitIdx, typename... ValueTypes>
-	constexpr void atomicSetBit() const noexcept {}
+	constexpr void atomicSetBit() const noexcept {
+		static_assert(atomicity);
+	}
 
 	/**
 	 * @brief		This function literally reads bits in the register

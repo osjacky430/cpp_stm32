@@ -20,21 +20,28 @@
 
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
+/**
+ *	@namespace	common
+ */
 namespace cpp_stm32::common {
 
 /**
- * @defgroup BAUDRATE_DEF_GGROUP
+ * @defgroup BAUDRATE_DEF_GGROUP		Baudrate related declaration
  * @{
  */
 
 /**
- * @typedef 	Baudrate StrongType
+ * @brief		Create strong type for baudrate
  */
 using Baudrate_t = StrongType<std::uint64_t, struct Baudrate>;
 
 /**
- * @brief		These literal operators create Baudrate_t instance according to input baudrate
- * @param 	t_baud input baudrate
+ * @defgroup 		BAUD_LITERAL_OP_GROUP		Baudrate related literal operators
+ * @brief				These literal operators create ::Baudrate_t instance according to input baudrate
+ * @param 			t_baud input baudrate
+ * @return 			see ::Baudrate_t
+ *
+ * @{
  */
 constexpr auto operator"" _Baud(std::uint64_t t_baud) noexcept { return Baudrate_t{t_baud}; }
 
@@ -47,6 +54,8 @@ constexpr auto operator"" _KBaud(std::uint64_t t_baud) noexcept { return Baudrat
 constexpr auto operator"" _MBaud(long double t_baud) noexcept {
 	return Baudrate_t{static_cast<std::uint64_t>(t_baud) * 1000000ULL};
 }
+
+/**@}*/
 
 constexpr auto operator"" _MBaud(std::uint64_t t_baud) noexcept { return Baudrate_t{t_baud * 1000000ULL}; }
 

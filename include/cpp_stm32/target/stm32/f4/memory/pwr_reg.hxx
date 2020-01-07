@@ -28,7 +28,7 @@ namespace cpp_stm32::stm32::f4 {
 static constexpr auto PWR_BASE = memory_at(PeriphAddr::Apb1Base, 0x7000U);
 
 /**
- * @defgroup  PWR_CR_GROUP
+ * @defgroup  PWR_CR_GROUP		Power Control Register Group
  * @{
  */
 
@@ -48,7 +48,7 @@ static constexpr Register<PwrCrInfo, PwrCrBit> PWR_CR{PWR_BASE, 0x00U};
 /**@}*/
 
 /**
- * @defgroup  PWR_CSR_GROUP
+ * @defgroup  PWR_CSR_GROUP		Power Control Status Register Group
  * @{
  */
 

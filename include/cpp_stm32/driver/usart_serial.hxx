@@ -29,8 +29,15 @@
 // target specific include
 #include "device.hxx"
 
+/**
+ * @namespace 	cpp_stm32::driver
+ */
 namespace cpp_stm32::driver {
-/**/
+
+/**
+ * @class 	UsartTx
+ * @brief		This class is used for static checking to check whether the input pin is available or not
+ */
 template <PinName TX>
 struct UsartTx {
 	static constexpr auto TX_USART_NUM = std::get<0>(UsartPinMap::getPinInfo<TX, UsartPinMap::PinInfo::Tx>());
@@ -42,6 +49,10 @@ struct UsartTx {
 template <PinName TX>
 static constexpr auto UsartTx_v = UsartTx<TX>{};
 
+/**
+ * @class 	UsartRx
+ * @brief		This class is used for static checking to check whether the input pin is available or not
+ */
 template <PinName RX>
 struct UsartRx {
 	static constexpr auto RX_USART_NUM = std::get<0>(UsartPinMap::getPinInfo<RX, UsartPinMap::PinInfo::Rx>());
@@ -116,6 +127,7 @@ class Usart {
 	}
 
 	constexpr auto setTxeInterrupt() const noexcept {
+		// this is definitely wrong
 		if (nvic_is_irq_enabled<USART_IRQ_NUM>()) {
 			nvic_disable_irq<USART_IRQ_NUM>();
 		}
@@ -128,6 +140,7 @@ class Usart {
 
 	template <auto F>
 	constexpr auto setTxeInterrupt(Callback<F> const& t_cb) const noexcept {
+		// this is definitely wrong
 		if (nvic_is_irq_enabled<USART_IRQ_NUM>()) {
 			nvic_disable_irq<USART_IRQ_NUM>();
 		}

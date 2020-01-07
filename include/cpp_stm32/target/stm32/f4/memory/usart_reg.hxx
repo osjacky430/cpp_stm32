@@ -43,7 +43,7 @@ static constexpr auto USART_BASE(UsartNum const& t_usart_num) {
 }
 
 /**
- * @defgroup USART_SR_GROUP
+ * @defgroup USART_SR_GROUP		USART Status Register Group
  * @{
  */
 
@@ -59,7 +59,7 @@ static constexpr Register<UsartSrInfo, UsartSrBit> USART_SR{USART_BASE(Port), 0x
 /**@}*/
 
 /**
- * @defgroup USART_DR_GROUP
+ * @defgroup USART_DR_GROUP		USART Data Register Group
  * @{
  */
 SETUP_REGISTER_INFO(UsartDrInfo, Bit<8>{BitPos_t{0}})
@@ -72,7 +72,7 @@ static constexpr Register<UsartDrInfo, UsartDrBit> USART_DR{USART_BASE(Port), 0x
 /**@}*/
 
 /**
- * @degroup USART_BRR_GROUP
+ * @degroup USART_BRR_GROUP		Usart Baud Rate Register Group
  * @{
  */
 
@@ -85,7 +85,7 @@ static constexpr Register<UsartBrrInfo, UsartBrrBit> USART_BRR{USART_BASE(Port),
 /**@}*/
 
 /**
- * @degroup USART_CR1_GROUP
+ * @degroup USART_CR1_GROUP		USART Control Register 1 Group
  * @{
  */
 
@@ -104,7 +104,7 @@ static constexpr Register<UsartCr1Info, UsartCr1Bit> USART_CR1{USART_BASE(Port),
 /**@}*/
 
 /**
- * @defgroup USART_CR2_GROUP
+ * @defgroup USART_CR2_GROUP		USART Control Register 2 Group
  * @{
  */
 
@@ -120,7 +120,7 @@ static constexpr Register<UsartCr2Info, UsartCr2Bit> USART_CR2{USART_BASE(Port),
 /**@}*/
 
 /**
- * @defgroup USART_CR3_GROUP
+ * @defgroup USART_CR3_GROUP		USART Control Register 3 Group
  * @{
  */
 
@@ -137,7 +137,7 @@ static constexpr Register<UsartCr3Info, UsartCr3Bit> USART_CR3{USART_BASE(Port),
 /**@}*/
 
 /**
- * @defgroup USART_GTPR_GROUP
+ * @defgroup USART_GTPR_GROUP		USART Guard Time and Prescaler Register Group
  * @{
  */
 

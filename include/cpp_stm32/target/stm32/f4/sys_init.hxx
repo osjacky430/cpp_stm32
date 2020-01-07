@@ -30,7 +30,7 @@
 namespace cpp_stm32::stm32::f4 {
 
 /**
- * @defgroup DEVICE_VOLTAGE_DEF
+ * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
  * @{
  */
 
@@ -43,7 +43,7 @@ static constexpr auto STM32_VDD = DEVICE_VDD;
 /**@}*/
 
 /**
- * @defgroup HSI_CLK_DEF
+ * @defgroup HSI_CLK_DEF    HSI Clock
  * @{
  */
 
@@ -56,7 +56,7 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
 /**@}*/
 
 /**
- * @defgroup HSE_CLK_DEF
+ * @defgroup HSE_CLK_DEF    HSE Clock
  * @{
  */
 
@@ -76,7 +76,7 @@ static_assert(HSE_CLK_FREQ_MIN <= HSE_CLK_FREQ && HSE_CLK_FREQ <= 25_MHz);
 /**@}*/
 
 /**
- * @defgroup PLL_VCO_DEF
+ * @defgroup PLL_VCO_DEF    PLL VCO
  * @{
  */
 
@@ -87,7 +87,7 @@ static constexpr auto VCO_OUTPUT_FREQ_MAX			 = 432_MHz;
 /**@}*/
 
 /**
- * @defgroup VOS_MAX_FREQ_DEF
+ * @defgroup VOS_MAX_FREQ_DEF   VOS Max with/without overdrive
  * @{
  */
 

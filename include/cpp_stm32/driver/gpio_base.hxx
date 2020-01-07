@@ -25,6 +25,9 @@
 // target specific include
 #include "device.hxx"
 
+/**
+ * @namespace   cpp_stm32::driver
+ */
 namespace cpp_stm32::driver {
 
 /**

@@ -37,7 +37,7 @@ static constexpr auto NVIC_IRQ_BIT_POS(IrqNum const& IRQn) {
 using NvicIdxType = decltype(NVIC_IRQ_BIT_POS(IrqNum{0}));
 
 /**
- *  @defgroup NVIC_ISER_GROUP
+ *  @defgroup NVIC_ISER_GROUP		NVIC Iterrupt Set Enable Register Group
  *  @{
  */
 SETUP_REGISTER_INFO(NvicIserInfo, SETUP_BIT_LIST<Binary<BitMod::RdSet>>(Interval<0, 31>{}));
@@ -48,7 +48,7 @@ static constexpr Register<NvicIserInfo, NvicIdxType> NVIC_ISER{NVIC_BASE, NVIC_G
 /**@}*/
 
 /**
- * @defgroup NVIC_ICER_GROUP
+ * @defgroup NVIC_ICER_GROUP		NVIC Interrupt Clear Enable Register Group
  * @{
  */
 SETUP_REGISTER_INFO(NvicIcerInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
@@ -59,7 +59,7 @@ static constexpr Register<NvicIcerInfo, NvicIdxType> NVIC_ICER{NVIC_BASE, 0x80U 
 /**@}*/
 
 /**
- * @defgroup  NVIC_ISPR_GROUP
+ * @defgroup  NVIC_ISPR_GROUP		NVIC Interrupt Set Pending Register Group
  * @{
  */
 SETUP_REGISTER_INFO(NvicIsprInfo, SETUP_BIT_LIST<Binary<BitMod::RdSet>>(Interval<0, 31>{}))
@@ -69,7 +69,7 @@ static constexpr Register<NvicIsprInfo, NvicIdxType> NVIC_ISPR{NVIC_BASE, 0x100U
 /**@}*/
 
 /**
- * @defgroup  NVIC_ICPR_GROUP
+ * @defgroup  NVIC_ICPR_GROUP		NVIC Interrupt Clear Pending Regsiter Group
  * @{
  */
 SETUP_REGISTER_INFO(NvicIcprInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
@@ -79,7 +79,7 @@ static constexpr Register<NvicIcprInfo, NvicIdxType> NVIC_ICPR{NVIC_BASE, 0x180U
 /**@}*/
 
 /**
- * @defgroup  NVIC_IABR_GROUP
+ * @defgroup  NVIC_IABR_GROUP		NVIC Interrupt Active Bit Register Group
  * @{
  */
 SETUP_REGISTER_INFO(NvicIabrInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
@@ -89,7 +89,7 @@ static constexpr Register<NvicIabrInfo, NvicIdxType> NVIC_IABR{NVIC_BASE, 0x200U
 /**@}*/
 
 /**
- * @defgroup NVIC_IPR_GROUP
+ * @defgroup NVIC_IPR_GROUP		NVIC Interrupt Priority Register Group
  * @{
  */
 SETUP_REGISTER_INFO(NvicIprInfo, Bit<8, std::uint8_t>{BitPos_t{0}})
@@ -102,7 +102,7 @@ static constexpr Register<NvicIprInfo, NvicIprBit, Access::Byte> NVIC_IPR{NVIC_B
 /**@}*/
 
 /**
- * @defgroup NVIC_STIR_GROUP
+ * @defgroup NVIC_STIR_GROUP		NVIC Software Trigger Interrupt Register Group
  * @{
  */
 
@@ -110,7 +110,7 @@ SETUP_REGISTER_INFO(NvicStirInfo, Bit<9, std::uint16_t, BitMod::WrOnly>{BitPos_t
 
 enum class NvicStirBit { IntId };
 
-// this is rather special cause nvic register are separated in two parts
+// this is rather special cause nvic register is separated to two parts
 static constexpr Register<NvicStirInfo, NvicStirBit> NVIC_STIR{NVIC_BASE, 0xD00};
 /**@}*/
 

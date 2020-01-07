@@ -37,7 +37,7 @@ static constexpr auto DivisionFactor_v = DivisionFactor_t<Val>{};
 enum class RccOsc : std::uint32_t;
 
 /**
- * @defgroup	RCC_CR_GROUP
+ * @defgroup	RCC_CR_GROUP		RCC Control Register Group
  *
  * @{
  */
@@ -65,89 +65,98 @@ static constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
 /** @}*/
 
 /**
- * @defgroup	RCC_PLLCFGR_GROUP
- *
+ * @def 	 SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)
+ * @brief	 A helper macro to declare division factor helper class
+ * @param  ClassName   	Class name
+ * @param  LowerBound		Lower bound of division factor
+ * @param  UpperBound		Upper bound of division factor
+ */
+#define SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)               \
+	struct ClassName {                                                                      \
+		std::uint32_t const m_divisionFactor;                                                 \
+                                                                                          \
+		template <std::uint32_t Val>                                                          \
+		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(Val) {  \
+			static_assert(LowerBound <= Val && Val <= UpperBound);                              \
+		}                                                                                     \
+                                                                                          \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; } \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }        \
+	}
+
+/**
+ * @def 	 SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)
+ * @param  ClassName 	Class name
+ * @param  VARARGS    division factor - register value pair
+ */
+#define SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)                                                 \
+	struct ClassName {                                                                                            \
+		std::uint32_t const m_divisionFactor;                                                                       \
+		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                             \
+                                                                                                                \
+		template <std::uint32_t Val>                                                                                \
+		static constexpr auto findDivisionFactor = []() {                                                           \
+			constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),       \
+																							[](auto const& t_pair) { return t_pair.first == Val; });          \
+			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                                   \
+			return iter_pos->second;                                                                                  \
+		};                                                                                                          \
+                                                                                                                \
+		template <std::uint32_t Val>                                                                                \
+		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(findDivisionFactor<Val>()) {} \
+                                                                                                                \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; }                       \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }                              \
+	}
+
+/**
+ * @defgroup	RCC_PLLCFGR_GROUP		RCC PLL Configuration Register Group
  * @{
  */
 
-struct PllM {
- private:
-	std::uint32_t const m_pllmDivisionFactor;
+/**
+ * @class 	PllM
+ * @brief		Utility class used to check whether division factor is reasonable.
+ * @note		PllM valid number lies between 2 and 63
+ */
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllM, 2, 63);
 
- public:
-	template <std::uint32_t Val>
-	constexpr PllM(DivisionFactor_t<Val> const&) noexcept : m_pllmDivisionFactor(Val) {
-		static_assert(2 <= Val && Val <= 63);
-	}
+/**
+ * @class		PllN
+ * @brief		Utility class used to check whether division factor is reasonable.
+ * @note		PllN valid number lies between 50 and 432
+ */
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllN, 50, 432);
 
-	constexpr auto get() const noexcept { return m_pllmDivisionFactor; }
-};
+/**
+ * @class 	PllP
+ * @brief		Utility class used to check whether division factor is reasonable.
+ * @note 		PllP valid number:
+ *
+ * 					 DivFactor |   RegVal
+ * 				  -----------|-----------
+ * 					     2		 |	 0b00
+ * 							 4		 |	 0b01
+ * 							 6		 |   0b10
+ * 							 8		 |	 0b11
+ */
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PllP, /**/
+																				std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10},
+																				std::pair{8, 0b11}, );
 
-struct PllN {
- private:
-	std::uint32_t const m_pllnDivisionFactor;
+/**
+ * @class 	PllQ
+ * @brief		Utility class used to check whether division factor is reasonable.
+ * @note		PllQ valid number lies between 2 and 15
+ */
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllQ, 2, 15);
 
- public:
-	template <std::uint32_t Val>
-	constexpr PllN(DivisionFactor_t<Val> const&) noexcept : m_pllnDivisionFactor(Val) {
-		static_assert(50 <= Val && Val <= 432);
-	}
-
-	constexpr auto get() const noexcept { return m_pllnDivisionFactor; }
-};
-
-struct PllP {
- public:
-	static constexpr std::array AVAIL_DIVISION_FACTOR{
-		std::pair{2, 0b00},
-		std::pair{4, 0b01},
-		std::pair{6, 0b10},
-		std::pair{8, 0b11},
-	};
-
-	template <std::uint32_t Val>
-	constexpr PllP(DivisionFactor_t<Val> const&) noexcept : m_pllpDivisionFactor(find_division_factor<Val>()) {}
-
-	constexpr auto get() const noexcept { return m_pllpDivisionFactor; }
-
- private:
-	std::uint32_t const m_pllpDivisionFactor;
-
-	template <std::uint32_t Val>
-	static constexpr auto find_division_factor = []() {
-		constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																						[](auto const& t_pair) { return t_pair.first == Val; });
-		// even though we dont need this line, since this is constexpr. This line may help debugging somehow.
-		static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-		return iter_pos->second;
-	};
-};
-
-struct PllQ {
- private:
-	std::uint32_t const m_pllqDivisionFactor;
-
- public:
-	template <std::uint32_t Val>
-	constexpr PllQ(DivisionFactor_t<Val> const&) noexcept : m_pllqDivisionFactor(Val) {
-		static_assert(2 <= Val && Val <= 15);
-	}
-
-	constexpr auto get() const noexcept { return m_pllqDivisionFactor; }
-};
-
-struct PllR {
- private:
-	std::uint32_t const m_pllrDivisionFactor;
-
- public:
-	template <std::uint32_t Val>
-	constexpr PllR(DivisionFactor_t<Val> const&) noexcept : m_pllrDivisionFactor(Val) {
-		static_assert(2 <= Val && Val <= 7);
-	}
-
-	constexpr auto get() const noexcept { return m_pllrDivisionFactor; }
-};
+/**
+ * @class 	PllR
+ * @brief		Utility class used to check whether division factor is reasonable.
+ * @note 		PllR valid number lies between 2 and 7
+ */
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllR, 2, 7);
 
 SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
 										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
@@ -159,56 +168,21 @@ static constexpr Register<RccPllcfgrBitInfo, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE,
 /** @}*/
 
 /**
- * @defgroup	RCC_CFG_GROUP
+ * @defgroup	RCC_CFG_GROUP		RCC Configuration Group
  *
  * @{
  */
 
 enum class SysClk : std::uint32_t;
 
-struct HPRE {
- private:
-	std::uint32_t const m_hpreDivisionFactor;
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(HPRE, /**/
+																				std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
+																				std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
+																				std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111});
 
- public:
-	static constexpr std::array AVAIL_DIVISION_FACTOR{
-		std::pair{1, 0b0000},	 std::pair{2, 0b1000},	 std::pair{4, 0b1001},	 std::pair{8, 0b1010},	std::pair{16, 0b1011},
-		std::pair{64, 0b1100}, std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111}};
-
- public:
-	template <std::uint32_t Val>
-	constexpr HPRE(DivisionFactor_t<Val> const&) noexcept
-		: m_hpreDivisionFactor([]() {
-				constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																								[](auto const& t_pair) { return t_pair.first == Val; });
-				static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-				return iter_pos->second;
-			}()) {}
-
-	constexpr auto get() const noexcept { return m_hpreDivisionFactor; }
-};
-
-struct PPRE {
- private:
-	std::uint32_t const m_ppreDivisionFactor;
-
- public:
-	static constexpr std::array AVAIL_DIVISION_FACTOR{
-		std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101}, std::pair{8, 0b110}, std::pair{16, 0b111},
-	};
-
- public:
-	template <std::uint32_t Val>
-	constexpr PPRE(DivisionFactor_t<Val> const&) noexcept
-		: m_ppreDivisionFactor([]() {
-				constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),
-																								[](auto const& t_pair) { return t_pair.first == Val; });
-				static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());
-				return iter_pos->second;
-			}()) {}
-
-	constexpr auto get() const noexcept { return m_ppreDivisionFactor; }
-};
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PPRE, /**/
+																				std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101},
+																				std::pair{8, 0b110}, std::pair{16, 0b111});
 
 SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
 										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
@@ -226,7 +200,7 @@ static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};
 /**@} */
 
 /**
- * @defgroup	RCC_AHB1RST_GROUP
+ * @defgroup	RCC_AHB1RST_GROUP		RCC AHB1 Reset Register Group
  * @{
  */
 
@@ -256,7 +230,7 @@ static constexpr Register<RccAhb1RstInfo, RccAhb1RstBit> RCC_AHB1RST{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup	RCC_APB1RST_GROUP
+ * @defgroup	RCC_APB1RST_GROUP		RCC APB1 Reset Register Group
  * @{
  */
 
@@ -269,7 +243,7 @@ static constexpr Register<RccApb1RstInfo, RccApb1RstBit> RCC_APB1RST{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup RCC_APB2RST_GROUP
+ * @defgroup RCC_APB2RST_GROUP		RCC APB2 Reset Register Group
  * @{
  */
 
@@ -282,7 +256,7 @@ static constexpr Register<RccApb2RstInfo, RccApb2RstBit> RCC_APB2RST{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup	RCC_AHB1ENR_GROUP
+ * @defgroup	RCC_AHB1ENR_GROUP		RCC AHB1 Enable Register Group
  * @{
  */
 
@@ -314,7 +288,7 @@ static constexpr Register<RccAhb1EnrInfo, RccAhb1EnrBit> RCC_AHB1ENR{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup	RCC_APB1ENR_GROUP
+ * @defgroup	RCC_APB1ENR_GROUP		RCC APB1 Enable Register Group
  * @{
  */
 
@@ -328,7 +302,7 @@ static constexpr Register<RccApb1EnrInfo, RccApb1EnrBit> RCC_APB1ENR{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup RCC_APB2ENR_GROUP
+ * @defgroup RCC_APB2ENR_GROUP		RCC APB2 Enable Register Group
  * @{
  */
 
@@ -341,7 +315,7 @@ static constexpr Register<RccApb2EnrInfo, RccApb2EnrBit> RCC_APB2ENR{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup	RCC_BDCR_GROUP
+ * @defgroup	RCC_BDCR_GROUP		RCC Backup Domain Control Register
  *
  * @{
  */

@@ -69,7 +69,7 @@ constexpr auto GPIO_BASE(common::GpioPort const& t_port) noexcept {
 }
 
 /**
- * @defgroup GPIO_MODER_GROUP
+ * @ingroup GPIO_MODER_GROUP
  * @{
  */
 
@@ -81,7 +81,7 @@ SETUP_REGISTER_INFO(GpioModerInfo, /**/
 										Bit<2, common::GpioMode>{BitPos_t(16)}, Bit<2, common::GpioMode>{BitPos_t(18)},
 										Bit<2, common::GpioMode>{BitPos_t(20)}, Bit<2, common::GpioMode>{BitPos_t(22)},
 										Bit<2, common::GpioMode>{BitPos_t(24)}, Bit<2, common::GpioMode>{BitPos_t(26)},
-										Bit<2, common::GpioMode>{BitPos_t(28)}, Bit<2, common::GpioMode>{BitPos_t(30)})
+										Bit<2, common::GpioMode>{BitPos_t(28)}, Bit<2, common::GpioMode>{BitPos_t(30)});
 
 template <common::GpioPort Port>
 static constexpr auto GPIO_MODER = BASE_GPIO_MODER<GPIO_BASE(Port), 0x00U>;
@@ -89,7 +89,7 @@ static constexpr auto GPIO_MODER = BASE_GPIO_MODER<GPIO_BASE(Port), 0x00U>;
 /**@}*/
 
 /**
- * @defgroup GPIO_PUPD_GROUP
+ * @ingroup GPIO_PUPD_GROUP
  * @{
  */
 
@@ -101,7 +101,7 @@ SETUP_REGISTER_INFO(GpioPupdInfo, /**/
 										Bit<2, common::GpioPupd>{BitPos_t(16)}, Bit<2, common::GpioPupd>{BitPos_t(18)},
 										Bit<2, common::GpioPupd>{BitPos_t(20)}, Bit<2, common::GpioPupd>{BitPos_t(22)},
 										Bit<2, common::GpioPupd>{BitPos_t(24)}, Bit<2, common::GpioPupd>{BitPos_t(26)},
-										Bit<2, common::GpioPupd>{BitPos_t(28)}, Bit<2, common::GpioPupd>{BitPos_t(30)})
+										Bit<2, common::GpioPupd>{BitPos_t(28)}, Bit<2, common::GpioPupd>{BitPos_t(30)});
 
 template <common::GpioPort Port>
 static constexpr auto GPIO_PUPDR = BASE_GPIO_PUPDR<GPIO_BASE(Port), 0x0CU>;
@@ -109,7 +109,7 @@ static constexpr auto GPIO_PUPDR = BASE_GPIO_PUPDR<GPIO_BASE(Port), 0x0CU>;
 /**@}*/
 
 /**
- * @defgroup GPIO_ODR_GROUP
+ * @ingroup GPIO_ODR_GROUP
  * @{
  */
 
@@ -117,7 +117,7 @@ SETUP_REGISTER_INFO(GpioOdrInfo, /**/
 										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)},
 										Bit<1>{BitPos_t(4)}, Bit<1>{BitPos_t(5)}, Bit<1>{BitPos_t(6)}, Bit<1>{BitPos_t(7)},
 										Bit<1>{BitPos_t(8)}, Bit<1>{BitPos_t(9)}, Bit<1>{BitPos_t(10)}, Bit<1>{BitPos_t(11)},
-										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(13)}, Bit<1>{BitPos_t(14)}, Bit<1>{BitPos_t(15)})
+										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(13)}, Bit<1>{BitPos_t(14)}, Bit<1>{BitPos_t(15)});
 
 template <common::GpioPort Port>
 static constexpr auto GPIO_ODR = BASE_GPIO_ODR<GPIO_BASE(Port), 0x14U>;
@@ -125,7 +125,7 @@ static constexpr auto GPIO_ODR = BASE_GPIO_ODR<GPIO_BASE(Port), 0x14U>;
 /**@}*/
 
 /**
- * @defgroup GPIO_BSRR_GROUP
+ * @ingroup GPIO_BSRR_GROUP
  * @{
  */
 
@@ -141,7 +141,7 @@ SETUP_REGISTER_INFO(
 	Binary<BitMod::WrOnly>{BitPos_t(21)}, Binary<BitMod::WrOnly>{BitPos_t(22)}, Binary<BitMod::WrOnly>{BitPos_t(23)},
 	Binary<BitMod::WrOnly>{BitPos_t(24)}, Binary<BitMod::WrOnly>{BitPos_t(25)}, Binary<BitMod::WrOnly>{BitPos_t(26)},
 	Binary<BitMod::WrOnly>{BitPos_t(27)}, Binary<BitMod::WrOnly>{BitPos_t(28)}, Binary<BitMod::WrOnly>{BitPos_t(29)},
-	Binary<BitMod::WrOnly>{BitPos_t(30)}, Binary<BitMod::WrOnly>{BitPos_t(31)})
+	Binary<BitMod::WrOnly>{BitPos_t(30)}, Binary<BitMod::WrOnly>{BitPos_t(31)});
 
 template <common::GpioPort Port>
 static constexpr auto GPIO_BSRR = BASE_GPIO_BSRR<GPIO_BASE(Port), 0x18U>;
@@ -149,7 +149,7 @@ static constexpr auto GPIO_BSRR = BASE_GPIO_BSRR<GPIO_BASE(Port), 0x18U>;
 /**@}*/
 
 /**
- * @defgroup GPIO_AFRH_ARGL_GROUP
+ * @ingroup GPIO_AFRH_ARGL_GROUP
  * @{
  */
 
@@ -157,7 +157,7 @@ SETUP_REGISTER_INFO(GpioAfrInfo, /**/
 										Bit<4, common::GpioAltFunc>{BitPos_t{0}}, Bit<4, common::GpioAltFunc>{BitPos_t{4}},
 										Bit<4, common::GpioAltFunc>{BitPos_t{8}}, Bit<4, common::GpioAltFunc>{BitPos_t{12}},
 										Bit<4, common::GpioAltFunc>{BitPos_t{16}}, Bit<4, common::GpioAltFunc>{BitPos_t{20}},
-										Bit<4, common::GpioAltFunc>{BitPos_t{24}}, Bit<4, common::GpioAltFunc>{BitPos_t{28}})
+										Bit<4, common::GpioAltFunc>{BitPos_t{24}}, Bit<4, common::GpioAltFunc>{BitPos_t{28}});
 
 template <common::GpioPort Port>
 static constexpr auto GPIO_AFRL = BASE_GPIO_AFRL<GPIO_BASE(Port), 0x20U>;

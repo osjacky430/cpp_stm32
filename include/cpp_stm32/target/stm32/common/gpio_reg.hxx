@@ -30,7 +30,7 @@ template <typename BitList, typename BitIdx, std::uint32_t BaseAddr, std::uint32
 using AtomicReg = cpp_stm32::AtomicReg<BitList, BitIdx, IoOp>;
 
 /**
- * @defgroup GPIO_MODER_GROUP
+ * @defgroup GPIO_MODER_GROUP		GPIO Mode Register declaration
  * @{
  */
 
@@ -42,7 +42,7 @@ static constexpr AtomicReg<GpioModerInfo, common::GpioPin, BaseAddr, OffsetAddr>
 /**@}*/
 
 /**
- * @defgroup GPIO_PUPD_GROUP
+ * @defgroup GPIO_PUPD_GROUP		GPIO Pullup Pulldown Register declaration
  * @{
  */
 
@@ -54,7 +54,7 @@ static constexpr AtomicReg<GpioPupdInfo, common::GpioPin, BaseAddr, OffsetAddr> 
 /**@}*/
 
 /**
- * @defgroup GPIO_ODR_GROUP
+ * @defgroup GPIO_ODR_GROUP		GPIO Output Data Register declaration
  * @{
  */
 
@@ -66,7 +66,7 @@ static constexpr AtomicReg<GpioOdrInfo, common::GpioPin, BaseAddr, OffsetAddr> B
 /**@}*/
 
 /**
- * @defgroup GPIO_BSRR_GROUP
+ * @defgroup GPIO_BSRR_GROUP		Gpio Bit Set/Reset Register declaration
  * @{
  */
 
@@ -78,7 +78,7 @@ static constexpr AtomicReg<GpioBsrrInfo, common::GpioPin, BaseAddr, OffsetAddr> 
 /**@}*/
 
 /**
- * @defgroup GPIO_AFRH_ARGL_GROUP
+ * @defgroup GPIO_AFRH_AFRL_GROUP		GPIO Alternate Function Register High/Low declaration
  * @{
  */
 
@@ -93,7 +93,8 @@ static constexpr AtomicReg<GpioAfrInfo, common::GpioPin, BaseAddr, OffsetAddr> B
 /**@}*/
 
 /**
- * @defgroup GPIO_BRR_GROUP
+ * @defgroup GPIO_BRR_GROUP		GPIO Bit Reset Register declaration
+ *
  * @note @ref STM32F302xx, STM32F303xx and STM32F313xx advanced ARM-based 32-bit MCUs.pdf
  * @{
  */

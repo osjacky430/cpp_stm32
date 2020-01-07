@@ -33,7 +33,7 @@ template <std::uint8_t Val>
 static constexpr auto CpuWaitState_v = CpuWaitState_t<Val>{};
 
 /**
- * @defgroup FLASH_ACR_GROUP
+ * @defgroup FLASH_ACR_GROUP    Flash Access Control Register Group
  * @{
  */
 

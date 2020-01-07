@@ -37,8 +37,8 @@ constexpr auto memory_at(Base b, Offset o) {
 }
 
 /**
- * @defgroup  INTERNAL_PRIVATE_PERIPH_BUSS
- * @ref 			ARM® Cortex®‑M4 Processor Technical Reference Manual
+ * @defgroup  INTERNAL_PRIVATE_PERIPH_BUS		Cortex-M4 private peripheral bus address
+ * @note 			see ARM Cortex‑M4 Processor Technical Reference Manual
  *
  * @todo 			Need to see also cortex-m3, or ARMv7-M Architecture Reference Manual
  * @{

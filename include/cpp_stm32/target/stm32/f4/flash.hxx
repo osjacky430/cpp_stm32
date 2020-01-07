@@ -25,6 +25,10 @@
 
 namespace cpp_stm32::stm32::f4 {
 
+/**
+ * @class   FlashWaitTable
+ * @brief   This class is used to get flash wait state according to clock frequency and device voltage
+ */
 struct FlashWaitTable {
  private:
 	template <float const& Vdd>
@@ -59,6 +63,12 @@ struct FlashWaitTable {
 	};
 
  public:
+	/**
+	 * @brief    A getter function that returns wait state according to clock frequency and device voltage
+	 * @tparam   DeviceVolt  Device voltage, see @ref DEVICE_VOLTAGE_DEF
+	 * @param    t_hclk      Ahb clock frequency
+	 * @return   the number of wait state
+	 */
 	template <float const& DeviceVolt>
 	static constexpr auto getWaitState(std::uint64_t const& t_hclk) noexcept {
 		return std::get<GET_IDX_FROM_VDD<DeviceVolt>()>(WAIT_STATE_TABLE)(t_hclk);

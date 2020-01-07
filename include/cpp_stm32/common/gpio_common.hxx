@@ -16,6 +16,10 @@
 
 #pragma once
 
+/**
+ * @namespace  cpp_stm32::common
+ * @brief      contains common definition for peripherals
+ */
 namespace cpp_stm32::common {
 
 enum class GpioPort;

@@ -18,15 +18,37 @@
 
 #include <cstdint>
 
+/**
+ * @namespace  cpp_stm32
+ */
 namespace cpp_stm32 {
 
+/**
+ * @class   StrongType
+ * @brief   This class is used to create strong type for strong interface
+ * @tparam  UnderlyingType  The underlying type of the strong type
+ * @tparam  Tag             Tag to prevent those with same underlying type are used at the place they shouldn't
+ */
 template <typename UnderlyingType, typename Tag>
 class StrongType {
  public:
-	constexpr explicit StrongType(UnderlyingType const& t_val) : m_val(t_val) {}
+	/**
+	 * @brief  Construct StrongType with underlying value
+	 * @param  t_val   The underlying value
+	 */
+	constexpr explicit StrongType(UnderlyingType const& t_val) noexcept : m_val(t_val) {}
 
-	constexpr UnderlyingType& get() { return m_val; }
-	constexpr UnderlyingType const& get() const { return m_val; }
+	/**
+	 * @brief  Getter function that returns the reference of its underlying value
+	 * @return The reference of underlying value of the strong type
+	 */
+	[[nodiscard]] constexpr UnderlyingType& get() noexcept { return m_val; }
+
+	/**
+	 * @brief   Getter function that returns the constant reference of underlying value
+	 * @return  The const reference of underlying value of the strong type
+	 */
+	[[nodiscard]] constexpr UnderlyingType const& get() const noexcept { return m_val; }
 
  private:
 	UnderlyingType m_val;
