@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+#include "cpp_stm32/utility/mmio.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 namespace cpp_stm32 {
@@ -37,6 +38,30 @@ constexpr auto to_alias_periph_addr(std::uint32_t const& t_mem_addr, std::uint8_
 constexpr auto to_alias_sram_addr(std::uint32_t const& t_mem_addr, std::uint8_t const& t_bit) noexcept {
 	return to_underlying(BitBandAddr::AliasSRAMBase) + (t_mem_addr - to_underlying(BitBandAddr::SRAMBase)) * 32U +
 				 t_bit * 4U;
+}
+
+constexpr auto is_in_sram_bit_band_region(std::uint32_t const& t_mem_addr) noexcept {
+	return to_underlying(BitBandAddr::SRAMBase) <= t_mem_addr &&
+				 t_mem_addr <= to_underlying(BitBandAddr::AliasPeriphBase);
+}
+
+constexpr auto is_in_periph_bit_band_region(std::uint32_t const& t_mem_addr) noexcept {
+	return to_underlying(BitBandAddr::PeriphBase) <= t_mem_addr &&
+				 t_mem_addr <= to_underlying(BitBandAddr::AliasPeriphBase);
+}
+
+constexpr auto to_alias_addr(std::uint32_t const& t_mem_addr, std::uint8_t const& t_bit) noexcept {
+	if (is_in_periph_bit_band_region(t_mem_addr)) {
+		return to_alias_periph_addr(t_mem_addr, t_bit);
+	} else if (is_in_sram_bit_band_region(t_mem_addr)) {
+		return to_alias_sram_addr(t_mem_addr, t_bit);
+	} else {
+		return 0UL;
+	}
+}
+
+constexpr auto have_atomic_op(std::uint32_t const& t_mem_addr) noexcept {
+	return is_in_periph_bit_band_region(t_mem_addr) || is_in_sram_bit_band_region(t_mem_addr);
 }
 
 }	 // namespace cpp_stm32

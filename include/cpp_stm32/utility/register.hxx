@@ -29,6 +29,21 @@
 namespace cpp_stm32 {
 
 /**
+ * @enum 	Access
+ */
+enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
+
+/**
+ * @brief		This function handles OR operator of enum @ref Access
+ * @param  	lhs		Left hand side
+ * @param 	rhs 	Right hand side
+ * @return 	Numeric value of OR operation of lhs and rhs
+ */
+constexpr auto operator|(Access const& lhs, Access const& rhs) {
+	return Access{to_underlying(lhs) | to_underlying(rhs)};
+}
+
+/**
  * @brief		This function is getter for bit list in bit
  * @tparam	BitList		List of bit.
  * @tparam	Idx 			Index of the bit in bit list.
@@ -65,7 +80,7 @@ static constexpr ValWithPosType ValWithPos{};
  *
  * @note		Need to add some sfinae or static_assert to ensure the user don't mess up with it
  */
-template <typename BitList, typename BitListIdx, Access IoOp = Access::Word>
+template <typename BitList, typename BitListIdx, Access IoOp = Access::Word, bool atomicity = false>
 class Register {
  private:
 	std::uint32_t const m_base;		/*!< Peripheral base address */
@@ -310,9 +325,12 @@ class Register {
 	[[nodiscard]] constexpr auto memAddr() const noexcept { return m_base + m_offset; }
 };
 
+template <typename BitList, typename BitIdx, Access IoOp>
+using AtomicReg = Register<BitList, BitIdx, IoOp, true>;
+
 /**
  * @def 		SETUP_REGISTER_INFO(Name, ...)
- * @brief		A helper macro to instantiate class (bit list) with @arg Name, and bits.
+ * @brief		A helper macro to instantiate class (bit list) with class name @arg Name, and bits.
  */
 #define SETUP_REGISTER_INFO(Name, ...)                   \
 	class Name {                                           \

@@ -23,6 +23,8 @@
 namespace cpp_stm32 {
 
 // slightly binary file size overhead, due to "regVal"
+// if memory location is non-type template param, this overhead can be eliminated,
+// but this is a huge change
 template <typename T>
 class MMIO_t {
  private:
@@ -105,10 +107,5 @@ constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
 static constexpr auto const MMIO32 = MMIO<std::uint32_t>;
 static constexpr auto const MMIO16 = MMIO<std::uint16_t>;
 static constexpr auto const MMIO8	 = MMIO<std::uint8_t>;
-
-enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
-constexpr auto operator|(Access const& lhs, Access const& rhs) {
-	return Access{to_underlying(lhs) | to_underlying(rhs)};
-}
 
 }	 // namespace cpp_stm32
