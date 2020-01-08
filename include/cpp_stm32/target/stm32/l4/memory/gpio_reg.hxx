@@ -17,7 +17,7 @@
 #pragma once
 
 #include "cpp_stm32/target/stm32/common/gpio_reg.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 

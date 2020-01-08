@@ -6,12 +6,14 @@
 
 // #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
+#include "gpio.hxx"
+#include "rcc.hxx"
 // #include "cpp_stm32/driver/digitalout.hxx"
 // #include "cpp_stm32/driver/usart_serial.hxx"
 
 // using namespace cpp_stm32::driver;
-// using namespace cpp_stm32::common;
-// using namespace cpp_stm32;
+using namespace cpp_stm32::common;
+using namespace cpp_stm32::stm32::l4;
 
 // struct DebugLogger {
 // 	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
@@ -25,8 +27,9 @@
 // };
 
 int main() {
+	rcc_enable_periph_clk<RccPeriph::GpioB>();
 	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
-
+	gpio_mode_setup<GpioPort::PortB, GpioPin::Pin3>(GpioMode::Output, GpioPupd::None);
 	// DebugLogger logger{};
 	// DigitalOut<PinName::PA_5> led;
 
@@ -36,6 +39,7 @@ int main() {
 			__asm__("nop");
 		}
 
+		gpio_toggle<GpioPort::PortB, GpioPin::Pin3>();
 		// led.toggle();
 	}
 

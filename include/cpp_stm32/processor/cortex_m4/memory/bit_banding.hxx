@@ -60,7 +60,7 @@ constexpr auto to_alias_addr(std::uint32_t const& t_mem_addr, std::uint8_t const
 	}
 }
 
-constexpr auto have_atomic_op(std::uint32_t const& t_mem_addr) noexcept {
+constexpr auto atomicity(std::uint32_t const& t_mem_addr) noexcept {
 	return is_in_periph_bit_band_region(t_mem_addr) || is_in_sram_bit_band_region(t_mem_addr);
 }
 

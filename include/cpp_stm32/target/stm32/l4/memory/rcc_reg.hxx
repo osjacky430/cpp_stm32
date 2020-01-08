@@ -18,6 +18,8 @@
 
 #include <cstdint>
 
+#include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
+
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/register.hxx"
@@ -59,9 +61,9 @@ SETUP_REGISTER_INFO(RccAhb2EnrInfo, /**/
 										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(7)},
 										Bit<1>{BitPos_t(13)}, Bit<1>{BitPos_t(18)})
 
-enum class RccAhb2EnrBit { GpioAEnr, GpioBEnr, GpioCEnr, GpioHEnr, AdcEnr, RngEnr };
+enum class RccAhb2EnrBit { GpioAEn, GpioBEn, GpioCEn, GpioHEn, AdcEn, RngEn };
 
-static constexpr Register<RccAhb2EnrInfo, RccAhb2EnrBit> RCC_AHB2RST{RCC_BASE, 0x4CU};
+static constexpr Register<RccAhb2EnrInfo, RccAhb2EnrBit> RCC_AHB2ENR{RCC_BASE, 0x4CU};
 
 /**@}*/
 
