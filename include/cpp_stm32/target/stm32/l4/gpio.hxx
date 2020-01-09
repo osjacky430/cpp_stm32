@@ -19,38 +19,36 @@
 #include <tuple>
 
 #include "cpp_stm32/common/gpio_common.hxx"
+#include "cpp_stm32/target/stm32/common/gpio.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/gpio_reg.hxx"
 
 namespace cpp_stm32::stm32::l4 {
 
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_set_mode(common::GpioMode const& t_mode) noexcept {
-	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
+	// do some static assertion
+	// static_assert(Port < common::GpioPort::PortJ);
+	detail::gpio_set_mode_impl<Port, Pins...>(t_mode);
 }
 
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_set_pupd(common::GpioPupd const& t_pupd) noexcept {
-	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
+	detail::gpio_set_pupd_impl<Port, Pins...>(t_pupd);
 }
 
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_mode_setup(common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
-	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
-	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
+	detail::gpio_mode_setup_impl<Port, Pins...>(t_mode, t_pupd);
 }
 
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_toggle() noexcept {
-	constexpr auto HALF_WORD_OFFSET = 16U;
+	detail::gpio_toggle_impl<Port, Pins...>();
+}
 
-	auto const m_odr	 = GPIO_ODR<Port>.template readBit<Pins...>(ValueOnly);
-	auto const mod_val = bit_group_cat(~m_odr, m_odr);
-
-	// this is a bit hacky IMO, but can't come up with a better idea
-	// @todo perhap add index rule in register class
-	// @todo maybe group bits in SETUP_REGISTER_INFO macro, e.g.
-	//			 SETUP_REGISTER_INFO(GpioBsrrInfo, {Bit<>{0}, Bit<>{16}, {...}})
-	GPIO_BSRR<Port>.template setBit<Pins..., common::GpioPin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
+template <common::GpioPort Port, common::GpioPin... Pins>
+constexpr void gpio_set_af(common::GpioAltFunc const& t_af) noexcept {
+	detail::gpio_set_af_impl<Port, Pins...>();
 }
 
 }	 // namespace cpp_stm32::stm32::l4

@@ -32,23 +32,24 @@ using ConstIndexType = std::integral_constant<std::size_t, idx>;
 /**
  *
  */
-template <std::size_t start, std::size_t seq, std::size_t... end>
+template <std::size_t interval, std::size_t start, std::size_t seq, std::size_t... end>
 struct IdxIntervalImpl {
-	using IdxIntervalType = typename IdxIntervalImpl<start, seq - 1, seq, end...>::IdxIntervalType;
+	static_assert(static_cast<int>(seq) - static_cast<int>(interval) >= 0);
+	using IdxIntervalType = typename IdxIntervalImpl<interval, start, seq - interval, seq, end...>::IdxIntervalType;
 };
 
-template <std::size_t start, std::size_t... seq>
-struct IdxIntervalImpl<start, start, seq...> {
+template <std::size_t interval, std::size_t start, std::size_t... seq>
+struct IdxIntervalImpl<interval, start, start, seq...> {
 	using IdxIntervalType = std::index_sequence<start, seq...>;
 };
 
-template <std::size_t start, std::size_t end>
+template <std::size_t start, std::size_t end, std::size_t interval>
 struct IdxInterval {
-	using IdxIntervalType = typename IdxIntervalImpl<start, end - 1, end>::IdxIntervalType;
+	using IdxIntervalType = typename IdxIntervalImpl<interval, start, end - interval, end>::IdxIntervalType;
 };
 
-template <std::size_t start, std::size_t end>
-using Interval = typename IdxInterval<start, end>::IdxIntervalType;
+template <std::size_t start, std::size_t end, std::size_t interval = 1>
+using Interval = typename IdxInterval<start, end, interval>::IdxIntervalType;
 
 /**
  *

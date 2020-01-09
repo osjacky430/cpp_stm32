@@ -343,4 +343,13 @@ using AtomicReg = Register<BitList, BitIdx, IoOp, true>;
 		static constexpr std::tuple BIT_LIST{__VA_ARGS__};   \
 	};
 
+// template <typename BitList, typename... Bits>
+// class SomeClass {
+// 	template <BitList, std::size_t Idx>
+// 	friend constexpr auto cpp_stm32::get_bit() noexcept;
+//
+//  private:
+// 	static constexpr std::tuple BIT_LIST{Bits{}...};
+// };
+
 }	 // namespace cpp_stm32

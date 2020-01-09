@@ -20,6 +20,7 @@
 #include <tuple>
 #include <utility>
 
+#include "cpp_stm32/target/stm32/common/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 
 namespace cpp_stm32::stm32::f4 {
@@ -130,18 +131,12 @@ class RccRegTable {
 // extend en and rst so that it takes template param pack
 template <RccPeriph PeriphClk>
 static constexpr void rcc_enable_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = RccRegTable::getPeriphEnReg<PeriphClk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
-	CTL_REG.template setBit<enable_bit>();
+	detail::rcc_enable_periph_clk_impl<RccRegTable, RccPeriph, PeriphClk>();
 }
 
 template <RccPeriph PeriphClk>
 static constexpr void rcc_reset_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = RccRegTable::getPeriphRstReg<PeriphClk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
-	CTL_REG.template setBit<enable_bit>();
+	detail::rcc_reset_periph_clk_impl<RccRegTable, RccPeriph, PeriphClk>();
 }
 
 template <RccOsc Clk>
