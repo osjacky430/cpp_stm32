@@ -32,7 +32,7 @@ namespace cpp_stm32::driver {
  * @class   DigitalOut
  * @brief   This class is a specialization of GpioUtil, it provides advance GPIO output control
  */
-template <PinName... PinNames>
+template <Manufacture::PinName... PinNames>
 class DigitalOut {
  public:
 	/**
@@ -52,4 +52,4 @@ class DigitalOut {
 	constexpr void toggle() const noexcept { GpioUtil<PinNames...>::toggle(); }
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

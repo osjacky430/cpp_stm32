@@ -39,6 +39,8 @@ static constexpr auto DivisionFactor_v = DivisionFactor_t<Val>{};
 
 enum class RccOsc : std::uint32_t;
 
+// @todo, consider combining all bitInfo and bit list for rst and en
+
 /**
  * @defgroup  RCC_CR_GROUP        RCC Control Register Group
  * @{
@@ -147,6 +149,34 @@ static constexpr Register<RccAhb2RstInfo, RccAhb2RstBit> RCC_AHB2RST{RCC_BASE, 0
 /**@}*/
 
 /**
+ * @defgroup	RCC_APB1RST_1_GROUP		RCC APB1 Reset Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb1Rst1Info, /**/
+										Bit<1>{BitPos_t{17}}, Bit<1>{BitPos_t{28}})
+
+enum class RccApb1Rst1Bit { Usart2Rst, PwrRst };
+
+static constexpr Register<RccApb1Rst1Info, RccApb1Rst1Bit> RCC_APB1RST_1{RCC_BASE, 0x38U};
+
+/**@}*/
+
+/**
+ * @defgroup	RCC_APB2RST_GROUP		RCC APB2 Reset Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb2RstInfo, /**/
+										Bit<1>{BitPos_t{14}})
+
+enum class RccApb2RstBit { Usart1Rst };
+
+static constexpr Register<RccApb2RstInfo, RccApb2RstBit> RCC_APB2RST{RCC_BASE, 0x40U};
+
+/**@}*/
+
+/**
  * @defgroup	RCC_AHB2ENR_GROUP		RCC AHB2 Enable Register Group
  * @{
  */
@@ -158,6 +188,34 @@ SETUP_REGISTER_INFO(RccAhb2EnrInfo, /**/
 enum class RccAhb2EnrBit { GpioAEn, GpioBEn, GpioCEn, GpioHEn, AdcEn, RngEn };
 
 static constexpr Register<RccAhb2EnrInfo, RccAhb2EnrBit> RCC_AHB2ENR{RCC_BASE, 0x4CU};
+
+/**@}*/
+
+/**
+ * @defgroup		RCC_APB1ENR_GROUP 	RCC APb1 Enable Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb1Enr1Info, /**/
+										Bit<1>{BitPos_t{17}}, Bit<1>{BitPos_t{28}})
+
+enum class RccApb1Enr1Bit { Usart2En, PwrEn };
+
+static constexpr Register<RccApb1Enr1Info, RccApb1Enr1Bit> RCC_APB1ENR_1{RCC_BASE, 0x58U};
+
+/**@}*/
+
+/**
+ * @defgroup		RCC_APB2ENR_GROUP		RCC APB2 Enable Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccApb2EnrInfo, /**/
+										Bit<1>{BitPos_t{14}})
+
+enum class RccApb2EnrBit { Usart1En };
+
+static constexpr Register<RccApb2EnrInfo, RccApb2EnrBit> RCC_APB2ENR{RCC_BASE, 0x5CU};
 
 /**@}*/
 

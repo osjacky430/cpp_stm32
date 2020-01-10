@@ -24,22 +24,31 @@
 namespace cpp_stm32::stm32::l4 {
 
 enum class RccPeriph : std::uint32_t {
-	/*AHB1*/
+
 	GpioA,
 	GpioB,
 	/*GpioC ~ GpioF*/
 
-	/*APB1*/
 	Usart2,
 	Pwr,
 
-	/*APB2*/
 	Usart1,
 
 };
 
+/**
+ *  @enum 	RccOsc
+ */
 enum class RccOsc : std::uint32_t { Hsi48Osc, MsiOsc, Hsi16Osc, HseOsc, PllOsc, PllSaiOsc, LseOsc, LsiOsc };
 
+/**
+ * 	@enum 	SysClk
+ * 	@brief	Four different clock sources can be used to drive the system clock:
+ * 					- HSI16 (High Speed Internal) 16 MHz RC oscillator clock
+ * 					- MSI (Multi Speed Internal) RC oscillator clock
+ * 					- HSE (High Speed External) oscillator clock, from 4 to 48 MHz
+ * 					- PLL Clock
+ */
 enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
 
 template <RccOsc Clk>
@@ -54,21 +63,23 @@ class RccRegTable {
 
  private:
 	static constexpr std::tuple RccPeriphRst{
-		std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioARst}, std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioBRst},
+		std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioARst},
+		std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioBRst},
 		/*APB1*/
-		// std::pair{RCC_APB1RST, RccApb1RstBit::Usart2Rst},
+		std::pair{RCC_APB1RST_1, RccApb1Rst1Bit::Usart2Rst},
 		// std::pair{RCC_APB1RST, RccApb1RstBit::PwrRst},
 		/*APB2*/
-		// std::pair{RCC_APB2RST, RccApb2RstBit::Usart1Rst},
+		std::pair{RCC_APB2RST, RccApb2RstBit::Usart1Rst},
 	};
 
 	static constexpr std::tuple RccPeriphEn{
-		std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioAEn}, std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioBEn},
+		std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioAEn},
+		std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioBEn},
 		/*APB1*/
-		// std::pair{RCC_APB1ENR, RccApb1EnrBit::Usart2En},
+		std::pair{RCC_APB1ENR_1, RccApb1Enr1Bit::Usart2En},
 		// std::pair{RCC_APB1ENR, RccApb1EnrBit::PwrEn},
 		/*APB2*/
-		// std::pair{RCC_APB2ENR, RccApb2EnrBit::Usart1En},
+		std::pair{RCC_APB2ENR, RccApb2EnrBit::Usart1En},
 	};
 
 	static constexpr std::tuple RccOscOn{

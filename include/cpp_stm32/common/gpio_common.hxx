@@ -25,7 +25,7 @@ namespace cpp_stm32::common {
 /**
  * @enum    GpioPort
  * @brief   GpioPort is a group of GpioPin arranged in a group. The naming convenetion
- *          differs from manufacture to manufacture, e.g., for STMicroelectronics, the
+ *          differs from Manufacture to Manufacture, e.g., for STMicroelectronics, the
  *          port is named in alphabetic order; for TI, the port is named in numeric order.
  */
 enum class GpioPort;
@@ -33,7 +33,7 @@ enum class GpioPort;
 /**
  * @enum    GpioPin
  * @brief   GpioPort contains multiple Gpio pins, the number of pin in a port varies from
- *          manufacture to manufacture, e.g., for STMicroelectronics, a port contains 16 pins
+ *          Manufacture to Manufacture, e.g., for STMicroelectronics, a port contains 16 pins
  *          , as for TI, a port contains 8 pins.
  */
 enum class GpioPin;

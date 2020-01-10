@@ -36,9 +36,10 @@ namespace cpp_stm32::driver {
  *          useful information.
  * @tparam  PinNames @ref PinName
  */
-template <PinName... PinNames>
+template <Manufacture::PinName... PinNames>
 class PinGroupingHelper {
  private:
+	using PinNameMap				 = Manufacture::PinNameMap;
 	using IdxThruPinNameList = std::make_index_sequence<sizeof...(PinNames)>;
 
 	/**
@@ -89,7 +90,7 @@ class PinGroupingHelper {
 	static constexpr auto PORT_NUM			= calcPortNum();								 /*!< Number of port used */
 	static constexpr auto PIN_NAME_LIST = genPinNameList();							 /*!< List of pin name */
 	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{}); /*!< list of port according to pin name list */
-	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	 /*!< list of pin according to pin name list*/
+	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	/*!< list of pin according to pin name list*/
 
 	/**
 	 * @brief    This function collect pins with same port
@@ -171,9 +172,10 @@ class PinGroupingHelper {
  *
  * @tparam  PinNames @ref PinName
  */
-template <PinName... PinNames>
+template <Manufacture::PinName... PinNames>
 class GpioUtil {
  private:
+	using PinName			= Manufacture::PinName;
 	using PinGrouper	= PinGroupingHelper<PinNames...>;
 	using IdxThruPort = typename PinGrouper::IdxThruPort;
 
@@ -201,7 +203,7 @@ class GpioUtil {
 																						common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		gpio_mode_setup<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_mode, t_pupd);
+		target_device::gpio_mode_setup<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_mode, t_pupd);
 	}
 
 	/**
@@ -226,7 +228,7 @@ class GpioUtil {
 																				 std::index_sequence<Idx...> /*unused*/) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		gpio_toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
+		target_device::gpio_toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
 	}
 
 	/**
@@ -245,7 +247,9 @@ class GpioUtil {
 	 */
 	template <std::size_t... Idx>
 	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...> /*unused*/) noexcept {
-		(rcc_enable_periph_clk<static_cast<RccPeriph>(PinGrouper::getPort(ConstIndexType<Idx>{}))>(), ...);
+		(target_device::rcc_enable_periph_clk<static_cast<target_device::RccPeriph>(
+			 PinGrouper::getPort(ConstIndexType<Idx>{}))>(),
+		 ...);
 	}
 
 	/**
@@ -259,7 +263,7 @@ class GpioUtil {
 																									common::GpioAltFunc const& t_af) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		gpio_set_af<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_af);
+		target_device::gpio_set_af<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_af);
 	}
 
 	/**
@@ -302,4 +306,4 @@ class GpioUtil {
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver
