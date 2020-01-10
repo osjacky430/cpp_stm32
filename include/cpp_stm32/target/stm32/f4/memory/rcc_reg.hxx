@@ -24,6 +24,9 @@
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+// temporary
+#include "cpp_stm32/target/stm32/common/macro.hxx"
+
 namespace cpp_stm32::stm32::f4 {
 
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
@@ -63,51 +66,6 @@ enum class RccCrBit {
 static constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
 
 /** @}*/
-
-/**
- * @def 	 SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)
- * @brief	 A helper macro to declare division factor helper class
- * @param  ClassName   	Class name
- * @param  LowerBound		Lower bound of division factor
- * @param  UpperBound		Upper bound of division factor
- */
-#define SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)               \
-	struct ClassName {                                                                      \
-		std::uint32_t const m_divisionFactor;                                                 \
-                                                                                          \
-		template <std::uint32_t Val>                                                          \
-		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(Val) {  \
-			static_assert(LowerBound <= Val && Val <= UpperBound);                              \
-		}                                                                                     \
-                                                                                          \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; } \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }        \
-	}
-
-/**
- * @def 	 SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)
- * @param  ClassName 	Class name
- * @param  VARARGS    division factor - register value pair
- */
-#define SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)                                                 \
-	struct ClassName {                                                                                            \
-		std::uint32_t const m_divisionFactor;                                                                       \
-		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                             \
-                                                                                                                \
-		template <std::uint32_t Val>                                                                                \
-		static constexpr auto findDivisionFactor = []() {                                                           \
-			constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),       \
-																							[](auto const& t_pair) { return t_pair.first == Val; });          \
-			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                                   \
-			return iter_pos->second;                                                                                  \
-		};                                                                                                          \
-                                                                                                                \
-		template <std::uint32_t Val>                                                                                \
-		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(findDivisionFactor<Val>()) {} \
-                                                                                                                \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; }                       \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }                              \
-	}
 
 /**
  * @defgroup	RCC_PLLCFGR_GROUP		RCC PLL Configuration Register Group
@@ -188,13 +146,7 @@ SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
 										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
 										Bit<3, PPRE>{BitPos_t(10)}, Bit<3, PPRE>{BitPos_t(13)})
 
-enum class RccCfgBit {
-	SW,
-	SWS,
-	HPRE,
-	PPRE1,
-	PPRE2,
-};
+enum class RccCfgBit { SW, SWS, HPRE, PPRE1, PPRE2 };
 
 static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};
 /**@} */
@@ -315,7 +267,7 @@ static constexpr Register<RccApb2EnrInfo, RccApb2EnrBit> RCC_APB2ENR{RCC_BASE, 0
 /**@}*/
 
 /**
- * @defgroup	RCC_BDCR_GROUP		RCC Backup Domain Control Register
+ * @defgroup	RCC_BDCR_GROUP		RCC Backup Domain Control Register Group
  *
  * @{
  */
@@ -334,4 +286,4 @@ static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x70U};
 
 /**@}*/
 
-}	 // namespace cpp_stm32::stm32::f4
+}	// namespace cpp_stm32::stm32::f4

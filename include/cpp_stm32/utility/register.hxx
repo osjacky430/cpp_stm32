@@ -334,22 +334,30 @@ using AtomicReg = Register<BitList, BitIdx, IoOp, true>;
  * @def 		SETUP_REGISTER_INFO(Name, ...)
  * @brief		A helper macro to instantiate class (bit list) with class name @arg Name, and bits.
  */
-#define SETUP_REGISTER_INFO(Name, ...)                   \
-	class Name {                                           \
-		template <typename BitList, std::size_t Idx>         \
-		friend constexpr auto cpp_stm32::get_bit() noexcept; \
-                                                         \
-	 private:                                              \
-		static constexpr std::tuple BIT_LIST{__VA_ARGS__};   \
+#define SETUP_REGISTER_INFO(Name, ...)                                            \
+	class Name {                                                                    \
+		template <typename BitList, std::size_t Idx>                                  \
+		friend constexpr auto cpp_stm32::get_bit() noexcept;                          \
+                                                                                  \
+	 private:                                                                       \
+		static constexpr std::tuple BIT_LIST = make_bit_list_from_input(__VA_ARGS__); \
 	};
 
-// template <typename BitList, typename... Bits>
-// class SomeClass {
-// 	template <BitList, std::size_t Idx>
-// 	friend constexpr auto cpp_stm32::get_bit() noexcept;
-//
-//  private:
-// 	static constexpr std::tuple BIT_LIST{Bits{}...};
-// };
+/**
+ * @brief		This function takes variadic input bit and turn it to tuple of bits
+ * @param  	t_input		Input variadic bit
+ * @return	tuple of bits
+ */
+static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
+	constexpr auto check_input_and_make_tuple = [](auto const& t_input) {
+		if constexpr (is_specialization<decltype(t_input), std::tuple>) {
+			return t_input;
+		} else {
+			return std::tuple{t_input};
+		}
+	};
 
-}	 // namespace cpp_stm32
+	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
+};
+
+}	// namespace cpp_stm32

@@ -40,7 +40,7 @@ using NvicIdxType = decltype(NVIC_IRQ_BIT_POS(IrqNum{0}));
  *  @defgroup NVIC_ISER_GROUP		NVIC Iterrupt Set Enable Register Group
  *  @{
  */
-SETUP_REGISTER_INFO(NvicIserInfo, SETUP_BIT_LIST<Binary<BitMod::RdSet>>(Interval<0, 31>{}));
+SETUP_REGISTER_INFO(NvicIserInfo, CREATE_LIST_OF_BITS<Binary<BitMod::RdSet>>(Interval<0, 31>{}));
 
 template <IrqNum IRQn>
 static constexpr Register<NvicIserInfo, NvicIdxType> NVIC_ISER{NVIC_BASE, NVIC_GROUP_OFFSET(IRQn)};
@@ -51,7 +51,7 @@ static constexpr Register<NvicIserInfo, NvicIdxType> NVIC_ISER{NVIC_BASE, NVIC_G
  * @defgroup NVIC_ICER_GROUP		NVIC Interrupt Clear Enable Register Group
  * @{
  */
-SETUP_REGISTER_INFO(NvicIcerInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
+SETUP_REGISTER_INFO(NvicIcerInfo, CREATE_LIST_OF_BITS<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
 
 template <IrqNum IRQn>
 static constexpr Register<NvicIcerInfo, NvicIdxType> NVIC_ICER{NVIC_BASE, 0x80U + NVIC_GROUP_OFFSET(IRQn)};
@@ -62,7 +62,7 @@ static constexpr Register<NvicIcerInfo, NvicIdxType> NVIC_ICER{NVIC_BASE, 0x80U 
  * @defgroup  NVIC_ISPR_GROUP		NVIC Interrupt Set Pending Register Group
  * @{
  */
-SETUP_REGISTER_INFO(NvicIsprInfo, SETUP_BIT_LIST<Binary<BitMod::RdSet>>(Interval<0, 31>{}))
+SETUP_REGISTER_INFO(NvicIsprInfo, CREATE_LIST_OF_BITS<Binary<BitMod::RdSet>>(Interval<0, 31>{}))
 
 template <IrqNum IRQn>
 static constexpr Register<NvicIsprInfo, NvicIdxType> NVIC_ISPR{NVIC_BASE, 0x100U + NVIC_GROUP_OFFSET(IRQn)};
@@ -72,7 +72,7 @@ static constexpr Register<NvicIsprInfo, NvicIdxType> NVIC_ISPR{NVIC_BASE, 0x100U
  * @defgroup  NVIC_ICPR_GROUP		NVIC Interrupt Clear Pending Regsiter Group
  * @{
  */
-SETUP_REGISTER_INFO(NvicIcprInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
+SETUP_REGISTER_INFO(NvicIcprInfo, CREATE_LIST_OF_BITS<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
 
 template <IrqNum IRQn>
 static constexpr Register<NvicIcprInfo, NvicIdxType> NVIC_ICPR{NVIC_BASE, 0x180U + NVIC_GROUP_OFFSET(IRQn)};
@@ -82,7 +82,7 @@ static constexpr Register<NvicIcprInfo, NvicIdxType> NVIC_ICPR{NVIC_BASE, 0x180U
  * @defgroup  NVIC_IABR_GROUP		NVIC Interrupt Active Bit Register Group
  * @{
  */
-SETUP_REGISTER_INFO(NvicIabrInfo, SETUP_BIT_LIST<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
+SETUP_REGISTER_INFO(NvicIabrInfo, CREATE_LIST_OF_BITS<Binary<BitMod::RdClrWr1>>(Interval<0, 31>{}))
 
 template <IrqNum IRQn>
 static constexpr Register<NvicIabrInfo, NvicIdxType> NVIC_IABR{NVIC_BASE, 0x200U + NVIC_GROUP_OFFSET(IRQn)};

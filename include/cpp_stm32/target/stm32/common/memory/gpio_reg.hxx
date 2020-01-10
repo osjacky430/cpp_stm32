@@ -36,7 +36,7 @@ constexpr auto GPIO_BASE(common::GpioPort const&) noexcept;
  */
 
 SETUP_REGISTER_INFO(GpioModerInfo, /**/
-										SETUP_BIT_LIST<Bit<2, common::GpioMode>>(Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, common::GpioMode>>(Interval<0, 30, 2>{}));
 
 template <common::GpioPort Port>
 static constexpr GpioReg<GpioModerInfo, atomicity(GPIO_BASE(Port) + 0x00U)> GPIO_MODER{GPIO_BASE(Port), 0x00U};
@@ -49,7 +49,7 @@ static constexpr GpioReg<GpioModerInfo, atomicity(GPIO_BASE(Port) + 0x00U)> GPIO
  */
 
 SETUP_REGISTER_INFO(GpioPupdInfo, /**/
-										SETUP_BIT_LIST<Bit<2, common::GpioPupd>>(Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, common::GpioPupd>>(Interval<0, 30, 2>{}));
 
 template <common::GpioPort Port>
 static constexpr GpioReg<GpioPupdInfo, atomicity(GPIO_BASE(Port) + 0x0CU)> GPIO_PUPDR{GPIO_BASE(Port), 0x0CU};
@@ -62,7 +62,7 @@ static constexpr GpioReg<GpioPupdInfo, atomicity(GPIO_BASE(Port) + 0x0CU)> GPIO_
  */
 
 SETUP_REGISTER_INFO(GpioOdrInfo, /**/
-										SETUP_BIT_LIST<Bit<1>>(Interval<0, 15>{}));
+										CREATE_LIST_OF_BITS<Bit<1>>(Interval<0, 15>{}));
 
 template <common::GpioPort Port>
 static constexpr GpioReg<GpioOdrInfo, atomicity(GPIO_BASE(Port) + 0x14U)> GPIO_ODR{GPIO_BASE(Port), 0x14U};
@@ -75,7 +75,7 @@ static constexpr GpioReg<GpioOdrInfo, atomicity(GPIO_BASE(Port) + 0x14U)> GPIO_O
  */
 
 SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
-										SETUP_BIT_LIST<Binary<BitMod::WrOnly>>(Interval<0, 31>{}));
+										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(Interval<0, 31>{}));
 
 template <common::GpioPort Port>
 static constexpr GpioReg<GpioBsrrInfo, atomicity(GPIO_BASE(Port) + 0x18U)> GPIO_BSRR{GPIO_BASE(Port), 0x18U};
@@ -88,7 +88,7 @@ static constexpr GpioReg<GpioBsrrInfo, atomicity(GPIO_BASE(Port) + 0x18U)> GPIO_
  */
 
 SETUP_REGISTER_INFO(GpioAfrInfo, /**/
-										SETUP_BIT_LIST<Bit<4, common::GpioAltFunc>>(Interval<0, 28, 4>{}));
+										CREATE_LIST_OF_BITS<Bit<4, common::GpioAltFunc>>(Interval<0, 28, 4>{}));
 
 template <common::GpioPort Port>
 static constexpr GpioReg<GpioAfrInfo, atomicity(GPIO_BASE(Port) + 0x20U)> GPIO_AFRL{GPIO_BASE(Port), 0x20U};

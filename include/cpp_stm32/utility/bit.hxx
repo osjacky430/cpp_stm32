@@ -128,8 +128,8 @@ static constexpr auto BitPosSeq = BitPosSeq_t<Pos...>{};
  *
  */
 template <typename T, std::size_t... Pos>
-constexpr auto SETUP_BIT_LIST(BitPosSeq_t<Pos...> const& /*unused*/) noexcept {
+[[nodiscard]] constexpr auto CREATE_LIST_OF_BITS(BitPosSeq_t<Pos...> const& /*unused*/) noexcept {
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

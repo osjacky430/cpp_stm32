@@ -68,4 +68,13 @@ constexpr auto to_underlying(Enum t_e) noexcept {
 	return static_cast<std::underlying_type_t<Enum>>(t_e);
 }
 
-}	 // namespace cpp_stm32
+/**
+ *
+ */
+template <typename Test, template <typename...> class Ref>
+static constexpr bool is_specialization = false;
+
+template <template <typename...> class Ref, typename... Args>
+static constexpr bool is_specialization<Ref<Args...>, Ref> = true;
+
+}	// namespace cpp_stm32

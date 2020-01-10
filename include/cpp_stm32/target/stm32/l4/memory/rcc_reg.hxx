@@ -24,6 +24,8 @@
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
+#include "cpp_stm32/target/stm32/common/macro.hxx"
+
 namespace cpp_stm32::stm32::l4 {
 
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x1000U);
@@ -36,6 +38,98 @@ template <std::uint32_t Val>
 static constexpr auto DivisionFactor_v = DivisionFactor_t<Val>{};
 
 enum class RccOsc : std::uint32_t;
+
+/**
+ * @defgroup  RCC_CR_GROUP        RCC Control Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccCrBitInfo, /**/
+										Bit<1>{BitPos_t{0}}, Bit<1>{BitPos_t{1}}, Bit<1>{BitPos_t{2}}, Bit<1>{BitPos_t{3}},
+										Bit<4>{BitPos_t{4}}, Bit<1>{BitPos_t{8}}, Bit<1>{BitPos_t{9}}, Bit<1>{BitPos_t{10}},
+										Bit<1>{BitPos_t{11}}, Bit<1>{BitPos_t{16}}, Bit<1>{BitPos_t{17}}, Bit<1>{BitPos_t{18}},
+										Bit<1>{BitPos_t{19}}, Bit<1>{BitPos_t{24}}, Bit<1>{BitPos_t{25}}, Bit<1>{BitPos_t{26}},
+										Bit<1>{BitPos_t{27}});
+
+enum class RccCrBit {
+	MsiOn,
+	MsiRdy,
+	MsiPllEn,
+	MsiRgSel,
+	MsiRange,
+	HsiOn,
+	HsiKerOn,
+	HsiRdy,
+	HsiASfS,
+	HseOn,
+	HseRdy,
+	HseByp,
+	CssOn,
+	PllOn,
+	PllRdy,
+	PllSaiOn,
+	PllSaiRdy
+};
+
+constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
+
+/**@}*/
+
+/**
+ * @defgroup  RCC_CFGR_GROUP    RCC Configuration Register Group
+ * @{
+ */
+
+enum class SysClk : std::uint32_t;
+
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(HPRE, /**/
+																				std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
+																				std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
+																				std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111});
+
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PPRE, /**/
+																				std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101},
+																				std::pair{8, 0b110}, std::pair{16, 0b111});
+
+SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
+										Bit<2, SysClk>{BitPos_t{0}}, Bit<2, SysClk>{BitPos_t{2}}, Bit<4, HPRE>{BitPos_t{4}},
+										Bit<3, PPRE>{BitPos_t{8}}, Bit<3, PPRE>{BitPos_t{11}})
+
+enum class RccCfgBit { SW, SWS, HPre, PPre1, PPre2 };
+
+static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08};
+
+/**@}*/
+
+/**
+ * @defgroup  RCC_PLLCFGR_GROUP   RCC Pll Configuration Register Group
+ * @{
+ */
+
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllM, 1, 8);
+
+SETUP_DIVISION_FACTOR_WITH_BOUND(PllN, 8, 86);
+
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PllP, std::pair{7, 0}, std::pair{17, 1});
+
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PllQ, /**/
+																				std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10},
+																				std::pair{8, 0b11}, );
+
+SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PllR, /**/
+																				std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10},
+																				std::pair{8, 0b11}, );
+
+SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
+										Bit<2, RccOsc>{BitPos_t{0}}, Bit<3, PllM>{BitPos_t{4}}, Bit<7, PllN>{BitPos_t{8}},
+										Bit<1>{BitPos_t{16}}, Bit<1, PllP>{BitPos_t{17}}, Bit<1>{BitPos_t{20}}, Bit<2, PllQ>{BitPos_t{21}},
+										Bit<1>{BitPos_t{24}}, Bit<2, PllR>{BitPos_t{25}}, Bit<5>{BitPos_t{27}})
+
+enum class RccPllCfgBit { PllSrc, PllM, PllN, PllPEn, PllP, PllQEn, PllQ, PllREn, PllR, PllPDiv };
+
+static constexpr Register<RccPllcfgrBitInfo, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE, 0x0C};
+
+/**}*/
 
 /**
  * @defgroup	RCC_AHB2RST_GROUP		RCC AHB2 Reset Register Group
@@ -67,4 +161,36 @@ static constexpr Register<RccAhb2EnrInfo, RccAhb2EnrBit> RCC_AHB2ENR{RCC_BASE, 0
 
 /**@}*/
 
-}	 // namespace cpp_stm32::stm32::l4
+/**
+ * @defgroup  RCC_BDCR_GROUP    RCC Backup Domain Control Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccBdcrBitInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<2>{BitPos_t(3)})
+
+enum class RccBdcrBit {
+	LseOn,
+	LseRdy,
+	LseByp,
+	LseDrv,
+};
+
+static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x90U};
+
+/**@}*/
+
+/**
+ * @defgroup  RCC_CRRCR_GROUP   RCC Clock Recovery RC Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccCrrCrBitInfo, Bit<1>{BitPos_t{0}}, Bit<1>{BitPos_t{1}}, Bit<9>{BitPos_t{7}})
+
+enum class RccCrrCrBit { Hsi48On, Hsi48Rdy, Hsi48Cal };
+
+static constexpr Register<RccCrrCrBitInfo, RccCrrCrBit> RCC_CRRCR{RCC_BASE, 0x98U};
+
+/**@}*/
+
+}	// namespace cpp_stm32::stm32::l4
