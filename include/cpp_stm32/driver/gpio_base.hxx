@@ -36,10 +36,9 @@ namespace cpp_stm32::driver {
  *          useful information.
  * @tparam  PinNames @ref PinName
  */
-template <Manufacture::PinName... PinNames>
+template <common::PinName... PinNames>
 class PinGroupingHelper {
  private:
-	using PinNameMap				 = Manufacture::PinNameMap;
 	using IdxThruPinNameList = std::make_index_sequence<sizeof...(PinNames)>;
 
 	/**
@@ -49,7 +48,7 @@ class PinGroupingHelper {
 	template <std::size_t... Idx>
 	static constexpr auto genPortList(std::index_sequence<Idx...> const& /*unused*/) noexcept {
 		using common::GpioPort;
-		auto port_list = std::array{PinNameMap::getPortFromPinMap(PIN_NAME_LIST[Idx])...};
+		auto port_list = std::array{Manufacture::get_port_from_pin_name_table(PIN_NAME_LIST[Idx])...};
 		std::array<GpioPort, PORT_NUM> result_port_list{};
 		cstd::unique_copy(port_list.begin(), port_list.end(), result_port_list.begin(),
 											[](auto const& lhs, auto const& rhs) { return lhs == rhs; });
@@ -63,7 +62,7 @@ class PinGroupingHelper {
 	 */
 	template <std::size_t... Idx>
 	static constexpr auto genPinList(std::index_sequence<Idx...> const& /*unused*/) noexcept {
-		return std::array{PinNameMap::getPinFromPinMap(PIN_NAME_LIST[Idx])...};
+		return std::array{Manufacture::get_pin_from_pin_name_table(PIN_NAME_LIST[Idx])...};
 	}
 
 	/**
@@ -71,7 +70,7 @@ class PinGroupingHelper {
 	 * @return   The number of port used
 	 */
 	static constexpr auto calcPortNum() noexcept {
-		auto port_list = std::array{PinNameMap::getPortFromPinMap(PinNames)...};
+		auto port_list = std::array{Manufacture::get_port_from_pin_name_table(PinNames)...};
 		cstd::sort(port_list, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
 		return cstd::unique(port_list.begin(), port_list.end()) - port_list.begin();
 	}
@@ -103,8 +102,8 @@ class PinGroupingHelper {
 																			 std::index_sequence<PinIdx...> const& /*unused*/) noexcept {
 		constexpr auto IterateThruPins = [](const auto t_pin_idx) noexcept {
 			if constexpr (constexpr auto pin_name = std::get<t_pin_idx()>(PIN_NAME_LIST);
-										getPort(ConstIndexType<PortIdx>{}) == PinNameMap::getPortFromPinMap(pin_name)) {
-				return std::tuple{PinNameMap::getPinFromPinMap(pin_name)};
+										getPort(ConstIndexType<PortIdx>{}) == Manufacture::get_port_from_pin_name_table(pin_name)) {
+				return std::tuple{Manufacture::get_pin_from_pin_name_table(pin_name)};
 			} else {
 				return std::tuple{};
 			}
@@ -172,10 +171,10 @@ class PinGroupingHelper {
  *
  * @tparam  PinNames @ref PinName
  */
-template <Manufacture::PinName... PinNames>
+template <common::PinName... PinNames>
 class GpioUtil {
  private:
-	using PinName			= Manufacture::PinName;
+	using PinName			= common::PinName;
 	using PinGrouper	= PinGroupingHelper<PinNames...>;
 	using IdxThruPort = typename PinGrouper::IdxThruPort;
 

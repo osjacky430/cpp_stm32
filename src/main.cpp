@@ -4,7 +4,7 @@
  * @Filename: main.cpp
  */
 
-// #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
+#include "cpp_stm32/target/stm32/l4/sys_init.hxx"
 
 // #include "gpio.hxx"
 // #include "rcc.hxx"
@@ -12,9 +12,7 @@
 // #include "cpp_stm32/driver/usart_serial.hxx"
 
 using namespace cpp_stm32::driver;
-using namespace Manufacture;
-// using namespace cpp_stm32::common;
-// using namespace cpp_stm32::stm32::l4;
+using namespace cpp_stm32::common;
 
 // struct DebugLogger {
 // 	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};

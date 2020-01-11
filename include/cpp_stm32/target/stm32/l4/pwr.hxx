@@ -16,13 +16,12 @@
 
 #pragma once
 
-#include "cpp_stm32/target/stm32/l4/gpio.hxx"
-#include "cpp_stm32/target/stm32/l4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/l4/rcc.hxx"
+#include "cpp_stm32/target/stm32/l4/memory/pwr_reg.hxx"
 
-namespace cpp_stm32::driver {
+namespace cpp_stm32::stm32::l4 {
 
-namespace Manufacture		= cpp_stm32::stm32;
-namespace target_device = cpp_stm32::stm32::l4;
+enum class VoltageScale { Range1, Range2 };
 
-}	// namespace cpp_stm32::driver
+constexpr void pwr_set_voltage_sclae(VoltageScale const& t_vos) noexcept { PWR_CR.setBit<PwrCrBit::Vos>(t_vos); }
+
+}	// namespace cpp_stm32::stm32::l4

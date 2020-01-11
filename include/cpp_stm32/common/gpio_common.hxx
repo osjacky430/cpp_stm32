@@ -44,4 +44,6 @@ enum class GpioOutType;
 enum class GpioOutSpeed;
 enum class GpioAltFunc;
 
-}	 // namespace cpp_stm32::common
+enum class PinName;
+
+}	// namespace cpp_stm32::common

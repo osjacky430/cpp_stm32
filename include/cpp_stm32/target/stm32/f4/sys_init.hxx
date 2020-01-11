@@ -23,6 +23,7 @@
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 
 #include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/utility/literal_op.hxx"
 
 // user spcific include
 #include "sys_info.hpp"
@@ -71,7 +72,7 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
 static constexpr auto HSE_CLK_FREQ_MIN = 4_MHz;
 static constexpr auto HSE_CLK_FREQ_MAX = 25_MHz;
 
-static_assert(HSE_CLK_FREQ_MIN <= HSE_CLK_FREQ && HSE_CLK_FREQ <= 25_MHz);
+static_assert(HSE_CLK_FREQ_MIN <= HSE_CLK_FREQ && HSE_CLK_FREQ <= HSE_CLK_FREQ_MAX);
 
 /**@}*/
 
@@ -87,13 +88,13 @@ static constexpr auto VCO_OUTPUT_FREQ_MAX			 = 432_MHz;
 /**@}*/
 
 /**
- * @defgroup VOS_MAX_FREQ_DEF   VOS Max with/without overdrive
+ * @defgroup VOS_MAX_FREQ_DEF    Max HCLK Freq under different VOS with/without overdrive
  * @{
  */
 
-static constexpr auto VOS_SCALE1_MAX_FREQ							 = 120_MHz;
-static constexpr auto VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE = 144_MHz;
-static constexpr auto VOS_SCALE2_MAX_FREQ_OVERDRIVE		 = 168_MHz;
+static constexpr auto AHB_VOS_SCALE1_MAX_FREQ							 = 120_MHz;
+static constexpr auto AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE = 144_MHz;
+static constexpr auto AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE		 = 168_MHz;
 
 /**@}*/
 
@@ -143,12 +144,12 @@ class SysClock {
 
 	static constexpr auto NEED_OVERDRIVE =
 		(APB1_CLK_FREQ >= APB1_FREQ_MAX_NO_OVERDRIVE || APB2_CLK_FREQ >= APB2_FREQ_MAX_NO_OVERDRIVE ||
-		 AHB_CLK_FREQ >= VOS_SCALE2_MAX_FREQ_OVERDRIVE);
+		 AHB_CLK_FREQ >= AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE);
 
 	static constexpr auto VOLTAGE_SCALE = []() {
-		if constexpr (NEED_OVERDRIVE || AHB_CLK_FREQ >= VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
+		if constexpr (NEED_OVERDRIVE || AHB_CLK_FREQ >= AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
 			return VoltageScale::Scale1Mode;
-		} else if constexpr (AHB_CLK_FREQ >= VOS_SCALE1_MAX_FREQ) {
+		} else if constexpr (AHB_CLK_FREQ >= AHB_VOS_SCALE1_MAX_FREQ) {
 			return VoltageScale::Scale2Mode;
 		} else {
 			return VoltageScale::Scale3Mode;
@@ -173,8 +174,9 @@ class SysClock {
 		}
 	}
 
-	template <SysClk SystemClock = SYS_CLK_SRC, RccOsc PllSrc>
-	static constexpr void init(PllClkSrc<PllSrc> const&) noexcept {
+	// @todo, this is a bit strange
+	template <RccOsc PllSrc, typename = std::enable_if_t<is_pll_clk_src<PllSrc>>>
+	static constexpr void init() noexcept {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
 			rcc_bypass_clksrc<RccOsc::HseOsc>();
 		}
@@ -184,11 +186,11 @@ class SysClock {
 		rcc_wait_osc_rdy<PllSrc>();
 		rcc_set_sysclk<SysClk{to_underlying(PllSrc)}>();
 
-		{	 // operations that requires PLL off
+		{	// operations that requires PLL off
 			const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
 
 			rcc_disable_clk<RccOsc::PllOsc>();
-			rcc_set_pllsrc_and_div_factor(PllClkSrc<PllSrc>{}, m, n, p, q, r);
+			rcc_set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
 			rcc_enable_periph_clk<RccPeriph::Pwr>();
 			pwr_set_voltage_scale(VOLTAGE_SCALE);
 		}
@@ -209,12 +211,12 @@ class SysClock {
 		const auto& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
 		rcc_config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc_wait_osc_rdy<RccOsc::PllOsc>();	 // wait for PLL lock
+		rcc_wait_osc_rdy<RccOsc::PllOsc>();	// wait for PLL lock
 
 		// switch sysclk and wait ready
-		rcc_set_sysclk<SystemClock>();
-		rcc_wait_sysclk_rdy<SystemClock>();
+		rcc_set_sysclk<SYS_CLK_SRC>();
+		rcc_wait_sysclk_rdy<SYS_CLK_SRC>();
 	}
 };
 
-}	 // namespace cpp_stm32::stm32::f4
+}	// namespace cpp_stm32::stm32::f4

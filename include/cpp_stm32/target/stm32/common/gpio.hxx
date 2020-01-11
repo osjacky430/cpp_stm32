@@ -48,7 +48,7 @@ enum class GpioPin {
  */
 enum class GpioMode {
 	Input,	 /*!< Input mode */
-	Output,	 /*!< Output mode */
+	Output,	/*!< Output mode */
 	AltFunc, /*!< Alternate Function mode*/
 	Analog	 /*!< Analog mode*/
 };
@@ -58,9 +58,28 @@ enum class GpioOutType { PushPull, OpenDrain };
 enum class GpioOutSpeed { Low, Medium, Fast, High };
 enum class GpioAltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15 };
 
-}	 // namespace cpp_stm32::common
+/**
+ * @enum  PinName
+ */
+enum class PinName { PA_1, PA_2, PA_3, PA_5, PB_1, PB_2, PB_3, NC };
+
+}	// namespace cpp_stm32::common
 
 namespace cpp_stm32::stm32::detail {
+
+using common::GpioPort, common::GpioPin;
+
+/**
+ * @var 		PIN_NAME_TABLE
+ * @brief
+ *
+ */
+static constexpr std::array PIN_NAME_TABLE{
+	std::pair{GpioPort::PortA, GpioPin::Pin1}, std::pair{GpioPort::PortA, GpioPin::Pin2},
+	std::pair{GpioPort::PortA, GpioPin::Pin3}, std::pair{GpioPort::PortA, GpioPin::Pin5},
+	std::pair{GpioPort::PortB, GpioPin::Pin1}, std::pair{GpioPort::PortB, GpioPin::Pin2},
+	std::pair{GpioPort::PortB, GpioPin::Pin3},
+};
 
 /**
  * @brief   This function handles the setup of mode
@@ -138,10 +157,7 @@ constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
 	if constexpr (((Pins > Pin7) || ...)) {
 		constexpr auto high_pin_group = [](common::GpioPin t_pin) {
 			if (t_pin > Pin7) {
-				// use "to_underlying" will generate internal compiler error
-				// this is a bit hacky IMO, but can't come up with a better idea
-				// @todo perhap add index rule in register class
-				return common::GpioPin{static_cast<std::underlying_type_t<common::GpioPin>>(t_pin) - 8};
+				return common::GpioPin{to_underlying(t_pin) - 8};
 			}
 		};
 
@@ -149,4 +165,16 @@ constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
 	}
 }
 
-}	 // namespace cpp_stm32::stm32::detail
+}	// namespace cpp_stm32::stm32::detail
+
+namespace cpp_stm32::stm32 {
+
+[[nodiscard]] constexpr auto get_port_from_pin_name_table(common::PinName const& t_pin_name) noexcept {
+	return std::get<0>(detail::PIN_NAME_TABLE[to_underlying(t_pin_name)]);
+}
+
+[[nodiscard]] constexpr auto get_pin_from_pin_name_table(common::PinName const& t_pin_name) noexcept {
+	return std::get<1>(detail::PIN_NAME_TABLE[to_underlying(t_pin_name)]);
+}
+
+}	// namespace cpp_stm32::stm32

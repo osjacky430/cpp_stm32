@@ -61,6 +61,14 @@ constexpr void fill(ForwardIt first, ForwardIt last, T const& value) {
 	}
 }
 
+template <class InputIt, class OutputIt>
+OutputIt copy(InputIt first, InputIt last, OutputIt d_first) {
+	while (first != last) {
+		*d_first++ = *first++;
+	}
+	return d_first;
+}
+
 /**
  * @ref https://tristanbrindle.com/posts/a-more-useful-compile-time-quicksort
  */
@@ -133,4 +141,4 @@ constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, Bin
 	return result;
 }
 
-}	 // namespace cpp_stm32::cstd
+}	// namespace cpp_stm32::cstd

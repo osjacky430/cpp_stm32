@@ -16,13 +16,31 @@
 
 #pragma once
 
-#include "cpp_stm32/target/stm32/l4/gpio.hxx"
-#include "cpp_stm32/target/stm32/l4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/l4/rcc.hxx"
+#include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
+#include "cpp_stm32/utility/bit.hxx"
+#include "cpp_stm32/utility/register.hxx"
 
-namespace cpp_stm32::driver {
+namespace cpp_stm32::stm32::l4 {
 
-namespace Manufacture		= cpp_stm32::stm32;
-namespace target_device = cpp_stm32::stm32::l4;
+/*!< */
+static constexpr auto PWR_BASE = memory_at(PeriphAddr::Apb1Base, 0x7000U);
 
-}	// namespace cpp_stm32::driver
+/**
+ * @defgroup  PWR_CR_GROUP		Power Control Register Group
+ * @{
+ */
+
+enum class VoltageScale;
+
+SETUP_REGISTER_INFO(PwrCrInfo, /**/
+										Bit<2, VoltageScale>{BitPos_t{9}})
+
+enum class PwrCrBit {
+	Vos,
+};
+
+static constexpr Register<PwrCrInfo, PwrCrBit> PWR_CR{PWR_BASE, 0x00U};
+
+/**@}*/
+
+}	// namespace cpp_stm32::stm32::l4
