@@ -28,7 +28,7 @@ namespace cpp_stm32 {
 template <typename T>
 class MMIO_t {
  private:
-	T& regVal;
+	T& regVal;	// this can be wrong
 
  public:
 	explicit constexpr MMIO_t(T& t_reg_val) noexcept : regVal(t_reg_val) {}
@@ -106,6 +106,6 @@ constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
 
 static constexpr auto const MMIO32 = MMIO<std::uint32_t>;
 static constexpr auto const MMIO16 = MMIO<std::uint16_t>;
-static constexpr auto const MMIO8	 = MMIO<std::uint8_t>;
+static constexpr auto const MMIO8	= MMIO<std::uint8_t>;
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

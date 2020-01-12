@@ -77,9 +77,7 @@ struct FlashWaitTable {
 
 enum class ARTAccel { InstructCache = 1, DataCache = 2, InstructPrefetch = 3 };
 
-constexpr void flash_set_latency(FlashLatency const& t_cpu) noexcept {
-	FLASH_ACR.template setBit<FlashAcrBit::Latency>(t_cpu);
-}
+constexpr void flash_set_latency(FlashLatency const& t_cpu) noexcept { FLASH_ACR.setBit<FlashAcrBit::Latency>(t_cpu); }
 
 constexpr void flash_enable_dcache() noexcept { FLASH_ACR.setBit<FlashAcrBit::DCEn>(); }
 
@@ -99,8 +97,8 @@ constexpr void flash_config_access_ctl(FlashLatency const& t_cpu) noexcept {
 	};
 
 	const auto val_to_set =
-		BitGroup{t_cpu, static_cast<std::uint8_t>(to_underlying(Setting) != 0)...};	 // fill the rest with 1
+		BitGroup{t_cpu, static_cast<std::uint8_t>(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
 	FLASH_ACR.template setBit<FlashAcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
-}	 // namespace cpp_stm32::stm32::f4
+}	// namespace cpp_stm32::stm32::f4

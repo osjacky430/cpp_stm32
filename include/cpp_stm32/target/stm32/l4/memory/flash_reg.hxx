@@ -17,14 +17,19 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/target/stm32/common/macro.hxx"
+#include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
 #include "cpp_stm32/utility/bit.hxx"
 #include "cpp_stm32/utility/register.hxx"
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::stm32::l4 {
 
-static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3'C00U);
+;
+static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x2'000U);
+
+struct FlashLatency;
 
 template <std::uint8_t Val>
 using CpuWaitState_t = std::integral_constant<std::uint8_t, Val>;
@@ -37,21 +42,10 @@ static constexpr auto CpuWaitState_v = CpuWaitState_t<Val>{};
  * @{
  */
 
-struct FlashLatency {
- private:
-	std::uint8_t const m_flashLatency;
-
- public:
-	template <std::uint8_t Val>
-	constexpr FlashLatency(CpuWaitState_t<Val> const&) noexcept : m_flashLatency(Val) {
-		static_assert(0 <= Val && Val <= 15);
-	}
-
-	constexpr auto get() const noexcept { return m_flashLatency; }
-};
+SETUP_FLASH_LATENCY(0, 4);
 
 SETUP_REGISTER_INFO(FlashAcrInfo, /**/
-										Bit<4, FlashLatency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}},
+										Bit<3, FlashLatency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}},
 										Binary<>{BitPos_t{10}}, Binary<>{BitPos_t{11}}, Binary<>{BitPos_t{12}})
 
 enum class FlashAcrBit {
@@ -67,4 +61,4 @@ static constexpr Register<FlashAcrInfo, FlashAcrBit> FLASH_ACR{FLASH_BASE, 0x00U
 
 /**@}*/
 
-}	// namespace cpp_stm32::stm32::f4
+}	// namespace cpp_stm32::stm32::l4

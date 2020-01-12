@@ -58,3 +58,16 @@
 		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; }                       \
 		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }                              \
 	}
+
+#define SETUP_FLASH_LATENCY(UpperBound, LowerBound)                                     \
+	struct FlashLatency {                                                                 \
+		std::uint8_t const m_flashLatency;                                                  \
+                                                                                        \
+		template <std::uint8_t Val>                                                         \
+		constexpr FlashLatency(CpuWaitState_t<Val> const&) noexcept {                       \
+			static_assert(LowerBound <= Val && Val <= UpperBound);                            \
+		}                                                                                   \
+                                                                                        \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_flashLatency; } \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_flashLatency; }        \
+	}

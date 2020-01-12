@@ -113,7 +113,7 @@ class SysClock {
 	 * @var		VOLTAGE_SCALE
 	 * @brief	This is chosen base on AHB clock frequency, if desire frequency is greater than
 	 * 				AHB_VOS_RANGE2_MAX_FREQ, then voltage scale must be range1. If desire frequency
-	 * 				is lower than AHB_VOS_RANGE2_MAX_FREQ, then choose voltage scale 2 for power
+	 * 				is lower than AHB_VOS_RANGE2_MAX_FREQ, then choose voltage scale 2 for lower power
 	 * 				consumption.
 	 */
 	static constexpr auto VOLTAGE_SCALE = []() {
@@ -135,8 +135,9 @@ class SysClock {
 	 * 						2. MSI_CLK_FREQ: This is the second option because it is defaut sys clock with 4_MHz after restart.
 	 * 						3. HSI_CLK_FREQ: Since HSI clk freq is fixed, this option is the least possible one, and can be replaced
 	 * 														 by MSI.
-	 * @note 		 In order for more complicated usage, I should provide more flags so user can skip this and can choose on
-	 * 					 their own
+	 * @note 		 In order for more complicated usage, I should provide more flags so user can skip this and choose
+	 * 					 arbitrary clock.
+	 *
 	 */
 	static constexpr auto SYS_CLK_SRC = []() {
 		if constexpr (SYS_CLK_FREQ != HSE_CLK_FREQ && SYS_CLK_FREQ != HSI_CLK_FREQ && SYS_CLK_FREQ != MSI_CLK_FREQ) {
