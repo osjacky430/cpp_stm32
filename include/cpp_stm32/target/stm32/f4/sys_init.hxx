@@ -41,6 +41,8 @@ namespace cpp_stm32::stm32::f4 {
 
 static constexpr auto STM32_VDD = DEVICE_VDD;
 
+static_assert(1.8f <= STM32_VDD && STM32_VDD <= 3.6f);
+
 /**@}*/
 
 /**
@@ -108,9 +110,11 @@ class SysClock {
 	static constexpr std::uint64_t AHB_CLK_FREQ_ = AHB_CLK_FREQ;
 
 	static constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR = []() {
-		return std::tuple{HPRE{DivisionFactor_v<SYS_CLK_FREQ / AHB_CLK_FREQ>},
-											PPRE{DivisionFactor_v<AHB_CLK_FREQ / APB1_CLK_FREQ>},
-											PPRE{DivisionFactor_v<AHB_CLK_FREQ / APB2_CLK_FREQ>}};
+		return std::tuple{
+			HPRE{DivisionFactor_v<SYS_CLK_FREQ / AHB_CLK_FREQ>},
+			PPRE{DivisionFactor_v<AHB_CLK_FREQ / APB1_CLK_FREQ>},
+			PPRE{DivisionFactor_v<AHB_CLK_FREQ / APB2_CLK_FREQ>},
+		};
 	};
 
 	template <RccOsc PllSrc>
@@ -123,7 +127,7 @@ class SysClock {
 		constexpr auto min_plln				= std::ceil(VCO_OUTPUT_FREQ_MIN / vco_input_freq);
 
 		constexpr auto pllp_satisfy_constraint = [](auto const& t_pllp_candidate) {
-			const auto plln = t_pllp_candidate.first * plln_over_pllp;
+			auto const plln = t_pllp_candidate.first * plln_over_pllp;
 			return (min_plln <= plln && plln <= max_plln);
 		};
 
@@ -186,8 +190,8 @@ class SysClock {
 		rcc_wait_osc_rdy<PllSrc>();
 		rcc_set_sysclk<SysClk{to_underlying(PllSrc)}>();
 
-		{	// operations that requires PLL off
-			const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
+		{	 // operations that requires PLL off
+			auto const& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
 
 			rcc_disable_clk<RccOsc::PllOsc>();
 			rcc_set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
@@ -208,10 +212,10 @@ class SysClock {
 		constexpr auto flash_wait_state = FlashLatency{CpuWaitState_v<CPU_WAIT_STATE>};
 		flash_config_access_ctl<ARTAccel::InstructCache, ARTAccel::DataCache>(flash_wait_state);
 
-		const auto& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
+		auto const& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
 		rcc_config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc_wait_osc_rdy<RccOsc::PllOsc>();	// wait for PLL lock
+		rcc_wait_osc_rdy<RccOsc::PllOsc>();	 // wait for PLL lock
 
 		// switch sysclk and wait ready
 		rcc_set_sysclk<SYS_CLK_SRC>();
@@ -219,4 +223,4 @@ class SysClock {
 	}
 };
 
-}	// namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::stm32::f4

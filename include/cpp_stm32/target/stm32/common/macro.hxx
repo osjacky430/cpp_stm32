@@ -15,59 +15,50 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @def 	 SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)
+ * @def 	 SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)
  * @brief	 A helper macro to declare division factor helper class
  * @param  ClassName   	Class name
  * @param  LowerBound		Lower bound of division factor
  * @param  UpperBound		Upper bound of division factor
  */
-#define SETUP_DIVISION_FACTOR_WITH_BOUND(ClassName, LowerBound, UpperBound)               \
-	struct ClassName {                                                                      \
-		std::uint32_t const m_divisionFactor;                                                 \
-                                                                                          \
-		template <std::uint32_t Val>                                                          \
-		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(Val) {  \
-			static_assert(LowerBound <= Val && Val <= UpperBound);                              \
-		}                                                                                     \
-                                                                                          \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; } \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }        \
+#define SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)                             \
+	struct ClassName {                                                                                 \
+		std::uint32_t const m_value;                                                                     \
+                                                                                                     \
+		static constexpr auto MAX = UpperBound;                                                          \
+		static constexpr auto MIN = LowerBound;                                                          \
+                                                                                                     \
+		template <std::uint32_t Val>                                                                     \
+		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept : m_value(Val) { \
+			static_assert(LowerBound <= Val && Val <= UpperBound);                                         \
+		}                                                                                                \
+                                                                                                     \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                     \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                            \
 	}
 
 /**
- * @def 	 SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)
+ * @def 	 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(ClassName, ...)
  * @param  ClassName 	Class name
  * @param  VARARGS    division factor - register value pair
  */
-#define SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(ClassName, ...)                                                 \
-	struct ClassName {                                                                                            \
-		std::uint32_t const m_divisionFactor;                                                                       \
-		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                             \
-                                                                                                                \
-		template <std::uint32_t Val>                                                                                \
-		static constexpr auto findDivisionFactor = []() {                                                           \
-			constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(),       \
-																							[](auto const& t_pair) { return t_pair.first == Val; });          \
-			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                                   \
-			return iter_pos->second;                                                                                  \
-		};                                                                                                          \
-                                                                                                                \
-		template <std::uint32_t Val>                                                                                \
-		constexpr ClassName(DivisionFactor_t<Val> const&) noexcept : m_divisionFactor(findDivisionFactor<Val>()) {} \
-                                                                                                                \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_divisionFactor; }                       \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_divisionFactor; }                              \
-	}
-
-#define SETUP_FLASH_LATENCY(UpperBound, LowerBound)                                     \
-	struct FlashLatency {                                                                 \
-		std::uint8_t const m_flashLatency;                                                  \
-                                                                                        \
-		template <std::uint8_t Val>                                                         \
-		constexpr FlashLatency(CpuWaitState_t<Val> const&) noexcept {                       \
-			static_assert(LowerBound <= Val && Val <= UpperBound);                            \
-		}                                                                                   \
-                                                                                        \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_flashLatency; } \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_flashLatency; }        \
+#define SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(ClassName, ...)                                              \
+	struct ClassName {                                                                                      \
+		std::uint32_t const m_value;                                                                          \
+		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                       \
+                                                                                                          \
+		template <std::uint32_t Val>                                                                          \
+		static constexpr auto findDivisionFactor = []() {                                                     \
+			constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(), \
+																							[](auto const& t_pair) { return t_pair.first == Val; });    \
+			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                             \
+			return iter_pos->second;                                                                            \
+		};                                                                                                    \
+                                                                                                          \
+		template <std::uint32_t Val>                                                                          \
+		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept                       \
+			: m_value(findDivisionFactor<Val>()) {}                                                             \
+                                                                                                          \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                          \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                 \
 	}

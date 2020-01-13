@@ -48,7 +48,7 @@ enum class GpioPin {
  */
 enum class GpioMode {
 	Input,	 /*!< Input mode */
-	Output,	/*!< Output mode */
+	Output,	 /*!< Output mode */
 	AltFunc, /*!< Alternate Function mode*/
 	Analog	 /*!< Analog mode*/
 };
@@ -63,7 +63,7 @@ enum class GpioAltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10,
  */
 enum class PinName { PA_1, PA_2, PA_3, PA_5, PB_1, PB_2, PB_3, NC };
 
-}	// namespace cpp_stm32::common
+}	 // namespace cpp_stm32::common
 
 namespace cpp_stm32::stm32::detail {
 
@@ -143,7 +143,8 @@ constexpr void gpio_toggle_impl() noexcept {
  */
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
-	constexpr auto Pin7 = common::GpioPin::Pin7;
+	constexpr auto Pin7				 = common::GpioPin::Pin7;
+	constexpr auto cast_to_int = to_underlying;	 // to prevent internal compiler error
 	if constexpr (((Pins <= Pin7) || ...)) {
 		constexpr auto low_pin_group = [](common::GpioPin t_pin) {
 			if (t_pin <= Pin7) {
@@ -157,7 +158,7 @@ constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
 	if constexpr (((Pins > Pin7) || ...)) {
 		constexpr auto high_pin_group = [](common::GpioPin t_pin) {
 			if (t_pin > Pin7) {
-				return common::GpioPin{to_underlying(t_pin) - 8};
+				return common::GpioPin{cast_to_int(t_pin) - 8};
 			}
 		};
 
@@ -165,7 +166,7 @@ constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
 	}
 }
 
-}	// namespace cpp_stm32::stm32::detail
+}	 // namespace cpp_stm32::stm32::detail
 
 namespace cpp_stm32::stm32 {
 
@@ -177,4 +178,4 @@ namespace cpp_stm32::stm32 {
 	return std::get<1>(detail::PIN_NAME_TABLE[to_underlying(t_pin_name)]);
 }
 
-}	// namespace cpp_stm32::stm32
+}	 // namespace cpp_stm32::stm32

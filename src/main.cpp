@@ -12,6 +12,7 @@
 // #include "cpp_stm32/driver/usart_serial.hxx"
 
 using namespace cpp_stm32::driver;
+using namespace target_device;
 using namespace cpp_stm32::common;
 
 // struct DebugLogger {
@@ -27,7 +28,7 @@ using namespace cpp_stm32::common;
 
 int main() {
 	// rcc_enable_periph_clk<RccPeriph::GpioB>();
-	// SysClock::init(PllClkSrc<RccOsc::HseOsc>{});
+	SysClock::init<RccOsc::MsiOsc>();
 	// gpio_mode_setup<GpioPort::PortB, GpioPin::Pin3>(GpioMode::Output, GpioPupd::None);
 	// DebugLogger logger{};
 	DigitalOut<PinName::PB_3> led;

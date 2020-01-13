@@ -16,8 +16,12 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <optional>
 
+#include "cpp_stm32/target/stm32/l4/flash.hxx"
 #include "cpp_stm32/target/stm32/l4/pwr.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 
@@ -27,6 +31,20 @@
 #include "sys_info.hpp"
 
 namespace cpp_stm32::stm32::l4 {
+
+/**
+ * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
+ * @{
+ */
+#if !defined(DEVICE_VDD)
+#define DEVICE_VDD 3.3f
+#endif
+
+static constexpr auto STM32_VDD = DEVICE_VDD;
+
+static_assert(1.71f <= STM32_VDD && STM32_VDD <= 3.6f);
+
+/**@}*/
 
 /**
  * @defgroup	HSI_CLK_DEF		HSI Clock
@@ -109,6 +127,58 @@ static_assert(AHB_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
 
 class SysClock {
  private:
+	static constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR = []() {
+		return std::tuple{
+			HPRE{DivisionFactor_v<SYS_CLK_FREQ / AHB_CLK_FREQ>},
+			PPRE{DivisionFactor_v<SYS_CLK_FREQ / APB1_CLK_FREQ>},
+			PPRE{DivisionFactor_v<SYS_CLK_FREQ / APB2_CLK_FREQ>},
+		};
+	};
+
+	template <RccOsc PllSrc>
+	static constexpr auto CALC_PLL_DIV_FACTOR() noexcept {
+		constexpr auto pll_input_clk_freq = []() {
+			switch (PllSrc) {
+				case RccOsc::MsiOsc:
+					return MSI_CLK_FREQ;
+				case RccOsc::HseOsc:
+					return std::uint64_t(HSE_CLK_FREQ);
+				case RccOsc::Hsi16Osc:
+					return std::uint64_t(HSI_CLK_FREQ);
+				default:
+					break;
+			}
+		}();
+
+		constexpr auto pllm_n_r = []() {
+			for (auto const& pllr_candidate : PllR::AVAIL_DIVISION_FACTOR) {
+				if (auto const vco_freq = pllr_candidate.first * SYS_CLK_FREQ; 64_MHz <= vco_freq && vco_freq <= 344_MHz) {
+					for (auto plln = PllN::MIN; plln < PllN::MAX; ++plln) {
+						if (auto const vco_input_freq = vco_freq / plln; 4_MHz <= vco_input_freq && vco_input_freq <= 16_MHz) {
+							return std::tuple{vco_input_freq / pll_input_clk_freq, plln, pllr_candidate.first};
+						}
+					}
+				}
+			}
+		}();
+		constexpr auto pllm = std::get<0>(pllm_n_r);
+		constexpr auto plln = std::get<1>(pllm_n_r);
+		constexpr auto pllr = std::get<2>(pllm_n_r);
+
+		// if constexpr (need to calculate pllp, pllq)
+		// {
+		//  ...
+		// } esle {
+		return std::tuple{PllM{DivisionFactor_v<pllm>}, PllN{DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
+											PllR{DivisionFactor_v<pllr>}};
+		// }
+	}
+	/**
+	 * @var 	CPU_WAIT_STATE
+	 * @brief	This is chosen base on AHB clock frequency
+	 */
+	static constexpr auto CPU_WAIT_STATE = FlashWaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ);
+
 	/**
 	 * @var		VOLTAGE_SCALE
 	 * @brief	This is chosen base on AHB clock frequency, if desire frequency is greater than
@@ -122,7 +192,7 @@ class SysClock {
 		} else {
 			return VoltageScale::Range2;
 		}
-	};
+	}();
 
 	/**
 	 * @var 		SYS_CLK_SRC
@@ -133,8 +203,8 @@ class SysClock {
 	 * 						1. HSE_CLK_FREQ: As long as HSE clk is valid, it must be the highest priority to be considered, since
 	 * 														 it needs additional care to enable HSE
 	 * 						2. MSI_CLK_FREQ: This is the second option because it is defaut sys clock with 4_MHz after restart.
-	 * 						3. HSI_CLK_FREQ: Since HSI clk freq is fixed, this option is the least possible one, and can be replaced
-	 * 														 by MSI.
+	 * 						3. HSI_CLK_FREQ: Since HSI clk freq is fixed, this option is the least possible one, and can be
+	 * 														 replaced by MSI.
 	 * @note 		 In order for more complicated usage, I should provide more flags so user can skip this and choose
 	 * 					 arbitrary clock.
 	 *
@@ -152,11 +222,44 @@ class SysClock {
 	}();
 
  public:
+	template <RccOsc PllSrc, typename = std::enable_if_t<SYS_CLK_SRC == SysClk::Pll && is_pll_clk_src<PllSrc>>>
 	static constexpr void init() noexcept {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
 			rcc_bypass_clksrc<RccOsc::HseOsc>();
 		}
-	}
-};
 
-}	// namespace cpp_stm32::stm32::l4
+		// enable pll clock src, i.e., HSE, HSI or MSI
+		rcc_enable_clk<PllSrc>();
+		rcc_wait_osc_rdy<PllSrc>();
+		rcc_set_sysclk<rcc_to_sys_enum(PllSrc)>();
+
+		if constexpr (PllSrc == RccOsc::MsiOsc) {
+			rcc_enable_msi_range();
+			rcc_set_msi_range(MsiRange{Frequency_v<MSI_CLK_FREQ>});
+		}
+
+		{
+			const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
+
+			rcc_disable_clk<RccOsc::PllOsc>();
+			rcc_set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
+			rcc_enable_periph_clk<RccPeriph::Pwr>();
+			pwr_set_voltage_scale(VOLTAGE_SCALE);
+		}
+
+		rcc_enable_clk<RccOsc::PllOsc>();
+
+		constexpr auto flash_wait_state = FlashLatency{CpuWaitState_v<CPU_WAIT_STATE>};
+		flash_config_access_ctl<ARTAccel::InstructCache, ARTAccel::DataCache>(flash_wait_state);
+
+		auto const& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
+		rcc_config_adv_bus_division_factor(ahb, apb1, apb2);
+
+		rcc_wait_osc_rdy<RccOsc::PllOsc>();
+
+		rcc_set_sysclk<SYS_CLK_SRC>();
+		rcc_wait_sysclk_rdy<SYS_CLK_SRC>();
+	}
+};	// namespace cpp_stm32::stm32::l4
+
+}	 // namespace cpp_stm32::stm32::l4

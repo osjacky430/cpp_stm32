@@ -32,7 +32,7 @@ static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x2'000U);
 struct FlashLatency;
 
 template <std::uint8_t Val>
-using CpuWaitState_t = std::integral_constant<std::uint8_t, Val>;
+using CpuWaitState_t = std::integral_constant<std::uint32_t, Val>;
 
 template <std::uint8_t Val>
 static constexpr auto CpuWaitState_v = CpuWaitState_t<Val>{};
@@ -42,7 +42,7 @@ static constexpr auto CpuWaitState_v = CpuWaitState_t<Val>{};
  * @{
  */
 
-SETUP_FLASH_LATENCY(0, 4);
+SETUP_LOOKUP_TABLE_WITH_BOUND(FlashLatency, 0, 4);
 
 SETUP_REGISTER_INFO(FlashAcrInfo, /**/
 										Bit<3, FlashLatency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}},
@@ -61,4 +61,4 @@ static constexpr Register<FlashAcrInfo, FlashAcrBit> FLASH_ACR{FLASH_BASE, 0x00U
 
 /**@}*/
 
-}	// namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::stm32::l4

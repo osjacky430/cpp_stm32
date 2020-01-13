@@ -16,9 +16,67 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "cpp_stm32/target/stm32/l4/memory/flash_reg.hxx"
+#include "cpp_stm32/utility/literal_op.hxx"
 
 namespace cpp_stm32::stm32::l4 {
+
+enum class VoltageScale;
+/**
+ * [if  description]
+ * @param _MHz [description]
+ */
+struct FlashWaitTable {
+ private:
+	static constexpr std::tuple WAIT_STATE_TABLE{
+		[](std::uint64_t const& t_hclk) {
+			if (64_MHz <= t_hclk && t_hclk <= 80_MHz) {
+				return 4;
+			} else if (48_MHz <= t_hclk && t_hclk <= 64_MHz) {
+				return 3;
+			} else if (32_MHz <= t_hclk && t_hclk <= 48_MHz) {
+				return 2;
+			} else if (16_MHz <= t_hclk && t_hclk <= 32_MHz) {
+				return 1;
+			} else if (t_hclk <= 16_MHz) {
+				return 0;
+			}
+		},
+		[](std::uint64_t const& t_hclk) {
+			if (18_MHz <= t_hclk && t_hclk <= 26_MHz) {
+				return 3;
+			} else if (12_MHz <= t_hclk && t_hclk <= 18_MHz) {
+				return 2;
+			} else if (6_MHz <= t_hclk && t_hclk <= 12_MHz) {
+				return 1;
+			} else if (t_hclk <= 6_MHz) {
+				return 0;
+			}
+		},
+		/*add the rest here*/
+	};
+
+ public:
+	/**
+	 * [getWaitState description]
+	 * @tparam 	DeviceVolt 		Device voltage, valid range from 1.71V to 3.6V
+	 * @param   t_hclk 				Ahpb clock freqency
+	 * @note		DeviceVolt is useless here, despite that the wait state depends on the voltage output
+	 * 				  of internal regulator, which somehow depends on Vdd. Since only two possible voltage
+	 * 				  range, we can decide the wait state by clock frequency.
+	 * @return  The wait state
+	 */
+	template <float const& DeviceVolt>
+	static constexpr auto getWaitState(std::uint64_t const& t_hclk) noexcept {
+		if (t_hclk >= 26_MHz) {
+			return std::get<0>(WAIT_STATE_TABLE)(t_hclk);
+		} else {
+			return std::get<1>(WAIT_STATE_TABLE)(t_hclk);
+		}
+	}
+};
 
 enum class ARTAccel { InstructCache = 1, DataCache = 2, InstructPrefetch = 3 };
 
@@ -41,8 +99,8 @@ constexpr void flash_config_access_ctl(FlashLatency const& t_cpu) noexcept {
 		}
 	};
 
-	const auto val_to_set = BitGroup{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
+	auto const val_to_set = BitGroup{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
 	FLASH_ACR.template setBit<FlashAcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
-}	// namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::stm32::l4

@@ -94,6 +94,86 @@ class MMIO_t {
 	}
 };
 
+// template <typename T>
+// class MMIO_t {
+//  private:
+// 	std::uint32_t addr;
+// 	T regVal;
+//
+// 	static constexpr decltype(auto) MMIO(std::uint32_t t_addr) noexcept { return *reinterpret_cast<volatile T*>(t_addr);
+// }
+// 	// T& regVal;	// this can be wrong
+//
+//  public:
+// 	// explicit constexpr MMIO_t(T& t_reg_val) noexcept : regVal(t_reg_val) {}
+// 	explicit constexpr MMIO_t(std::uint32_t t_addr) noexcept : addr(t_addr), regVal(MMIO(addr)) {}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator|(Rhs const& t_val) const noexcept {
+// 		return regVal | t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator|=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) |= t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator&(Rhs const& t_val) const noexcept {
+// 		return regVal & t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator&=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) &= t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator^(Rhs const& t_val) const noexcept {
+// 		return regVal ^ t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator^=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) ^= t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator~() const noexcept {
+// 		return ~regVal;
+// 	}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator<<(Rhs const& t_val) const noexcept {
+// 		return regVal << t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator<<=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) <<= t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	[[nodiscard]] constexpr auto operator>>(Rhs const& t_val) const noexcept {
+// 		return regVal >> t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator>>=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) >>= t_val;
+// 	}
+//
+// 	template <typename Rhs>
+// 	constexpr void operator=(Rhs const& t_val) const noexcept {
+// 		MMIO(addr) = t_val;
+// 	}
+// };
+// //
+// template <typename T>
+// constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
+// 	return MMIO_t<T>{addr + offset};
+// }
+
 template <typename T>
 constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
 	return MMIO_t{*reinterpret_cast<volatile T*>(addr + offset)};
@@ -106,6 +186,6 @@ constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
 
 static constexpr auto const MMIO32 = MMIO<std::uint32_t>;
 static constexpr auto const MMIO16 = MMIO<std::uint16_t>;
-static constexpr auto const MMIO8	= MMIO<std::uint8_t>;
+static constexpr auto const MMIO8	 = MMIO<std::uint8_t>;
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

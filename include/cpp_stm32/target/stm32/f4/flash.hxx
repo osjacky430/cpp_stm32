@@ -60,13 +60,14 @@ struct FlashWaitTable {
 				return 0;
 			}
 		},
+		/* add the rest here */
 	};
 
  public:
 	/**
 	 * @brief    A getter function that returns wait state according to clock frequency and device voltage
 	 * @tparam   DeviceVolt  Device voltage, see @ref DEVICE_VOLTAGE_DEF
-	 * @param    t_hclk      Ahb clock frequency
+	 * @param    t_hclk      Ahpb clock frequency
 	 * @return   the number of wait state
 	 */
 	template <float const& DeviceVolt>
@@ -96,9 +97,8 @@ constexpr void flash_config_access_ctl(FlashLatency const& t_cpu) noexcept {
 		}
 	};
 
-	const auto val_to_set =
-		BitGroup{t_cpu, static_cast<std::uint8_t>(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
+	auto const val_to_set = BitGroup{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
 	FLASH_ACR.template setBit<FlashAcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
-}	// namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::stm32::f4

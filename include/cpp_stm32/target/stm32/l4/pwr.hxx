@@ -22,6 +22,6 @@ namespace cpp_stm32::stm32::l4 {
 
 enum class VoltageScale { Range1, Range2 };
 
-constexpr void pwr_set_voltage_sclae(VoltageScale const& t_vos) noexcept { PWR_CR.setBit<PwrCrBit::Vos>(t_vos); }
+constexpr void pwr_set_voltage_scale(VoltageScale const& t_vos) noexcept { PWR_CR.setBit<PwrCrBit::Vos>(t_vos); }
 
-}	// namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::stm32::l4

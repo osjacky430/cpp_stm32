@@ -51,6 +51,28 @@ enum class RccOsc : std::uint32_t { Hsi48Osc, MsiOsc, Hsi16Osc, HseOsc, PllOsc, 
  */
 enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
 
+/**
+ * @brief		This function transform rcc enum to its equivalent sys enum
+ * @param 	t_rcc  see ::RccOsc
+ */
+static constexpr auto rcc_to_sys_enum = [](RccOsc t_rcc) {
+	switch (t_rcc) {
+		case RccOsc::Hsi16Osc:
+			return SysClk::Hsi16;
+		case RccOsc::MsiOsc:
+			return SysClk::Msi;
+		case RccOsc::HseOsc:
+			return SysClk::Hse;
+		case RccOsc::PllOsc:
+			return SysClk::Pll;
+		default:
+			break;
+	}
+};
+
+/**
+ *
+ */
 template <RccOsc Clk>
 static constexpr bool is_ext_clk = (Clk == RccOsc::HseOsc || Clk == RccOsc::LseOsc);
 
@@ -179,7 +201,7 @@ static constexpr void rcc_set_sysclk() noexcept {
 }
 
 static constexpr SysClk rcc_sysclk_in_use() noexcept {
-	return get<0>(RCC_CFGR.readBit<RccCfgBit::SWS>(ValueOnly));	//
+	return get<0>(RCC_CFGR.readBit<RccCfgBit::SWS>(ValueOnly));	 //
 }
 
 template <SysClk Clk>
@@ -236,4 +258,10 @@ static constexpr void rcc_config_adv_bus_division_factor(HPRE const& t_hpre, PPR
 	RCC_CFGR.setBit<RccCfgBit::HPre, RccCfgBit::PPre1, RccCfgBit::PPre2>(val_to_set);
 }
 
-}	// namespace cpp_stm32::stm32::l4
+static constexpr void rcc_set_msi_range(MsiRange const& t_msi_range) noexcept {
+	RCC_CR.setBit<RccCrBit::MsiRange>(t_msi_range);
+}
+
+static constexpr void rcc_enable_msi_range() noexcept { RCC_CR.setBit<RccCrBit::MsiRgSel>(std::uint8_t(1)); }
+
+}	 // namespace cpp_stm32::stm32::l4

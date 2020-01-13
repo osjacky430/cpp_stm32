@@ -32,6 +32,12 @@ namespace cpp_stm32::stm32::f4 {
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
 
 template <std::uint32_t Val>
+static constexpr auto Frequency_t = std::integral_constant<std::uint32_t, Val>;
+
+template <std::uint32_t Val>
+static constexpr auto Frequency_v = Frequency_t<Val>{};
+
+template <std::uint32_t Val>
 using DivisionFactor_t = std::integral_constant<std::uint32_t, Val>;
 
 template <std::uint32_t Val>
@@ -77,14 +83,14 @@ static constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllM valid number lies between 2 and 63
  */
-SETUP_DIVISION_FACTOR_WITH_BOUND(PllM, 2, 63);
+SETUP_LOOKUP_TABLE_WITH_BOUND(PllM, 2, 63);
 
 /**
  * @class		PllN
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllN valid number lies between 50 and 432
  */
-SETUP_DIVISION_FACTOR_WITH_BOUND(PllN, 50, 432);
+SETUP_LOOKUP_TABLE_WITH_BOUND(PllN, 50, 432);
 
 /**
  * @class 	PllP
@@ -98,23 +104,22 @@ SETUP_DIVISION_FACTOR_WITH_BOUND(PllN, 50, 432);
  * 							 6		 |   0b10
  * 							 8		 |	 0b11
  */
-SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PllP, /**/
-																				std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10},
-																				std::pair{8, 0b11}, );
+SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllP, /**/
+																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
 
 /**
  * @class 	PllQ
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllQ valid number lies between 2 and 15
  */
-SETUP_DIVISION_FACTOR_WITH_BOUND(PllQ, 2, 15);
+SETUP_LOOKUP_TABLE_WITH_BOUND(PllQ, 2, 15);
 
 /**
  * @class 	PllR
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note 		PllR valid number lies between 2 and 7
  */
-SETUP_DIVISION_FACTOR_WITH_BOUND(PllR, 2, 7);
+SETUP_LOOKUP_TABLE_WITH_BOUND(PllR, 2, 7);
 
 SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
 										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
@@ -133,14 +138,14 @@ static constexpr Register<RccPllcfgrBitInfo, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE,
 
 enum class SysClk : std::uint32_t;
 
-SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(HPRE, /**/
-																				std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
-																				std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
-																				std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111});
+SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(HPRE, /**/
+																		 std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
+																		 std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
+																		 std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111});
 
-SETUP_DIVISION_FACTOR_WITH_KEY_VAL_PAIR(PPRE, /**/
-																				std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101},
-																				std::pair{8, 0b110}, std::pair{16, 0b111});
+SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PPRE, /**/
+																		 std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101}, std::pair{8, 0b110},
+																		 std::pair{16, 0b111});
 
 SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
 										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
@@ -286,4 +291,4 @@ static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x70U};
 
 /**@}*/
 
-}	// namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::stm32::f4
