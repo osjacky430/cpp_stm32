@@ -6,31 +6,18 @@
 
 #include "cpp_stm32/target/stm32/l4/sys_init.hxx"
 
-// #include "gpio.hxx"
-// #include "rcc.hxx"
 #include "cpp_stm32/driver/digitalout.hxx"
-// #include "cpp_stm32/driver/usart_serial.hxx"
+#include "cpp_stm32/driver/usart_serial.hxx"
 
 using namespace cpp_stm32::driver;
 using namespace target_device;
 using namespace cpp_stm32::common;
 
-// struct DebugLogger {
-// 	static inline Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
-//
-// 	constexpr DebugLogger() noexcept {
-// 		/**/
-// 		debugOut.setTxeInterrupt(Callback<&DebugLogger::log>(this));
-// 	}
-//
-// 	constexpr void log() noexcept { debugOut << 'c'; }
-// };
-
 int main() {
 	// rcc_enable_periph_clk<RccPeriph::GpioB>();
 	SysClock::init<RccOsc::MsiOsc>();
-	// gpio_mode_setup<GpioPort::PortB, GpioPin::Pin3>(GpioMode::Output, GpioPupd::None);
-	// DebugLogger logger{};
+
+	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 	DigitalOut<PinName::PB_3> led;
 
 	while (true) {
@@ -40,6 +27,7 @@ int main() {
 		}
 
 		// gpio_toggle<GpioPort::PortB, GpioPin::Pin3>();
+		debugOut << "c\n\r";
 		led.toggle();
 	}
 

@@ -46,7 +46,7 @@ constexpr void gpio_toggle() noexcept {
 
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_set_af(common::GpioAltFunc const& t_af) noexcept {
-	detail::gpio_set_af_impl<Port, Pins...>();
+	detail::gpio_set_af_impl<Port, Pins...>(t_af);
 }
 
 }	 // namespace cpp_stm32::stm32::f4

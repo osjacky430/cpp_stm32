@@ -26,7 +26,6 @@
 
 namespace cpp_stm32::stm32::l4 {
 
-;
 static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x2'000U);
 
 struct FlashLatency;

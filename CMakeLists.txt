@@ -14,8 +14,13 @@ set(OPTIMIZE_FOR_SIZE "-Os")
 set(OPTIMIZE_MAX "-O3")
 set(OPTIMIZE_NONE "-O0")
 
+set(CMAKE_FLAG_SET True CACHE BOOL "" FORCE)
+
+if (${CMAKE_FLAG_SET})
 set(CMAKE_CXX_FLAGS "-v ${CMAKE_CXX_FLAGS} ${OPTIMIZE_FOR_SIZE}" CACHE STRING "" FORCE)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles ${LINKER_SCRIPT} ${GENERATE_MAP_FILE} ${PRINT_MEM_USAGE}" CACHE STRING "" FORCE)
+endif()
+
 
 include_directories(${TARGET_DIR})  # cpp driver target
 include_directories(${CMAKE_SOURCE_DIR}/include/)

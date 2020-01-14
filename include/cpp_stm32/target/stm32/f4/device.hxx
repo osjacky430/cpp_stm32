@@ -28,4 +28,4 @@ namespace cpp_stm32::driver {
 namespace Manufacture		= cpp_stm32::stm32;
 namespace target_device = cpp_stm32::stm32::f4;
 
-}	// namespace cpp_stm32::driver
+}	 // namespace cpp_stm32::driver

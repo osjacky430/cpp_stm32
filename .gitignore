@@ -21,3 +21,6 @@ Debug
 
 # ignore my document file
 *.docx
+
+#
+.vscode

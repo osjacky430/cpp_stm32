@@ -152,10 +152,13 @@ class SysClock {
 
 		constexpr auto pllm_n_r = []() {
 			for (auto const& pllr_candidate : PllR::AVAIL_DIVISION_FACTOR) {
-				if (auto const vco_freq = pllr_candidate.first * SYS_CLK_FREQ; 64_MHz <= vco_freq && vco_freq <= 344_MHz) {
+				if (auto const vco_freq = pllr_candidate.first * SYS_CLK_FREQ;
+						VCO_OUTPUT_FREQ_MIN <= vco_freq && vco_freq <= VCO_OUTPUT_FREQ_MAX) {
 					for (auto plln = PllN::MIN; plln < PllN::MAX; ++plln) {
-						if (auto const vco_input_freq = vco_freq / plln; 4_MHz <= vco_input_freq && vco_input_freq <= 16_MHz) {
-							return std::tuple{vco_input_freq / pll_input_clk_freq, plln, pllr_candidate.first};
+						if (auto const vco_input_freq = vco_freq / plln;
+								VCO_INPUT_FREQ_MIN <= vco_input_freq && vco_input_freq <= VCO_INPUT_FREQ_MAX) {
+							if (auto const pllm = pll_input_clk_freq / vco_input_freq; PllM::MIN <= pllm && pllm <= PllM::MAX)
+								return std::tuple{pllm, plln, pllr_candidate.first};
 						}
 					}
 				}

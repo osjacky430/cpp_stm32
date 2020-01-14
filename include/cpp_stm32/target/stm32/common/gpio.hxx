@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <array>
+
 #include "cpp_stm32/common/gpio_common.hxx"
 #include "cpp_stm32/target/stm32/common/memory/gpio_reg.hxx"
 
@@ -144,7 +146,9 @@ constexpr void gpio_toggle_impl() noexcept {
 template <common::GpioPort Port, common::GpioPin... Pins>
 constexpr void gpio_set_af_impl(common::GpioAltFunc const& t_af) noexcept {
 	constexpr auto Pin7				 = common::GpioPin::Pin7;
-	constexpr auto cast_to_int = to_underlying;	 // to prevent internal compiler error
+	constexpr auto cast_to_int = [](auto const& t_val) {
+		return to_underlying(t_val);
+	};	// to prevent internal compiler error
 	if constexpr (((Pins <= Pin7) || ...)) {
 		constexpr auto low_pin_group = [](common::GpioPin t_pin) {
 			if (t_pin <= Pin7) {

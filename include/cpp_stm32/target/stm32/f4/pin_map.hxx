@@ -29,16 +29,17 @@ namespace cpp_stm32::stm32 {
 class UsartPinMap {
  private:
 	// this is not the best way of doing it
-	using UsartAltFuncGroup = std::tuple<f4::UsartNum, GpioAltFunc, f4::RccPeriph, IrqNum>;
+	using PinName						= common::PinName;
+	using UsartAltFuncGroup = std::tuple<f4::UsartNum, common::GpioAltFunc, f4::RccPeriph, IrqNum>;
 
 	static constexpr auto TX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_2,
-							UsartAltFuncGroup{f4::UsartNum::Usart2, GpioAltFunc::AF7, f4::RccPeriph::Usart2, IrqNum::Usart2Global}},
+		std::pair{PinName::PA_2, UsartAltFuncGroup{f4::UsartNum::Usart2, common::GpioAltFunc::AF7, f4::RccPeriph::Usart2,
+																							 IrqNum::Usart2Global}},
 	};
 
 	static constexpr auto RX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_3,
-							UsartAltFuncGroup{f4::UsartNum::Usart2, GpioAltFunc::AF7, f4::RccPeriph::Usart2, IrqNum::Usart2Global}},
+		std::pair{PinName::PA_3, UsartAltFuncGroup{f4::UsartNum::Usart2, common::GpioAltFunc::AF7, f4::RccPeriph::Usart2,
+																							 IrqNum::Usart2Global}},
 	};
 
 	static constexpr auto USART_PIN_NAME_TABLE = std::tuple{TX_PIN_NAME_TABLE, RX_PIN_NAME_TABLE};
@@ -49,11 +50,11 @@ class UsartPinMap {
 	template <PinName Pin, PinInfo Idx>
 	static constexpr auto getPinInfo() noexcept {
 		constexpr auto PIN_NAME_TABLE = std::get<to_underlying(Idx)>(USART_PIN_NAME_TABLE);
-		const auto iter_pos =
-			cstd::find_if(PIN_NAME_TABLE.begin(), PIN_NAME_TABLE.end(), [](auto const& t_pair) { return (t_pair.first == Pin); });
+		const auto iter_pos						= cstd::find_if(PIN_NAME_TABLE.begin(), PIN_NAME_TABLE.end(),
+																				[](auto const& t_pair) { return (t_pair.first == Pin); });
 
 		return iter_pos->second;
 	};
 };
 
-}	// namespace cpp_stm32::stm32
+}	 // namespace cpp_stm32::stm32
