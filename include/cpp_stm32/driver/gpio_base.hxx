@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <tuple>
 
-#include "cpp_stm32/common/gpio_common.hxx"
+#include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 // target specific include
@@ -36,7 +36,7 @@ namespace cpp_stm32::driver {
  *          useful information.
  * @tparam  PinNames @ref PinName
  */
-template <common::PinName... PinNames>
+template <gpio::PinName... PinNames>
 class PinGroupingHelper {
  private:
 	using IdxThruPinNameList = std::make_index_sequence<sizeof...(PinNames)>;
@@ -47,9 +47,9 @@ class PinGroupingHelper {
 	 */
 	template <std::size_t... Idx>
 	static constexpr auto genPortList(std::index_sequence<Idx...> const& /*unused*/) noexcept {
-		using common::GpioPort;
+		using gpio::Port;
 		auto port_list = std::array{Manufacture::get_port_from_pin_name_table(PIN_NAME_LIST[Idx])...};
-		std::array<GpioPort, PORT_NUM> result_port_list{};
+		std::array<Port, PORT_NUM> result_port_list{};
 		cstd::unique_copy(port_list.begin(), port_list.end(), result_port_list.begin(),
 											[](auto const& lhs, auto const& rhs) { return lhs == rhs; });
 		return result_port_list;
@@ -137,9 +137,9 @@ class PinGroupingHelper {
 	using IdxThruPort = std::make_index_sequence<PORT_NUM>;
 	/**
 	 * @brief    This function is a getter function to get nth port in gpio port list
-	 * @todo     Is the order of GpioPort important in this case? Since we remove duplicate
+	 * @todo     Is the order of Port important in this case? Since we remove duplicate
 	 *           pin name, this means the number may not be the same as user expected
-	 * @return   @ref GpioPort
+	 * @return   @ref Port
 	 */
 	template <std::size_t N>
 	[[nodiscard]] static constexpr auto getPort(ConstIndexType<N>) noexcept {
@@ -148,7 +148,7 @@ class PinGroupingHelper {
 
 	/**
 	 * @brief   This function is a getter function to get nth pin in gpio pin list
-	 * @return  @ref GpioPin
+	 * @return  @ref Pin
 	 */
 	template <std::size_t N>
 	[[nodiscard]] static constexpr auto getPin(ConstIndexType<N>) noexcept {
@@ -171,10 +171,10 @@ class PinGroupingHelper {
  *
  * @tparam  PinNames @ref PinName
  */
-template <common::PinName... PinNames>
+template <gpio::PinName... PinNames>
 class GpioUtil {
  private:
-	using PinName			= common::PinName;
+	using PinName			= gpio::PinName;
 	using PinGrouper	= PinGroupingHelper<PinNames...>;
 	using IdxThruPort = typename PinGrouper::IdxThruPort;
 
@@ -193,16 +193,16 @@ class GpioUtil {
 	 *           gpio functions for each port, this is done by two std::index_sequence, first one
 	 *           index through all port, see @ref modeSetupIdxThruPort, second one index through
 	 *           pins, which is the purpose of this function
-	 * @param t_mode @ref GpioMode
-	 * @param t_pupd @ref GpioPupd
+	 * @param t_mode @ref Mode
+	 * @param t_pupd @ref Pupd
 	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void modeSetupIdxThruPin(ConstIndexType<Num> const& /*unused*/,
 																						std::index_sequence<Idx...> const& /*unused*/,
-																						common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
+																						gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		target_device::gpio_mode_setup<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_mode, t_pupd);
+		target_device::mode_setup<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_mode, t_pupd);
 	}
 
 	/**
@@ -210,12 +210,12 @@ class GpioUtil {
 	 * @details  Since we aim to accept pin names, we need to group pins wth same port, and call
 	 *           gpio functions for each port, this is done by two std::index_sequence, first one
 	 *           index through all port, which is the purpose of this function
-	 * @param t_mode @ref GpioMode
-	 * @param t_pupd @ref GpioPupd
+	 * @param t_mode @ref Mode
+	 * @param t_pupd @ref Pupd
 	 */
 	template <std::size_t... Idx>
 	static constexpr void modeSetupIdxThruPort(std::index_sequence<Idx...> const& /*unused*/,
-																						 common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
+																						 gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) noexcept {
 		(modeSetupIdxThruPin(ConstIndexType<Idx>{}, GpioGroupTupIdxSeq<Idx>, t_mode, t_pupd), ...);
 	}
 
@@ -227,7 +227,7 @@ class GpioUtil {
 																				 std::index_sequence<Idx...> /*unused*/) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		target_device::gpio_toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
+		target_device::toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
 	}
 
 	/**
@@ -239,9 +239,9 @@ class GpioUtil {
 	}
 
 	/**
-	 * @brief    This function handles enabling of RCC peripheral clock of @ref GpioPort
-	 * @note     This is done by static casting @ref GpioPort to @ref RccPeriph, this implies that
-	 *           if we want this to work, we need to ensure @ref GpioPort enum entries match to the
+	 * @brief    This function handles enabling of RCC peripheral clock of @ref Port
+	 * @note     This is done by static casting @ref Port to @ref RccPeriph, this implies that
+	 *           if we want this to work, we need to ensure @ref Port enum entries match to the
 	 *           correct @ref RccPeriph enum entries
 	 */
 	template <std::size_t... Idx>
@@ -254,25 +254,25 @@ class GpioUtil {
 	/**
 	 * @brief    This function handles the setup of alternate function, for implementation
 	 *           detail, see @ref modeSetupIdxThruPin
-	 * @param    t_af   @ref GpioAltFunc
+	 * @param    t_af   @ref AltFunc
 	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void alternateFuncSteupThruPin(ConstIndexType<Num> const& /*unused*/,
 																									std::index_sequence<Idx...> const& /*unused*/,
-																									common::GpioAltFunc const& t_af) noexcept {
+																									gpio::AltFunc const& t_af) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(ConstIndexType<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
-		target_device::gpio_set_af<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_af);
+		target_device::set_alternate_function<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_af);
 	}
 
 	/**
 	 * @brief    This function handles the setup of alternate function, for implementation detail,
 	 *           see @ref modeSetupIdxThruPort
-	 * @param    t_af  @ref GpioAltFunc
+	 * @param    t_af  @ref AltFunc
 	 */
 	template <std::size_t... Idx>
 	static constexpr void alternateFuncSetupThruPort(std::index_sequence<Idx...> const& /*unused*/,
-																									 common::GpioAltFunc const& t_af) noexcept {
+																									 gpio::AltFunc const& t_af) noexcept {
 		(alternateFuncSteupThruPin(ConstIndexType<Idx>{}, GpioGroupTupIdxSeq<Idx>, t_af), ...);
 	}
 
@@ -284,10 +284,10 @@ class GpioUtil {
 
 	/**
 	 * @brief  This function is the public interface of gpio mode setup
-	 * @param t_mode @ref GpioMode
-	 * @param t_pupd @ref GpioPupd
+	 * @param t_mode @ref Mode
+	 * @param t_pupd @ref Pupd
 	 */
-	static constexpr void modeSetup(common::GpioMode const& t_mode, common::GpioPupd const& t_pupd) noexcept {
+	static constexpr void modeSetup(gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) noexcept {
 		modeSetupIdxThruPort(IdxThruPort{}, t_mode, t_pupd);
 	}
 
@@ -298,9 +298,9 @@ class GpioUtil {
 
 	/**
 	 * @brief  This function is the public interface of gpio set alternate function
-	 * @param t_af  @ref GpioAltFunc
+	 * @param t_af  @ref AltFunc
 	 */
-	static constexpr void alternateFuncSetup(common::GpioAltFunc const& t_af) noexcept {
+	static constexpr void alternateFuncSetup(gpio::AltFunc const& t_af) noexcept {
 		alternateFuncSetupThruPort(IdxThruPort{}, t_af);
 	}
 };

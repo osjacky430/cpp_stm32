@@ -18,7 +18,7 @@
 
 #include <array>
 
-#include "cpp_stm32/common/gpio_common.hxx"
+#include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
@@ -29,16 +29,16 @@ namespace cpp_stm32::stm32 {
 class UsartPinMap {
  private:
 	// this is not the best way of doing it
-	using PinName						= common::PinName;
-	using UsartAltFuncGroup = std::tuple<f4::UsartNum, common::GpioAltFunc, f4::RccPeriph, IrqNum>;
+	using PinName						= gpio::PinName;
+	using UsartAltFuncGroup = std::tuple<f4::UsartNum, gpio::AltFunc, f4::RccPeriph, IrqNum>;
 
 	static constexpr auto TX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_2, UsartAltFuncGroup{f4::UsartNum::Usart2, common::GpioAltFunc::AF7, f4::RccPeriph::Usart2,
+		std::pair{PinName::PA_2, UsartAltFuncGroup{f4::UsartNum::Usart2, gpio::AltFunc::AF7, f4::RccPeriph::Usart2,
 																							 IrqNum::Usart2Global}},
 	};
 
 	static constexpr auto RX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_3, UsartAltFuncGroup{f4::UsartNum::Usart2, common::GpioAltFunc::AF7, f4::RccPeriph::Usart2,
+		std::pair{PinName::PA_3, UsartAltFuncGroup{f4::UsartNum::Usart2, gpio::AltFunc::AF7, f4::RccPeriph::Usart2,
 																							 IrqNum::Usart2Global}},
 	};
 

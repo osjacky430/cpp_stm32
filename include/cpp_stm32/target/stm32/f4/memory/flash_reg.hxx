@@ -18,10 +18,10 @@
 
 #include <cstdint>
 
-#include "cpp_stm32/target/stm32/common/macro.hxx"
+#include "cpp_stm32/utility/macro.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
-#include "cpp_stm32/utility/bit.hxx"
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/bit.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32::stm32::f4 {
 

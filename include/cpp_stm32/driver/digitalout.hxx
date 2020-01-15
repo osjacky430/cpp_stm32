@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cpp_stm32/common/gpio_common.hxx"
+#include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
@@ -32,17 +32,17 @@ namespace cpp_stm32::driver {
  * @class   DigitalOut
  * @brief   This class is a specialization of GpioUtil, it provides advance GPIO output control
  */
-template <common::PinName... PinNames>
+template <gpio::PinName... PinNames>
 class DigitalOut {
  public:
 	/**
 	 * @brief  Default constructor, it enables rcc peripheral clock, and setup gpio mode to output, no pull
 	 */
 	constexpr DigitalOut() noexcept {
-		using common::GpioMode, common::GpioPupd;
+		using gpio::Mode, gpio::Pupd;
 
 		GpioUtil<PinNames...>::enableAllGpioClk();
-		GpioUtil<PinNames...>::modeSetup(GpioMode::Output, GpioPupd::None);
+		GpioUtil<PinNames...>::modeSetup(Mode::Output, Pupd::None);
 	}
 
 	/**

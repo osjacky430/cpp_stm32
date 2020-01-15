@@ -19,8 +19,8 @@
 #include "cpp_stm32/common/usart_common.hxx"
 
 #include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
-#include "cpp_stm32/utility/bit.hxx"
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/bit.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32::stm32::l4 {
 
@@ -50,13 +50,13 @@ SETUP_REGISTER_INFO(UsartCr1Info,																 /************ Description ****
 										Binary<>{BitPos_t{6}},											 // Transmission Complete Interrupt Enable
 										Binary<>{BitPos_t{7}},											 // Transmitter Empty Interrupt Enable
 										Binary<>{BitPos_t{8}},											 // Packet Error Interrupt Enable
-										Bit<1, common::UsartParity>{BitPos_t{9}},		 // Parity Selection
+										Bit<1, usart::Parity>{BitPos_t{9}},		 // Parity Selection
 										Binary<>{BitPos_t{10}},											 // Parity Control Enable
 										Binary<>{BitPos_t{11}},											 // Receiver Wakeup Mode
 										Binary<>{BitPos_t{12}},											 // Word Length (bit 0)
 										Binary<>{BitPos_t{13}},											 // Mute Mode Enable
 										Binary<>{BitPos_t{14}},											 // Character match interrupt enable
-										Bit<1, common::OverSampling>{BitPos_t{15}},	 // OverSampling
+										Bit<1, usart::OverSampling>{BitPos_t{15}},	 // OverSampling
 										Bit<5>{BitPos_t{16}},												 // Driver Enable De-assertion time
 										Bit<5>{BitPos_t{21}},												 // Driver Enable assertion time
 										Binary<>{BitPos_t{26}},											 // Receiver Timeout Interrupt Enable
@@ -106,7 +106,7 @@ SETUP_REGISTER_INFO(UsartCr2Info,																 /************ Description ****
 										Binary<>{BitPos_t{9}},											 // Clock Phase
 										Binary<>{BitPos_t{10}},											 // Clock Polarity
 										Binary<>{BitPos_t{11}},											 // Clock Enable
-										Bit<2, common::UsartStopbit>{BitPos_t{12}},	 // Stop Bit
+										Bit<2, usart::Stopbit>{BitPos_t{12}},	 // Stop Bit
 										Binary<>{BitPos_t{14}},											 // LIN Mode Enable
 										Binary<>{BitPos_t{15}},											 // Swap TX/RX Pin
 										Binary<>{BitPos_t{16}},											 // RX pin active level Inversion

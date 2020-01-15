@@ -17,33 +17,33 @@
 #pragma once
 
 /**
- * @namespace  cpp_stm32::common
- * @brief      contains common definition for peripherals
+ * @namespace  cpp_stm32::gpio
+ * @brief      contains common definition for gpio
  */
-namespace cpp_stm32::common {
+namespace cpp_stm32::gpio {
 
 /**
- * @enum    GpioPort
- * @brief   GpioPort is a group of GpioPin arranged in a group. The naming convenetion
+ * @enum    Port
+ * @brief   Port is a group of Pin arranged in a group. The naming convenetion
  *          differs from Manufacture to Manufacture, e.g., for STMicroelectronics, the
  *          port is named in alphabetic order; for TI, the port is named in numeric order.
  */
-enum class GpioPort;
+enum class Port;
 
 /**
- * @enum    GpioPin
- * @brief   GpioPort contains multiple Gpio pins, the number of pin in a port varies from
+ * @enum    Pin
+ * @brief   Port contains multiple Gpio pins, the number of pin in a port varies from
  *          Manufacture to Manufacture, e.g., for STMicroelectronics, a port contains 16 pins
  *          , as for TI, a port contains 8 pins.
  */
-enum class GpioPin;
+enum class Pin;
 
-enum class GpioMode;
-enum class GpioPupd;
-enum class GpioOutType;
-enum class GpioOutSpeed;
-enum class GpioAltFunc;
+enum class Mode;
+enum class Pupd;
+enum class OutputType;
+enum class OutputSpeed;
+enum class AltFunc;
 
 enum class PinName;
 
-}	// namespace cpp_stm32::common
+}	 // namespace cpp_stm32::gpio

@@ -62,3 +62,11 @@
 		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                          \
 		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                 \
 	}
+
+/**
+ *
+ */
+#define CREATE_PIN_TABLE(ClassName, ...)                \
+	struct ClassName {                                    \
+		static constexpr std::array PIN_TABLE{__VA_ARGS__}; \
+	}

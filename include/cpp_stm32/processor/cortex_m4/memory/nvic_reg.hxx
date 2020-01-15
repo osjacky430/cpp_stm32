@@ -17,8 +17,8 @@
 #pragma once
 
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
-#include "cpp_stm32/utility/bit.hxx"
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/bit.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32 {
 

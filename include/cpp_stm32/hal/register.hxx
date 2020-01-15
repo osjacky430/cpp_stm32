@@ -21,9 +21,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "cpp_stm32/utility/bit.hxx"
+#include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
-#include "cpp_stm32/utility/mmio.hxx"
+#include "cpp_stm32/hal/mmio.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 namespace cpp_stm32 {

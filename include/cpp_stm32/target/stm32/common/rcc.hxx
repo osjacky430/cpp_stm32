@@ -18,7 +18,7 @@
 
 #include <tuple>
 
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32::stm32::detail {
 

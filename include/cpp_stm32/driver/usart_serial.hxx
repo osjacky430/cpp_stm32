@@ -22,7 +22,7 @@
 
 #include "cpp_stm32/common/usart_common.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
-#include "cpp_stm32/utility/callback.hxx"
+#include "cpp_stm32/hal/callback.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/utility/serial.hxx"
 
@@ -38,7 +38,7 @@ namespace cpp_stm32::driver {
  * @class 	UsartTx
  * @brief		This class is used for static checking to check whether the input pin is available or not
  */
-template <common::PinName TX>
+template <gpio::PinName TX>
 struct UsartTx {
 	using UsartPinMap = Manufacture::UsartPinMap;
 
@@ -48,14 +48,14 @@ struct UsartTx {
 	static constexpr auto TX_IRQ			 = std::get<3>(UsartPinMap::getPinInfo<TX, UsartPinMap::PinInfo::Tx>());
 };
 
-template <common::PinName TX>
+template <gpio::PinName TX>
 static constexpr auto UsartTx_v = UsartTx<TX>{};
 
 /**
  * @class 	UsartRx
  * @brief		This class is used for static checking to check whether the input pin is available or not
  */
-template <common::PinName RX>
+template <gpio::PinName RX>
 struct UsartRx {
 	using UsartPinMap = Manufacture::UsartPinMap;
 
@@ -65,11 +65,11 @@ struct UsartRx {
 	static constexpr auto RX_IRQ			 = std::get<3>(UsartPinMap::getPinInfo<RX, UsartPinMap::PinInfo::Rx>());
 };
 
-template <common::PinName RX>
+template <gpio::PinName RX>
 static constexpr auto UsartRx_v = UsartRx<RX>{};
 
-template <common::PinName TX, common::PinName RX, common::PinName CTS = common::PinName::NC,
-					common::PinName RTS = common::PinName::NC>
+template <gpio::PinName TX, gpio::PinName RX, gpio::PinName CTS = gpio::PinName::NC,
+					gpio::PinName RTS = gpio::PinName::NC>
 class Usart {
  private:
 	static_assert(UsartTx<TX>::TX_USART_NUM == UsartRx<RX>::RX_USART_NUM);
@@ -83,21 +83,21 @@ class Usart {
 	explicit constexpr Usart(std::uint64_t const& t_baud) noexcept {}
 
 	explicit constexpr Usart(UsartTx<TX> const& /*unused*/, UsartRx<RX> const& /*unused*/,
-													 common::Baudrate_t const& t_baud) noexcept {
-		using common::DataBit, common::UsartParity, common::UsartMode, common::HardwareFlowControl, common::UsartStopbit;
-		using common::GpioMode, common::GpioPupd, target_device::StopBit_v;
+													 usart::Baudrate_t const& t_baud) noexcept {
+		using gpio::Pupd, target_device::StopBit_v;
+		using usart::DataBit, usart::Parity, usart::HardwareFlowControl, usart::Stopbit;
 
 		target_device::rcc_enable_periph_clk<USART_RCC>();
 		//
 		GpioUtil<TX, RX>::enableAllGpioClk();
-		GpioUtil<TX, RX>::modeSetup(GpioMode::AltFunc, GpioPupd::None);
+		GpioUtil<TX, RX>::modeSetup(gpio::Mode::AltFunc, Pupd::None);
 		GpioUtil<TX, RX>::alternateFuncSetup(USART_GPIO_AF);
 
-		target_device::usart_set_baudrate<USART_PORT>(t_baud);
-		target_device::usart_set_dps<USART_PORT>(DataBit::DataBit8, UsartParity::None, StopBit_v<UsartStopbit::Bit1>);
+		target_device::set_baudrate<USART_PORT>(t_baud);
+		target_device::set_dps<USART_PORT>(DataBit::DataBit8, Parity::None, StopBit_v<Stopbit::Bit1>);
 
-		target_device::usart_set_transfer_mode<USART_PORT>(UsartMode::TxRx);
-		target_device::usart_set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
+		target_device::set_transfer_mode<USART_PORT>(usart::Mode::TxRx);
+		target_device::set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
 
 		// small overhead here, to eliminate this overhead, change to this line
 		//
@@ -105,18 +105,18 @@ class Usart {
 		//                                       UsartCr1Bit::UE, UsartCr1Bit::M,
 		//                                       UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_set);
 
-		target_device::usart_enable<USART_PORT>();
+		target_device::enable<USART_PORT>();
 	}
 
 	constexpr auto operator<<(char const& t_val) const noexcept {
-		target_device::usart_send<USART_PORT>(static_cast<std::uint8_t>(t_val));
+		target_device::send<USART_PORT>(static_cast<std::uint8_t>(t_val));
 
 		return *this;
 	}
 
 	constexpr auto operator<<(std::string_view const& t_str) const noexcept {
 		for (auto const& val : t_str) {
-			target_device::usart_send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
+			target_device::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}
 
 		return *this;
@@ -125,7 +125,7 @@ class Usart {
 	template <typename T>
 	constexpr auto operator<<(Serializable<T> const& t_struct) const noexcept {
 		for (auto const& val : t_struct.serialize()) {
-			target_device::usart_send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
+			target_device::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}
 
 		return *this;
@@ -140,7 +140,7 @@ class Usart {
 		constexpr Callback<target_device::IRQ_FUNC_HANDLER[to_underlying(USART_IRQ_NUM)]> cb;
 		Interrupt<USART_IRQ_NUM>::attach(cb);
 		nvic_enable_irq<USART_IRQ_NUM>();
-		target_device::usart_enable_txe_irq<USART_PORT>();
+		target_device::enable_txe_irq<USART_PORT>();
 	}
 
 	template <auto F>
@@ -152,7 +152,7 @@ class Usart {
 
 		Interrupt<USART_IRQ_NUM>::attach(t_cb);
 		nvic_enable_irq<USART_IRQ_NUM>();
-		target_device::usart_enable_txe_irq<USART_PORT>();
+		target_device::enable_txe_irq<USART_PORT>();
 	}
 };
 

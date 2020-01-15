@@ -18,7 +18,7 @@
 
 #include <array>
 
-#include "cpp_stm32/utility/callback.hxx"
+#include "cpp_stm32/hal/callback.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 namespace cpp_stm32 {

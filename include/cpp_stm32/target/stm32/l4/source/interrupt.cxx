@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cpp_stm32/target/stm32/l4/interrupt.hxx"
-#include "cpp_stm32/utility/interrupt.hxx"
+#include "cpp_stm32/hal/interrupt.hxx"
 
 namespace cpp_stm32::stm32::l4 {
 

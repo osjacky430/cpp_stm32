@@ -4,14 +4,15 @@
  * @Filename: main.cpp
  */
 
-#include "cpp_stm32/target/stm32/l4/sys_init.hxx"
+#include "sys_init.hxx"
 
 #include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 
 using namespace cpp_stm32::driver;
 using namespace target_device;
-using namespace cpp_stm32::common;
+using namespace cpp_stm32::gpio;
+using namespace cpp_stm32::usart;
 
 int main() {
 	SysClock::init<RccOsc::MsiOsc>();

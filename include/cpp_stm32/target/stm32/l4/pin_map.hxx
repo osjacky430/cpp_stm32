@@ -30,17 +30,17 @@ namespace cpp_stm32::stm32 {
 
 class UsartPinMap {
  private:
-	using PinName						= common::PinName;
-	using UsartAltFuncGroup = std::tuple<l4::UsartNum, common::GpioAltFunc, l4::RccPeriph, IrqNum>;
+	using PinName						= gpio::PinName;
+	using UsartAltFuncGroup = std::tuple<l4::UsartNum, gpio::AltFunc, l4::RccPeriph, IrqNum>;
 
 	static constexpr auto TX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_2, UsartAltFuncGroup{l4::UsartNum::Usart2, common::GpioAltFunc::AF7, l4::RccPeriph::Usart2,
-																							 IrqNum::Usart2Global}},
+		std::pair{PinName::PA_2,
+							UsartAltFuncGroup{l4::UsartNum::Usart2, gpio::AltFunc::AF7, l4::RccPeriph::Usart2, IrqNum::Usart2Global}},
 	};
 
 	static constexpr auto RX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_3, UsartAltFuncGroup{l4::UsartNum::Usart2, common::GpioAltFunc::AF7, l4::RccPeriph::Usart2,
-																							 IrqNum::Usart2Global}},
+		std::pair{PinName::PA_3,
+							UsartAltFuncGroup{l4::UsartNum::Usart2, gpio::AltFunc::AF7, l4::RccPeriph::Usart2, IrqNum::Usart2Global}},
 	};
 
 	static constexpr auto USART_PIN_NAME_TABLE = std::tuple{TX_PIN_NAME_TABLE, RX_PIN_NAME_TABLE};

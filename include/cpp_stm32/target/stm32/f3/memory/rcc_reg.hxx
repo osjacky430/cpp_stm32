@@ -20,9 +20,9 @@
 #include <utility>
 
 #include "cpp_stm32/target/stm32/f3/memory/memory_map.hxx"
-#include "cpp_stm32/utility/bit.hxx"
+#include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32::stm32::f3 {
 

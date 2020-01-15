@@ -23,7 +23,7 @@
 /**
  *	@namespace	common
  */
-namespace cpp_stm32::common {
+namespace cpp_stm32::usart {
 
 /**
  * @defgroup BAUDRATE_DEF_GGROUP		Baudrate related declaration
@@ -55,8 +55,6 @@ constexpr auto operator"" _MBaud(long double t_baud) noexcept {
 	return Baudrate_t{static_cast<std::uint64_t>(t_baud) * 1000000ULL};
 }
 
-/**@}*/
-
 constexpr auto operator"" _MBaud(std::uint64_t t_baud) noexcept { return Baudrate_t{t_baud * 1000000ULL}; }
 
 /**@}*/
@@ -64,8 +62,8 @@ constexpr auto operator"" _MBaud(std::uint64_t t_baud) noexcept { return Baudrat
 enum class DataBit : std::uint8_t;
 enum class HardwareFlowControl : std::uint8_t;
 enum class OverSampling : std::uint8_t;
-enum class UsartMode : std::uint8_t;
-enum class UsartParity : std::uint8_t;
-enum class UsartStopbit : std::uint8_t;
+enum class Mode : std::uint8_t;
+enum class Parity : std::uint8_t;
+enum class Stopbit : std::uint8_t;
 
-}	 // namespace cpp_stm32::common
+}	 // namespace cpp_stm32::usart

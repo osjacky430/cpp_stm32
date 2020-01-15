@@ -19,10 +19,10 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "cpp_stm32/target/stm32/common/macro.hxx"
+#include "cpp_stm32/utility/macro.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
-#include "cpp_stm32/utility/bit.hxx"
-#include "cpp_stm32/utility/register.hxx"
+#include "cpp_stm32/hal/bit.hxx"
+#include "cpp_stm32/hal/register.hxx"
 
 namespace cpp_stm32::stm32::l4 {
 

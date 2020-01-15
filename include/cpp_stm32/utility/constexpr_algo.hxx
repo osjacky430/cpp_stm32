@@ -21,6 +21,7 @@
 #include <utility>
 
 namespace cpp_stm32::cstd {
+
 template <class InputIt, class T>
 constexpr InputIt find(InputIt first, InputIt last, const T& value) {
 	for (; first != last; ++first) {
@@ -141,4 +142,4 @@ constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, Bin
 	return result;
 }
 
-}	// namespace cpp_stm32::cstd
+}	 // namespace cpp_stm32::cstd
