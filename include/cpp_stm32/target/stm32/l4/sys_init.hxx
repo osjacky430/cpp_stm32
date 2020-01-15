@@ -157,7 +157,7 @@ class SysClock {
 					for (auto plln = PllN::MIN; plln < PllN::MAX; ++plln) {
 						if (auto const vco_input_freq = vco_freq / plln;
 								VCO_INPUT_FREQ_MIN <= vco_input_freq && vco_input_freq <= VCO_INPUT_FREQ_MAX) {
-							if (auto const pllm = pll_input_clk_freq / vco_input_freq; PllM::MIN <= pllm && pllm <= PllM::MAX)
+							if (auto const pllm = pll_input_clk_freq / vco_input_freq; 1 <= pllm && pllm <= 7)
 								return std::tuple{pllm, plln, pllr_candidate.first};
 						}
 					}

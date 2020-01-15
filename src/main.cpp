@@ -14,10 +14,9 @@ using namespace target_device;
 using namespace cpp_stm32::common;
 
 int main() {
-	// rcc_enable_periph_clk<RccPeriph::GpioB>();
 	SysClock::init<RccOsc::MsiOsc>();
 
-	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
+	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 9600_Baud};
 	DigitalOut<PinName::PB_3> led;
 
 	while (true) {
@@ -26,7 +25,6 @@ int main() {
 			__asm__("nop");
 		}
 
-		// gpio_toggle<GpioPort::PortB, GpioPin::Pin3>();
 		debugOut << "c\n\r";
 		led.toggle();
 	}

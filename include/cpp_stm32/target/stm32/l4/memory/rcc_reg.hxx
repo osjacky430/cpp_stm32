@@ -121,7 +121,10 @@ static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08};
  * @{
  */
 
-SETUP_LOOKUP_TABLE_WITH_BOUND(PllM, 1, 8);
+SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllM, /**/
+																		 std::pair{1, 0b000}, std::pair{2, 0b001}, std::pair{3, 0b010}, std::pair{4, 0b011},
+																		 std::pair{5, 0b100}, std::pair{6, 0b101}, std::pair{7, 0b110},
+																		 std::pair{8, 0b111});
 
 SETUP_LOOKUP_TABLE_WITH_BOUND(PllN, 8, 86);
 
