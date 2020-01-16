@@ -20,10 +20,9 @@
 
 #include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
-#include "cpp_stm32/target/stm32/common/gpio.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/gpio_reg.hxx"
 
-namespace cpp_stm32::stm32::l4 {
+namespace cpp_stm32::gpio {
 
 /**
  * @brief   This function handles the setup of mode
@@ -31,11 +30,11 @@ namespace cpp_stm32::stm32::l4 {
  * @tparam  Pins      ::Pin
  * @param   t_mode    ::Mode
  */
-template <gpio::Port Port, gpio::Pin... Pins>
-constexpr void set_mode(gpio::Mode const& t_mode) noexcept {
+template <Port Port, Pin... Pins>
+constexpr void set_mode(Mode const& t_mode) noexcept {
 	// do some static assertion
-	// static_assert(Port < gpio::Port::PortJ);
-	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
+	// static_assert(Port < Port::PortJ);
+	reg::MODER<Port>.template setBit<Pins...>(t_mode);
 }
 
 /**
@@ -44,9 +43,9 @@ constexpr void set_mode(gpio::Mode const& t_mode) noexcept {
  * @tparam  Pins    ::Pin
  * @param   t_pupd  ::Pupd
  */
-template <gpio::Port Port, gpio::Pin... Pins>
-constexpr void set_pupd(gpio::Pupd const& t_pupd) noexcept {
-	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
+template <Port Port, Pin... Pins>
+constexpr void set_pupd(Pupd const& t_pupd) noexcept {
+	reg::PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
 /**
@@ -56,10 +55,10 @@ constexpr void set_pupd(gpio::Pupd const& t_pupd) noexcept {
  * @param   t_mode    ::Mode
  * @param   t_pupd    ::Pupd
  */
-template <gpio::Port Port, gpio::Pin... Pins>
-constexpr void mode_setup(gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) noexcept {
-	GPIO_MODER<Port>.template setBit<Pins...>(t_mode);
-	GPIO_PUPDR<Port>.template setBit<Pins...>(t_pupd);
+template <Port Port, Pin... Pins>
+constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
+	reg::MODER<Port>.template setBit<Pins...>(t_mode);
+	reg::PUPDR<Port>.template setBit<Pins...>(t_pupd);
 }
 
 /**
@@ -67,18 +66,18 @@ constexpr void mode_setup(gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) no
  * @tparam  Port      ::Port
  * @tparam  Pins      ::Pin
  */
-template <gpio::Port Port, gpio::Pin... Pins>
+template <Port Port, Pin... Pins>
 constexpr void toggle() noexcept {
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
-	auto const m_odr	 = GPIO_ODR<Port>.template readBit<Pins...>(ValueOnly);
+	auto const m_odr	 = reg::ODR<Port>.template readBit<Pins...>(ValueOnly);
 	auto const mod_val = bit_group_cat(~m_odr, m_odr);
 
 	// this is a bit hacky IMO, but can't come up with a better idea
 	// @todo perhap add index rule in register class
 	// @todo maybe group bits in SETUP_REGISTER_INFO macro, e.g.
 	//			 SETUP_REGISTER_INFO(GpioBsrrInfo, {Bit<>{0}, Bit<>{16}, {...}})
-	GPIO_BSRR<Port>.template setBit<Pins..., gpio::Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
+	reg::BSRR<Port>.template setBit<Pins..., Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
 /**
@@ -87,31 +86,31 @@ constexpr void toggle() noexcept {
  * @tparam    Pins    ::Pin
  * @param     t_af    ::AltFunc
  */
-template <gpio::Port Port, gpio::Pin... Pins>
-constexpr void set_alternate_function(gpio::AltFunc const& t_af) noexcept {
-	constexpr auto Pin7				 = gpio::Pin::Pin7;
+template <Port Port, Pin... Pins>
+constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
+	constexpr auto Pin7				 = Pin::Pin7;
 	constexpr auto cast_to_int = [](auto const& t_val) {
 		return to_underlying(t_val);
 	};	// to prevent internal compiler error
 	if constexpr (((Pins <= Pin7) || ...)) {
-		constexpr auto low_pin_group = [](gpio::Pin t_pin) {
+		constexpr auto low_pin_group = [](Pin t_pin) {
 			if (t_pin <= Pin7) {
 				return t_pin;
 			}
 		};
 
-		GPIO_AFRL<Port>.template setBit<low_pin_group(Pins)...>(t_af);
+		reg::AFRL<Port>.template setBit<low_pin_group(Pins)...>(t_af);
 	}
 
 	if constexpr (((Pins > Pin7) || ...)) {
-		constexpr auto high_pin_group = [](gpio::Pin t_pin) {
+		constexpr auto high_pin_group = [](Pin t_pin) {
 			if (t_pin > Pin7) {
-				return gpio::Pin{cast_to_int(t_pin) - 8};
+				return Pin{cast_to_int(t_pin) - 8};
 			}
 		};
 
-		GPIO_AFRH<Port>.template setBit<high_pin_group(Pins)...>(t_af);
+		reg::AFRH<Port>.template setBit<high_pin_group(Pins)...>(t_af);
 	}
 }
 
-}	 // namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::gpio

@@ -22,8 +22,9 @@
 #include <utility>
 
 #include "cpp_stm32/hal/bit.hxx"
-#include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/hal/mmio.hxx"
+#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/utility/integral_constant.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 namespace cpp_stm32 {
@@ -251,7 +252,7 @@ class Register {
 
 		const auto current_val = readCurrentVal<BitIdx...>();
 
-		const auto mod_val		= (... | mod_val_for_each_bit(ConstIndexType<to_underlying(BitIdx)>{}, t_param));
+		const auto mod_val		= (... | mod_val_for_each_bit(size_c<to_underlying(BitIdx)>{}, t_param));
 		const auto clear_mask = ~(... | get_bit<BitList, to_underlying(BitIdx)>().mask);
 
 		readReg() = ((current_val & clear_mask) | mod_val);
@@ -360,4 +361,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

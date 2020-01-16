@@ -19,45 +19,49 @@
 #include <cstdint>
 #include <tuple>
 
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
+#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 
-namespace cpp_stm32::stm32::f4 {
-
-static constexpr auto PWR_BASE = memory_at(PeriphAddr::Apb1Base, 0x7000U);
-
-/**
- * @defgroup  PWR_CR_GROUP		Power Control Register Group
- * @{
- */
+namespace cpp_stm32::pwr {
 
 enum class VoltageScale;
+
+}
+
+namespace cpp_stm32::pwr::reg {
+
+static constexpr auto BASE_ADDR = memory_at(PeriphAddr::Apb1Base, 0x7000U);
+
+/**
+ * @defgroup  CR_GROUP		Power Control Register Group
+ * @{
+ */
 
 SETUP_REGISTER_INFO(PwrCrInfo, /**/
 										Bit<2, VoltageScale>{BitPos_t{14}}, Binary<>{BitPos_t{16}}, Binary<>{BitPos_t{17}})
 
-enum class PwrCrBit {
+enum class CrBit {
 	Vos,
 	OdEn,
 	OdSwEn,
 };
 
-static constexpr Register<PwrCrInfo, PwrCrBit> PWR_CR{PWR_BASE, 0x00U};
+static constexpr Register<PwrCrInfo, CrBit> CR{BASE_ADDR, 0x00U};
 
 /**@}*/
 
 /**
- * @defgroup  PWR_CSR_GROUP		Power Control Status Register Group
+ * @defgroup  CSR_GROUP		Power Control Status Register Group
  * @{
  */
 
 SETUP_REGISTER_INFO(PwrCsrInfo, /**/
 										StatusBit<1>{BitPos_t{14}}, StatusBit<1>{BitPos_t{16}}, StatusBit<1>{BitPos_t{17}})
 
-enum class PwrCsrBit { VosRdy, OdrRdy, OdrSwRdy };
+enum class CsrBit { VosRdy, OdrRdy, OdrSwRdy };
 
-static constexpr Register<PwrCsrInfo, PwrCsrBit> PWR_CSR{PWR_BASE, 0x04U};
+static constexpr Register<PwrCsrInfo, CsrBit> CSR{BASE_ADDR, 0x04U};
 /**@}*/
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::pwr::reg

@@ -18,39 +18,37 @@
 
 #include "cpp_stm32/target/stm32/f4/memory/pwr_reg.hxx"
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::pwr {
 
 enum class VoltageScale { Scale1Mode = 0b11, Scale2Mode = 0b10, Scale3Mode = 0b01 };
 
 // only set with pll is enabled
 // @ref https://community.st.com/s/question/0D50X0000A4qUmwSQE/more-documentation-about-vosrdy
-constexpr auto pwr_is_vos_rdy() noexcept { return get<0>(PWR_CSR.readBit<PwrCsrBit::VosRdy>(ValueOnly)); }
+constexpr auto is_vos_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::VosRdy>(ValueOnly)); }
 
-constexpr void pwr_enable_overdrive() noexcept { PWR_CR.setBit<PwrCrBit::OdEn>(); }
+constexpr void enable_overdrive() noexcept { reg::CR.setBit<reg::CrBit::OdEn>(); }
 
-constexpr void pwr_enable_overdrive_switch() noexcept { PWR_CR.setBit<PwrCrBit::OdSwEn>(); }
+constexpr void enable_overdrive_switch() noexcept { reg::CR.setBit<reg::CrBit::OdSwEn>(); }
 
-constexpr auto pwr_is_overdrive_rdy() noexcept { return get<0>(PWR_CSR.readBit<PwrCsrBit::OdrRdy>(ValueOnly)); }
+constexpr auto is_overdrive_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::OdrRdy>(ValueOnly)); }
 
-constexpr auto pwr_is_overdrive_switch_rdy() noexcept {
-	return get<0>(PWR_CSR.readBit<PwrCsrBit::OdrSwRdy>(ValueOnly));
-}
+constexpr auto is_overdrive_switch_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::OdrSwRdy>(ValueOnly)); }
 
-constexpr void pwr_wait_vos_rdy() noexcept {
-	while (pwr_is_vos_rdy() != 1) {
+constexpr void wait_vos_rdy() noexcept {
+	while (is_vos_rdy() != 1) {
 	}
 }
 
-constexpr void pwr_wait_overdrive_rdy() noexcept {
-	while (pwr_is_overdrive_rdy() != 1) {
+constexpr void wait_overdrive_rdy() noexcept {
+	while (is_overdrive_rdy() != 1) {
 	}
 }
 
-constexpr void pwr_wait_overdrive_switch_rdy() noexcept {
-	while (pwr_is_overdrive_switch_rdy() != 1) {
+constexpr void wait_overdrive_switch_rdy() noexcept {
+	while (is_overdrive_switch_rdy() != 1) {
 	}
 }
 
-constexpr void pwr_set_voltage_scale(VoltageScale const& t_val) noexcept { PWR_CR.setBit<PwrCrBit::Vos>(t_val); }
+constexpr void set_voltage_scale(VoltageScale const& t_val) noexcept { reg::CR.setBit<reg::CrBit::Vos>(t_val); }
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::pwr

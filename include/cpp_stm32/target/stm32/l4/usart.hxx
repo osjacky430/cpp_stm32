@@ -43,36 +43,37 @@ enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
 enum class Parity : std::uint8_t { Even, Odd, None };
 enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
 
-}	 // namespace cpp_stm32::usart
-
-namespace cpp_stm32::stm32::l4 {
-
 template <usart::Stopbit StopBit>
 using StopBit_t = std::integral_constant<decltype(StopBit), StopBit>;
 
 template <usart::Stopbit StopBit>
 static constexpr StopBit_t<StopBit> StopBit_v{};
 
-template <UsartNum Port>
+/**
+ * [set_baudrate description]
+ * @param  t_baud [description]
+ * @return        [description]
+ */
+template <Port InputPort>
 constexpr auto set_baudrate(usart::Baudrate_t const& t_baud) noexcept {
-	constexpr auto clk_freq = (Port == UsartNum::Usart1 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
+	constexpr auto clk_freq = (InputPort == Port::Usart1 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
 
 	std::uint16_t const usart_div =
 		(clk_freq + t_baud.get() / 2) / t_baud.get();	 // round (avoiding floating point arithmetic)
 
-	USART_BRR<Port>.template setBit<UsartBrrBit::Brr>(usart_div);
+	reg::BRR<InputPort>.template setBit<reg::BrrBit::Brr>(usart_div);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void set_databit(usart::DataBit const& t_d_bit) noexcept {
 	std::uint8_t const m1 = (to_underlying(t_d_bit) & 0b10) != 0;
 	std::uint8_t const m0 = (to_underlying(t_d_bit) & 0b01);
 
 	auto const val_to_write = BitGroup{m1, m0};
-	USART_CR1<Port>.template setBit<UsartCr1Bit::M1, UsartCr1Bit::M0>(val_to_write);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0>(val_to_write);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ctl) noexcept {
 	// @todo : static_assert (UART4 and UART5)
 	using usart::HardwareFlowControl;
@@ -82,80 +83,80 @@ constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ct
 	std::uint8_t const cts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
 	std::uint8_t const rts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
 	auto const val_to_write = BitGroup{rts, cts};
-	USART_CR3<Port>.template setBit<UsartCr3Bit::RTSE, UsartCr3Bit::CTSE>(val_to_write);
+	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(val_to_write);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void set_transfer_mode(usart::Mode const& t_mode) noexcept {
 	using usart::Mode;
 
 	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
 	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
 	auto const val_to_write = BitGroup{txe, rxe};
-	USART_CR1<Port>.template setBit<UsartCr1Bit::TE, UsartCr1Bit::RE>(val_to_write);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(val_to_write);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void set_parity(usart::Parity const& t_parity) noexcept {
 	using usart::Parity;
 
 	std::uint8_t const pe		= (t_parity != Parity::None);
 	auto const val_to_write = BitGroup{pe, t_parity};
-	USART_CR1<Port>.template setBit<UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_write);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
 }
 
-template <UsartNum Port, usart::Stopbit StopBit>
+template <Port InputPort, usart::Stopbit StopBit>
 constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
 	// static_assert()
-	USART_CR2<Port>.template setBit<UsartCr2Bit::Stop>(StopBit);
+	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(StopBit);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void send(std::uint8_t const& t_data) noexcept {
-	USART_TDR<Port>.template setBit<UsartTDrBit::TDr>(t_data);
+	reg::TDR<InputPort>.template setBit<reg::TDrBit::TDr>(t_data);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr auto receive() noexcept {
-	return get<0>(USART_RDR<Port>.template readBit<UsartRDrBit::RDr>(ValueOnly));
+	return get<0>(reg::RDR<InputPort>.template readBit<reg::RDrBit::RDr>(ValueOnly));
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr auto is_tx_empty() noexcept {
 	// 0: data is not transferred to shift register
 	// 1: data is transferred to shift register
-	return get<0>(USART_ISR<Port>.template readBit<UsartISrBit::TxE>(ValueOnly)) != 0;
+	return get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::TxE>(ValueOnly)) != 0;
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr auto is_rx_empty() noexcept {
-	return get<0>(USART_ISR<Port>.template readBit<UsartISrBit::RxNE>(ValueOnly)) == 0;
+	return get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::RxNE>(ValueOnly)) == 0;
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr auto wait_rx_not_empty() noexcept {
-	while (is_rx_empty<Port>()) {
+	while (is_rx_empty<InputPort>()) {
 	}
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void wait_tx_rdy() noexcept {
-	while (!is_tx_empty<Port>()) {
+	while (!is_tx_empty<InputPort>()) {
 	}
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr auto send_blocking(std::uint8_t const& t_data) noexcept {
-	send<Port>(t_data);
-	wait_tx_rdy<Port>();
+	send<InputPort>(t_data);
+	wait_tx_rdy<InputPort>();
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void enable() noexcept {
-	USART_CR1<Port>.template setBit<UsartCr1Bit::UE>();
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::UE>();
 }
 
-template <UsartNum Port, usart::Stopbit Stop>
+template <Port InputPort, usart::Stopbit Stop>
 constexpr void set_dps(usart::DataBit const& t_d, usart::Parity const& t_p,
 											 StopBit_t<Stop> const& /*unused*/) noexcept {
 	using usart::Parity;
@@ -165,18 +166,19 @@ constexpr void set_dps(usart::DataBit const& t_d, usart::Parity const& t_p,
 	std::uint8_t const d0 = (to_underlying(t_d) & 0b01);
 
 	auto const val_to_write = BitGroup{d1, d0, pe, t_p};
-	USART_CR1<Port>.template setBit<UsartCr1Bit::M1, UsartCr1Bit::M0, UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_write);
-	USART_CR2<Port>.template setBit<UsartCr2Bit::Stop>(Stop);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(
+		val_to_write);
+	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(Stop);
 }
 
-template <UsartNum Port>
+template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
-	USART_CR1<Port>.template setBit<UsartCr1Bit::TxEIE>();
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
 }
 
-template <UsartNum Port, UsartIcrBit flag>
+template <Port InputPort, reg::IcrBit flag>
 constexpr void clear_flag() noexcept {
-	USART_ICR<Port>.template setBit<flag>();
+	reg::ICR<InputPort>.template setBit<flag>();
 }
 
-}	 // namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::usart

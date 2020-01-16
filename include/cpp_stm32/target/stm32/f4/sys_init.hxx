@@ -117,9 +117,9 @@ class SysClock {
 		};
 	};
 
-	template <RccOsc PllSrc>
+	template <ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() {
-		constexpr auto pll_input_clk_freq = (PllSrc == RccOsc::HseOsc ? HSE_CLK_FREQ : HSI_CLK_FREQ);
+		constexpr auto pll_input_clk_freq = (PllSrc == ClkSrc::Hse ? HSE_CLK_FREQ : HSI_CLK_FREQ);
 		constexpr auto pllm = static_cast<std::uint32_t>(std::ceil(pll_input_clk_freq / RECOMMEND_VCO_INPUT_FREQ));
 		constexpr auto vco_input_freq = pll_input_clk_freq / pllm;
 		constexpr auto plln_over_pllp = SYS_CLK_FREQ / vco_input_freq;
@@ -144,7 +144,7 @@ class SysClock {
 	}
 
  public:
-	static constexpr auto CPU_WAIT_STATE = FlashWaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ_);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ_);
 
 	static constexpr auto NEED_OVERDRIVE =
 		(APB1_CLK_FREQ >= APB1_FREQ_MAX_NO_OVERDRIVE || APB2_CLK_FREQ >= APB2_FREQ_MAX_NO_OVERDRIVE ||
@@ -152,11 +152,11 @@ class SysClock {
 
 	static constexpr auto VOLTAGE_SCALE = []() {
 		if constexpr (NEED_OVERDRIVE || AHB_CLK_FREQ >= AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
-			return VoltageScale::Scale1Mode;
+			return pwr::VoltageScale::Scale1Mode;
 		} else if constexpr (AHB_CLK_FREQ >= AHB_VOS_SCALE1_MAX_FREQ) {
-			return VoltageScale::Scale2Mode;
+			return pwr::VoltageScale::Scale2Mode;
 		} else {
-			return VoltageScale::Scale3Mode;
+			return pwr::VoltageScale::Scale3Mode;
 		}
 	}();
 
@@ -174,15 +174,15 @@ class SysClock {
 	template <SysClk SystemClock = SYS_CLK_SRC>
 	static constexpr void init() noexcept {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
-			rcc_bypass_clksrc<RccOsc::HseOsc>();
+			rcc_bypass_clksrc<ClkSrc::Hse>();
 		}
 	}
 
 	// @todo, this is a bit strange
-	template <RccOsc PllSrc, typename = std::enable_if_t<is_pll_clk_src<PllSrc>>>
+	template <ClkSrc PllSrc, typename = std::enable_if_t<is_pll_clk_src<PllSrc>>>
 	static constexpr void init() noexcept {
 		if constexpr (HSE_BYPASS_CLK_SRC) {
-			rcc_bypass_clksrc<RccOsc::HseOsc>();
+			rcc_bypass_clksrc<ClkSrc::Hse>();
 		}
 
 		// enable PLL Clock Src, i.e., HSE or HSI
@@ -193,29 +193,29 @@ class SysClock {
 		{	 // operations that requires PLL off
 			auto const& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
 
-			rcc_disable_clk<RccOsc::PllOsc>();
+			rcc_disable_clk<ClkSrc::Pll>();
 			rcc_set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
-			rcc_enable_periph_clk<RccPeriph::Pwr>();
-			pwr_set_voltage_scale(VOLTAGE_SCALE);
+			rcc_enable_periph_clk<PeriphClk::Pwr>();
+			pwr::set_voltage_scale(VOLTAGE_SCALE);
 		}
 
-		rcc_enable_clk<RccOsc::PllOsc>();
+		rcc_enable_clk<ClkSrc::Pll>();
 
 		if constexpr (NEED_OVERDRIVE) {
-			pwr_enable_overdrive();
-			pwr_wait_overdrive_rdy();
+			pwr::enable_overdrive();
+			pwr::wait_overdrive_rdy();
 
-			pwr_enable_overdrive_switch();
-			pwr_wait_overdrive_switch_rdy();
+			pwr::enable_overdrive_switch();
+			pwr::wait_overdrive_switch_rdy();
 		}
 
-		constexpr auto flash_wait_state = FlashLatency{CpuWaitState_v<CPU_WAIT_STATE>};
-		flash_config_access_ctl<ARTAccel::InstructCache, ARTAccel::DataCache>(flash_wait_state);
+		constexpr auto wait_state = flash::Latency{flash::CpuWaitState_v<CPU_WAIT_STATE>};
+		flash::config_access_ctl<flash::ARTAccel::InstructCache, flash::ARTAccel::DataCache>(wait_state);
 
 		auto const& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
 		rcc_config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc_wait_osc_rdy<RccOsc::PllOsc>();	 // wait for PLL lock
+		rcc_wait_osc_rdy<ClkSrc::Pll>();	 // wait for PLL lock
 
 		// switch sysclk and wait ready
 		rcc_set_sysclk<SYS_CLK_SRC>();

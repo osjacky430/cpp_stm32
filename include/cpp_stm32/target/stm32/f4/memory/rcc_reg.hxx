@@ -17,12 +17,15 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <utility>
 
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
 #include "cpp_stm32/hal/bit.hxx"
-#include "cpp_stm32/utility/constexpr_algo.hxx"
 #include "cpp_stm32/hal/register.hxx"
+#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/utility/constexpr_algo.hxx"
+
+#include "cpp_stm32/utility/integral_constant.hxx"
 
 // temporary
 #include "cpp_stm32/utility/macro.hxx"
@@ -32,18 +35,12 @@ namespace cpp_stm32::stm32::f4 {
 static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
 
 template <std::uint32_t Val>
-static constexpr auto Frequency_t = std::integral_constant<std::uint32_t, Val>;
-
-template <std::uint32_t Val>
-static constexpr auto Frequency_v = Frequency_t<Val>{};
-
-template <std::uint32_t Val>
 using DivisionFactor_t = std::integral_constant<std::uint32_t, Val>;
 
 template <std::uint32_t Val>
 static constexpr auto DivisionFactor_v = DivisionFactor_t<Val>{};
 
-enum class RccOsc : std::uint32_t;
+enum class ClkSrc : std::uint32_t;
 
 /**
  * @defgroup	RCC_CR_GROUP		RCC Control Register Group
@@ -123,7 +120,7 @@ SETUP_LOOKUP_TABLE_WITH_BOUND(PllR, 2, 7);
 
 SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
 										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
-										Bit<1, RccOsc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}})
+										Bit<1, ClkSrc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}})
 
 enum class RccPllCfgBit { PLLM, PLLN, PLLP, PLLSRC, PLLQ, PLLR };
 

@@ -11,11 +11,12 @@
 
 using namespace cpp_stm32::driver;
 using namespace target_device;
+using namespace cpp_stm32;
 using namespace cpp_stm32::gpio;
 using namespace cpp_stm32::usart;
 
 int main() {
-	SysClock::init<RccOsc::MsiOsc>();
+	sys::Clock::init<rcc::ClkSrc::Msi>();
 
 	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 9600_Baud};
 	DigitalOut<PinName::PB_3> led;

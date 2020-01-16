@@ -18,12 +18,12 @@
 
 #include <optional>
 
-#include "cpp_stm32/target/stm32/common/rcc.hxx"
+#include "cpp_stm32/common/rcc.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/rcc_reg.hxx"
 
-namespace cpp_stm32::stm32::l4 {
+namespace cpp_stm32::rcc {
 
-enum class RccPeriph : std::uint32_t {
+enum class PeriphClk : std::uint32_t {
 
 	GpioA,
 	GpioB,
@@ -37,9 +37,9 @@ enum class RccPeriph : std::uint32_t {
 };
 
 /**
- *  @enum 	RccOsc
+ *  @enum 	ClkSrc
  */
-enum class RccOsc : std::uint32_t { Hsi48Osc, MsiOsc, Hsi16Osc, HseOsc, PllOsc, PllSaiOsc, LseOsc, LsiOsc };
+enum class ClkSrc : std::uint32_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, Lsi };
 
 /**
  * 	@enum 	SysClk
@@ -53,17 +53,17 @@ enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
 
 /**
  * @brief		This function transform rcc enum to its equivalent sys enum
- * @param 	t_rcc  see ::RccOsc
+ * @param 	t_rcc  see ::ClkSrc
  */
-static constexpr auto rcc_to_sys_enum = [](RccOsc t_rcc) {
+static constexpr auto to_sys_clk = [](ClkSrc t_rcc) {
 	switch (t_rcc) {
-		case RccOsc::Hsi16Osc:
+		case ClkSrc::Hsi160:
 			return SysClk::Hsi16;
-		case RccOsc::MsiOsc:
+		case ClkSrc::Msi:
 			return SysClk::Msi;
-		case RccOsc::HseOsc:
+		case ClkSrc::Hse:
 			return SysClk::Hse;
-		case RccOsc::PllOsc:
+		case ClkSrc::Pll:
 			return SysClk::Pll;
 		default:
 			break;
@@ -73,11 +73,11 @@ static constexpr auto rcc_to_sys_enum = [](RccOsc t_rcc) {
 /**
  *
  */
-template <RccOsc Clk>
-static constexpr bool is_ext_clk = (Clk == RccOsc::HseOsc || Clk == RccOsc::LseOsc);
+template <ClkSrc Clk>
+static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 
-template <RccOsc Clk>
-static constexpr bool is_pll_clk_src = (Clk == RccOsc::HseOsc || Clk == RccOsc::Hsi16Osc || Clk == RccOsc::MsiOsc);
+template <ClkSrc Clk>
+static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi160 || Clk == ClkSrc::Msi);
 
 class RccRegTable {
 	// template <std::size_t Idx>
@@ -85,141 +85,162 @@ class RccRegTable {
 
  private:
 	static constexpr std::tuple RccPeriphRst{
-		std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioARst},
-		std::pair{RCC_AHB2RST, RccAhb2RstBit::GpioBRst},
+		std::pair{reg::AHB2RST, reg::Ahb2RstBit::GpioARst},
+		std::pair{reg::AHB2RST, reg::Ahb2RstBit::GpioBRst},
 		/*APB1*/
-		std::pair{RCC_APB1RST_1, RccApb1Rst1Bit::Usart2Rst},
-		// std::pair{RCC_APB1RST, RccApb1RstBit::PwrRst},
+		std::pair{reg::APB1RST_1, reg::Apb1Rst1Bit::Usart2Rst},
+		// std::pair{reg::APB1RST, RccApb1RstBit::PwrRst},
 		/*APB2*/
-		std::pair{RCC_APB2RST, RccApb2RstBit::Usart1Rst},
+		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart1Rst},
 	};
 
 	static constexpr std::tuple RccPeriphEn{
-		std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioAEn},
-		std::pair{RCC_AHB2ENR, RccAhb2EnrBit::GpioBEn},
+		std::pair{reg::AHB2ENR, reg::Ahb2EnrBit::GpioAEn},
+		std::pair{reg::AHB2ENR, reg::Ahb2EnrBit::GpioBEn},
 		/*APB1*/
-		std::pair{RCC_APB1ENR_1, RccApb1Enr1Bit::Usart2En},
-		// std::pair{RCC_APB1ENR, RccApb1EnrBit::PwrEn},
+		std::pair{reg::APB1ENR_1, reg::Apb1Enr1Bit::Usart2En},
+		// std::pair{reg::APB1ENR, RccApb1EnrBit::PwrEn},
 		/*APB2*/
-		std::pair{RCC_APB2ENR, RccApb2EnrBit::Usart1En},
+		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart1En},
 	};
 
 	static constexpr std::tuple RccOscOn{
-		std::pair{RCC_CRRCR, RccCrrCrBit::Hsi48On}, std::pair{RCC_CR, RccCrBit::MsiOn},
-		std::pair{RCC_CR, RccCrBit::HsiOn},					std::pair{RCC_CR, RccCrBit::HseOn},
-		std::pair{RCC_CR, RccCrBit::PllOn},					std::pair{RCC_CR, RccCrBit::PllSaiOn},
+		std::pair{reg::CRRCR, reg::CrrCrBit::Hsi48On}, std::pair{reg::CR, reg::CrBit::MsiOn},
+		std::pair{reg::CR, reg::CrBit::HsiOn},				 std::pair{reg::CR, reg::CrBit::HseOn},
+		std::pair{reg::CR, reg::CrBit::PllOn},				 std::pair{reg::CR, reg::CrBit::PllSaiOn},
 	};
 
 	static constexpr std::tuple RccOscRdy{
-		std::pair{RCC_CRRCR, RccCrrCrBit::Hsi48Rdy}, std::pair{RCC_CR, RccCrBit::MsiRdy},
-		std::pair{RCC_CR, RccCrBit::HsiRdy},				 std::pair{RCC_CR, RccCrBit::HseRdy},
-		std::pair{RCC_CR, RccCrBit::PllRdy},				 std::pair{RCC_CR, RccCrBit::PllSaiRdy},
+		std::pair{reg::CRRCR, reg::CrrCrBit::Hsi48Rdy}, std::pair{reg::CR, reg::CrBit::MsiRdy},
+		std::pair{reg::CR, reg::CrBit::HsiRdy},					std::pair{reg::CR, reg::CrBit::HseRdy},
+		std::pair{reg::CR, reg::CrBit::PllRdy},					std::pair{reg::CR, reg::CrBit::PllSaiRdy},
 	};
 
 	static constexpr std::tuple ExtBypass{
-		std::pair{RCC_CR, RccCrBit::HseByp},
-		std::pair{RCC_BDCR, RccBdcrBit::LseByp},
+		std::pair{reg::CR, reg::CrBit::HseByp},
+		std::pair{reg::BDCR, reg::BdcrBit::LseByp},
 	};
 
  public:
 	// friend?
-	template <RccPeriph PeriphClk>
+	template <PeriphClk PeriphClk>
 	[[nodiscard]] static constexpr auto getPeriphEnReg() noexcept {
 		return std::get<to_underlying(PeriphClk)>(RccPeriphEn);
 	}
 
-	template <RccPeriph PeriphClk>
+	template <PeriphClk PeriphClk>
 	[[nodiscard]] static constexpr auto getPeriphRstReg() noexcept {
 		return std::get<to_underlying(PeriphClk)>(RccPeriphRst);
 	}
 
-	template <RccOsc Clk>
+	template <ClkSrc Clk>
 	[[nodiscard]] static constexpr auto const getOscOnReg() noexcept {
 		return std::get<to_underlying(Clk)>(RccOscOn);
 	}
 
-	template <RccOsc Clk>
+	template <ClkSrc Clk>
 	[[nodiscard]] static constexpr auto const getOscRdyReg() noexcept {
 		return std::get<to_underlying(Clk)>(RccOscRdy);
 	}
 
-	template <RccOsc Clk>
+	template <ClkSrc Clk>
 	[[nodiscard]] static constexpr auto const& getExtBypassReg() noexcept {
 		static_assert(is_ext_clk<Clk>);
-		if constexpr (Clk == RccOsc::HseOsc) {
+		if constexpr (Clk == ClkSrc::Hse) {
 			return std::get<0>(ExtBypass);
-		} else if constexpr (Clk == RccOsc::LseOsc) {
+		} else if constexpr (Clk == ClkSrc::Lse) {
 			return std::get<1>(ExtBypass);
 		}
 	}
 };
 
-template <RccPeriph PeriphClk>
-static constexpr void rcc_enable_periph_clk() noexcept {
-	detail::rcc_enable_periph_clk_impl<RccRegTable, RccPeriph, PeriphClk>();
+template <PeriphClk PeriphClk>
+static constexpr void enable_periph_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getPeriphEnReg<PeriphClk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<enable_bit>();
 }
 
-template <RccPeriph PeriphClk>
-static constexpr void rcc_reset_periph_clk() noexcept {
-	detail::rcc_reset_periph_clk_impl<RccRegTable, RccPeriph, PeriphClk>();
+template <PeriphClk PeriphClk>
+static constexpr void reset_periph_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getOscOnReg<PeriphClk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<enable_bit>();
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_enable_clk() noexcept {
-	detail::rcc_enable_clk_impl<RccRegTable, RccOsc, Clk>();
+template <ClkSrc Clk>
+static constexpr void enable_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getOscOnReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<enable_bit>();
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_disable_clk() noexcept {
-	detail::rcc_disable_clk_impl<RccRegTable, RccOsc, Clk>();
+template <ClkSrc Clk>
+static constexpr void disable_clk() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getOscOnReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<enable_bit>();
 }
 
-template <RccOsc Clk>
-static constexpr bool rcc_is_osc_rdy() noexcept {
-	return detail::rcc_is_osc_rdy_impl<RccRegTable, RccOsc, Clk>();
+template <ClkSrc Clk>
+static constexpr bool is_osc_rdy() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getOscRdyReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const rdy_bit			= std::get<1>(reg_bit_pair);
+	return get<0>(CTL_REG.template readBit<rdy_bit>(ValueOnly));
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_wait_osc_rdy() noexcept {
-	while (!rcc_is_osc_rdy<Clk>()) {
+template <ClkSrc Clk>
+static constexpr void wait_osc_rdy() noexcept {
+	while (!is_osc_rdy<Clk>()) {
 	}
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_bypass_clksrc() noexcept {
-	detail::rcc_bypass_clksrc_impl<RccRegTable, RccOsc, Clk>();
+template <ClkSrc Clk>
+static constexpr void bypass_clksrc() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getExtBypassReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<bypass_bit>();
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_no_bypass() noexcept {
-	detail::rcc_no_bypass_impl<RccRegTable, RccOsc, Clk>();
-}
-
-template <SysClk Clk>
-static constexpr void rcc_set_sysclk() noexcept {
-	RCC_CFGR.template setBit<RccCfgBit::SW>(Clk);
-}
-
-static constexpr SysClk rcc_sysclk_in_use() noexcept {
-	return get<0>(RCC_CFGR.readBit<RccCfgBit::SWS>(ValueOnly));	 //
+template <ClkSrc Clk>
+static constexpr void no_bypass() noexcept {
+	constexpr auto const reg_bit_pair = RccRegTable::template getExtBypassReg<Clk>();
+	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<bypass_bit>();
 }
 
 template <SysClk Clk>
-static constexpr void rcc_wait_sysclk_rdy() noexcept {
-	while (rcc_sysclk_in_use() != Clk) {
+static constexpr void set_sysclk() noexcept {
+	reg::CFGR.template setBit<reg::CfgBit::SW>(Clk);
+}
+
+static constexpr SysClk sysclk_in_use() noexcept {
+	return get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	//
+}
+
+template <SysClk Clk>
+static constexpr void wait_sysclk_rdy() noexcept {
+	while (sysclk_in_use() != Clk) {
 	}
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_set_pllsrc() {
+template <ClkSrc Clk>
+static constexpr void set_pllsrc() {
 	static_assert(is_pll_clk_src<Clk>);
-	RCC_PLLCFGR.template setBit<RccPllCfgBit::PllSrc>(Clk);
+	reg::PLLCFGR.template setBit<reg::PllCfgBit::PllSrc>(Clk);
 }
 
-static constexpr void rcc_config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln,
-																										 std::optional<PllP> const& t_pllp = std::nullopt,
-																										 std::optional<PllQ> const& t_pllq = std::nullopt,
-																										 std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
+static constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln,
+																								 std::optional<PllP> const& t_pllp = std::nullopt,
+																								 std::optional<PllQ> const& t_pllq = std::nullopt,
+																								 std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
 	std::uint8_t const enable_pllp = static_cast<bool>(t_pllp);
 	std::uint8_t const enable_pllq = static_cast<bool>(t_pllq);
 	std::uint8_t const enable_pllr = static_cast<bool>(t_pllr);
@@ -229,15 +250,16 @@ static constexpr void rcc_config_pll_division_factor(PllM const& t_pllm, PllN co
 	auto const pllr_val		= t_pllr.value_or(PllR{DivisionFactor_v<2>});
 	auto const val_to_set = BitGroup{t_pllm, t_plln, pllp_val, enable_pllp, pllq_val, enable_pllq, pllr_val, enable_pllr};
 
-	RCC_PLLCFGR.setBit<RccPllCfgBit::PllM, RccPllCfgBit::PllN, RccPllCfgBit::PllP, RccPllCfgBit::PllPEn,
-										 RccPllCfgBit::PllQ, RccPllCfgBit::PllQEn, RccPllCfgBit::PllR, RccPllCfgBit::PllREn>(val_to_set);
+	reg::PLLCFGR.setBit<reg::PllCfgBit::PllM, reg::PllCfgBit::PllN, reg::PllCfgBit::PllP, reg::PllCfgBit::PllPEn,
+											reg::PllCfgBit::PllQ, reg::PllCfgBit::PllQEn, reg::PllCfgBit::PllR, reg::PllCfgBit::PllREn>(
+		val_to_set);
 }
 
-template <RccOsc Clk>
-static constexpr void rcc_set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln,
-																										std::optional<PllP> const& t_pllp = std::nullopt,
-																										std::optional<PllQ> const& t_pllq = std::nullopt,
-																										std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
+template <ClkSrc Clk>
+static constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln,
+																								std::optional<PllP> const& t_pllp = std::nullopt,
+																								std::optional<PllQ> const& t_pllq = std::nullopt,
+																								std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 
 	std::uint8_t const enable_pllp = static_cast<bool>(t_pllp);
@@ -248,20 +270,20 @@ static constexpr void rcc_set_pllsrc_and_div_factor(PllM const& t_pllm, PllN con
 	auto const pllq_val = t_pllq.value_or(PllQ{DivisionFactor_v<2>});
 	auto const pllr_val = t_pllr.value_or(PllR{DivisionFactor_v<2>});
 	BitGroup const val_to_set{Clk, t_pllm, t_plln, pllp_val, enable_pllp, pllq_val, enable_pllq, pllr_val, enable_pllr};
-	RCC_PLLCFGR
-		.setBit<RccPllCfgBit::PllSrc, RccPllCfgBit::PllM, RccPllCfgBit::PllN, RccPllCfgBit::PllP, RccPllCfgBit::PllPEn,
-						RccPllCfgBit::PllQ, RccPllCfgBit::PllQEn, RccPllCfgBit::PllR, RccPllCfgBit::PllREn>(val_to_set);
+	reg::PLLCFGR.setBit<reg::PllCfgBit::PllSrc, reg::PllCfgBit::PllM, reg::PllCfgBit::PllN, reg::PllCfgBit::PllP,
+											reg::PllCfgBit::PllPEn, reg::PllCfgBit::PllQ, reg::PllCfgBit::PllQEn, reg::PllCfgBit::PllR,
+											reg::PllCfgBit::PllREn>(val_to_set);
 }
 
-static constexpr void rcc_config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
+static constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
 	auto const val_to_set = BitGroup{t_hpre, t_ppre1, t_ppre2};
-	RCC_CFGR.setBit<RccCfgBit::HPre, RccCfgBit::PPre1, RccCfgBit::PPre2>(val_to_set);
+	reg::CFGR.setBit<reg::CfgBit::HPre, reg::CfgBit::PPre1, reg::CfgBit::PPre2>(val_to_set);
 }
 
-static constexpr void rcc_set_msi_range(MsiRange const& t_msi_range) noexcept {
-	RCC_CR.setBit<RccCrBit::MsiRange>(t_msi_range);
+static constexpr void set_msi_range(MsiRange const& t_msi_range) noexcept {
+	reg::CR.setBit<reg::CrBit::MsiRange>(t_msi_range);
 }
 
-static constexpr void rcc_enable_msi_range() noexcept { RCC_CR.setBit<RccCrBit::MsiRgSel>(std::uint8_t(1)); }
+static constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CrBit::MsiRgSel>(std::uint8_t(1)); }
 
-}	 // namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::rcc

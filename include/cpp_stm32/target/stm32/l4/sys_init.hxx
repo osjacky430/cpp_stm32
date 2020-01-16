@@ -30,7 +30,7 @@
 
 #include "sys_info.hpp"
 
-namespace cpp_stm32::stm32::l4 {
+namespace cpp_stm32::sys {
 
 /**
  * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
@@ -125,25 +125,27 @@ static constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
 
 static_assert(AHB_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
 
-class SysClock {
+class Clock {
  private:
 	static constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR = []() {
 		return std::tuple{
-			HPRE{DivisionFactor_v<SYS_CLK_FREQ / AHB_CLK_FREQ>},
-			PPRE{DivisionFactor_v<SYS_CLK_FREQ / APB1_CLK_FREQ>},
-			PPRE{DivisionFactor_v<SYS_CLK_FREQ / APB2_CLK_FREQ>},
+			rcc::HPRE{rcc::DivisionFactor_v<SYS_CLK_FREQ / AHB_CLK_FREQ>},
+			rcc::PPRE{rcc::DivisionFactor_v<SYS_CLK_FREQ / APB1_CLK_FREQ>},
+			rcc::PPRE{rcc::DivisionFactor_v<SYS_CLK_FREQ / APB2_CLK_FREQ>},
 		};
 	};
 
-	template <RccOsc PllSrc>
+	template <rcc::ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() noexcept {
+		using rcc::ClkSrc, rcc::PllM, rcc::PllN, rcc::PllP, rcc::PllQ, rcc::PllR;
+
 		constexpr auto pll_input_clk_freq = []() {
 			switch (PllSrc) {
-				case RccOsc::MsiOsc:
+				case ClkSrc::Msi:
 					return MSI_CLK_FREQ;
-				case RccOsc::HseOsc:
+				case ClkSrc::Hse:
 					return std::uint64_t(HSE_CLK_FREQ);
-				case RccOsc::Hsi16Osc:
+				case ClkSrc::Hsi160:
 					return std::uint64_t(HSI_CLK_FREQ);
 				default:
 					break;
@@ -172,15 +174,15 @@ class SysClock {
 		// {
 		//  ...
 		// } esle {
-		return std::tuple{PllM{DivisionFactor_v<pllm>}, PllN{DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
-											PllR{DivisionFactor_v<pllr>}};
+		return std::tuple{PllM{rcc::DivisionFactor_v<pllm>}, PllN{rcc::DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
+											PllR{rcc::DivisionFactor_v<pllr>}};
 		// }
 	}
 	/**
 	 * @var 	CPU_WAIT_STATE
 	 * @brief	This is chosen base on AHB clock frequency
 	 */
-	static constexpr auto CPU_WAIT_STATE = FlashWaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ);
 
 	/**
 	 * @var		VOLTAGE_SCALE
@@ -191,9 +193,9 @@ class SysClock {
 	 */
 	static constexpr auto VOLTAGE_SCALE = []() {
 		if constexpr (AHB_CLK_FREQ > AHB_VOS_RANGE2_MAX_FREQ) {
-			return VoltageScale::Range1;
+			return pwr::VoltageScale::Range1;
 		} else {
-			return VoltageScale::Range2;
+			return pwr::VoltageScale::Range2;
 		}
 	}();
 
@@ -213,6 +215,7 @@ class SysClock {
 	 *
 	 */
 	static constexpr auto SYS_CLK_SRC = []() {
+		using rcc::SysClk;
 		if constexpr (SYS_CLK_FREQ != HSE_CLK_FREQ && SYS_CLK_FREQ != HSI_CLK_FREQ && SYS_CLK_FREQ != MSI_CLK_FREQ) {
 			return SysClk::Pll;
 		} else if constexpr (HSE_CLK_VALID && SYS_CLK_FREQ == HSE_CLK_FREQ) {
@@ -225,44 +228,47 @@ class SysClock {
 	}();
 
  public:
-	template <RccOsc PllSrc, typename = std::enable_if_t<SYS_CLK_SRC == SysClk::Pll && is_pll_clk_src<PllSrc>>>
+	template <rcc::ClkSrc PllSrc,
+						typename = std::enable_if_t<SYS_CLK_SRC == rcc::SysClk::Pll && rcc::is_pll_clk_src<PllSrc>>>
 	static constexpr void init() noexcept {
+		using rcc::MsiRange, rcc::Frequency_v, rcc::PeriphClk, rcc::ClkSrc;
+
 		if constexpr (HSE_BYPASS_CLK_SRC) {
-			rcc_bypass_clksrc<RccOsc::HseOsc>();
+			rcc::bypass_clksrc<rcc::ClkSrc::Hse>();
 		}
 
 		// enable pll clock src, i.e., HSE, HSI or MSI
-		rcc_enable_clk<PllSrc>();
-		rcc_wait_osc_rdy<PllSrc>();
-		rcc_set_sysclk<rcc_to_sys_enum(PllSrc)>();
+		rcc::enable_clk<PllSrc>();
+		rcc::wait_osc_rdy<PllSrc>();
+		rcc::set_sysclk<rcc::to_sys_clk(PllSrc)>();
 
-		if constexpr (PllSrc == RccOsc::MsiOsc) {
-			rcc_enable_msi_range();
-			rcc_set_msi_range(MsiRange{Frequency_v<MSI_CLK_FREQ>});
+		if constexpr (PllSrc == ClkSrc::Msi) {
+			rcc::enable_msi_range();
+			rcc::set_msi_range(MsiRange{Frequency_v<MSI_CLK_FREQ>});
 		}
 
 		{
 			const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
 
-			rcc_disable_clk<RccOsc::PllOsc>();
-			rcc_set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
-			rcc_enable_periph_clk<RccPeriph::Pwr>();
-			pwr_set_voltage_scale(VOLTAGE_SCALE);
+			rcc::disable_clk<ClkSrc::Pll>();
+			rcc::set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
+			rcc::enable_periph_clk<PeriphClk::Pwr>();
+			pwr::set_voltage_scale(VOLTAGE_SCALE);
 		}
 
-		rcc_enable_clk<RccOsc::PllOsc>();
+		rcc::enable_clk<ClkSrc::Pll>();
 
-		constexpr auto flash_wait_state = FlashLatency{CpuWaitState_v<CPU_WAIT_STATE>};
-		flash_config_access_ctl<ARTAccel::InstructCache, ARTAccel::DataCache>(flash_wait_state);
+		constexpr auto wait_state = flash::Latency{flash::CpuWaitState_v<CPU_WAIT_STATE>};
+		flash::config_access_ctl<flash::ARTAccel::InstructCache, flash::ARTAccel::DataCache>(wait_state);
 
 		auto const& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
-		rcc_config_adv_bus_division_factor(ahb, apb1, apb2);
+		rcc::config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc_wait_osc_rdy<RccOsc::PllOsc>();
+		rcc::wait_osc_rdy<ClkSrc::Pll>();
 
-		rcc_set_sysclk<SYS_CLK_SRC>();
-		rcc_wait_sysclk_rdy<SYS_CLK_SRC>();
+		rcc::set_sysclk<SYS_CLK_SRC>();
+		rcc::wait_sysclk_rdy<SYS_CLK_SRC>();
 	}
 };	// namespace cpp_stm32::stm32::l4
 
-}	 // namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::sys

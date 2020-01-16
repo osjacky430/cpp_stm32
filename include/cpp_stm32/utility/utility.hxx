@@ -21,35 +21,9 @@
 #include <type_traits>
 #include <utility>
 
+#include "cpp_stm32/detail/index_interval.hxx"
+
 namespace cpp_stm32 {
-
-/**
- *
- */
-template <std::size_t idx>
-using ConstIndexType = std::integral_constant<std::size_t, idx>;
-
-/**
- *
- */
-template <std::size_t interval, std::size_t start, std::size_t seq, std::size_t... end>
-struct IdxIntervalImpl {
-	static_assert(static_cast<int>(seq) - static_cast<int>(interval) >= 0);
-	using IdxIntervalType = typename IdxIntervalImpl<interval, start, seq - interval, seq, end...>::IdxIntervalType;
-};
-
-template <std::size_t interval, std::size_t start, std::size_t... seq>
-struct IdxIntervalImpl<interval, start, start, seq...> {
-	using IdxIntervalType = std::index_sequence<start, seq...>;
-};
-
-template <std::size_t start, std::size_t end, std::size_t interval>
-struct IdxInterval {
-	using IdxIntervalType = typename IdxIntervalImpl<interval, start, end - interval, end>::IdxIntervalType;
-};
-
-template <std::size_t start, std::size_t end, std::size_t interval = 1>
-using Interval = typename IdxInterval<start, end, interval>::IdxIntervalType;
 
 /**
  *
@@ -77,4 +51,4 @@ static constexpr bool is_specialization = false;
 template <template <typename...> class Ref, typename... Args>
 static constexpr bool is_specialization<Ref<Args...>, Ref> = true;
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

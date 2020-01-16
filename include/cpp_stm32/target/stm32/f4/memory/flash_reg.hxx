@@ -18,33 +18,32 @@
 
 #include <cstdint>
 
-#include "cpp_stm32/utility/macro.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/common/flash.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
+#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/utility/macro.hxx"
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::flash {
 
-static constexpr auto FLASH_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3'C00U);
+SETUP_LOOKUP_TABLE_WITH_BOUND(Latency, 0, 15);
 
-template <std::uint8_t Val>
-using CpuWaitState_t = std::integral_constant<std::uint8_t, Val>;
+}
 
-template <std::uint8_t Val>
-static constexpr auto CpuWaitState_v = CpuWaitState_t<Val>{};
+namespace cpp_stm32::flash::reg {
+
+static constexpr auto BASE_ADDR = memory_at(PeriphAddr::Ahb1Base, 0x3'C00U);
 
 /**
- * @defgroup FLASH_ACR_GROUP    Flash Access Control Register Group
+ * @defgroup ACR_GROUP    Flash Access Control Register Group
  * @{
  */
 
-SETUP_LOOKUP_TABLE_WITH_BOUND(FlashLatency, 0, 15);
-
 SETUP_REGISTER_INFO(FlashAcrInfo, /**/
-										Bit<4, FlashLatency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}},
-										Binary<>{BitPos_t{10}}, Binary<>{BitPos_t{11}}, Binary<>{BitPos_t{12}})
+										Bit<4, Latency>{BitPos_t{0}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}}, Binary<>{BitPos_t{10}},
+										Binary<>{BitPos_t{11}}, Binary<>{BitPos_t{12}})
 
-enum class FlashAcrBit {
+enum class AcrBit {
 	Latency,
 	PrftEn,
 	ICEn,
@@ -53,8 +52,8 @@ enum class FlashAcrBit {
 	DCRst,
 };
 
-static constexpr Register<FlashAcrInfo, FlashAcrBit> FLASH_ACR{FLASH_BASE, 0x00U};
+static constexpr Register<FlashAcrInfo, AcrBit> ACR{BASE_ADDR, 0x00U};
 
 /**@}*/
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::flash::reg

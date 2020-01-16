@@ -16,22 +16,35 @@
 
 #pragma once
 
-#include <cstdint>
-#include <utility>
+#include <tuple>
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
 namespace cpp_stm32 {
 
-constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
-constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
+template <typename... Args>
+class PinData {
+ private:
+	std::tuple<Args...> argTup;
 
-template <char... num>
-constexpr auto operator"" _ic() noexcept {
-	constexpr auto idx = detail::str_to_num(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
-	return size_c<idx>{};
-}
+	template <std::size_t... Idx>
+	constexpr void element_eq(PinData<Args...> const& t_data, std::index_sequence<Idx...> const& /*unused*/) noexcept {
+		((std::get<Idx>(argTup) = std::get<Idx>(t_data.argTup)), ...);
+	}
+
+ public:
+	constexpr PinData() noexcept : argTup{Args{}...} {}
+	constexpr PinData(PinData const& t_tup) noexcept : argTup(t_tup.argTup) {}
+	constexpr PinData(Args... args) noexcept : argTup{args...} {}
+
+	template <auto Idx>
+	[[nodiscard]] constexpr auto const& operator[](size_c<Idx> const& /*unused*/) const noexcept {
+		return std::get<Idx>(argTup);
+	}
+
+	constexpr void operator=(PinData<Args...> const& t_data) noexcept {
+		element_eq(t_data, std::make_index_sequence<sizeof...(Args)>{});
+	}
+};
 
 }	 // namespace cpp_stm32

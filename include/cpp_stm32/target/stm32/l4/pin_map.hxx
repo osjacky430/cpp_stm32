@@ -19,43 +19,86 @@
 #include <array>
 #include <tuple>
 
-#include "cpp_stm32/target/stm32/common/gpio.hxx"
+#include "cpp_stm32/common/pin_data.hxx"
+
+#include "cpp_stm32/target/stm32/l4/gpio.hxx"
 #include "cpp_stm32/target/stm32/l4/interrupt.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/usart_reg.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 
-namespace cpp_stm32::stm32::detail {}	 // namespace cpp_stm32::stm32::detail
+namespace cpp_stm32::usart {
 
-namespace cpp_stm32::stm32 {
-
-class UsartPinMap {
+class PinMap {
  private:
-	using PinName						= gpio::PinName;
-	using UsartAltFuncGroup = std::tuple<l4::UsartNum, gpio::AltFunc, l4::RccPeriph, IrqNum>;
+	using PinName = gpio::PinName;
 
-	static constexpr auto TX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_2,
-							UsartAltFuncGroup{l4::UsartNum::Usart2, gpio::AltFunc::AF7, l4::RccPeriph::Usart2, IrqNum::Usart2Global}},
+	using UsartPinData = PinData<PinName, Port, gpio::AltFunc, rcc::PeriphClk, IrqNum>;
+
+	static constexpr std::array TX_PIN_TABLE{
+		UsartPinData{PinName::PA_2, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
 	};
 
-	static constexpr auto RX_PIN_NAME_TABLE = std::array{
-		std::pair{PinName::PA_3,
-							UsartAltFuncGroup{l4::UsartNum::Usart2, gpio::AltFunc::AF7, l4::RccPeriph::Usart2, IrqNum::Usart2Global}},
+	static constexpr std::array RX_PIN_TABLE{
+		UsartPinData{PinName::PA_3, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
 	};
 
-	static constexpr auto USART_PIN_NAME_TABLE = std::tuple{TX_PIN_NAME_TABLE, RX_PIN_NAME_TABLE};
+	static constexpr auto USART_PIN_NAME_TABLE = std::tuple{TX_PIN_TABLE, RX_PIN_TABLE};
 
  public:
-	enum class PinInfo { Tx, Rx };
+	template <PinName Pin>
+	[[nodiscard]] static constexpr auto getTxPinData() noexcept {
+		auto const iter = *cstd::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(),
+																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
 
-	template <PinName Pin, PinInfo Idx>
-	static constexpr auto getPinInfo() noexcept {
-		constexpr auto PIN_NAME_TABLE = std::get<to_underlying(Idx)>(USART_PIN_NAME_TABLE);
-		const auto iter_pos						= cstd::find_if(PIN_NAME_TABLE.begin(), PIN_NAME_TABLE.end(),
-																				[](auto const& t_pair) { return (t_pair.first == Pin); });
+		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};
+	}
 
-		return iter_pos->second;
-	};
+	template <PinName Pin>
+	[[nodiscard]] static constexpr auto getRxPinData() noexcept {
+		auto const iter = *cstd::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(),
+																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
+
+		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};
+	}
 };
 
-}	 // namespace cpp_stm32::stm32
+}	 // namespace cpp_stm32::usart
+
+namespace cpp_stm32::gpio {
+
+class PinMap {
+ private:
+	using PortPinPair = PinData<Port, Pin>;
+
+	/**
+	 * @var 		PIN_NAME_TABLE
+	 * @brief
+	 *
+	 */
+	static constexpr auto PIN_TABLE = []() {
+		std::array<PortPinPair, to_underlying(PinName::Total)> temp{};
+
+		temp[to_underlying(PinName::PA_0)] = PortPinPair{Port::PortA, Pin::Pin0};
+		temp[to_underlying(PinName::PA_1)] = PortPinPair{Port::PortA, Pin::Pin1};
+		temp[to_underlying(PinName::PA_2)] = PortPinPair{Port::PortA, Pin::Pin2};
+		temp[to_underlying(PinName::PA_3)] = PortPinPair{Port::PortA, Pin::Pin3};
+		temp[to_underlying(PinName::PA_5)] = PortPinPair{Port::PortA, Pin::Pin5};
+
+		temp[to_underlying(PinName::PB_1)] = PortPinPair{Port::PortB, Pin::Pin1};
+		temp[to_underlying(PinName::PB_2)] = PortPinPair{Port::PortB, Pin::Pin2};
+		temp[to_underlying(PinName::PB_3)] = PortPinPair{Port::PortB, Pin::Pin3};
+
+		return temp;
+	}();
+
+ public:
+	[[nodiscard]] static constexpr auto getPort(PinName const& t_pin_name) noexcept {
+		return PIN_TABLE[to_underlying(t_pin_name)][0_ic];
+	}
+
+	[[nodiscard]] static constexpr auto getPin(PinName const& t_pin_name) noexcept {
+		return PIN_TABLE[to_underlying(t_pin_name)][1_ic];
+	}
+};
+
+}	 // namespace cpp_stm32::gpio
