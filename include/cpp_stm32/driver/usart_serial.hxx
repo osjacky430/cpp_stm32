@@ -20,7 +20,7 @@
 #include <tuple>
 #include <utility>
 
-#include "cpp_stm32/common/usart_common.hxx"
+#include "cpp_stm32/common/usart.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/hal/callback.hxx"
 #include "cpp_stm32/utility/constexpr_algo.hxx"
@@ -64,6 +64,9 @@ struct UsartRx {
 template <gpio::PinName RX>
 static constexpr auto UsartRx_v = UsartRx<RX>{};
 
+/**
+ *
+ */
 template <gpio::PinName TX, gpio::PinName RX, gpio::PinName CTS = gpio::PinName::NC,
 					gpio::PinName RTS = gpio::PinName::NC>
 class Usart {
@@ -84,7 +87,7 @@ class Usart {
 		using usart::StopBit_v, usart::DataBit, usart::Parity, usart::HardwareFlowControl, usart::Stopbit;
 
 		rcc::enable_periph_clk<USART_RCC>();
-		//
+
 		GpioUtil<TX, RX>::enableAllGpioClk();
 		GpioUtil<TX, RX>::modeSetup(gpio::Mode::AltFunc, Pupd::None);
 		GpioUtil<TX, RX>::alternateFuncSetup(USART_GPIO_AF);
@@ -133,7 +136,7 @@ class Usart {
 			nvic_disable_irq<USART_IRQ_NUM>();
 		}
 
-		constexpr Callback<target_device::IRQ_FUNC_HANDLER[to_underlying(USART_IRQ_NUM)]> cb;
+		constexpr Callback<interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)]> cb;
 		Interrupt<USART_IRQ_NUM>::attach(cb);
 		nvic_enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();

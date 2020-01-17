@@ -17,7 +17,7 @@
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 #include "cpp_stm32/hal/interrupt.hxx"
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::interrupt {
 
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void wwdg_isr() noexcept;
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pvd_isr() noexcept;
@@ -61,12 +61,12 @@ namespace cpp_stm32::stm32::f4 {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart3_isr() noexcept;
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti5_10_isr() noexcept;
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::interrupt
 
 namespace cpp_stm32 {
 
 template <IrqNum IRQn>
 std::pair<void*, void (*)(void* const) noexcept> Interrupt<IRQn>::m_callback{
-	nullptr, &WRAP_TO_C_STYLE_FUNC<stm32::f4::IRQ_FUNC_HANDLER[to_underlying(IRQn)]>};
+	nullptr, &WRAP_TO_C_STYLE_FUNC<interrupt::IRQ_TABLE[to_underlying(IRQn)]>};
 
 }

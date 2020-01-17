@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cpp_stm32/common/usart_common.hxx"
+#include "cpp_stm32/common/usart.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
@@ -25,7 +25,25 @@ namespace cpp_stm32::usart {
 
 enum class Port { Usart1, Usart2, Usart3, Uart4, Uart5, Usart6 };
 
-}
+/**
+ * @enum OverSampling
+ */
+enum class OverSampling : std::uint8_t {
+	OverSampling16,
+	OverSampling8,
+};
+
+/**
+ * @enum 	DataBit
+ */
+enum class DataBit : std::uint8_t { DataBit8, DataBit9 };
+
+enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
+enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
+enum class Parity : std::uint8_t { Even, Odd, None };
+enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
+
+}	 // namespace cpp_stm32::usart
 
 namespace cpp_stm32::usart::reg {
 

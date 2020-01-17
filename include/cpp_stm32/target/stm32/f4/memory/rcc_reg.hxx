@@ -30,50 +30,7 @@
 // temporary
 #include "cpp_stm32/utility/macro.hxx"
 
-namespace cpp_stm32::stm32::f4 {
-
-static constexpr auto RCC_BASE = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
-
-template <std::uint32_t Val>
-using DivisionFactor_t = std::integral_constant<std::uint32_t, Val>;
-
-template <std::uint32_t Val>
-static constexpr auto DivisionFactor_v = DivisionFactor_t<Val>{};
-
-enum class ClkSrc : std::uint32_t;
-
-/**
- * @defgroup	RCC_CR_GROUP		RCC Control Register Group
- *
- * @{
- */
-
-SETUP_REGISTER_INFO(RccCrBitInfo, /**/
-										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(16)}, Bit<1>{BitPos_t(17)},
-										Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(19)}, Bit<1>{BitPos_t(24)}, Bit<1>{BitPos_t(25)},
-										Bit<1>{BitPos_t(26)}, Bit<1>{BitPos_t(27)}, Bit<1>{BitPos_t(28)}, Bit<1>{BitPos_t(29)})
-
-enum class RccCrBit {
-	HsiOn,
-	HsiRdy,
-	HseOn,
-	HseRdy,
-	HseByp,
-	CssOn,
-	PllOn,
-	PllRdy,
-	PllSaiOn,
-	PllSaiRdy,
-};
-
-static constexpr Register<RccCrBitInfo, RccCrBit> RCC_CR{RCC_BASE, 0};
-
-/** @}*/
-
-/**
- * @defgroup	RCC_PLLCFGR_GROUP		RCC PLL Configuration Register Group
- * @{
- */
+namespace cpp_stm32::rcc {
 
 /**
  * @class 	PllM
@@ -118,23 +75,6 @@ SETUP_LOOKUP_TABLE_WITH_BOUND(PllQ, 2, 15);
  */
 SETUP_LOOKUP_TABLE_WITH_BOUND(PllR, 2, 7);
 
-SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
-										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
-										Bit<1, ClkSrc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}})
-
-enum class RccPllCfgBit { PLLM, PLLN, PLLP, PLLSRC, PLLQ, PLLR };
-
-static constexpr Register<RccPllcfgrBitInfo, RccPllCfgBit> RCC_PLLCFGR{RCC_BASE, 0x04U};
-/** @}*/
-
-/**
- * @defgroup	RCC_CFG_GROUP		RCC Configuration Group
- *
- * @{
- */
-
-enum class SysClk : std::uint32_t;
-
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(HPRE, /**/
 																		 std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
 																		 std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
@@ -144,17 +84,109 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PPRE, /**/
 																		 std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101}, std::pair{8, 0b110},
 																		 std::pair{16, 0b111});
 
-SETUP_REGISTER_INFO(RccCfgBitInfo, /**/
+/**
+ * [memory_at description]
+ */
+enum class PeriphClk : std::uint32_t {
+	/*AHB1*/
+	GpioA,
+	GpioB,
+	/*GpioC ~ GpioF*/
+
+	/*APB1*/
+	Usart2,
+	Pwr,
+
+	/*APB2*/
+	Usart1,
+
+};
+
+enum class ClkSrc : std::uint32_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
+
+/**
+ * @enum 		SysClk
+ * @brief		Three different clock sources can be used to drive the system clock
+ * 					- HSI (High Speed Internal) oscillator clock
+ * 					- HSE (High Speed External) oscillator clock
+ * 					- Two main PLL (Phase Lock Loop) clock
+ */
+enum class SysClk : std::uint32_t { Hsi, Hse, Pllp, Pllr };
+
+/**
+ *
+ */
+template <ClkSrc Clk>
+static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
+
+template <ClkSrc Clk>
+static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
+
+}	 // namespace cpp_stm32::rcc
+
+namespace cpp_stm32::rcc::reg {
+
+static constexpr auto BASE_ADDR = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
+
+/**
+ * @defgroup	CR_GROUP		RCC Control Register Group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccCrInfo, /**/
+										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(16)}, Bit<1>{BitPos_t(17)},
+										Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(19)}, Bit<1>{BitPos_t(24)}, Bit<1>{BitPos_t(25)},
+										Bit<1>{BitPos_t(26)}, Bit<1>{BitPos_t(27)}, Bit<1>{BitPos_t(28)}, Bit<1>{BitPos_t(29)})
+
+enum class CrBit {
+	HsiOn,
+	HsiRdy,
+	HseOn,
+	HseRdy,
+	HseByp,
+	CssOn,
+	PllOn,
+	PllRdy,
+	PllSaiOn,
+	PllSaiRdy,
+};
+
+static constexpr Register<RccCrInfo, CrBit> CR{BASE_ADDR, 0};
+
+/** @}*/
+
+/**
+ * @defgroup	PLLCFGR_GROUP		RCC PLL Configuration Register Group
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccPllcfgrBitInfo, /**/
+										Bit<6, PllM>{BitPos_t{0}}, Bit<9, PllN>{BitPos_t{6}}, Bit<2, PllP>{BitPos_t{16}},
+										Bit<1, ClkSrc>{BitPos_t{22}}, Bit<4, PllQ>{BitPos_t{24}}, Bit<3, PllR>{BitPos_t{28}})
+
+enum class PllCfgBit { PLLM, PLLN, PLLP, PLLSRC, PLLQ, PLLR };
+
+static constexpr Register<RccPllcfgrBitInfo, PllCfgBit> PLLCFGR{BASE_ADDR, 0x04U};
+/** @}*/
+
+/**
+ * @defgroup	CFG_GROUP		RCC Configuration Group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(RccCfgInfo, /**/
 										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
 										Bit<3, PPRE>{BitPos_t(10)}, Bit<3, PPRE>{BitPos_t(13)})
 
-enum class RccCfgBit { SW, SWS, HPRE, PPRE1, PPRE2 };
+enum class CfgBit { SW, SWS, HPRE, PPRE1, PPRE2 };
 
-static constexpr Register<RccCfgBitInfo, RccCfgBit> RCC_CFGR{RCC_BASE, 0x08U};
+static constexpr Register<RccCfgInfo, CfgBit> CFGR{BASE_ADDR, 0x08U};
 /**@} */
 
 /**
- * @defgroup	RCC_AHB1RST_GROUP		RCC AHB1 Reset Register Group
+ * @defgroup	AHB1RST_GROUP		RCC AHB1 Reset Register Group
  * @{
  */
 
@@ -164,7 +196,7 @@ SETUP_REGISTER_INFO(RccAhb1RstInfo, /**/
 										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(21)}, Bit<1>{BitPos_t(22)},
 										Bit<1>{BitPos_t(29)}, Bit<1>{BitPos_t(30)})
 
-enum class RccAhb1RstBit {
+enum class Ahb1RstBit {
 	GpioARst,
 	GpioBRst,
 	GpioCRst,
@@ -180,37 +212,37 @@ enum class RccAhb1RstBit {
 	OtgHsRst
 };
 
-static constexpr Register<RccAhb1RstInfo, RccAhb1RstBit> RCC_AHB1RST{RCC_BASE, 0x10U};
+static constexpr Register<RccAhb1RstInfo, Ahb1RstBit> AHB1RST{BASE_ADDR, 0x10U};
 /**@}*/
 
 /**
- * @defgroup	RCC_APB1RST_GROUP		RCC APB1 Reset Register Group
+ * @defgroup	APB1RST_GROUP		RCC APB1 Reset Register Group
  * @{
  */
 
 SETUP_REGISTER_INFO(RccApb1RstInfo, Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
 
-enum class RccApb1RstBit { Usart2Rst, PwrRst };
+enum class Apb1RstBit { Usart2Rst, PwrRst };
 
-static constexpr Register<RccApb1RstInfo, RccApb1RstBit> RCC_APB1RST{RCC_BASE, 0x20U};
+static constexpr Register<RccApb1RstInfo, Apb1RstBit> APB1RST{BASE_ADDR, 0x20U};
 
 /**@}*/
 
 /**
- * @defgroup RCC_APB2RST_GROUP		RCC APB2 Reset Register Group
+ * @defgroup APB2RST_GROUP		RCC APB2 Reset Register Group
  * @{
  */
 
 SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}})
 
-enum class RccApb2RstBit { Usart1Rst };
+enum class Apb2RstBit { Usart1Rst };
 
-static constexpr Register<RccApb2RstInfo, RccApb2RstBit> RCC_APB2RST{RCC_BASE, 0x24U};
+static constexpr Register<RccApb2RstInfo, Apb2RstBit> APB2RST{BASE_ADDR, 0x24U};
 
 /**@}*/
 
 /**
- * @defgroup	RCC_AHB1ENR_GROUP		RCC AHB1 Enable Register Group
+ * @defgroup	AHB1ENR_GROUP		RCC AHB1 Enable Register Group
  * @{
  */
 
@@ -220,7 +252,7 @@ SETUP_REGISTER_INFO(RccAhb1EnrInfo, /**/
 										Bit<1>{BitPos_t(12)}, Bit<1>{BitPos_t(18)}, Bit<1>{BitPos_t(21)}, Bit<1>{BitPos_t(22)},
 										Bit<1>{BitPos_t(29)}, Bit<1>{BitPos_t(30)})
 
-enum class RccAhb1EnrBit {
+enum class Ahb1EnrBit {
 	GpioAEn,
 	GpioBEn,
 	GpioCEn,
@@ -237,55 +269,55 @@ enum class RccAhb1EnrBit {
 	OtgHsULPIEn
 };
 
-static constexpr Register<RccAhb1EnrInfo, RccAhb1EnrBit> RCC_AHB1ENR{RCC_BASE, 0x30U};
+static constexpr Register<RccAhb1EnrInfo, Ahb1EnrBit> AHB1ENR{BASE_ADDR, 0x30U};
 
 /**@}*/
 
 /**
- * @defgroup	RCC_APB1ENR_GROUP		RCC APB1 Enable Register Group
+ * @defgroup	APB1ENR_GROUP		RCC APB1 Enable Register Group
  * @{
  */
 
 SETUP_REGISTER_INFO(RccApb1EnrInfo, /**/
 										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
 
-enum class RccApb1EnrBit { Usart2En, PwrEn };
+enum class Apb1EnrBit { Usart2En, PwrEn };
 
-static constexpr Register<RccApb1EnrInfo, RccApb1EnrBit> RCC_APB1ENR{RCC_BASE, 0x40U};
+static constexpr Register<RccApb1EnrInfo, Apb1EnrBit> APB1ENR{BASE_ADDR, 0x40U};
 
 /**@}*/
 
 /**
- * @defgroup RCC_APB2ENR_GROUP		RCC APB2 Enable Register Group
+ * @defgroup APB2ENR_GROUP		RCC APB2 Enable Register Group
  * @{
  */
 
 SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}})
 
-enum class RccApb2EnrBit { Usart1En };
+enum class Apb2EnrBit { Usart1En };
 
-static constexpr Register<RccApb2EnrInfo, RccApb2EnrBit> RCC_APB2ENR{RCC_BASE, 0x44U};
+static constexpr Register<RccApb2EnrInfo, Apb2EnrBit> APB2ENR{BASE_ADDR, 0x44U};
 
 /**@}*/
 
 /**
- * @defgroup	RCC_BDCR_GROUP		RCC Backup Domain Control Register Group
+ * @defgroup	BDCR_GROUP		RCC Backup Domain Control Register Group
  *
  * @{
  */
 
-SETUP_REGISTER_INFO(RccBdcrBitInfo, /**/
+SETUP_REGISTER_INFO(RccBdcrInfo, /**/
 										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)})
 
-enum class RccBdcrBit {
+enum class BdcrBit {
 	LSEON,
 	LSERDY,
 	LseByp,
 	LSEMOD,
 };
 
-static constexpr Register<RccBdcrBitInfo, RccBdcrBit> RCC_BDCR{RCC_BASE, 0x70U};
+static constexpr Register<RccBdcrInfo, BdcrBit> BDCR{BASE_ADDR, 0x70U};
 
 /**@}*/
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::rcc::reg

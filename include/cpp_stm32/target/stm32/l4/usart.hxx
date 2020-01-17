@@ -19,35 +19,11 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "cpp_stm32/common/usart_common.hxx"
+#include "cpp_stm32/common/usart.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/usart_reg.hxx"
 #include "cpp_stm32/target/stm32/l4/sys_init.hxx"
 
 namespace cpp_stm32::usart {
-
-/**
- * @enum OverSampling
- */
-enum class OverSampling : std::uint8_t {
-	OverSampling16,
-	OverSampling8,
-};
-
-/**
- * @enum 	DataBit
- */
-enum class DataBit : std::uint8_t { DataBit8, DataBit9, DataBit7 };
-
-enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
-enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
-enum class Parity : std::uint8_t { Even, Odd, None };
-enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
-
-template <usart::Stopbit StopBit>
-using StopBit_t = std::integral_constant<decltype(StopBit), StopBit>;
-
-template <usart::Stopbit StopBit>
-static constexpr StopBit_t<StopBit> StopBit_v{};
 
 /**
  * [set_baudrate description]

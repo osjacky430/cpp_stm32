@@ -95,7 +95,7 @@ enum class IrqNum : std::uint8_t {
 
 }
 
-namespace cpp_stm32::stm32::l4 {
+namespace cpp_stm32::interrupt {
 
 void wwdg_isr() noexcept;
 void pvd_isr() noexcept;
@@ -138,7 +138,7 @@ void usart2_isr() noexcept;
 void usart3_isr() noexcept;
 void exti5_10_isr() noexcept;
 
-static constexpr auto IRQ_FUNC_HANDLER = []() {
+static constexpr auto IRQ_TABLE = []() {
 	using irq_func_ptr = void (*)() noexcept;
 	std::array<irq_func_ptr, to_underlying(IrqNum::NvicIrqTotal)> func_ptr_holder{};
 
@@ -186,4 +186,4 @@ static constexpr auto IRQ_FUNC_HANDLER = []() {
 	return func_ptr_holder;
 }();
 
-}	 // namespace cpp_stm32::stm32::l4
+}	 // namespace cpp_stm32::interrupt

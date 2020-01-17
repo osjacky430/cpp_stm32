@@ -16,38 +16,15 @@
 
 #pragma once
 
-#include "cpp_stm32/common/usart_common.hxx"
+#include "cpp_stm32/common/usart.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
-#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
+
+#include "sys_info.hpp"
 
 namespace cpp_stm32::usart {
 
-/**
- * @enum OverSampling
- */
-enum class OverSampling : std::uint8_t {
-	OverSampling16,
-	OverSampling8,
-};
-
-/**
- * @enum 	DataBit
- */
-enum class DataBit : std::uint8_t { DataBit8, DataBit9 };
-
-enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
-enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
-enum class Parity : std::uint8_t { Even, Odd, None };
-enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
-
-template <usart::Stopbit StopBit>
-using StopBit_t = std::integral_constant<decltype(StopBit), StopBit>;
-
-template <usart::Stopbit StopBit>
-static constexpr StopBit_t<StopBit> StopBit_v{};
-
 template <Port InputPort>
-constexpr auto set_baudrate(usart::Baudrate_t const& t_baud) noexcept {
+constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	constexpr auto clk_freq = (InputPort == Port::Usart1 || InputPort == Port::Usart6 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
 
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
@@ -58,14 +35,13 @@ constexpr auto set_baudrate(usart::Baudrate_t const& t_baud) noexcept {
 }
 
 template <Port InputPort>
-constexpr void set_databit(usart::DataBit const& t_d_bit) noexcept {
+constexpr void set_databit(DataBit const& t_d_bit) noexcept {
 	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M>(t_d_bit);
 }
 
 template <Port InputPort>
-constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ctl) noexcept {
+constexpr void set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noexcept {
 	// @todo : static_assert (UART4 and UART5)
-	using usart::HardwareFlowControl;
 	// maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value
 	// so that t_flow_ctl & mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl & mask = 0 when
 	// t_flow_ctl = none, e.g. ctl = 1, rts = 3, none = 4
@@ -76,9 +52,7 @@ constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ct
 }
 
 template <Port InputPort>
-constexpr void set_transfer_mode(usart::Mode const& t_mode) noexcept {
-	using usart::Mode;
-
+constexpr void set_transfer_mode(Mode const& t_mode) noexcept {
 	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
 	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
 	auto const val_to_write = BitGroup{txe, rxe};
@@ -86,15 +60,13 @@ constexpr void set_transfer_mode(usart::Mode const& t_mode) noexcept {
 }
 
 template <Port InputPort>
-constexpr void set_parity(usart::Parity const& t_parity) noexcept {
-	using usart::Parity;
-
+constexpr void set_parity(Parity const& t_parity) noexcept {
 	std::uint8_t const pe		= (t_parity != Parity::None);
 	auto const val_to_write = BitGroup{pe, t_parity};
 	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
 }
 
-template <Port InputPort, usart::Stopbit StopBit>
+template <Port InputPort, Stopbit StopBit>
 constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
 	// static_assert()
 	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(StopBit);
@@ -148,10 +120,7 @@ constexpr void send_blocking(std::uint8_t const& t_data) noexcept {
 // @todo this should be sfinae instead of static assert?
 // @todo the interface should unify, StopBit_t here makes it hard to do so.
 template <Port InputPort, usart::Stopbit Stop>
-constexpr void set_dps(usart::DataBit const& t_d, usart::Parity const& t_p,
-											 StopBit_t<Stop> const& /*unused*/) noexcept {
-	using usart::Parity;
-
+constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
 	std::uint8_t const pe		= (t_p != Parity::None);
 	auto const val_to_write = BitGroup{t_d, pe, t_p};
 	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);

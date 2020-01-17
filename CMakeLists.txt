@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.11.4 FATAL_ERROR)
 
-set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/l4")
+set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
 
-# set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
-set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32l432kc.ld")
+set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
+# set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32l432kc.ld")
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
 
 project(CppForStm32 LANGUAGES CXX)

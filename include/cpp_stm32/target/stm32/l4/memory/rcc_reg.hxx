@@ -59,8 +59,64 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllQ, /**/
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllR, /**/
 																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
 
-enum class SysClk : std::uint32_t;
-enum class ClkSrc : std::uint32_t;
+/**
+ * @enum
+ */
+enum class PeriphClk : std::uint32_t {
+
+	GpioA,
+	GpioB,
+	/*GpioC ~ GpioF*/
+
+	Usart2,
+	Pwr,
+
+	Usart1,
+
+};
+
+/**
+ * 	@enum 	SysClk
+ * 	@brief	Four different clock sources can be used to drive the system clock:
+ * 					- HSI16 (High Speed Internal) 16 MHz RC oscillator clock
+ * 					- MSI (Multi Speed Internal) RC oscillator clock
+ * 					- HSE (High Speed External) oscillator clock, from 4 to 48 MHz
+ * 					- PLL Clock
+ */
+enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
+
+/**
+ *  @enum 	ClkSrc
+ */
+enum class ClkSrc : std::uint32_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, Lsi };
+
+/**
+ * @brief		This function transform rcc enum to its equivalent sys enum
+ * @param 	t_rcc  see ::ClkSrc
+ */
+static constexpr auto to_sys_clk = [](ClkSrc t_rcc) {
+	switch (t_rcc) {
+		case ClkSrc::Hsi160:
+			return SysClk::Hsi16;
+		case ClkSrc::Msi:
+			return SysClk::Msi;
+		case ClkSrc::Hse:
+			return SysClk::Hse;
+		case ClkSrc::Pll:
+			return SysClk::Pll;
+		default:
+			break;
+	}
+};
+
+/**
+ *
+ */
+template <ClkSrc Clk>
+static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
+
+template <ClkSrc Clk>
+static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi160 || Clk == ClkSrc::Msi);
 
 }	 // namespace cpp_stm32::rcc
 

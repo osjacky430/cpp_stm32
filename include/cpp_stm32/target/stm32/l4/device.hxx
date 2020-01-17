@@ -22,10 +22,3 @@
 #include "cpp_stm32/target/stm32/l4/pin_map.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 #include "cpp_stm32/target/stm32/l4/usart.hxx"
-
-namespace cpp_stm32::driver {
-
-namespace Manufacture		= cpp_stm32::stm32;
-namespace target_device = cpp_stm32::stm32::l4;
-
-}	 // namespace cpp_stm32::driver

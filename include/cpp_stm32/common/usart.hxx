@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
@@ -65,5 +66,11 @@ enum class OverSampling : std::uint8_t;
 enum class Mode : std::uint8_t;
 enum class Parity : std::uint8_t;
 enum class Stopbit : std::uint8_t;
+
+template <Stopbit StopBit>
+using StopBit_t = std::integral_constant<decltype(StopBit), StopBit>;
+
+template <Stopbit StopBit>
+static constexpr StopBit_t<StopBit> StopBit_v{};
 
 }	 // namespace cpp_stm32::usart
