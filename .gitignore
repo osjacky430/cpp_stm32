@@ -28,3 +28,4 @@ Debug
 #
 include/cpp_stm32/tool/code_generator/.idea
 include/cpp_stm32/tool/code_generator/venv/
+include/cpp_stm32/tool/code_generator/__pycache__/
