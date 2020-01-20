@@ -13,6 +13,21 @@ static constexpr auto BASE_ADDR = 0x40023800U;
  * @{
  */
 
+SETUP_REGISTER_INFO(CRBitList, /**/
+					Binary<>{BitPos_t{0}},	// HSION
+					StatusBit<1>{BitPos_t{1}},	// HSIRDY
+					Bit<5>{BitPos_t{3}},	// HSITRIM
+					StatusBit<8>{BitPos_t{8}},	// HSICAL
+					Binary<>{BitPos_t{16}},	// HSEON
+					StatusBit<1>{BitPos_t{17}},	// HSERDY
+					Binary<>{BitPos_t{18}},	// HSEBYP
+					Binary<>{BitPos_t{19}},	// CSSON
+					Binary<>{BitPos_t{24}},	// PLLON
+					StatusBit<1>{BitPos_t{25}},	// PLLRDY
+					Binary<>{BitPos_t{26}},	// PLLI2SON
+					StatusBit<1>{BitPos_t{27}}	// PLLI2SRDY
+					)
+
 enum class CRField {
 	HSION,		/*!< Internal high-speed clock enable*/
 	HSIRDY,		/*!< Internal high-speed clock ready flag*/
@@ -28,7 +43,7 @@ enum class CRField {
 	PLLI2SRDY,		/*!< PLLI2S clock ready flag*/
 };
 
-static constexpr Register<, CRField> CR{BASE_ADDR, 0x00U};
+static constexpr Register<CRBitList, CRField> CR{BASE_ADDR, 0x00U};
 /**@}*/
 
 /**
@@ -36,6 +51,14 @@ static constexpr Register<, CRField> CR{BASE_ADDR, 0x00U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(PLLCFGRBitList, /**/
+					Bit<6>{BitPos_t{0}},	// PLLM
+					Bit<9, std::uint16_t>{BitPos_t{6}},	// PLLN
+					Bit<2>{BitPos_t{16}},	// PLLP
+					Binary<>{BitPos_t{22}},	// PLLSRC
+					Bit<4>{BitPos_t{24}}	// PLLQ
+					)
 
 enum class PLLCFGRField {
 	PLLM,		/*!< Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock*/
@@ -45,7 +68,7 @@ enum class PLLCFGRField {
 	PLLQ,		/*!< Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks*/
 };
 
-static constexpr Register<, PLLCFGRField> PLLCFGR{BASE_ADDR, 0x04U};
+static constexpr Register<PLLCFGRBitList, PLLCFGRField> PLLCFGR{BASE_ADDR, 0x04U};
 /**@}*/
 
 /**
@@ -53,6 +76,20 @@ static constexpr Register<, PLLCFGRField> PLLCFGR{BASE_ADDR, 0x04U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(CFGRBitList, /**/
+					Bit<2>{BitPos_t{0}},	// SW
+					StatusBit<2>{BitPos_t{2}},	// SWS
+					Bit<4>{BitPos_t{4}},	// HPRE
+					Bit<3>{BitPos_t{10}},	// PPRE1
+					Bit<3>{BitPos_t{13}},	// PPRE2
+					Bit<5>{BitPos_t{16}},	// RTCPRE
+					Bit<2>{BitPos_t{21}},	// MCO1
+					Binary<>{BitPos_t{23}},	// I2SSRC
+					Bit<3>{BitPos_t{24}},	// MCO1PRE
+					Bit<3>{BitPos_t{27}},	// MCO2PRE
+					Bit<2>{BitPos_t{30}}	// MCO2
+					)
 
 enum class CFGRField {
 	SW,		/*!< System clock switch*/
@@ -68,7 +105,7 @@ enum class CFGRField {
 	MCO2,		/*!< Microcontroller clock output 2*/
 };
 
-static constexpr Register<, CFGRField> CFGR{BASE_ADDR, 0x08U};
+static constexpr Register<CFGRBitList, CFGRField> CFGR{BASE_ADDR, 0x08U};
 /**@}*/
 
 /**
@@ -76,6 +113,32 @@ static constexpr Register<, CFGRField> CFGR{BASE_ADDR, 0x08U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(CIRBitList, /**/
+					StatusBit<1>{BitPos_t{0}},	// LSIRDYF
+					StatusBit<1>{BitPos_t{1}},	// LSERDYF
+					StatusBit<1>{BitPos_t{2}},	// HSIRDYF
+					StatusBit<1>{BitPos_t{3}},	// HSERDYF
+					StatusBit<1>{BitPos_t{4}},	// PLLRDYF
+					StatusBit<1>{BitPos_t{5}},	// PLLI2SRDYF
+					StatusBit<1>{BitPos_t{6}},	// PLLSAIRDYF
+					StatusBit<1>{BitPos_t{7}},	// CSSF
+					Binary<>{BitPos_t{8}},	// LSIRDYIE
+					Binary<>{BitPos_t{9}},	// LSERDYIE
+					Binary<>{BitPos_t{10}},	// HSIRDYIE
+					Binary<>{BitPos_t{11}},	// HSERDYIE
+					Binary<>{BitPos_t{12}},	// PLLRDYIE
+					Binary<>{BitPos_t{13}},	// PLLI2SRDYIE
+					Binary<>{BitPos_t{14}},	// PLLSAIRDYIE
+					Binary<BitMod::WrOnly>{BitPos_t{16}},	// LSIRDYC
+					Binary<BitMod::WrOnly>{BitPos_t{17}},	// LSERDYC
+					Binary<BitMod::WrOnly>{BitPos_t{18}},	// HSIRDYC
+					Binary<BitMod::WrOnly>{BitPos_t{19}},	// HSERDYC
+					Binary<BitMod::WrOnly>{BitPos_t{20}},	// PLLRDYC
+					Binary<BitMod::WrOnly>{BitPos_t{21}},	// PLLI2SRDYC
+					Binary<BitMod::WrOnly>{BitPos_t{22}},	// PLLSAIRDYC
+					Binary<BitMod::WrOnly>{BitPos_t{23}}	// CSSC
+					)
 
 enum class CIRField {
 	LSIRDYF,		/*!< LSI ready interrupt flag*/
@@ -103,7 +166,7 @@ enum class CIRField {
 	CSSC,		/*!< Clock security system interrupt clear*/
 };
 
-static constexpr Register<, CIRField> CIR{BASE_ADDR, 0x0cU};
+static constexpr Register<CIRBitList, CIRField> CIR{BASE_ADDR, 0x0cU};
 /**@}*/
 
 /**
@@ -111,6 +174,20 @@ static constexpr Register<, CIRField> CIR{BASE_ADDR, 0x0cU};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(AHB1RSTRBitList, /**/
+					Binary<>{BitPos_t{0}},	// GPIOARST
+					Binary<>{BitPos_t{1}},	// GPIOBRST
+					Binary<>{BitPos_t{2}},	// GPIOCRST
+					Binary<>{BitPos_t{3}},	// GPIODRST
+					Binary<>{BitPos_t{4}},	// GPIOERST
+					Binary<>{BitPos_t{5}},	// GPIOFRST
+					Binary<>{BitPos_t{6}},	// GPIOGRST
+					Binary<>{BitPos_t{7}},	// GPIOHRST
+					Binary<>{BitPos_t{12}},	// CRCRST
+					Bit<2>{BitPos_t{21}},	// DMA1RS
+					Binary<>{BitPos_t{29}}	// OTGHSRST
+					)
 
 enum class AHB1RSTRField {
 	GPIOARST,		/*!< IO port A reset*/
@@ -126,7 +203,7 @@ enum class AHB1RSTRField {
 	OTGHSRST,		/*!< USB OTG HS module reset*/
 };
 
-static constexpr Register<, AHB1RSTRField> AHB1RSTR{BASE_ADDR, 0x10U};
+static constexpr Register<AHB1RSTRBitList, AHB1RSTRField> AHB1RSTR{BASE_ADDR, 0x10U};
 /**@}*/
 
 /**
@@ -135,12 +212,17 @@ static constexpr Register<, AHB1RSTRField> AHB1RSTR{BASE_ADDR, 0x10U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB2RSTRBitList, /**/
+					Binary<>{BitPos_t{0}},	// DCMIRST
+					Binary<>{BitPos_t{7}}	// OTGFSRST
+					)
+
 enum class AHB2RSTRField {
 	DCMIRST,		/*!< Camera interface reset*/
 	OTGFSRST,		/*!< USB OTG FS module reset*/
 };
 
-static constexpr Register<, AHB2RSTRField> AHB2RSTR{BASE_ADDR, 0x14U};
+static constexpr Register<AHB2RSTRBitList, AHB2RSTRField> AHB2RSTR{BASE_ADDR, 0x14U};
 /**@}*/
 
 /**
@@ -149,12 +231,17 @@ static constexpr Register<, AHB2RSTRField> AHB2RSTR{BASE_ADDR, 0x14U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB3RSTRBitList, /**/
+					Binary<>{BitPos_t{1}},	// QSPIRST
+					Binary<>{BitPos_t{0}}	// FMCRST
+					)
+
 enum class AHB3RSTRField {
 	QSPIRST,		/*!< QUADSPI module reset*/
 	FMCRST,		/*!< Flexible memory controller module reset*/
 };
 
-static constexpr Register<, AHB3RSTRField> AHB3RSTR{BASE_ADDR, 0x18U};
+static constexpr Register<AHB3RSTRBitList, AHB3RSTRField> AHB3RSTR{BASE_ADDR, 0x18U};
 /**@}*/
 
 /**
@@ -162,6 +249,34 @@ static constexpr Register<, AHB3RSTRField> AHB3RSTR{BASE_ADDR, 0x18U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB1RSTRBitList, /**/
+					Binary<>{BitPos_t{29}},	// DACRST
+					Binary<>{BitPos_t{28}},	// PWRRST
+					Binary<>{BitPos_t{26}},	// CAN2RST
+					Binary<>{BitPos_t{25}},	// CAN1RST
+					Binary<>{BitPos_t{24}},	// I2CFMP1RST
+					Binary<>{BitPos_t{23}},	// I2C3RST
+					Binary<>{BitPos_t{22}},	// I2C2RST
+					Binary<>{BitPos_t{21}},	// I2C1RST
+					Binary<>{BitPos_t{20}},	// UART5RST
+					Binary<>{BitPos_t{19}},	// UART4RST
+					Binary<>{BitPos_t{18}},	// UART3RST
+					Binary<>{BitPos_t{17}},	// UART2RST
+					Binary<>{BitPos_t{16}},	// SPDIFRST
+					Binary<>{BitPos_t{15}},	// SPI3RST
+					Binary<>{BitPos_t{14}},	// SPI2RST
+					Binary<>{BitPos_t{11}},	// WWDGRST
+					Binary<>{BitPos_t{8}},	// TIM14RST
+					Binary<>{BitPos_t{7}},	// TIM13RST
+					Binary<>{BitPos_t{6}},	// TIM12RST
+					Binary<>{BitPos_t{5}},	// TIM7RST
+					Binary<>{BitPos_t{4}},	// TIM6RST
+					Binary<>{BitPos_t{3}},	// TIM5RST
+					Binary<>{BitPos_t{2}},	// TIM4RST
+					Binary<>{BitPos_t{1}},	// TIM3RST
+					Binary<>{BitPos_t{0}}	// TIM2RST
+					)
 
 enum class APB1RSTRField {
 	DACRST,		/*!< DAC reset*/
@@ -191,7 +306,7 @@ enum class APB1RSTRField {
 	TIM2RST,		/*!< TIM2 reset*/
 };
 
-static constexpr Register<, APB1RSTRField> APB1RSTR{BASE_ADDR, 0x20U};
+static constexpr Register<APB1RSTRBitList, APB1RSTRField> APB1RSTR{BASE_ADDR, 0x20U};
 /**@}*/
 
 /**
@@ -199,6 +314,23 @@ static constexpr Register<, APB1RSTRField> APB1RSTR{BASE_ADDR, 0x20U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB2RSTRBitList, /**/
+					Binary<>{BitPos_t{23}},	// SAI2RST
+					Binary<>{BitPos_t{22}},	// SAI1RST
+					Binary<>{BitPos_t{18}},	// TIM11RST
+					Binary<>{BitPos_t{17}},	// TIM10RST
+					Binary<>{BitPos_t{16}},	// TIM9RST
+					Binary<>{BitPos_t{14}},	// SYSCFGRST
+					Binary<>{BitPos_t{13}},	// SPI4RST
+					Binary<>{BitPos_t{12}},	// SPI1RST
+					Binary<>{BitPos_t{11}},	// SDIORST
+					Binary<>{BitPos_t{8}},	// ADCRST
+					Binary<>{BitPos_t{5}},	// USART6RST
+					Binary<>{BitPos_t{4}},	// USART1RST
+					Binary<>{BitPos_t{1}},	// TIM8RST
+					Binary<>{BitPos_t{0}}	// TIM1RST
+					)
 
 enum class APB2RSTRField {
 	SAI2RST,		/*!< SAI2 reset*/
@@ -217,7 +349,7 @@ enum class APB2RSTRField {
 	TIM1RST,		/*!< TIM1 reset*/
 };
 
-static constexpr Register<, APB2RSTRField> APB2RSTR{BASE_ADDR, 0x24U};
+static constexpr Register<APB2RSTRBitList, APB2RSTRField> APB2RSTR{BASE_ADDR, 0x24U};
 /**@}*/
 
 /**
@@ -225,6 +357,23 @@ static constexpr Register<, APB2RSTRField> APB2RSTR{BASE_ADDR, 0x24U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(AHB1ENRBitList, /**/
+					Binary<>{BitPos_t{0}},	// GPIOAEN
+					Binary<>{BitPos_t{1}},	// GPIOBEN
+					Binary<>{BitPos_t{2}},	// GPIOCEN
+					Binary<>{BitPos_t{3}},	// GPIODEN
+					Binary<>{BitPos_t{4}},	// GPIOEEN
+					Binary<>{BitPos_t{5}},	// GPIOFEN
+					Binary<>{BitPos_t{6}},	// GPIOGEN
+					Binary<>{BitPos_t{7}},	// GPIOHEN
+					Binary<>{BitPos_t{12}},	// CRCEN
+					Binary<>{BitPos_t{18}},	// BKPSRAMEN
+					Binary<>{BitPos_t{21}},	// DMA1EN
+					Binary<>{BitPos_t{22}},	// DMA2EN
+					Binary<>{BitPos_t{29}},	// OTGHSEN
+					Binary<>{BitPos_t{30}}	// OTGHSULPIEN
+					)
 
 enum class AHB1ENRField {
 	GPIOAEN,		/*!< IO port A clock enable*/
@@ -243,7 +392,7 @@ enum class AHB1ENRField {
 	OTGHSULPIEN,		/*!< USB OTG HSULPI clock enable*/
 };
 
-static constexpr Register<, AHB1ENRField> AHB1ENR{BASE_ADDR, 0x30U};
+static constexpr Register<AHB1ENRBitList, AHB1ENRField> AHB1ENR{BASE_ADDR, 0x30U};
 /**@}*/
 
 /**
@@ -252,12 +401,17 @@ static constexpr Register<, AHB1ENRField> AHB1ENR{BASE_ADDR, 0x30U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB2ENRBitList, /**/
+					Binary<>{BitPos_t{0}},	// DCMIEN
+					Binary<>{BitPos_t{7}}	// OTGFSEN
+					)
+
 enum class AHB2ENRField {
 	DCMIEN,		/*!< Camera interface enable*/
 	OTGFSEN,		/*!< USB OTG FS clock enable*/
 };
 
-static constexpr Register<, AHB2ENRField> AHB2ENR{BASE_ADDR, 0x34U};
+static constexpr Register<AHB2ENRBitList, AHB2ENRField> AHB2ENR{BASE_ADDR, 0x34U};
 /**@}*/
 
 /**
@@ -266,12 +420,17 @@ static constexpr Register<, AHB2ENRField> AHB2ENR{BASE_ADDR, 0x34U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB3ENRBitList, /**/
+					Binary<>{BitPos_t{1}},	// QSPIEN
+					Binary<>{BitPos_t{0}}	// FMCEN
+					)
+
 enum class AHB3ENRField {
 	QSPIEN,		/*!< QUADSPI memory controller module clock enable*/
 	FMCEN,		/*!< Flexible memory controller module clock enable*/
 };
 
-static constexpr Register<, AHB3ENRField> AHB3ENR{BASE_ADDR, 0x38U};
+static constexpr Register<AHB3ENRBitList, AHB3ENRField> AHB3ENR{BASE_ADDR, 0x38U};
 /**@}*/
 
 /**
@@ -279,6 +438,35 @@ static constexpr Register<, AHB3ENRField> AHB3ENR{BASE_ADDR, 0x38U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB1ENRBitList, /**/
+					Binary<>{BitPos_t{29}},	// DACEN
+					Binary<>{BitPos_t{28}},	// PWREN
+					Binary<>{BitPos_t{27}},	// CEC
+					Binary<>{BitPos_t{26}},	// CAN2EN
+					Binary<>{BitPos_t{25}},	// CAN1EN
+					Binary<>{BitPos_t{24}},	// I2CFMP1EN
+					Binary<>{BitPos_t{23}},	// I2C3EN
+					Binary<>{BitPos_t{22}},	// I2C2EN
+					Binary<>{BitPos_t{21}},	// I2C1EN
+					Binary<>{BitPos_t{20}},	// UART5EN
+					Binary<>{BitPos_t{19}},	// UART4EN
+					Binary<>{BitPos_t{18}},	// USART3EN
+					Binary<>{BitPos_t{17}},	// USART2EN
+					Binary<>{BitPos_t{16}},	// SPDIFEN
+					Binary<>{BitPos_t{15}},	// SPI3EN
+					Binary<>{BitPos_t{14}},	// SPI2EN
+					Binary<>{BitPos_t{11}},	// WWDGEN
+					Binary<>{BitPos_t{8}},	// TIM14EN
+					Binary<>{BitPos_t{7}},	// TIM13EN
+					Binary<>{BitPos_t{6}},	// TIM12EN
+					Binary<>{BitPos_t{5}},	// TIM7EN
+					Binary<>{BitPos_t{4}},	// TIM6EN
+					Binary<>{BitPos_t{3}},	// TIM5EN
+					Binary<>{BitPos_t{2}},	// TIM4EN
+					Binary<>{BitPos_t{1}},	// TIM3EN
+					Binary<>{BitPos_t{0}}	// TIM2EN
+					)
 
 enum class APB1ENRField {
 	DACEN,		/*!< DAC interface clock enable*/
@@ -309,7 +497,7 @@ enum class APB1ENRField {
 	TIM2EN,		/*!< TIM2 clock enable*/
 };
 
-static constexpr Register<, APB1ENRField> APB1ENR{BASE_ADDR, 0x40U};
+static constexpr Register<APB1ENRBitList, APB1ENRField> APB1ENR{BASE_ADDR, 0x40U};
 /**@}*/
 
 /**
@@ -317,6 +505,25 @@ static constexpr Register<, APB1ENRField> APB1ENR{BASE_ADDR, 0x40U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB2ENRBitList, /**/
+					Binary<>{BitPos_t{23}},	// SAI2EN
+					Binary<>{BitPos_t{22}},	// SAI1EN
+					Binary<>{BitPos_t{18}},	// TIM11EN
+					Binary<>{BitPos_t{17}},	// TIM10EN
+					Binary<>{BitPos_t{16}},	// TIM9EN
+					Binary<>{BitPos_t{14}},	// SYSCFGEN
+					Binary<>{BitPos_t{13}},	// SPI4ENR
+					Binary<>{BitPos_t{12}},	// SPI1EN
+					Binary<>{BitPos_t{11}},	// SDIOEN
+					Binary<>{BitPos_t{10}},	// ADC3EN
+					Binary<>{BitPos_t{9}},	// ADC2EN
+					Binary<>{BitPos_t{8}},	// ADC1EN
+					Binary<>{BitPos_t{5}},	// USART6EN
+					Binary<>{BitPos_t{4}},	// USART1EN
+					Binary<>{BitPos_t{1}},	// TIM8EN
+					Binary<>{BitPos_t{0}}	// TIM1EN
+					)
 
 enum class APB2ENRField {
 	SAI2EN,		/*!< SAI2 clock enable*/
@@ -337,7 +544,7 @@ enum class APB2ENRField {
 	TIM1EN,		/*!< TIM1 clock enable*/
 };
 
-static constexpr Register<, APB2ENRField> APB2ENR{BASE_ADDR, 0x44U};
+static constexpr Register<APB2ENRBitList, APB2ENRField> APB2ENR{BASE_ADDR, 0x44U};
 /**@}*/
 
 /**
@@ -345,6 +552,26 @@ static constexpr Register<, APB2ENRField> APB2ENR{BASE_ADDR, 0x44U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(AHB1LPENRBitList, /**/
+					Binary<>{BitPos_t{30}},	// OTGHSULPILPEN
+					Binary<>{BitPos_t{29}},	// OTGHSLPEN
+					Binary<>{BitPos_t{22}},	// DMA2LPEN
+					Binary<>{BitPos_t{21}},	// DMA1LPEN
+					Binary<>{BitPos_t{18}},	// BKPSRAMLPEN
+					Binary<>{BitPos_t{17}},	// SRAM2LPEN
+					Binary<>{BitPos_t{16}},	// SRAM1LPEN
+					Binary<>{BitPos_t{15}},	// FLITFLPEN
+					Binary<>{BitPos_t{12}},	// CRCLPEN
+					Binary<>{BitPos_t{7}},	// GPIOHLPEN
+					Binary<>{BitPos_t{6}},	// GPIOGLPEN
+					Binary<>{BitPos_t{5}},	// GPIOFLPEN
+					Binary<>{BitPos_t{4}},	// GPIOELPEN
+					Binary<>{BitPos_t{3}},	// GPIODLPEN
+					Binary<>{BitPos_t{2}},	// GPIOCLPEN
+					Binary<>{BitPos_t{1}},	// GPIOBLPEN
+					Binary<>{BitPos_t{0}}	// GPIOALPEN
+					)
 
 enum class AHB1LPENRField {
 	OTGHSULPILPEN,		/*!< USB OTG HS ULPI clock enable during Sleep mode*/
@@ -366,7 +593,7 @@ enum class AHB1LPENRField {
 	GPIOALPEN,		/*!< IO port A clock enable during sleep mode*/
 };
 
-static constexpr Register<, AHB1LPENRField> AHB1LPENR{BASE_ADDR, 0x50U};
+static constexpr Register<AHB1LPENRBitList, AHB1LPENRField> AHB1LPENR{BASE_ADDR, 0x50U};
 /**@}*/
 
 /**
@@ -375,12 +602,17 @@ static constexpr Register<, AHB1LPENRField> AHB1LPENR{BASE_ADDR, 0x50U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB2LPENRBitList, /**/
+					Binary<>{BitPos_t{0}},	// DCMILPEN
+					Binary<>{BitPos_t{7}}	// OTGFSLPEN
+					)
+
 enum class AHB2LPENRField {
 	DCMILPEN,		/*!< Camera interface enable during Sleep mode*/
 	OTGFSLPEN,		/*!< USB OTG FS clock enable during Sleep mode*/
 };
 
-static constexpr Register<, AHB2LPENRField> AHB2LPENR{BASE_ADDR, 0x54U};
+static constexpr Register<AHB2LPENRBitList, AHB2LPENRField> AHB2LPENR{BASE_ADDR, 0x54U};
 /**@}*/
 
 /**
@@ -389,12 +621,17 @@ static constexpr Register<, AHB2LPENRField> AHB2LPENR{BASE_ADDR, 0x54U};
  * @{
  */
 
+SETUP_REGISTER_INFO(AHB3LPENRBitList, /**/
+					Binary<>{BitPos_t{1}},	// QSPILPEN
+					Binary<>{BitPos_t{0}}	// FMCLPEN
+					)
+
 enum class AHB3LPENRField {
 	QSPILPEN,		/*!< QUADSPI memory controller module clock enable during Sleep mode*/
 	FMCLPEN,		/*!< Flexible memory controller module clock enable during Sleep mode*/
 };
 
-static constexpr Register<, AHB3LPENRField> AHB3LPENR{BASE_ADDR, 0x58U};
+static constexpr Register<AHB3LPENRBitList, AHB3LPENRField> AHB3LPENR{BASE_ADDR, 0x58U};
 /**@}*/
 
 /**
@@ -402,6 +639,35 @@ static constexpr Register<, AHB3LPENRField> AHB3LPENR{BASE_ADDR, 0x58U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB1LPENRBitList, /**/
+					Binary<>{BitPos_t{29}},	// DACLPEN
+					Binary<>{BitPos_t{28}},	// PWRLPEN
+					Binary<>{BitPos_t{27}},	// CECLPEN
+					Binary<>{BitPos_t{26}},	// CAN2LPEN
+					Binary<>{BitPos_t{25}},	// CAN1LPEN
+					Binary<>{BitPos_t{24}},	// I2CFMP1LPEN
+					Binary<>{BitPos_t{23}},	// I2C3LPEN
+					Binary<>{BitPos_t{22}},	// I2C2LPEN
+					Binary<>{BitPos_t{21}},	// I2C1LPEN
+					Binary<>{BitPos_t{20}},	// UART5LPEN
+					Binary<>{BitPos_t{19}},	// UART4LPEN
+					Binary<>{BitPos_t{18}},	// USART3LPEN
+					Binary<>{BitPos_t{17}},	// USART2LPEN
+					Binary<>{BitPos_t{16}},	// SPDIFLPEN
+					Binary<>{BitPos_t{15}},	// SPI3LPEN
+					Binary<>{BitPos_t{14}},	// SPI2LPEN
+					Binary<>{BitPos_t{11}},	// WWDGLPEN
+					Binary<>{BitPos_t{8}},	// TIM14LPEN
+					Binary<>{BitPos_t{7}},	// TIM13LPEN
+					Binary<>{BitPos_t{6}},	// TIM12LPEN
+					Binary<>{BitPos_t{5}},	// TIM7LPEN
+					Binary<>{BitPos_t{4}},	// TIM6LPEN
+					Binary<>{BitPos_t{3}},	// TIM5LPEN
+					Binary<>{BitPos_t{2}},	// TIM4LPEN
+					Binary<>{BitPos_t{1}},	// TIM3LPEN
+					Binary<>{BitPos_t{0}}	// TIM2LPEN
+					)
 
 enum class APB1LPENRField {
 	DACLPEN,		/*!< DAC interface clock enable during Sleep mode*/
@@ -432,7 +698,7 @@ enum class APB1LPENRField {
 	TIM2LPEN,		/*!< TIM2 clock enable during Sleep mode*/
 };
 
-static constexpr Register<, APB1LPENRField> APB1LPENR{BASE_ADDR, 0x60U};
+static constexpr Register<APB1LPENRBitList, APB1LPENRField> APB1LPENR{BASE_ADDR, 0x60U};
 /**@}*/
 
 /**
@@ -440,6 +706,25 @@ static constexpr Register<, APB1LPENRField> APB1LPENR{BASE_ADDR, 0x60U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(APB2LPENRBitList, /**/
+					Binary<>{BitPos_t{23}},	// SAI2LPEN
+					Binary<>{BitPos_t{22}},	// SAI1LPEN
+					Binary<>{BitPos_t{18}},	// TIM11LPEN
+					Binary<>{BitPos_t{17}},	// TIM10LPEN
+					Binary<>{BitPos_t{16}},	// TIM9LPEN
+					Binary<>{BitPos_t{14}},	// SYSCFGLPEN
+					Binary<>{BitPos_t{13}},	// SPI4LPEN
+					Binary<>{BitPos_t{12}},	// SPI1LPEN
+					Binary<>{BitPos_t{11}},	// SDIOLPEN
+					Binary<>{BitPos_t{10}},	// ADC3LPEN
+					Binary<>{BitPos_t{9}},	// ADC2LPEN
+					Binary<>{BitPos_t{8}},	// ADC1LPEN
+					Binary<>{BitPos_t{5}},	// USART6LPEN
+					Binary<>{BitPos_t{4}},	// USART1LPEN
+					Binary<>{BitPos_t{1}},	// TIM8LPEN
+					Binary<>{BitPos_t{0}}	// TIM1LPEN
+					)
 
 enum class APB2LPENRField {
 	SAI2LPEN,		/*!< SAI2 clock enable*/
@@ -460,7 +745,7 @@ enum class APB2LPENRField {
 	TIM1LPEN,		/*!< TIM1 clock enable during Sleep mode*/
 };
 
-static constexpr Register<, APB2LPENRField> APB2LPENR{BASE_ADDR, 0x64U};
+static constexpr Register<APB2LPENRBitList, APB2LPENRField> APB2LPENR{BASE_ADDR, 0x64U};
 /**@}*/
 
 /**
@@ -468,6 +753,16 @@ static constexpr Register<, APB2LPENRField> APB2LPENR{BASE_ADDR, 0x64U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(BDCRBitList, /**/
+					Binary<>{BitPos_t{0}},	// LSEON
+					StatusBit<1>{BitPos_t{1}},	// LSERDY
+					Binary<>{BitPos_t{2}},	// LSEBYP
+					Binary<>{BitPos_t{3}},	// LSEMOD
+					Bit<2>{BitPos_t{8}},	// RTCSEL
+					Binary<>{BitPos_t{15}},	// RTCEN
+					Binary<>{BitPos_t{16}}	// BDRST
+					)
 
 enum class BDCRField {
 	LSEON,		/*!< External low-speed oscillator enable*/
@@ -479,7 +774,7 @@ enum class BDCRField {
 	BDRST,		/*!< Backup domain software reset*/
 };
 
-static constexpr Register<, BDCRField> BDCR{BASE_ADDR, 0x70U};
+static constexpr Register<BDCRBitList, BDCRField> BDCR{BASE_ADDR, 0x70U};
 /**@}*/
 
 /**
@@ -487,6 +782,19 @@ static constexpr Register<, BDCRField> BDCR{BASE_ADDR, 0x70U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(CSRBitList, /**/
+					Binary<>{BitPos_t{0}},	// LSION
+					StatusBit<1>{BitPos_t{1}},	// LSIRDY
+					Binary<>{BitPos_t{24}},	// RMVF
+					Binary<>{BitPos_t{25}},	// BORRSTF
+					Binary<>{BitPos_t{26}},	// PADRSTF
+					Binary<>{BitPos_t{27}},	// PORRSTF
+					Binary<>{BitPos_t{28}},	// SFTRSTF
+					Binary<>{BitPos_t{29}},	// WDGRSTF
+					Binary<>{BitPos_t{30}},	// WWDGRSTF
+					Binary<>{BitPos_t{31}}	// LPWRRSTF
+					)
 
 enum class CSRField {
 	LSION,		/*!< Internal low-speed oscillator enable*/
@@ -501,7 +809,7 @@ enum class CSRField {
 	LPWRRSTF,		/*!< Low-power reset flag*/
 };
 
-static constexpr Register<, CSRField> CSR{BASE_ADDR, 0x74U};
+static constexpr Register<CSRBitList, CSRField> CSR{BASE_ADDR, 0x74U};
 /**@}*/
 
 /**
@@ -510,6 +818,13 @@ static constexpr Register<, CSRField> CSR{BASE_ADDR, 0x74U};
  * @{
  */
 
+SETUP_REGISTER_INFO(SSCGRBitList, /**/
+					Bit<13, std::uint16_t>{BitPos_t{0}},	// MODPER
+					Bit<15, std::uint16_t>{BitPos_t{13}},	// INCSTEP
+					Binary<>{BitPos_t{30}},	// SPREADSEL
+					Binary<>{BitPos_t{31}}	// SSCGEN
+					)
+
 enum class SSCGRField {
 	MODPER,		/*!< Modulation period*/
 	INCSTEP,		/*!< Incrementation step*/
@@ -517,7 +832,7 @@ enum class SSCGRField {
 	SSCGEN,		/*!< Spread spectrum modulation enable*/
 };
 
-static constexpr Register<, SSCGRField> SSCGR{BASE_ADDR, 0x80U};
+static constexpr Register<SSCGRBitList, SSCGRField> SSCGR{BASE_ADDR, 0x80U};
 /**@}*/
 
 /**
@@ -525,6 +840,14 @@ static constexpr Register<, SSCGRField> SSCGR{BASE_ADDR, 0x80U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(PLLI2SCFGRBitList, /**/
+					Bit<3>{BitPos_t{28}},	// PLLI2SR
+					Bit<4>{BitPos_t{24}},	// PLLI2SQ
+					Bit<2>{BitPos_t{16}},	// PLLI2SP
+					Bit<9, std::uint16_t>{BitPos_t{6}},	// PLLI2SN
+					Bit<6>{BitPos_t{0}}	// PLLI2SM
+					)
 
 enum class PLLI2SCFGRField {
 	PLLI2SR,		/*!< PLLI2S division factor for I2S clocks*/
@@ -534,7 +857,7 @@ enum class PLLI2SCFGRField {
 	PLLI2SM,		/*!< Division factor for audio PLL (PLLI2S) input clock*/
 };
 
-static constexpr Register<, PLLI2SCFGRField> PLLI2SCFGR{BASE_ADDR, 0x84U};
+static constexpr Register<PLLI2SCFGRBitList, PLLI2SCFGRField> PLLI2SCFGR{BASE_ADDR, 0x84U};
 /**@}*/
 
 /**
@@ -543,6 +866,13 @@ static constexpr Register<, PLLI2SCFGRField> PLLI2SCFGR{BASE_ADDR, 0x84U};
  * @{
  */
 
+SETUP_REGISTER_INFO(PLLSAICFGRBitList, /**/
+					Bit<4>{BitPos_t{24}},	// PLLSAIQ
+					Bit<2>{BitPos_t{16}},	// PLLSAIP
+					Bit<9, std::uint16_t>{BitPos_t{6}},	// PLLSAIN
+					Bit<6>{BitPos_t{0}}	// PLLSAIM
+					)
+
 enum class PLLSAICFGRField {
 	PLLSAIQ,		/*!< PLLSAI division factor for SAIs clock*/
 	PLLSAIP,		/*!< PLLSAI division factor for 48 MHz clock*/
@@ -550,7 +880,7 @@ enum class PLLSAICFGRField {
 	PLLSAIM,		/*!< Division factor for audio PLLSAI input clock*/
 };
 
-static constexpr Register<, PLLSAICFGRField> PLLSAICFGR{BASE_ADDR, 0x88U};
+static constexpr Register<PLLSAICFGRBitList, PLLSAICFGRField> PLLSAICFGR{BASE_ADDR, 0x88U};
 /**@}*/
 
 /**
@@ -558,6 +888,16 @@ static constexpr Register<, PLLSAICFGRField> PLLSAICFGR{BASE_ADDR, 0x88U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(DCKCFGRBitList, /**/
+					Bit<2>{BitPos_t{27}},	// I2S2SRC
+					Bit<2>{BitPos_t{25}},	// I2S1SRC
+					Binary<>{BitPos_t{24}},	// TIMPRE
+					Bit<2>{BitPos_t{22}},	// SAI2SRC
+					Bit<2>{BitPos_t{20}},	// SAI1SRC
+					Bit<5>{BitPos_t{8}},	// PLLSAIDIVQ
+					Bit<5>{BitPos_t{0}}	// PLLI2SDIVQ
+					)
 
 enum class DCKCFGRField {
 	I2S2SRC,		/*!< I2S APB2 clock source selection*/
@@ -569,7 +909,7 @@ enum class DCKCFGRField {
 	PLLI2SDIVQ,		/*!< PLLI2S division factor for SAIs clock*/
 };
 
-static constexpr Register<, DCKCFGRField> DCKCFGR{BASE_ADDR, 0x8cU};
+static constexpr Register<DCKCFGRBitList, DCKCFGRField> DCKCFGR{BASE_ADDR, 0x8cU};
 /**@}*/
 
 /**
@@ -577,6 +917,16 @@ static constexpr Register<, DCKCFGRField> DCKCFGR{BASE_ADDR, 0x8cU};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(CKGATENRBitList, /**/
+					Binary<>{BitPos_t{6}},	// RCC_CKEN
+					Binary<>{BitPos_t{5}},	// FLITF_CKEN
+					Binary<>{BitPos_t{4}},	// SRAM_CKEN
+					Binary<>{BitPos_t{3}},	// SPARE_CKEN
+					Binary<>{BitPos_t{2}},	// CM4DBG_CKEN
+					Binary<>{BitPos_t{1}},	// AHB2APB2_CKEN
+					Binary<>{BitPos_t{0}}	// AHB2APB1_CKEN
+					)
 
 enum class CKGATENRField {
 	RCC_CKEN,		/*!< RCC clock enable*/
@@ -588,7 +938,7 @@ enum class CKGATENRField {
 	AHB2APB1_CKEN,		/*!< AHB to APB1 Bridge clock enable*/
 };
 
-static constexpr Register<, CKGATENRField> CKGATENR{BASE_ADDR, 0x90U};
+static constexpr Register<CKGATENRBitList, CKGATENRField> CKGATENR{BASE_ADDR, 0x90U};
 /**@}*/
 
 /**
@@ -596,6 +946,14 @@ static constexpr Register<, CKGATENRField> CKGATENR{BASE_ADDR, 0x90U};
  *
  * @{
  */
+
+SETUP_REGISTER_INFO(DCKCFGR2BitList, /**/
+					Binary<>{BitPos_t{29}},	// SPDIFSEL
+					Binary<>{BitPos_t{28}},	// SDIOSEL
+					Binary<>{BitPos_t{27}},	// CK48MSEL
+					Binary<>{BitPos_t{26}},	// CECSEL
+					Bit<2>{BitPos_t{22}}	// FMPI2C1SEL
+					)
 
 enum class DCKCFGR2Field {
 	SPDIFSEL,		/*!< SPDIF clock selection*/
@@ -605,7 +963,7 @@ enum class DCKCFGR2Field {
 	FMPI2C1SEL,		/*!< I2C4 kernel clock source selection*/
 };
 
-static constexpr Register<, DCKCFGR2Field> DCKCFGR2{BASE_ADDR, 0x94U};
+static constexpr Register<DCKCFGR2BitList, DCKCFGR2Field> DCKCFGR2{BASE_ADDR, 0x94U};
 /**@}*/
 
 

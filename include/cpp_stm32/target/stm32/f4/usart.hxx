@@ -30,8 +30,8 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 	std::uint16_t const mantissa = usart_div >> 4;
 	std::uint8_t const fraction	 = usart_div & 0xF;
-	auto const val_to_write			 = BitGroup{fraction, mantissa};
-	reg::BRR<InputPort>.template setBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(val_to_write);
+
+	reg::BRR<InputPort>.template setBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
 
 template <Port InputPort>
@@ -45,25 +45,24 @@ constexpr void set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noex
 	// maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value
 	// so that t_flow_ctl & mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl & mask = 0 when
 	// t_flow_ctl = none, e.g. ctl = 1, rts = 3, none = 4
-	std::uint8_t const cts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
-	std::uint8_t const rts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
-	auto const val_to_write = BitGroup{rts, cts};
-	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(val_to_write);
+	std::uint8_t const cts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
+	std::uint8_t const rts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
+
+	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(cts, rts);
 }
 
 template <Port InputPort>
 constexpr void set_transfer_mode(Mode const& t_mode) noexcept {
-	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
-	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
-	auto const val_to_write = BitGroup{txe, rxe};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(val_to_write);
+	std::uint8_t const tx_en = (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
+	std::uint8_t const rx_en = (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
+
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(tx_en, rx_en);
 }
 
 template <Port InputPort>
 constexpr void set_parity(Parity const& t_parity) noexcept {
-	std::uint8_t const pe		= (t_parity != Parity::None);
-	auto const val_to_write = BitGroup{pe, t_parity};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
+	std::uint8_t const pe = (t_parity != Parity::None);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(pe, t_parity);
 }
 
 template <Port InputPort, Stopbit StopBit>
@@ -121,9 +120,8 @@ constexpr void send_blocking(std::uint8_t const& t_data) noexcept {
 // @todo the interface should unify, StopBit_t here makes it hard to do so.
 template <Port InputPort, usart::Stopbit Stop>
 constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
-	std::uint8_t const pe		= (t_p != Parity::None);
-	auto const val_to_write = BitGroup{t_d, pe, t_p};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
+	std::uint8_t const pe = (t_p != Parity::None);
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(t_d, pe, t_p);
 	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(Stop);
 }
 

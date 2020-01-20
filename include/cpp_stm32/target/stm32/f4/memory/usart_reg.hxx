@@ -103,7 +103,7 @@ SETUP_REGISTER_INFO(UsartBrrInfo, Bit<4>{BitPos_t{0}}, Bit<12, std::uint16_t>{Bi
 enum class BrrBit { DivFraction, DivMantissa };
 
 template <Port InputPort>
-static constexpr Register<UsartBrrInfo, BrrBit> BRR{BASE_ADDR(InputPort), 0x08U};
+static constexpr Register<UsartBrrInfo, BrrBit, Access::HalfWord> BRR{BASE_ADDR(InputPort), 0x08U};
 /**@}*/
 
 /**

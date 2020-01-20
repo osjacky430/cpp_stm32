@@ -29,41 +29,41 @@ namespace cpp_stm32::rcc {
 // extend en and rst so that it takes template param pack
 template <PeriphClk PeriphClk>
 static constexpr void enable_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<enable_bit>();
 }
 
 template <PeriphClk PeriphClk>
 static constexpr void reset_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const rst_bit			= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<rst_bit>();
 }
 
 template <ClkSrc Clk>
 static constexpr void enable_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<enable_bit>();
 }
 
 template <ClkSrc Clk>
 static constexpr void disable_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<enable_bit>();
 }
 
 template <ClkSrc Clk>
 static constexpr bool is_osc_rdy() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getOscRdyReg<Clk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const rdy_bit			= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getOscRdyReg<Clk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto rdy_bit			= std::get<1>(reg_bit_pair);
 	return get<0>(CTL_REG.template readBit<rdy_bit>(ValueOnly));
 }
 
@@ -75,17 +75,17 @@ static constexpr void wait_osc_rdy() noexcept {
 
 template <ClkSrc Clk>
 static constexpr void bypass_clksrc() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto bypass_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<bypass_bit>();
 }
 
 template <ClkSrc Clk>
 static constexpr void no_bypass() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
-	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
-	constexpr auto const bypass_bit		= std::get<1>(reg_bit_pair);
+	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto bypass_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<bypass_bit>();
 }
 
@@ -112,23 +112,20 @@ static constexpr void set_pllsrc() {
 
 static constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																								 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
-	auto const val_to_set = BitGroup{t_pllm, t_plln, t_pllp, t_pllq, t_pllr};
 	reg::PLLCFGR.setBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
-											reg::PllCfgBit::PLLR>(val_to_set);
+											reg::PllCfgBit::PLLR>(t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
 template <ClkSrc Clk>
 static constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																								PllQ const& t_pllq, PllR const& t_pllr) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
-	auto const val_to_set = BitGroup{Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr};
 	reg::PLLCFGR.setBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
-											reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(val_to_set);
+											reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
 static constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
-	auto const val_to_set = BitGroup{t_hpre, t_ppre1, t_ppre2};
-	reg::CFGR.setBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(val_to_set);
+	reg::CFGR.setBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
 
 }	 // namespace cpp_stm32::rcc

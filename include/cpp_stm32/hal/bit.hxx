@@ -63,8 +63,8 @@ class Bit {
 template <BitMod Mod = BitMod::RdWr>
 using Binary = Bit<1, std::uint8_t, Mod>;
 
-template <std::uint32_t L>
-using StatusBit = Bit<L, std::uint8_t, BitMod::RdOnly>;
+template <std::uint32_t L, typename DataType = std::uint8_t>
+using StatusBit = Bit<L, DataType, BitMod::RdOnly>;
 
 template <typename... Args>
 class BitGroup {
@@ -132,4 +132,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

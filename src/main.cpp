@@ -17,7 +17,7 @@ using namespace cpp_stm32;
 int main() {
 	sys::Clock::init<rcc::ClkSrc::Hse>();
 
-	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 9600_Baud};
+	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 	DigitalOut<PinName::PA_5> led;
 
 	while (true) {

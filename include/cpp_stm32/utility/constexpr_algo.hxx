@@ -42,6 +42,11 @@ constexpr InputIt find_if(InputIt first, InputIt last, UnaryPredicate p) {
 	return last;
 }
 
+template <class InputIt, class UnaryPredicate>
+constexpr bool all_of(InputIt first, InputIt last, UnaryPredicate p) {
+	return std::find_if_not(first, last, p) == last;
+}
+
 template <class ForwardIt>
 constexpr ForwardIt unique(ForwardIt first, ForwardIt last) {
 	if (first == last) return last;
@@ -63,7 +68,7 @@ constexpr void fill(ForwardIt first, ForwardIt last, T const& value) {
 }
 
 template <class InputIt, class OutputIt>
-OutputIt copy(InputIt first, InputIt last, OutputIt d_first) {
+constexpr OutputIt copy(InputIt first, InputIt last, OutputIt d_first) {
 	while (first != last) {
 		*d_first++ = *first++;
 	}
@@ -124,7 +129,6 @@ constexpr auto sort(Range&& range, Compare cmp = Compare{}) {
 /**
  * @ref https://github.com/llvm-mirror/libcxx/blob/a12cb9d211019d99b5875b6d8034617cbc24c2cc/include/algorithm#L2177
  */
-
 template <class BinaryPredicate, class InputIt, class OutputIt>
 constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, BinaryPredicate pred) {
 	if (first != last) {
