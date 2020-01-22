@@ -154,14 +154,6 @@ class Register {
 		constexpr bool mod_only_byte_0 = (last_byte_to_mod == 0);
 
 		if constexpr (must_thread_safe) {
-			if constexpr ((to_underlying(IoOp) & to_underlying(Access::Byte)) != 0 && mod_only_byte_0) {
-				return MMIO8(m_base, m_offset);
-			} else if constexpr (constexpr bool mod_byte_01 = (last_byte_to_mod == 1);
-													 (to_underlying(IoOp) & to_underlying(Access::HalfWord)) != 0 && mod_byte_01) {
-				return MMIO16(m_base, m_offset);
-			} else {
-				return MMIO32(m_base, m_offset);
-			}
 		} else {
 			// note: not sure if there is performance difference regarding the speed
 			//  		 of byte, half word, word access.
