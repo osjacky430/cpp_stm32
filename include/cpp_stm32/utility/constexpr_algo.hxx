@@ -16,11 +16,35 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
 #include <iterator>
 #include <utility>
 
 namespace cpp_stm32::cstd {
+
+template <class T, std::size_t Size>
+constexpr auto array_count(std::array<T, Size> const& t_arr, T const& t_val) {
+	int ret = 0;
+	for (int i = 0; i < Size; ++i) {
+		if (t_arr[i] == t_val) {
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
+template <class InputIt, class T>
+constexpr auto count(InputIt first, InputIt last, const T& value) {
+	typename std::iterator_traits<InputIt>::difference_type ret = 0;
+	for (; first != last; ++first) {
+		if (*first == value) {
+			ret++;
+		}
+	}
+	return ret;
+}
 
 template <class InputIt, class T>
 constexpr InputIt find(InputIt first, InputIt last, const T& value) {

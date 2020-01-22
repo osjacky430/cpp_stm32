@@ -28,6 +28,7 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	constexpr auto clk_freq = (InputPort == Port::Usart1 || InputPort == Port::Usart6 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
 
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
+
 	std::uint16_t const mantissa = usart_div >> 4;
 	std::uint8_t const fraction	 = usart_div & 0xF;
 

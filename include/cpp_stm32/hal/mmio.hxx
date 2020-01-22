@@ -174,15 +174,15 @@ class MMIO_t {
 // 	return MMIO_t<T>{addr + offset};
 // }
 
-template <typename T>
-constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
-	return MMIO_t{*reinterpret_cast<volatile T*>(addr + offset)};
-}
-
 // template <typename T>
-// constexpr decltype(auto) MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
-// 	return *reinterpret_cast<volatile T*>(addr + offset);
+// constexpr auto MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
+// 	return MMIO_t{*reinterpret_cast<volatile T*>(addr + offset)};
 // }
+
+template <typename T>
+constexpr decltype(auto) MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
+	return *reinterpret_cast<volatile T*>(addr + offset);
+}
 
 static constexpr auto const MMIO32 = MMIO<std::uint32_t>;
 static constexpr auto const MMIO16 = MMIO<std::uint16_t>;

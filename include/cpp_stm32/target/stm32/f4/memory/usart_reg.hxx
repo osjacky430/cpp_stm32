@@ -89,7 +89,7 @@ SETUP_REGISTER_INFO(UsartDrInfo, Bit<8>{BitPos_t{0}})
 enum class DrBit { Dr };
 
 template <Port InputPort>
-static constexpr Register<UsartDrInfo, DrBit> DR{BASE_ADDR(InputPort), 0x04U};
+static constexpr Register<UsartDrInfo, DrBit, Access::Byte> DR{BASE_ADDR(InputPort), 0x04U};
 
 /**@}*/
 
