@@ -16,23 +16,27 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
+#include <utility>
 
 namespace cpp_stm32 {
 
 /**
- * @enum  	PeriphAddr
- * @brief		Device specific peripheral address
+ *
  */
-enum class PeriphAddr : std::uint32_t {
-	PeriphBase = 0x4000'0000U,
-	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
-	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
-	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
-};
+template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
+constexpr auto to_underlying(Enum t_e) noexcept {
+	return static_cast<std::underlying_type_t<Enum>>(t_e);
+}
+
+/**
+ * @brief		This function handles AND operator of #Access
+ * @param  	lhs		Left hand side
+ * @param 	rhs 	Right hand side
+ * @return 	Numeric value of AND operation of lhs and rhs
+ */
+template <typename Enum>
+constexpr auto operator&(Enum const& lhs, Enum const& rhs) noexcept {
+	return Enum{to_underlying(lhs) & to_underlying(rhs)};
+}
 
 }	// namespace cpp_stm32

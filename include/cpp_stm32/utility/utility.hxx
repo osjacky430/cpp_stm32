@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "cpp_stm32/detail/index_interval.hxx"
+#include "cpp_stm32/utility/enum_op.hxx"
 
 namespace cpp_stm32 {
 
@@ -37,18 +38,10 @@ static constexpr auto IsNthTypeSame = std::is_same_v<NthType<N, Args...>, T>;
 /**
  *
  */
-template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
-constexpr auto to_underlying(Enum t_e) noexcept {
-	return static_cast<std::underlying_type_t<Enum>>(t_e);
-}
-
-/**
- *
- */
 template <typename Test, template <typename...> class Ref>
 static constexpr bool is_specialization = false;
 
 template <template <typename...> class Ref, typename... Args>
 static constexpr bool is_specialization<Ref<Args...>, Ref> = true;
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

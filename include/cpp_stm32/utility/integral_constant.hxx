@@ -33,25 +33,4 @@ using uint32_c = std::integral_constant<std::uint32_t, Val>;
 template <std::uint8_t Val>
 using uint8_c = std::integral_constant<std::uint8_t, Val>;
 
-}	 // namespace cpp_stm32
-
-// @todo find a better place
-namespace cpp_stm32::detail {
-
-constexpr int to_number(char c) noexcept { return static_cast<int>(c) - static_cast<int>('0'); }
-
-template <int Pow>
-constexpr int decimal_pow() noexcept {
-	if constexpr (Pow == 0) {
-		return 1;
-	} else {
-		return decimal_pow<Pow - 1>() * 10;
-	}
-}
-
-template <typename... num, std::size_t... Idx>
-constexpr auto str_to_num(std::tuple<num...> const& str, std::index_sequence<Idx...> const&) noexcept {
-	return ((to_number(std::get<Idx>(str)) * decimal_pow<sizeof...(Idx) - Idx - 1>()) + ...);
-}
-
-}	 // namespace cpp_stm32::detail
+}	// namespace cpp_stm32

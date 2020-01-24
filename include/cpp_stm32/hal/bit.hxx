@@ -58,6 +58,13 @@ class Bit {
 			return (t_val.get() << pos) & mask;
 		}
 	}
+
+	template <typename ValueType>
+	[[nodiscard]] static constexpr auto isTypeAvailable() noexcept {
+		return std::is_same_v<ValueType, DataType>;
+	}
+	[[nodiscard]] static constexpr auto isWritable() noexcept { return (Mod & BitMod::WrOnly) == BitMod::WrOnly; }
+	[[nodiscard]] static constexpr auto isReadable() noexcept { return (Mod & BitMod::RdOnly) == BitMod::RdOnly; }
 };
 
 template <BitMod Mod = BitMod::RdWr>
@@ -132,4 +139,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

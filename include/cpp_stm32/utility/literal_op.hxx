@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "cpp_stm32/detail/char_literal_idx.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
 
 namespace cpp_stm32 {
@@ -34,4 +35,4 @@ constexpr auto operator"" _ic() noexcept {
 	return size_c<idx>{};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

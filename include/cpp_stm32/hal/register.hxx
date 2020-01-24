@@ -32,7 +32,7 @@ namespace cpp_stm32 {
 /**
  * @enum 	Access
  */
-enum class Access { Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
+enum class Access { None = 0, Word = 0b100, HalfWord = 0b010, Byte = 0b001 };
 
 /**
  * @brief		This function handles OR operator of #Access
@@ -102,24 +102,18 @@ class Register {
 	template <BitListIdx... Idx>
 	using IsolateFrom_t = std::integer_sequence<BitListIdx, Idx...>;
 
+	template <bool NeedTS, Access TSIo>
+	struct ThreadSafe {};
+
+	static constexpr auto NoThreadSafe = ThreadSafe<false, Access::None>{};
+
 	std::uint32_t const m_base;		/*!< Peripheral base address */
 	std::uint32_t const m_offset; /*!< Offset relative to peripheral base */
 
 	/**
-	 * @brief		This function handles MMIO operation according to Access flag
-	 * @return 	Register value
-	 * @note 		This is written in relatively easy way, can be extended if needed
+	 * [viewRegByAccessMode description]
+	 * @return [description]
 	 */
-	constexpr decltype(auto) readReg() const noexcept {
-		if constexpr ((to_underlying(IoOp) & to_underlying(Access::Word)) != 0) {
-			return MMIO32(m_base, m_offset);
-		} else if constexpr ((to_underlying(IoOp) & to_underlying(Access::HalfWord)) != 0) {
-			return MMIO16(m_base, m_offset);
-		} else if constexpr ((to_underlying(IoOp) & to_underlying(Access::Byte)) != 0) {
-			return MMIO8(m_base, m_offset);
-		}
-	}
-
 	template <BitListIdx... Idx, Access IoMode = Access::Byte>
 	static constexpr auto viewRegByAccessMode() noexcept {
 		if constexpr (IoMode == Access::Byte) {
@@ -139,21 +133,38 @@ class Register {
 	}
 
 	/**
-	 * [decltype description]
-	 * @return      [description]
+	 * [idxInAccessUnit description]
+	 * @return [description]
 	 */
-	template <BitListIdx... Idx, bool must_thread_safe = false>
-	constexpr decltype(auto) readReg() const noexcept {
-		constexpr auto mod_byte_n = viewRegByAccessMode<Idx...>();
+	template <BitListIdx... BitIdx, Access IoMode = Access::Byte>
+	static constexpr auto idxInAccessUnit() noexcept {
+		constexpr auto mod_n = viewRegByAccessMode<BitIdx..., IoMode>();
 
-		constexpr auto last_byte_to_mod = [=]() {
-			for (int i = 3; i >= 0; --i) {
-				if (mod_byte_n[i]) return i;
+		for (int i = 0; i < mod_n.size(); ++i) {
+			if (mod_n[i]) {
+				return i;
 			}
-		}();
-		constexpr bool mod_only_byte_0 = (last_byte_to_mod == 0);
+		}
+	}
 
-		if constexpr (must_thread_safe) {
+	/**
+	 * @brief		This function handles MMIO operation according to Access flag
+	 * @return 	Register value
+	 * @note 		This is written in relatively easy way, can be extended if needed
+	 */
+	template <BitListIdx... Idx, bool NeedTS = false, Access TSIo = Access::None>
+	constexpr decltype(auto) readReg(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
+		if constexpr (NeedTS) {
+			constexpr auto idx	= idxInAccessUnit<Idx..., TSIo>();
+			constexpr auto mmio = []() {
+				if constexpr (TSIo == Access::Byte) {
+					return MMIO8;
+				} else if constexpr (TSIo == Access::HalfWord) {
+					return MMIO16;
+				}
+			}();
+
+			return mmio(m_base + m_offset, to_underlying(TSIo) * idx);
 		} else {
 			// note: not sure if there is performance difference regarding the speed
 			//  		 of byte, half word, word access.
@@ -180,55 +191,15 @@ class Register {
 			// 			8000384:	6013      	str	r3, [r2, #0]
 			//
 			// as for reason why, still investigating...
-			return readReg();
+			if constexpr ((IoOp & Access::Word) == Access::Word) {
+				return MMIO32(m_base, m_offset);
+			} else if constexpr ((IoOp & Access::HalfWord) == Access::HalfWord) {
+				return MMIO16(m_base, m_offset);
+			} else if constexpr ((IoOp & Access::Byte) == Access::Byte) {
+				return MMIO8(m_base, m_offset);
+			}
 		}
 	}
-
-	/**
-	 * @brief		This function check if the type of the value to be set to is valid
-	 * @tparam 	BitIdx			The bit to be set in the register
-	 * @tparam 	ValueType		The type of the value to be set to
-	 * @rerturn	true if the type matches with the bit, false otherwise.
-	 */
-	template <BitListIdx BitIdx, typename ValueType>
-	static constexpr auto IS_TYPE_AVAILABLE = []() {
-		using BitType = decltype(GET_BIT<BitIdx>());
-		return std::is_same_v<ValueType, typename BitType::AbstractType>;
-	};
-
-	/**
-	 * @brief		This function checks if the bit mode of the bit equals the input bitmod
-	 * @tparam 	BitIdx 		The bit to be checked in the register
-	 * @param		t_check		see @ref BitMod
-	 * @return 	true if two bitmods are equal, false otherwise.
-	 */
-	template <BitListIdx BitIdx>
-	static constexpr auto CHECK_BIT_MOD = [](BitMod const& t_check) {
-		using BitType = decltype(GET_BIT<BitIdx>());
-		return BitType::MOD == t_check;
-	};
-
-	/**
-	 * @brief		This function checks if the bit mode of the bit is writable
-	 * @tparam 	BitIdx		The bit to be checked in the register.
-	 * @return 	true if bitmod is writable, false otherwise.
-	 */
-	template <BitListIdx BitIdx>
-	static constexpr auto IS_BIT_WRITABLE = []() {
-		using BitType = decltype(GET_BIT<BitIdx>());
-		return (to_underlying(BitType::MOD) & to_underlying(BitMod::WrOnly)) != 0;
-	};
-
-	/**
-	 * @brief		This function checks if the bit mode of the bit is readable
-	 * @tparam 	BitIdx 		The bit to be checked in the register.
-	 * @return 	true if bitmod is readable, false otherwise.
-	 */
-	template <BitListIdx BitIdx>
-	static constexpr auto IS_BIT_READABLE = []() {
-		using BitType = decltype(GET_BIT<BitIdx>());
-		return (to_underlying(BitType::MOD) & to_underlying(BitMod::RdOnly)) != 0;
-	};
 
 	/**
 	 * @brief		This function reads single bit.
@@ -260,16 +231,29 @@ class Register {
 	 * @tparam  	BitIdx	Variadic template parameter that contains the positions of bits.
 	 * @return		If reading register is necessary, then return the value of the register, otherwise return 0.
 	 */
-	template <BitListIdx... BitIdx>
-	constexpr decltype(auto) readCurrentVal() const noexcept {
-		constexpr auto need_to_read_current_val =
-			((!CHECK_BIT_MOD<BitIdx>(BitMod::WrOnly) && !CHECK_BIT_MOD<BitIdx>(BitMod::RdSet)) || ...);
+	template <BitListIdx... BitIdx, bool NeedTS = false, Access TSIo = Access::None>
+	constexpr decltype(auto) readCurrentVal(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
+		constexpr auto need_to_read_current_val = [](auto const& bit) {
+			return (!(bit.MOD == BitMod::WrOnly) && !(bit.MOD == BitMod::RdSet));
+		};
 
-		if constexpr (need_to_read_current_val) {
-			// return readReg();
-			return readReg<BitIdx...>();
+		if constexpr ((need_to_read_current_val(GET_BIT<BitIdx>()) && ...)) {
+			return readReg<BitIdx...>(t_ts);
 		} else {
 			return 0;
+		}
+	}
+
+	/**
+	 * [isolateFrom description]
+	 * @return [description]
+	 */
+	template <BitListIdx... BitIdx, BitListIdx... Avoid>
+	static constexpr auto getThreadSafeAccess(IsolateFrom_t<Avoid...> const& t_isolate) noexcept {
+		if constexpr (IS_SEPARABLE<Access::Byte, BitIdx...>(t_isolate)) {
+			return Access::Byte;
+		} else if constexpr (IS_SEPARABLE<Access::HalfWord, BitIdx...>(t_isolate)) {
+			return Access::HalfWord;
 		}
 	}
 
@@ -299,7 +283,6 @@ class Register {
 
 		static_assert(bit.LENGTH == 1);
 		readReg<BitIdx>() |= bit.mask;
-		// readReg() |= bit.mask;
 	}
 
 	/**
@@ -311,15 +294,14 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx, typename ValueType>
 	constexpr void setBit(ValueType const& t_param) const noexcept {
-		static_assert((IS_TYPE_AVAILABLE<BitIdx, ValueType>() && ...));
-		static_assert((IS_BIT_WRITABLE<BitIdx>() && ...));
+		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueType>() && ...));
+		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
 
 		auto const current_val = readCurrentVal<BitIdx...>();
 
 		auto const mod_val		= (... | GET_BIT<BitIdx>()(t_param));
 		auto const clear_mask = ~(... | GET_BIT<BitIdx>().mask);
 
-		// readReg() = (current_val & clear_mask) | mod_val;
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
 
@@ -333,8 +315,8 @@ class Register {
 	template <BitListIdx... BitIdx, typename... ValueTypes>
 	constexpr void setBit(BitGroup<ValueTypes...> const& t_param) const noexcept {
 		static_assert(sizeof...(BitIdx) == sizeof...(ValueTypes));
-		static_assert((IS_TYPE_AVAILABLE<BitIdx, ValueTypes>() && ...));
-		static_assert((IS_BIT_WRITABLE<BitIdx>() && ...));
+		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueTypes>() && ...));
+		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
 
 		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_param) {
 			constexpr auto bit		= GET_BIT<BitListIdx{t_bit_idx()}>();
@@ -348,7 +330,6 @@ class Register {
 		auto const clear_mask = ~(... | GET_BIT<BitIdx>().mask);
 
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
-		// readReg() = ((current_val & clear_mask) | mod_val);
 	}
 
 	/**
@@ -371,12 +352,7 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx, typename... ValueTypes, BitListIdx... Avoid>
 	constexpr void setBit(BitGroup<ValueTypes...> const& t_val, IsolateFrom_t<Avoid...> const& t_isolate) const noexcept {
-		if constexpr (IS_SEPARABLE<Access::Byte, BitIdx...>(t_isolate) ||
-									IS_SEPARABLE<Access::HalfWord, BitIdx...>(t_isolate)) {
-		} else {
-			// this would always be true, !true = false
-			static_assert(!IS_SEPARABLE<Access::Word, BitIdx...>(t_isolate));
-		}
+		auto const current_val = readCurrentVal<BitIdx...>(ThreadSafe<true, getThreadSafeAccess<BitIdx...>(t_isolate)>{});
 	}
 
 	/**
@@ -424,9 +400,9 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx>
 	[[nodiscard]] constexpr auto readBit(ValWithPosType /*unused*/) const noexcept {
-		static_assert((IS_BIT_READABLE<BitIdx>() && ...));
+		static_assert((GET_BIT<BitIdx>().isReadable() && ...));
 		constexpr auto mask = (GET_BIT<BitIdx>().mask | ...);
-		return readReg() & mask;
+		return readReg<BitIdx...>() & mask;
 	}
 
 	/**
@@ -438,9 +414,10 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx>
 	[[nodiscard]] constexpr auto readBit(ValueOnlyType /*unused*/) const noexcept {
-		static_assert((IS_BIT_READABLE<BitIdx>() && ...));
+		static_assert((GET_BIT<BitIdx>().isReadable() && ...));
 
 		auto const reg_val = readCurrentVal<BitIdx...>();
+
 		return BitGroup{extractBitValue<BitIdx>(reg_val)...};
 	}
 
@@ -450,10 +427,10 @@ class Register {
 	 */
 	template <BitListIdx BitIdx>
 	constexpr void clearBit() const noexcept {
-		static_assert(!CHECK_BIT_MOD<BitIdx>(BitMod::RdClrWr1));
+		static_assert(!(GET_BIT<BitIdx>().MOD == BitMod::RdClrWr1));
 
 		constexpr auto bit = GET_BIT<BitIdx>();
-		readReg() &= (~bit.mask);
+		readReg<BitIdx>() &= (~bit.mask);
 	}
 
 	/**
@@ -497,4 +474,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

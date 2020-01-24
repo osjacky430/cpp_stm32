@@ -16,23 +16,22 @@
 
 #pragma once
 
-#include <cstdint>
+namespace cpp_stm32::detail {
 
-#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
+constexpr int to_number(char c) noexcept { return static_cast<int>(c) - static_cast<int>('0'); }
 
-namespace cpp_stm32 {
+template <int Pow>
+constexpr int decimal_pow() noexcept {
+	if constexpr (Pow == 0) {
+		return 1;
+	} else {
+		return decimal_pow<Pow - 1>() * 10;
+	}
+}
 
-/**
- * @enum  	PeriphAddr
- * @brief		Device specific peripheral address
- */
-enum class PeriphAddr : std::uint32_t {
-	PeriphBase = 0x4000'0000U,
-	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
-	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
-	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
-};
+template <typename... num, std::size_t... Idx>
+constexpr auto str_to_num(std::tuple<num...> const& str, std::index_sequence<Idx...> const&) noexcept {
+	return ((to_number(std::get<Idx>(str)) * decimal_pow<sizeof...(Idx) - Idx - 1>()) + ...);
+}
 
-}	// namespace cpp_stm32
+}	// namespace cpp_stm32::detail
