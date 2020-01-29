@@ -22,6 +22,6 @@ namespace cpp_stm32::pwr {
 
 enum class VoltageScale { Range1, Range2 };
 
-constexpr void set_voltage_scale(VoltageScale const& t_vos) noexcept { reg::CR.setBit<reg::CrBit::Vos>(t_vos); }
+constexpr void set_voltage_scale(VoltageScale const& t_vos) noexcept { reg::CR.writeBit<reg::CrBit::Vos>(t_vos); }
 
 }	 // namespace cpp_stm32::pwr

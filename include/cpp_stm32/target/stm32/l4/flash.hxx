@@ -87,11 +87,11 @@ struct WaitTable {
 
 enum class ARTAccel { InstructCache = 1, DataCache = 2, InstructPrefetch = 3 };
 
-constexpr void set_latency(Latency const& t_cpu) noexcept { reg::ACR.setBit<reg::AcrBit::Latency>(t_cpu); }
+constexpr void set_latency(Latency const& t_cpu) noexcept { reg::ACR.writeBit<reg::AcrBit::Latency>(t_cpu); }
 
-constexpr void enable_dcache() noexcept { reg::ACR.setBit<reg::AcrBit::DCEn>(); }
+constexpr void enable_dcache() noexcept { reg::ACR.writeBit<reg::AcrBit::DCEn>(); }
 
-constexpr void enable_icache() noexcept { reg::ACR.setBit<reg::AcrBit::ICEn>(); }
+constexpr void enable_icache() noexcept { reg::ACR.writeBit<reg::AcrBit::ICEn>(); }
 
 template <ARTAccel... Setting>
 constexpr void config_access_ctl(Latency const& t_cpu) noexcept {
@@ -107,7 +107,7 @@ constexpr void config_access_ctl(Latency const& t_cpu) noexcept {
 	};
 
 	auto const val_to_set = BitGroup{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
-	reg::ACR.template setBit<reg::AcrBit::Latency, register_to_set(Setting)...>(val_to_set);
+	reg::ACR.template writeBit<reg::AcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
 }	 // namespace cpp_stm32::flash

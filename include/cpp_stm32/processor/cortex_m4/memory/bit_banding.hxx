@@ -19,6 +19,7 @@
 #include <cstdint>
 
 #include "cpp_stm32/hal/mmio.hxx"
+#include "cpp_stm32/hal/register.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
 namespace cpp_stm32 {
@@ -64,4 +65,11 @@ constexpr auto atomicity(std::uint32_t const& t_mem_addr) noexcept {
 	return is_in_periph_bit_band_region(t_mem_addr) || is_in_sram_bit_band_region(t_mem_addr);
 }
 
-}	 // namespace cpp_stm32
+template <typename BitList, typename BitListIdx, Access IoOp, bool atomicity>
+template <BitListIdx BitIdx, typename... ValueTypes, bool b>
+constexpr void Register<BitList, BitListIdx, IoOp, atomicity>::writeBit(BitGroup<ValueTypes...> const& t_param,
+																																				Atomic<b> const& /*unused*/) const noexcept {
+	//
+}
+
+}	// namespace cpp_stm32

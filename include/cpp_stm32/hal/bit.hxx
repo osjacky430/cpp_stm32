@@ -37,8 +37,6 @@ enum class BitMod {
 template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::RdWr>
 class Bit {
  public:
-	using AbstractType = DataType;
-
 	static constexpr auto MOD		 = Mod;
 	static constexpr auto LENGTH = L;
 	std::uint32_t const pos;
@@ -65,6 +63,11 @@ class Bit {
 	}
 	[[nodiscard]] static constexpr auto isWritable() noexcept { return (Mod & BitMod::WrOnly) == BitMod::WrOnly; }
 	[[nodiscard]] static constexpr auto isReadable() noexcept { return (Mod & BitMod::RdOnly) == BitMod::RdOnly; }
+
+	template <typename ValueType>
+	[[nodiscard]] constexpr auto toDataType(ValueType const& t_val) const noexcept {
+		return static_cast<DataType>(t_val);
+	}
 };
 
 template <BitMod Mod = BitMod::RdWr>

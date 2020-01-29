@@ -30,14 +30,14 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	 = usart_div & 0xF;
+	std::uint8_t const fraction	= usart_div & 0xF;
 
-	reg::BRR<InputPort>.template setBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
+	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
 
 template <Port InputPort>
 constexpr void set_databit(DataBit const& t_d_bit) noexcept {
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M>(t_d_bit);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M>(t_d_bit);
 }
 
 template <Port InputPort>
@@ -49,7 +49,7 @@ constexpr void set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noex
 	std::uint8_t const cts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
 	std::uint8_t const rts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
 
-	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(cts, rts);
+	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(cts, rts);
 }
 
 template <Port InputPort>
@@ -57,24 +57,24 @@ constexpr void set_transfer_mode(Mode const& t_mode) noexcept {
 	std::uint8_t const tx_en = (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
 	std::uint8_t const rx_en = (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
 
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(tx_en, rx_en);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(tx_en, rx_en);
 }
 
 template <Port InputPort>
 constexpr void set_parity(Parity const& t_parity) noexcept {
 	std::uint8_t const pe = (t_parity != Parity::None);
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(pe, t_parity);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(pe, t_parity);
 }
 
 template <Port InputPort, Stopbit StopBit>
 constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
 	// static_assert()
-	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(StopBit);
+	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(StopBit);
 }
 
 template <Port InputPort>
 constexpr void send(std::uint8_t const& data) noexcept {
-	reg::DR<InputPort>.template setBit<reg::DrBit::Dr>(data);
+	reg::DR<InputPort>.template writeBit<reg::DrBit::Dr>(data);
 }
 
 template <Port InputPort>
@@ -122,13 +122,13 @@ constexpr void send_blocking(std::uint8_t const& t_data) noexcept {
 template <Port InputPort, usart::Stopbit Stop>
 constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
 	std::uint8_t const pe = (t_p != Parity::None);
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(t_d, pe, t_p);
-	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(Stop);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(t_d, pe, t_p);
+	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(Stop);
 }
 
 template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
 }
 
-}	 // namespace cpp_stm32::usart
+}	// namespace cpp_stm32::usart

@@ -163,6 +163,7 @@ class RegFileMaker:
         self.__start_doc_group(peripheral.name, register.name, register.description)
 
         if peripheral.group_name == 'GPIO':
+            self.grouped_field = register.fields
             self.__add_field(register)
             idx_str = 'Pin'
         else:

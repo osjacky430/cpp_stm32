@@ -37,7 +37,7 @@ constexpr auto set_baudrate(usart::Baudrate_t const& t_baud) noexcept {
 	std::uint16_t const usart_div =
 		(clk_freq + t_baud.get() / 2) / t_baud.get();	 // round (avoiding floating point arithmetic)
 
-	reg::BRR<InputPort>.template setBit<reg::BrrBit::Brr>(usart_div);
+	reg::BRR<InputPort>.template writeBit<reg::BrrBit::Brr>(usart_div);
 }
 
 template <Port InputPort>
@@ -46,7 +46,7 @@ constexpr void set_databit(usart::DataBit const& t_d_bit) noexcept {
 	std::uint8_t const m0 = (to_underlying(t_d_bit) & 0b01);
 
 	auto const val_to_write = BitGroup{m1, m0};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0>(val_to_write);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0>(val_to_write);
 }
 
 template <Port InputPort>
@@ -59,7 +59,7 @@ constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ct
 	std::uint8_t const cts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
 	std::uint8_t const rts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
 	auto const val_to_write = BitGroup{rts, cts};
-	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(val_to_write);
+	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(val_to_write);
 }
 
 template <Port InputPort>
@@ -69,7 +69,7 @@ constexpr void set_transfer_mode(usart::Mode const& t_mode) noexcept {
 	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
 	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
 	auto const val_to_write = BitGroup{txe, rxe};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(val_to_write);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(val_to_write);
 }
 
 template <Port InputPort>
@@ -78,18 +78,18 @@ constexpr void set_parity(usart::Parity const& t_parity) noexcept {
 
 	std::uint8_t const pe		= (t_parity != Parity::None);
 	auto const val_to_write = BitGroup{pe, t_parity};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
 }
 
 template <Port InputPort, usart::Stopbit StopBit>
 constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
 	// static_assert()
-	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(StopBit);
+	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(StopBit);
 }
 
 template <Port InputPort>
 constexpr void send(std::uint8_t const& t_data) noexcept {
-	reg::TDR<InputPort>.template setBit<reg::TDrBit::TDr>(t_data);
+	reg::TDR<InputPort>.template writeBit<reg::TDrBit::TDr>(t_data);
 }
 
 template <Port InputPort>
@@ -129,7 +129,7 @@ constexpr auto send_blocking(std::uint8_t const& t_data) noexcept {
 
 template <Port InputPort>
 constexpr void enable() noexcept {
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::UE>();
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::UE>();
 }
 
 template <Port InputPort, usart::Stopbit Stop>
@@ -142,19 +142,19 @@ constexpr void set_dps(usart::DataBit const& t_d, usart::Parity const& t_p,
 	std::uint8_t const d0 = (to_underlying(t_d) & 0b01);
 
 	auto const val_to_write = BitGroup{d1, d0, pe, t_p};
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(
 		val_to_write);
-	reg::CR2<InputPort>.template setBit<reg::Cr2Bit::Stop>(Stop);
+	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(Stop);
 }
 
 template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
 }
 
 template <Port InputPort, reg::IcrBit flag>
 constexpr void clear_flag() noexcept {
-	reg::ICR<InputPort>.template setBit<flag>();
+	reg::ICR<InputPort>.template writeBit<flag>();
 }
 
 }	 // namespace cpp_stm32::usart

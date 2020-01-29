@@ -39,4 +39,27 @@ constexpr auto operator&(Enum const& lhs, Enum const& rhs) noexcept {
 	return Enum{to_underlying(lhs) & to_underlying(rhs)};
 }
 
+/**
+ * @brief		This function handles OR operator of #Access
+ * @param  	lhs		Left hand side
+ * @param 	rhs 	Right hand side
+ * @return 	Numeric value of OR operation of lhs and rhs
+ */
+template <typename Enum>
+constexpr auto operator|(Enum const& lhs, Enum const& rhs) noexcept {
+	return Enum{to_underlying(lhs) | to_underlying(rhs)};
+}
+
+/**
+ * @brief		This function handles OR operator of #Access
+ * @param  	lhs		Left hand side
+ * @param 	rhs 	Right hand side
+ * @return 	Numeric value of OR operation of lhs and rhs
+ */
+template <typename Enum>
+constexpr Enum& operator|=(Enum& lhs, Enum rhs) noexcept {
+	lhs = lhs | rhs;
+	return lhs;
+}
+
 }	// namespace cpp_stm32

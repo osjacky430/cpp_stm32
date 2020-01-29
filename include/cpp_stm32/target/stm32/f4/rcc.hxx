@@ -91,7 +91,7 @@ static constexpr void no_bypass() noexcept {
 
 template <SysClk Clk>
 static constexpr void set_sysclk() noexcept {
-	reg::CFGR.template setBit<reg::CfgBit::SW>(Clk);
+	reg::CFGR.template writeBit<reg::CfgBit::SW>(Clk);
 }
 
 static constexpr SysClk sysclk_in_use() noexcept {
@@ -107,25 +107,25 @@ static constexpr void wait_sysclk_rdy() noexcept {
 template <ClkSrc Clk>
 static constexpr void set_pllsrc() {
 	static_assert(is_pll_clk_src<Clk>);
-	reg::PLLCFGR.template setBit<reg::PllCfgBit::PLLSRC>(Clk);
+	reg::PLLCFGR.template writeBit<reg::PllCfgBit::PLLSRC>(Clk);
 }
 
 static constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																								 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
-	reg::PLLCFGR.setBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
-											reg::PllCfgBit::PLLR>(t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
+	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
+												reg::PllCfgBit::PLLR>(t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
 template <ClkSrc Clk>
 static constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
 																								PllQ const& t_pllq, PllR const& t_pllr) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
-	reg::PLLCFGR.setBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
-											reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
+	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
+												reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
 static constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
-	reg::CFGR.setBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
+	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
 
-}	 // namespace cpp_stm32::rcc
+}	// namespace cpp_stm32::rcc

@@ -100,7 +100,7 @@ class Usart {
 
 		// small overhead here, to eliminate this overhead, change to this line
 		//
-		// USART_CR1<USART_PORT>.template setBit<UsartCr1Bit::TE, UsartCr1Bit::RE,
+		// USART_CR1<USART_PORT>.template writeBit<UsartCr1Bit::TE, UsartCr1Bit::RE,
 		//                                       UsartCr1Bit::UE, UsartCr1Bit::M,
 		//                                       UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_set);
 

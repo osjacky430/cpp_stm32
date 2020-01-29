@@ -49,6 +49,6 @@ constexpr void wait_overdrive_switch_rdy() noexcept {
 	}
 }
 
-constexpr void set_voltage_scale(VoltageScale const& t_val) noexcept { reg::CR.setBit<reg::CrBit::Vos>(t_val); }
+constexpr void set_voltage_scale(VoltageScale const& t_val) noexcept { reg::CR.writeBit<reg::CrBit::Vos>(t_val); }
 
-}	 // namespace cpp_stm32::pwr
+}	// namespace cpp_stm32::pwr

@@ -136,7 +136,6 @@ enum class CR1Field {
 
 template <Port USART>
 static constexpr Register<CR1BitList, CR1Field> CR1{BASE_ADDR(USART), 0x0cU};
-
 /**@}*/
 
 /**

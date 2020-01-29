@@ -8,7 +8,6 @@
 
 #include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
-// #include "cpp_stm32/target/stm32/f4/usart.hxx"
 
 using namespace cpp_stm32;
 using namespace driver;
@@ -20,7 +19,7 @@ int main() {
 
 	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 	DigitalOut<PinName::PA_5> led;
-	//
+
 	while (true) {
 		constexpr auto SOME_PERIOD = 1000000;
 		for (int i = 0; i < SOME_PERIOD; ++i) {

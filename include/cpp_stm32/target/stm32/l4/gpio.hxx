@@ -34,7 +34,7 @@ template <Port Port, Pin... Pins>
 constexpr void set_mode(Mode const& t_mode) noexcept {
 	// do some static assertion
 	// static_assert(Port < Port::PortJ);
-	reg::MODER<Port>.template setBit<Pins...>(t_mode);
+	reg::MODER<Port>.template writeBit<Pins...>(t_mode);
 }
 
 /**
@@ -45,7 +45,7 @@ constexpr void set_mode(Mode const& t_mode) noexcept {
  */
 template <Port Port, Pin... Pins>
 constexpr void set_pupd(Pupd const& t_pupd) noexcept {
-	reg::PUPDR<Port>.template setBit<Pins...>(t_pupd);
+	reg::PUPDR<Port>.template writeBit<Pins...>(t_pupd);
 }
 
 /**
@@ -57,8 +57,8 @@ constexpr void set_pupd(Pupd const& t_pupd) noexcept {
  */
 template <Port Port, Pin... Pins>
 constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
-	reg::MODER<Port>.template setBit<Pins...>(t_mode);
-	reg::PUPDR<Port>.template setBit<Pins...>(t_pupd);
+	reg::MODER<Port>.template writeBit<Pins...>(t_mode);
+	reg::PUPDR<Port>.template writeBit<Pins...>(t_pupd);
 }
 
 /**
@@ -77,7 +77,7 @@ constexpr void toggle() noexcept {
 	// @todo perhap add index rule in register class
 	// @todo maybe group bits in SETUP_REGISTER_INFO macro, e.g.
 	//			 SETUP_REGISTER_INFO(GpioBsrrInfo, {Bit<>{0}, Bit<>{16}, {...}})
-	reg::BSRR<Port>.template setBit<Pins..., Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
+	reg::BSRR<Port>.template writeBit<Pins..., Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
 /**
@@ -101,7 +101,7 @@ constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 			}
 		};
 
-		reg::AFRL<Port>.template setBit<low_pin_group(Pins)...>(t_af);
+		reg::AFRL<Port>.template writeBit<low_pin_group(Pins)...>(t_af);
 	}
 
 	if constexpr (((Pins > Pin7) || ...)) {
@@ -111,7 +111,7 @@ constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 			}
 		};
 
-		reg::AFRH<Port>.template setBit<high_pin_group(Pins)...>(t_af);
+		reg::AFRH<Port>.template writeBit<high_pin_group(Pins)...>(t_af);
 	}
 }
 
