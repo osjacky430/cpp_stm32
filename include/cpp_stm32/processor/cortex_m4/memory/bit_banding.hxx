@@ -66,10 +66,27 @@ constexpr auto atomicity(std::uint32_t const& t_mem_addr) noexcept {
 }
 
 template <typename BitList, typename BitListIdx, Access IoOp, bool atomicity>
-template <BitListIdx BitIdx, typename... ValueTypes, bool b>
-constexpr void Register<BitList, BitListIdx, IoOp, atomicity>::writeBit(BitGroup<ValueTypes...> const& t_param,
-																																				Atomic<b> const& /*unused*/) const noexcept {
-	//
+template <BitListIdx BitIdx, typename ValueType, bool b>
+constexpr void Register<BitList, BitListIdx, IoOp, atomicity>::writeBit(ValueType const& t_param,
+																																				Atomic_t<b> const& /*unused*/) const noexcept {
+	constexpr auto bit = GET_BIT<BitIdx>();
+	static_assert(atomicity && b);
+	static_assert((bit.template isTypeAvailable<ValueType>()));
+	static_assert((bit.isWritable()));
+
+	auto const val = [=]() {
+		if constexpr (std::is_enum_v<ValueType>) {
+			return to_underlying(t_param);
+		} else if constexpr (std::is_integral_v<ValueType>) {
+			return t_param;
+		} else {
+			return t_param.get();
+		}
+	}();
+
+	for (std::uint8_t i = 0U; i < bit.LENGTH; ++i) {
+		MMIO32(m_base + m_offset, i) = (val & (1U << i)) >> i;
+	}
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

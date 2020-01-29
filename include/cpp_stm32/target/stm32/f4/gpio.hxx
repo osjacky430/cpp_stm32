@@ -85,10 +85,12 @@ constexpr void toggle() noexcept {
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
-	constexpr auto Pin7				 = Pin::Pin7;
-	constexpr auto cast_to_int = [](auto const& t_val) {
+	constexpr auto Pin7 = Pin::Pin7;
+
+	[[maybe_unused]] constexpr auto cast_to_int = [](auto const& t_val) {
 		return to_underlying(t_val);
 	};	// to prevent internal compiler error
+
 	if constexpr (((Pins <= Pin7) || ...)) {
 		constexpr auto low_pin_group = [](Pin t_pin) {
 			if (t_pin <= Pin7) {

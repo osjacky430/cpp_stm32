@@ -63,7 +63,10 @@ struct ValWithPosType {};
 static constexpr ValWithPosType ValWithPos{};
 
 template <bool b>
-static constexpr Atomic = std::bool_constant<b>{};
+using Atomic_t = std::bool_constant<b>;
+
+template <bool b>
+static constexpr auto Atomic = Atomic_t<b>{};
 
 /**
  * @class 	Register
@@ -138,7 +141,7 @@ class Register {
 	 * @note 		This is written in relatively easy way, can be extended if needed
 	 */
 	template <BitListIdx... Idx, bool NeedTS = false, Access TSIo = Access::None>
-	constexpr decltype(auto) readReg(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
+	constexpr decltype(auto) readReg([[gnu::unused]] ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
 		if constexpr (NeedTS) {
 			constexpr auto idx	= idxInAccessUnit<Idx..., TSIo>();
 			constexpr auto mmio = []() {
@@ -347,7 +350,7 @@ class Register {
 
 		auto const current_val = readCurrentVal<BitIdx...>(thread_safety);
 		auto const mod_val		 = (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
-		auto const clear_mask	= ~(... | GET_BIT<BitIdx>().mask);
+		auto const clear_mask	 = ~(... | GET_BIT<BitIdx>().mask);
 
 		readCurrentVal<BitIdx...>(thread_safety) = ((current_val & clear_mask) | mod_val);
 	}
@@ -382,8 +385,8 @@ class Register {
 	 * @note 		This should check whether it is doable or not, according to bit banding address,
 	 * 					not implemented yet
 	 */
-	template <BitListIdx BitIdx, typename... ValueTypes, bool b>
-	constexpr void writeBit(BitGroup<ValueTypes...> const& t_param, Atomic<b> const& /*unused*/) const noexcept;
+	template <BitListIdx BitIdx, typename ValueType, bool b>
+	constexpr void writeBit(ValueType const& t_param, Atomic_t<b> const& /*unused*/) const noexcept;
 
 	/**
 	 * @brief		This function literally reads bits in the register
@@ -467,4 +470,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32
