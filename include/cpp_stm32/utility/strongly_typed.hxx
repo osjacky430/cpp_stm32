@@ -60,4 +60,5 @@ using BitLength_t	 = StrongType<std::uint32_t, struct BitLength>;
 using BaseAddr_t	 = StrongType<std::uint32_t, struct BaseAddress>;
 using Offset_t		 = StrongType<std::uint16_t, struct Offset>;
 
+using Priority_t = StrongType<std::size_t, struct Priority>;
 }	 // namespace cpp_stm32

@@ -98,12 +98,6 @@ class Usart {
 		usart::set_transfer_mode<USART_PORT>(usart::Mode::TxRx);
 		usart::set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
 
-		// small overhead here, to eliminate this overhead, change to this line
-		//
-		// USART_CR1<USART_PORT>.template writeBit<UsartCr1Bit::TE, UsartCr1Bit::RE,
-		//                                       UsartCr1Bit::UE, UsartCr1Bit::M,
-		//                                       UsartCr1Bit::PCE, UsartCr1Bit::PS>(val_to_set);
-
 		usart::enable<USART_PORT>();
 	}
 

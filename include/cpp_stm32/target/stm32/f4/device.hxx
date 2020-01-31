@@ -22,3 +22,5 @@
 #include "cpp_stm32/target/stm32/f4/pin_map.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/usart.hxx"
+
+#include "cpp_stm32/processor/cortex_m4/core_util.hxx"
