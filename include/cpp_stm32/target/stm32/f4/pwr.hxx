@@ -22,7 +22,7 @@ namespace cpp_stm32::pwr {
 
 enum class VoltageScale { Scale1Mode = 0b11, Scale2Mode = 0b10, Scale3Mode = 0b01 };
 
-// only set with pll is enabled
+// only set when pll is enabled
 // @ref https://community.st.com/s/question/0D50X0000A4qUmwSQE/more-documentation-about-vosrdy
 constexpr auto is_vos_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::VosRdy>(ValueOnly)); }
 
@@ -51,4 +51,4 @@ constexpr void wait_overdrive_switch_rdy() noexcept {
 
 constexpr void set_voltage_scale(VoltageScale const& t_val) noexcept { reg::CR.writeBit<reg::CrBit::Vos>(t_val); }
 
-}	// namespace cpp_stm32::pwr
+}	 // namespace cpp_stm32::pwr

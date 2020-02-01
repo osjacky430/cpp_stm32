@@ -35,4 +35,10 @@ constexpr auto operator"" _ic() noexcept {
 	return size_c<idx>{};
 }
 
-}	// namespace cpp_stm32
+template <char... num>
+constexpr auto operator"" _byte() noexcept {
+	constexpr auto idx = detail::str_to_num(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	return ByteCount<idx>{};
+}
+
+}	 // namespace cpp_stm32

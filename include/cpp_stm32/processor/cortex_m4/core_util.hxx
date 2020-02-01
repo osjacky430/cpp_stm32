@@ -76,7 +76,8 @@ namespace cpp_stm32::detail {
 namespace cpp_stm32 {
 
 template <std::uint8_t Priority = 0>
-[[nodiscard]] constexpr auto critical_section(MaskPriority<Priority> const& t_mask = MaskPriority<0>{}) noexcept {
+[[nodiscard]] constexpr auto create_critical_section(
+	[[gnu::unused]] MaskPriority<Priority> const& t_mask = MaskPriority<0>{}) noexcept {
 	using namespace detail;
 
 	class CriticalSection {

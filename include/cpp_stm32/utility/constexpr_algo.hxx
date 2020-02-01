@@ -23,6 +23,13 @@
 
 namespace cpp_stm32::cstd {
 
+template <class ForwardIt, class Generator>
+constexpr void generate(ForwardIt first, ForwardIt last, Generator g) {
+	while (first != last) {
+		*first++ = g();
+	}
+}
+
 template <class T, std::size_t Size>
 constexpr auto array_count(std::array<T, Size> const& t_arr, T const& t_val) {
 	int ret = 0;

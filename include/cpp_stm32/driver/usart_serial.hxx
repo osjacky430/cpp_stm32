@@ -79,7 +79,7 @@ class Usart {
 	static constexpr auto USART_IRQ_NUM = UsartTx<TX>::TX_IRQ;
 
  public:
-	explicit constexpr Usart(std::uint64_t const& t_baud) noexcept {}
+	explicit constexpr Usart(usart::Baudrate_t const& t_baud) noexcept {}
 
 	explicit constexpr Usart(UsartTx<TX> const& /*unused*/, UsartRx<RX> const& /*unused*/,
 													 usart::Baudrate_t const& t_baud) noexcept {
@@ -101,8 +101,32 @@ class Usart {
 		usart::enable<USART_PORT>();
 	}
 
+	template <std::uint8_t BC>
+	[[nodiscard]] constexpr auto receive(ByteCount<BC> const& /*unused*/) const noexcept {
+		std::array<std::uint8_t, BC> ret_val{};
+		cstd::generate(ret_val.begin(), ret_val.end(), []() { return usart::receive_blocking<USART_PORT>(); });
+		return ret_val;
+	}
+
+	constexpr void send(char const& t_val) const noexcept {
+		usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
+	}
+
+	constexpr void send(std::string_view const& t_str) const noexcept {
+		for (auto const& val : t_str) {
+			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
+		}
+	}
+
+	template <typename T>
+	constexpr void send(Serializable<T> const& t_val) const noexcept {
+		for (auto const& val : t_val.serialize()) {
+			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
+		}
+	}
+
 	constexpr auto operator<<(char const& t_val) const noexcept {
-		usart::send<USART_PORT>(static_cast<std::uint8_t>(t_val));
+		usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
 
 		return *this;
 	}
@@ -124,26 +148,24 @@ class Usart {
 		return *this;
 	}
 
-	constexpr auto setTxeInterrupt() const noexcept {
-		// this is definitely wrong
-		if (nvic_is_irq_enabled<USART_IRQ_NUM>()) {
-			nvic_disable_irq<USART_IRQ_NUM>();
-		}
+	constexpr void setTxeInterrupt() const noexcept {
+		{
+			auto const critical_section = create_critical_section();
+			constexpr Callback<interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)]> cb;
+			Interrupt<USART_IRQ_NUM>::attach(cb);
+		}	 // end critical section
 
-		constexpr Callback<interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)]> cb;
-		Interrupt<USART_IRQ_NUM>::attach(cb);
 		nvic_enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();
 	}
 
 	template <auto F>
-	constexpr auto setTxeInterrupt(Callback<F> const& t_cb) const noexcept {
-		// this is definitely wrong
-		if (nvic_is_irq_enabled<USART_IRQ_NUM>()) {
-			nvic_disable_irq<USART_IRQ_NUM>();
-		}
+	constexpr void setTxeInterrupt(Callback<F> const& t_cb) const noexcept {
+		{
+			auto const critical_section = create_critical_section();
+			Interrupt<USART_IRQ_NUM>::attach(t_cb);
+		}	 // end critical section
 
-		Interrupt<USART_IRQ_NUM>::attach(t_cb);
 		nvic_enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();
 	}

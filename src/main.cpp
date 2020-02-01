@@ -9,6 +9,8 @@
 #include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 
+#include "cpp_stm32/utility/serial.hxx"
+
 using namespace cpp_stm32;
 using namespace driver;
 using namespace gpio;
@@ -27,6 +29,7 @@ int main() {
 		}
 
 		debugOut << "c\n\r";
+		// auto const a = debugOut.receive(4_byte);
 		led.toggle();
 	}
 

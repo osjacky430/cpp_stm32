@@ -33,4 +33,7 @@ using uint32_c = std::integral_constant<std::uint32_t, Val>;
 template <std::uint8_t Val>
 using uint8_c = std::integral_constant<std::uint8_t, Val>;
 
-}	// namespace cpp_stm32
+template <std::uint8_t BC>
+struct ByteCount {};
+
+}	 // namespace cpp_stm32

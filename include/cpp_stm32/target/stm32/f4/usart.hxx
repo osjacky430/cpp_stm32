@@ -30,7 +30,7 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	= usart_div & 0xF;
+	std::uint8_t const fraction	 = usart_div & 0xF;
 
 	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
@@ -117,6 +117,11 @@ constexpr void send_blocking(std::uint8_t const& t_data) noexcept {
 	wait_tx_rdy<InputPort>();
 }
 
+template <Port InputPort>
+constexpr auto receive_blocking() noexcept {
+	wait_rx_not_empty<InputPort>();
+	return get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
+}
 // @todo this should be sfinae instead of static assert?
 // @todo the interface should unify, StopBit_t here makes it hard to do so.
 template <Port InputPort, usart::Stopbit Stop>
@@ -131,4 +136,4 @@ constexpr void enable_txe_irq() noexcept {
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
 }
 
-}	// namespace cpp_stm32::usart
+}	 // namespace cpp_stm32::usart

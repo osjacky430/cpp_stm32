@@ -9,3 +9,5 @@ Since there are alot of things going on here, I need to make a list of recent id
 - [A Possible Future of Embedded Software Development - Odin Holmes](https://www.youtube.com/watch?v=fsMmh8F8uV0)
 - [Jason Turner “Rich Code for Tiny Computers: A Simple Commodore 64 Game in C++17”](https://www.youtube.com/watch?v=zBkNBP00wJE)
 - [Writing better embedded Software - Dan Saks](https://www.youtube.com/watch?v=3VtGCPIoBfs&t=2123s)
+- [Modern C++ in Embedded Systems](https://www.youtube.com/watch?v=1l2g2dAobXA)
+- [CppCon 2018: Michael Caisse “Modern C++ in Embedded Systems - The Saga Continues”](https://www.youtube.com/watch?v=LfRLQ7IChtg)
