@@ -122,6 +122,7 @@ constexpr auto receive_blocking() noexcept {
 	wait_rx_not_empty<InputPort>();
 	return get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
 }
+
 // @todo this should be sfinae instead of static assert?
 // @todo the interface should unify, StopBit_t here makes it hard to do so.
 template <Port InputPort, usart::Stopbit Stop>
@@ -134,6 +135,16 @@ constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> co
 template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
+}
+
+template <Port InputPort>
+constexpr void enable_half_duplex() noexcept {
+	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::HDSel>();
+}
+
+template <Port InputPort>
+constexpr void disable_half_duplex() noexcept {
+	reg::CR3<InputPort>.template clearBit<reg::Cr3Bit::HDSel>();
 }
 
 }	 // namespace cpp_stm32::usart

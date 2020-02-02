@@ -115,13 +115,14 @@ class BitGroup {
 };
 
 template <std::size_t Idx, typename... Args>
-static constexpr std::tuple_element_t<Idx, std::tuple<Args...>> get(BitGroup<Args...> const& t_bit_group) noexcept {
+[[nodiscard]] static constexpr std::tuple_element_t<Idx, std::tuple<Args...>> get(
+	BitGroup<Args...> const& t_bit_group) noexcept {
 	return std::get<Idx>(t_bit_group.m_tup);
 }
 
 template <typename... BitGroups>
 static constexpr auto bit_group_cat(BitGroups&&... t_bit_groups) noexcept {
-	const auto tup = std::tuple_cat((t_bit_groups.m_tup)...);
+	auto const tup = std::tuple_cat((t_bit_groups.m_tup)...);
 	return BitGroup{tup};
 }
 
@@ -142,4 +143,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

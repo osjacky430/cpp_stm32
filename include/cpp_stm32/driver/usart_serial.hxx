@@ -101,10 +101,16 @@ class Usart {
 		usart::enable<USART_PORT>();
 	}
 
-	template <std::uint8_t BC>
-	[[nodiscard]] constexpr auto receive(ByteCount<BC> const& /*unused*/) const noexcept {
+	constexpr auto sendable() const noexcept { return usart::is_tx_empty<USART_PORT>(); }
+
+	constexpr auto receivable() const noexcept { return usart::is_rx_empty<USART_PORT>(); }
+
+	template <std::uint8_t BC = 1, bool Wait = false>
+	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	 = 1_byte,
+																			 [[maybe_unused]] Waiting_t<Wait> const& t_w = Waiting<false>) const noexcept {
 		std::array<std::uint8_t, BC> ret_val{};
-		cstd::generate(ret_val.begin(), ret_val.end(), []() { return usart::receive_blocking<USART_PORT>(); });
+		cstd::generate(ret_val.begin(), ret_val.end(),
+									 []() { return Wait ? usart::receive_blocking<USART_PORT>() : usart::receive<USART_PORT>(); });
 		return ret_val;
 	}
 

@@ -16,7 +16,7 @@
 #define APB1_CLK_FREQ (45 MHz)
 #define APB2_CLK_FREQ (90 MHz)
 //
-// #define HSE_BYPASS_CLK_SRC true
+#define HSE_BYPASS_CLK_SRC true
 
 // stm32l4
 // #define SYS_CLK_FREQ (80 MHz)

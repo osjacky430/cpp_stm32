@@ -21,6 +21,10 @@
 
 namespace cpp_stm32 {
 
+/**
+ * [Serializable description]
+ * @return [description]
+ */
 template <typename Derive>
 class Serializable {
  protected:
@@ -29,5 +33,14 @@ class Serializable {
  public:
 	constexpr auto serialize() const noexcept { return static_cast<Derive const*>(this)->serialization(); }
 };
+
+/**
+ *
+ */
+template <bool W>
+struct Waiting_t {};
+
+template <bool W>
+static constexpr auto Waiting = Waiting_t<W>{};
 
 }	 // namespace cpp_stm32

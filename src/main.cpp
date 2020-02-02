@@ -19,18 +19,14 @@ using namespace usart;
 int main() {
 	sys::Clock::init<rcc::ClkSrc::Hse>();
 
-	Usart const debugOut{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
+	Usart const pc{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 	DigitalOut<PinName::PA_5> led;
 
 	while (true) {
-		constexpr auto SOME_PERIOD = 1000000;
-		for (int i = 0; i < SOME_PERIOD; ++i) {
-			__asm__("nop");
-		}
-
-		debugOut << "c\n\r";
-		// auto const a = debugOut.receive(4_byte);
 		led.toggle();
+
+		auto const [user_input, nl] = pc.receive(2_byte, Waiting<true>);
+		pc << user_input << nl << "\r";
 	}
 
 	return 0;
