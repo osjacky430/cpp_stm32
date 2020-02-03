@@ -285,8 +285,8 @@ class Register {
 
 		auto const current_val = readCurrentVal<BitIdx...>();
 
-		auto const mod_val		= (... | GET_BIT<BitIdx>()(t_param));
-		auto const clear_mask = ~(... | GET_BIT<BitIdx>().mask);
+		auto const mod_val				= (... | GET_BIT<BitIdx>()(t_param));
+		constexpr auto clear_mask = ~(... | GET_BIT<BitIdx>().mask);
 
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
@@ -312,8 +312,8 @@ class Register {
 
 		auto const current_val = readCurrentVal<BitIdx...>();
 
-		auto const mod_val		= (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
-		auto const clear_mask = ~(... | GET_BIT<BitIdx>().mask);
+		auto const mod_val				= (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
+		constexpr auto clear_mask = ~(... | GET_BIT<BitIdx>().mask);
 
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
@@ -348,9 +348,9 @@ class Register {
 			return bit(val_to_mod);
 		};
 
-		auto const current_val = readCurrentVal<BitIdx...>(thread_safety);
-		auto const mod_val		 = (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
-		auto const clear_mask	 = ~(... | GET_BIT<BitIdx>().mask);
+		auto const current_val		= readCurrentVal<BitIdx...>(thread_safety);
+		auto const mod_val				= (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
+		constexpr auto clear_mask = ~(... | GET_BIT<BitIdx>().mask);
 
 		readCurrentVal<BitIdx...>(thread_safety) = ((current_val & clear_mask) | mod_val);
 	}

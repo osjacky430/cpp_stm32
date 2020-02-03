@@ -189,11 +189,12 @@ class RegFileMaker:
         if len(addr_port_list) == 1:
             base_address_str += ' = 0x%08xU;\n\n' % addr_port_list[0][0]
         else:
-            base_address_str += '(Port const& t_%s) {\n' % peripheral.group_name.lower()
+            base_address_str += '(Port const& t_%s) {\n'\
+                                '\tswitch(t_%s) {' % peripheral.group_name.lower()
             for addr, port in addr_port_list:
                 base_address_str += '\tcase Port::%s:\n' \
                                     '\t\treturn 0x%08xU;\n' % (port, addr)
-            base_address_str += '}\n\n'
+            base_address_str += '}\n\t}\n\n'
 
         self.file.write(base_address_str)
 
