@@ -37,6 +37,7 @@ enum class TransferDir { PeriphToMem, MemToPeriph, MemToMem };
 enum class StreamPriority { Low, Medium, High, VeryHigh };
 enum class DataSize { Byte, HalfWord, Word };
 enum class BurstSize { Single, Incr4, Incr8, Incr16 };
+enum class FifoThreshold { OneFourths, Half, ThreeFourths, Full };
 
 }	 // namespace cpp_stm32::dma
 
@@ -270,7 +271,9 @@ enum class SxFCRField {
 };
 
 template <Port DMA, Stream Str>
-static constexpr Register<SxFCRBitList, SxFCRField> SxFCR{BASE_ADDR(DMA), 0x24U + 0x24 * to_underlying(Str)};
+static constexpr Register<SxFCRBitList, SxFCRField> SxFCR{BASE_ADDR(DMA),											//
+																													0x24U + 0x24 * to_underlying(Str),	//
+																													ResetVal_t{0x0000'0021}};
 /**@}*/
 
 }	 // namespace cpp_stm32::dma::reg

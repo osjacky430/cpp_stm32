@@ -97,6 +97,7 @@ class Register {
 
 	std::uint32_t const m_base;		/*!< Peripheral base address */
 	std::uint32_t const m_offset; /*!< Offset relative to peripheral base */
+	std::uint32_t const m_resetVal;
 
 	/**
 	 * [viewRegByAccessMode description]
@@ -258,7 +259,9 @@ class Register {
 	 * @param   base   	Base peripheral address
 	 * @param   offset 	Offset address
 	 */
-	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset) : m_base(base), m_offset(offset) {}
+	explicit constexpr Register(std::uint32_t const base, std::uint32_t const offset,
+															ResetVal_t const& t_rst = ResetVal_t{0x0})
+		: m_base(base), m_offset(offset), m_resetVal(t_rst.get()) {}
 
 	/**
 	 * @brief 	This function set single bit to 1
@@ -430,11 +433,15 @@ class Register {
 	}
 
 	/**
-	 * @brief			This function returns the memory address of the register, it can be used for
-	 * 						bit banding. (And is the reason why this function exists)
-	 * @return		Memory address of the register
+	 * @brief 	This function reset the register to its reset value
 	 */
-	[[nodiscard]] constexpr auto memAddr() const noexcept { return m_base + m_offset; }
+	constexpr void reset() const noexcept { MMIO32(m_base, m_offset) = m_resetVal; }
+
+	/**
+	 * @brief 	This function returns the memory address of the register
+	 * @return  The memory address of register
+	 */
+	[[nodiscard]] constexpr auto memoryAddr() const noexcept { return m_base + m_offset; }
 };	// namespace cpp_stm32
 
 template <typename BitList, typename BitIdx, Access IoOp>

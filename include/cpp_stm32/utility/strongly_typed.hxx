@@ -57,8 +57,10 @@ class StrongType {
 using DeviceVolt_t = StrongType<float, struct Vdd_t>;
 using BitPos_t		 = StrongType<std::uint32_t, struct BitPosition>;
 using BitLength_t	 = StrongType<std::uint32_t, struct BitLength>;
-using BaseAddr_t	 = StrongType<std::uint32_t, struct BaseAddress>;
-using Offset_t		 = StrongType<std::uint16_t, struct Offset>;
+
+using BaseAddr_t = StrongType<std::uint32_t, struct BaseAddress>;
+using Offset_t	 = StrongType<std::uint16_t, struct Offset>;
 
 using Priority_t = StrongType<std::size_t, struct Priority>;
+using ResetVal_t = StrongType<std::uint32_t, struct ResetVal>;
 }	 // namespace cpp_stm32

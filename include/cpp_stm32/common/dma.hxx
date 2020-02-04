@@ -16,4 +16,11 @@
 
 #pragma once
 
-namespace cpp_stm32::dma {}
+#include "cpp_stm32/utility/strongly_typed.hxx"
+
+namespace cpp_stm32::dma {
+
+using PeriphAddress_t = StrongType<std::uint32_t, struct PeripherAddress>;
+using MemoryAddress_t = StrongType<std::uint32_t, struct MemoryAddress>;
+
+}	 // namespace cpp_stm32::dma
