@@ -63,7 +63,7 @@ class PinMap {
 	}
 };
 
-}	 // namespace cpp_stm32::usart
+}	// namespace cpp_stm32::usart
 
 namespace cpp_stm32::gpio {
 
@@ -100,7 +100,7 @@ class PinMap {
 	}
 };
 
-}	 // namespace cpp_stm32::gpio
+}	// namespace cpp_stm32::gpio
 
 namespace cpp_stm32::rcc {
 
@@ -110,6 +110,9 @@ class ClkRegMap {
 		/*AHB1*/
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::GpioARst},
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::GpioBRst},
+
+		std::pair{reg::AHB1RST, reg::Ahb1RstBit::Dma1Rst},
+		std::pair{reg::AHB1RST, reg::Ahb1RstBit::Dma2Rst},
 		/*APB1*/
 		std::pair{reg::APB1RST, reg::Apb1RstBit::Usart2Rst},
 		std::pair{reg::APB1RST, reg::Apb1RstBit::PwrRst},
@@ -121,6 +124,9 @@ class ClkRegMap {
 		/*AHB1*/
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::GpioAEn},
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::GpioBEn},
+
+		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::Dma1En},
+		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::Dma2En},
 		/*APB1*/
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Usart2En},
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::PwrEn},
@@ -179,4 +185,4 @@ class ClkRegMap {
 	}
 };
 
-}	 // namespace cpp_stm32::rcc
+}	// namespace cpp_stm32::rcc

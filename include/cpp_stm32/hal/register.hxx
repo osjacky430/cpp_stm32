@@ -247,7 +247,8 @@ class Register {
 
  public:
 	/**
-	 *
+	 *	@brief	This function is a IsolateFrom_t factory
+	 *	@return IsolateFrom_t, used for thread-safe set bit
 	 */
 	template <BitListIdx... Idx>
 	[[nodiscard]] static constexpr auto isolateFrom() noexcept {
@@ -328,7 +329,16 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx, typename... ValueTypes>
 	constexpr void writeBit(ValueTypes const&... t_param) const noexcept {
-		writeBit<BitIdx...>(BitGroup{t_param...});
+		static_assert(sizeof...(BitIdx) == sizeof...(ValueTypes));
+		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueTypes>() && ...));
+		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
+
+		auto const current_val = readCurrentVal<BitIdx...>();
+
+		auto const mod_val				= (... | GET_BIT<BitIdx>()(t_param));
+		constexpr auto clear_mask = ~(... | GET_BIT<BitIdx>().mask);
+
+		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
 
 	/**
@@ -438,6 +448,18 @@ class Register {
 	constexpr void reset() const noexcept { MMIO32(m_base, m_offset) = m_resetVal; }
 
 	/**
+	 * [memoryAddr description]
+	 * @return [description]
+	 */
+	template <BitListIdx BitIdx>
+	constexpr auto defaultVal() const noexcept {
+		constexpr auto bit		 = GET_BIT<BitIdx>();
+		auto const default_val = (bit.mask & m_resetVal) >> bit.pos;
+
+		return bit.toDataType(default_val);
+	}
+
+	/**
 	 * @brief 	This function returns the memory address of the register
 	 * @return  The memory address of register
 	 */
@@ -477,4 +499,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

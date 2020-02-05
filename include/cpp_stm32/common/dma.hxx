@@ -20,7 +20,7 @@
 
 namespace cpp_stm32::dma {
 
-using PeriphAddress_t = StrongType<std::uint32_t, struct PeripherAddress>;
-using MemoryAddress_t = StrongType<std::uint32_t, struct MemoryAddress>;
+using PeriphAddress_t = StrongType<std::uintptr_t, struct PeripherAddress>;
+using MemoryAddress_t = StrongType<std::uintptr_t, struct MemoryAddress>;
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma

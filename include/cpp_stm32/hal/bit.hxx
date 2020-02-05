@@ -143,4 +143,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

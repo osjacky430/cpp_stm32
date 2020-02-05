@@ -30,7 +30,7 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	 = usart_div & 0xF;
+	std::uint8_t const fraction	= usart_div & 0xF;
 
 	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
@@ -133,13 +133,23 @@ constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> co
 }
 
 template <Port InputPort>
+constexpr void enable_tx_dma() noexcept {
+	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::DMAT>();
+}
+
+template <Port InputPort>
+constexpr void enable_rx_dma() noexcept {
+	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::DMAR>();
+}
+
+template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
 }
 
 template <Port InputPort>
 constexpr void enable_half_duplex() noexcept {
-	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::HDSel>();
+	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::HDSel>();
 }
 
 template <Port InputPort>
@@ -147,4 +157,4 @@ constexpr void disable_half_duplex() noexcept {
 	reg::CR3<InputPort>.template clearBit<reg::Cr3Bit::HDSel>();
 }
 
-}	 // namespace cpp_stm32::usart
+}	// namespace cpp_stm32::usart

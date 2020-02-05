@@ -39,7 +39,7 @@ enum class DataSize { Byte, HalfWord, Word };
 enum class BurstSize { Single, Incr4, Incr8, Incr16 };
 enum class FifoThreshold { OneFourths, Half, ThreeFourths, Full };
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma
 
 namespace cpp_stm32::dma::reg {
 
@@ -141,10 +141,10 @@ SETUP_REGISTER_INFO(SxCRBitList,													 /**/
 										Binary<>{BitPos_t{8}},								 // CIRC
 										Binary<>{BitPos_t{9}},								 // PINC
 										Binary<>{BitPos_t{10}},								 // MINC
-										Bit<2>{BitPos_t{11}},									 // PSIZE
+										Bit<2, DataSize>{BitPos_t{11}},				 // PSIZE
 										Bit<2, DataSize>{BitPos_t{13}},				 // MSIZE
 										Binary<>{BitPos_t{15}},								 // PINCOS
-										Bit<2, StreamPriority>{BitPos_t{16}},	 // PL
+										Bit<2, StreamPriority>{BitPos_t{16}},	// PL
 										Binary<>{BitPos_t{18}},								 // DBM
 										Binary<>{BitPos_t{19}},								 // CT
 										Bit<2, BurstSize>{BitPos_t{21}},			 // PBURST
@@ -185,7 +185,7 @@ static constexpr Register<SxCRBitList, SxCRField> SxCR{BASE_ADDR(DMA), 0x10 + 0x
  */
 
 SETUP_REGISTER_INFO(SxNDTRBitList,											 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	 // NDT
+										Bit<16, std::uint16_t>{BitPos_t{0}}	// NDT
 )
 
 enum class SxNDTRField {
@@ -202,8 +202,8 @@ static constexpr Register<SxNDTRBitList, SxNDTRField> SxNDTR{BASE_ADDR(DMA), 0x1
  * @{
  */
 
-SETUP_REGISTER_INFO(SxPARBitList,												 /**/
-										Bit<32, std::uint32_t>{BitPos_t{0}}	 // PA
+SETUP_REGISTER_INFO(SxPARBitList,													/**/
+										Bit<32, std::uintptr_t>{BitPos_t{0}}	// PA
 )
 
 enum class SxPARField {
@@ -220,8 +220,8 @@ static constexpr Register<SxPARBitList, SxPARField> SxPAR{BASE_ADDR(DMA), 0x18 +
  * @{
  */
 
-SETUP_REGISTER_INFO(SxM0ARBitList,											 /**/
-										Bit<32, std::uint32_t>{BitPos_t{0}}	 // M0A
+SETUP_REGISTER_INFO(SxM0ARBitList,												/**/
+										Bit<32, std::uintptr_t>{BitPos_t{0}}	// M0A
 )
 
 enum class SxM0ARField {
@@ -238,8 +238,8 @@ static constexpr Register<SxM0ARBitList, SxM0ARField> SxM0AR{BASE_ADDR(DMA), 0x1
  * @{
  */
 
-SETUP_REGISTER_INFO(SxM1ARBitList,											 /**/
-										Bit<32, std::uint32_t>{BitPos_t{0}}	 // M1A
+SETUP_REGISTER_INFO(SxM1ARBitList,												/**/
+										Bit<32, std::uintptr_t>{BitPos_t{0}}	// M1A
 )
 
 enum class SxM1ARField {
@@ -256,18 +256,18 @@ static constexpr Register<SxM1ARBitList, SxM1ARField> SxM1AR{BASE_ADDR(DMA), 0x2
  * @{
  */
 
-SETUP_REGISTER_INFO(SxFCRBitList,								/**/
-										Bit<2>{BitPos_t{0}},				// FTH
-										Binary<>{BitPos_t{2}},			// DMDIS
-										StatusBit<3>{BitPos_t{3}},	// FS
-										Binary<>{BitPos_t{7}}				// FEIE
+SETUP_REGISTER_INFO(SxFCRBitList,												 /**/
+										Bit<2, FifoThreshold>{BitPos_t{0}},	// FTH
+										Binary<>{BitPos_t{2}},							 // DMDIS
+										StatusBit<3>{BitPos_t{3}},					 // FS
+										Binary<>{BitPos_t{7}}								 // FEIE
 )
 
 enum class SxFCRField {
 	FTH,	 /*!< FIFO threshold selection*/
 	DMDIS, /*!< Direct mode disable*/
 	FS,		 /*!< FIFO status*/
-	FEIE,	 /*!< FIFO error interrupt enable*/
+	FEIE,	/*!< FIFO error interrupt enable*/
 };
 
 template <Port DMA, Stream Str>
@@ -276,4 +276,4 @@ static constexpr Register<SxFCRBitList, SxFCRField> SxFCR{BASE_ADDR(DMA),							
 																													ResetVal_t{0x0000'0021}};
 /**@}*/
 
-}	 // namespace cpp_stm32::dma::reg
+}	// namespace cpp_stm32::dma::reg

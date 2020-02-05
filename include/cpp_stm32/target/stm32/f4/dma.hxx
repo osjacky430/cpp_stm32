@@ -27,9 +27,9 @@ namespace cpp_stm32::dma {
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 constexpr void clear_interrupt_flag() noexcept {
 	if constexpr (to_underlying(Str) <= 3) {
-		reg::LIFCR<DMA>.template setBit<Flags...>();
+		reg::LIFCR<DMA>.template setBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>();
 	} else {
-		reg::HIFCR<DMA>.template setBit<Flags...>();
+		reg::HIFCR<DMA>.template setBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>();
 	}
 }
 
@@ -38,11 +38,13 @@ constexpr void clear_interrupt_flag() noexcept {
  * @return [description]
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
-constexpr auto get_interrupt_flag() noexcept {
+[[nodiscard]] constexpr bool get_interrupt_flag() noexcept {
 	if constexpr (to_underlying(Str) <= 3) {
-		return reg::LIFCR<DMA>.template readBit<Flags...>(ValueOnly);
+		return get<0>(
+			reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(ValueOnly));
 	} else {
-		return reg::HIFCR<DMA>.template readBit<Flags...>(ValueOnly);
+		return get<0>(
+			reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(ValueOnly));
 	}
 }
 
@@ -51,8 +53,8 @@ constexpr auto get_interrupt_flag() noexcept {
  * @return [description]
  */
 template <Port DMA, Stream Str>
-constexpr bool is_enabled() noexcept {
-	return reg::SxCR<DMA, Str>.template readBit<reg::SxCRField::EN>();
+[[nodiscard]] constexpr bool is_enabled() noexcept {
+	return get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField::EN>(ValueOnly));
 }
 
 /**
@@ -133,7 +135,7 @@ template <Port DMA, Stream Str>
 constexpr void disable_periph_increment() noexcept {
 	reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::PINC>();
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma
 
 /**
  * [enable_periph_fix_increment description]
@@ -230,16 +232,16 @@ constexpr auto get_tx_data_num() noexcept {
  * @tparam  Port    ::Port
  * @tparam  Stream  ::Stream
  */
-template <Port DMA, Stream Str>
-constexpr void enable_tx_complete_irq() noexcept {
-	if constexpr (to_underlying(Str) <= 3) {
-		constexpr auto idx = to_underlying(InterruptFlag::TCI) * 4U + to_underlying(Str);
-		reg::LISR<DMA>.template setBit<InterruptFlag{idx}>();
-	} else {
-		constexpr auto idx = to_underlying(InterruptFlag::TCI) * 4U + to_underlying(Str);
-		reg::HISR<DMA>.template setBit<InterruptFlag{idx}>();
-	}
-}
+// template <Port DMA, Stream Str>
+// constexpr void enable_tx_complete_irq() noexcept {
+// 	if constexpr (to_underlying(Str) <= 3) {
+// 		constexpr auto idx = to_underlying(InterruptFlag::TCI) * 4U + to_underlying(Str);
+// 		reg::LISR<DMA>.template setBit<InterruptFlag{idx}>();
+// 	} else {
+// 		constexpr auto idx = to_underlying(InterruptFlag::TCI) * 4U + to_underlying(Str);
+// 		reg::HISR<DMA>.template setBit<InterruptFlag{idx}>();
+// 	}
+// }
 
 /**
  * [enable description]
@@ -340,7 +342,7 @@ class DmaBuilder {
 		reset<DMA, Str>();
 	}
 
-	constexpr auto transferDir(PeriphAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
 		m_transferDirection = TransferDir::PeriphToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
@@ -349,7 +351,7 @@ class DmaBuilder {
 		return *this;
 	}
 
-	constexpr auto transferDir(MemoryAddress_t const& t_from, PeriphAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, PeriphAddress_t const& t_to) noexcept {
 		m_transferDirection = TransferDir::MemToPeriph;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_to.get());
@@ -358,7 +360,7 @@ class DmaBuilder {
 		return *this;
 	}
 
-	constexpr auto transferDir(MemoryAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
 		m_transferDirection = TransferDir::MemToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
@@ -367,84 +369,86 @@ class DmaBuilder {
 		return *this;
 	}
 
-	constexpr auto txDataNum(std::uint16_t const& t_ndt) noexcept {
-		reg::SxNDTR<DMA, Str>.template writeBit(t_ndt);
+	[[nodiscard]] constexpr auto txDataNum(std::uint16_t const& t_ndt) noexcept {
+		reg::SxNDTR<DMA, Str>.template writeBit<reg::SxNDTRField::NDT>(t_ndt);
 		return *this;
 	}
 
-	constexpr auto selectChannel(Channel const& t_ch) noexcept {
+	[[nodiscard]] constexpr auto selectChannel(Channel const& t_ch) noexcept {
 		m_channelSelect = t_ch;
 		return *this;
 	}
 
-	constexpr auto streamPriority(StreamPriority const& t_str) noexcept {
+	[[nodiscard]] constexpr auto streamPriority(StreamPriority const& t_str) noexcept {
 		m_streamPriority = t_str;
 		return *this;
 	}
 
-	constexpr auto memoryIncrementMode(bool const& t_incr) noexcept {
+	[[nodiscard]] constexpr auto memoryIncrementMode(bool const& t_incr) noexcept {
 		m_memoryIncrementMode = t_incr;
 		return *this;
 	}
 
-	constexpr auto memoryBurstTransfer(BurstSize const& t_bs) noexcept {
+	[[nodiscard]] constexpr auto memoryBurstTransfer(BurstSize const& t_bs) noexcept {
 		m_memoryBurstSize = t_bs;
 		return *this;
 	}
 
-	constexpr auto memoryDataWidth(DataSize const& t_ds) noexcept {
+	[[nodiscard]] constexpr auto memoryDataWidth(DataSize const& t_ds) noexcept {
 		m_memoryDataSize = t_ds;
 		return *this;
 	}
 
-	constexpr auto peripheralIncrementMode(bool const& t_incr) noexcept {
+	[[nodiscard]] constexpr auto peripheralIncrementMode(bool const& t_incr) noexcept {
 		m_periphIncrementMode = t_incr;
 		return *this;
 	}
 
-	constexpr auto perihperalFixIncrement(bool const& t_fix_incr) noexcept {
+	[[nodiscard]] constexpr auto perihperalFixIncrement(bool const& t_fix_incr) noexcept {
 		m_periphFixIncr = t_fix_incr;
 		return *this;
 	}
 
-	constexpr auto peripheralBurstTransfer(BurstSize const& t_bs) noexcept {
+	[[nodiscard]] constexpr auto peripheralBurstTransfer(BurstSize const& t_bs) noexcept {
 		m_peripheralBurstSize = t_bs;
 		return *this;
 	}
 
-	constexpr auto perihperalDataWidth(DataSize const& t_ds) noexcept {
+	[[nodiscard]] constexpr auto perihperalDataWidth(DataSize const& t_ds) noexcept {
 		m_peripheralDataSize = t_ds;
 		return *this;
 	}
 
-	constexpr auto circularMode(bool const& t_c) noexcept {
+	[[nodiscard]] constexpr auto circularMode(bool const& t_c) noexcept {
 		m_circularMode = t_c;
 		return *this;
 	}
 
-	constexpr auto doubleBufferTarget(std::uint8_t const& t_target = 0) noexcept {
+	[[nodiscard]] constexpr auto doubleBufferTarget(std::uint8_t const& t_target = 0) noexcept {
 		m_doubleBuffer	= true;
 		m_currentTarget = t_target;
 		return *this;
 	}
 
-	constexpr auto configFIFO(FifoThreshold const& t_fts) noexcept {
+	[[nodiscard]] constexpr auto configFIFO(FifoThreshold const& t_fts) noexcept {
 		m_directModeDisabled = true;
 		m_fifoThreshold			 = t_fts;
 		return *this;
 	}
 
 	template <InterruptFlag... Flags>
-	constexpr auto enableInterrupt() noexcept {
+	[[nodiscard]] constexpr auto enableInterrupt() noexcept {
 		// @todo find a better way to do this
 		m_fifoErrorIrq							 = ((Flags == InterruptFlag::FEI) || ...);
 		m_directModeDisabledErrorIrq = ((Flags == InterruptFlag::DMEI) || ...);
 		m_transferErrorIrq					 = ((Flags == InterruptFlag::TEI) || ...);
 		m_halfTransferIrq						 = ((Flags == InterruptFlag::HTI) || ...);
 		m_transferCompleteIrq				 = ((Flags == InterruptFlag::TCI) || ...);
+
+		return *this;
 	}
 
-	constexpr auto build() noexcept {
+	constexpr void build() noexcept {
 		using namespace reg;
 
 		SxFCR<DMA, Str>.template writeBit<SxFCRField::FTH, SxFCRField::DMDIS, SxFCRField::FEIE>(
@@ -455,11 +459,11 @@ class DmaBuilder {
                                      SxCRField::PINCOS, SxCRField::PL, SxCRField::DBM, SxCRField::CT, SxCRField::PBURST,
                                      SxCRField::MBURST, SxCRField::CHSEL>(
 			m_directModeDisabledErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq, m_transferDirection,
-			m_circularMode, m_periphIncrementMode, m_memoryIncrementMode, m_peripheralBurstSize, m_memoryBurstSize, m_periphFixIncr,
+			m_circularMode, m_periphIncrementMode, m_memoryIncrementMode, m_peripheralDataSize, m_memoryDataSize, m_periphFixIncr,
       m_streamPriority, m_doubleBuffer, m_currentTarget, m_peripheralBurstSize, m_memoryBurstSize, m_channelSelect);
 
 		enable<DMA, Str>();
 	}
 };
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma
