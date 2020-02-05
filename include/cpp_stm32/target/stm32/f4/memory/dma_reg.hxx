@@ -38,8 +38,8 @@ enum class StreamPriority { Low, Medium, High, VeryHigh };
 enum class DataSize { Byte, HalfWord, Word };
 enum class BurstSize { Single, Incr4, Incr8, Incr16 };
 enum class FifoThreshold { OneFourths, Half, ThreeFourths, Full };
-
-}	// namespace cpp_stm32::dma
+enum class FlowControl { DMA, Peripheral };
+}	 // namespace cpp_stm32::dma
 
 namespace cpp_stm32::dma::reg {
 
@@ -144,7 +144,7 @@ SETUP_REGISTER_INFO(SxCRBitList,													 /**/
 										Bit<2, DataSize>{BitPos_t{11}},				 // PSIZE
 										Bit<2, DataSize>{BitPos_t{13}},				 // MSIZE
 										Binary<>{BitPos_t{15}},								 // PINCOS
-										Bit<2, StreamPriority>{BitPos_t{16}},	// PL
+										Bit<2, StreamPriority>{BitPos_t{16}},	 // PL
 										Binary<>{BitPos_t{18}},								 // DBM
 										Binary<>{BitPos_t{19}},								 // CT
 										Bit<2, BurstSize>{BitPos_t{21}},			 // PBURST
@@ -185,7 +185,7 @@ static constexpr Register<SxCRBitList, SxCRField> SxCR{BASE_ADDR(DMA), 0x10 + 0x
  */
 
 SETUP_REGISTER_INFO(SxNDTRBitList,											 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	// NDT
+										Bit<16, std::uint16_t>{BitPos_t{0}}	 // NDT
 )
 
 enum class SxNDTRField {
@@ -257,7 +257,7 @@ static constexpr Register<SxM1ARBitList, SxM1ARField> SxM1AR{BASE_ADDR(DMA), 0x2
  */
 
 SETUP_REGISTER_INFO(SxFCRBitList,												 /**/
-										Bit<2, FifoThreshold>{BitPos_t{0}},	// FTH
+										Bit<2, FifoThreshold>{BitPos_t{0}},	 // FTH
 										Binary<>{BitPos_t{2}},							 // DMDIS
 										StatusBit<3>{BitPos_t{3}},					 // FS
 										Binary<>{BitPos_t{7}}								 // FEIE
@@ -267,7 +267,7 @@ enum class SxFCRField {
 	FTH,	 /*!< FIFO threshold selection*/
 	DMDIS, /*!< Direct mode disable*/
 	FS,		 /*!< FIFO status*/
-	FEIE,	/*!< FIFO error interrupt enable*/
+	FEIE,	 /*!< FIFO error interrupt enable*/
 };
 
 template <Port DMA, Stream Str>
@@ -276,4 +276,4 @@ static constexpr Register<SxFCRBitList, SxFCRField> SxFCR{BASE_ADDR(DMA),							
 																													ResetVal_t{0x0000'0021}};
 /**@}*/
 
-}	// namespace cpp_stm32::dma::reg
+}	 // namespace cpp_stm32::dma::reg

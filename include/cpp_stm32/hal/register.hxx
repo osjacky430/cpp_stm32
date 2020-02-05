@@ -62,6 +62,10 @@ static constexpr ValueOnlyType ValueOnly{};
 struct ValWithPosType {};
 static constexpr ValWithPosType ValWithPos{};
 
+/**
+ * [to_underlying description]
+ * @param Idx [description]
+ */
 template <bool b>
 using Atomic_t = std::bool_constant<b>;
 
@@ -221,8 +225,15 @@ class Register {
 	 */
 	template <BitListIdx... BitIdx, bool NeedTS = false, Access TSIo = Access::None>
 	constexpr decltype(auto) readCurrentVal(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
-		constexpr auto need_to_read_current_val = [](auto const& bit) {
-			return (!(bit.MOD == BitMod::WrOnly) && !(bit.MOD == BitMod::RdSet));
+		constexpr auto num_of_bit_to_mod = []() {
+			auto arr = std::array{BitIdx...};
+			cstd::sort(arr, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
+			return cstd::unique(arr.begin(), arr.end()) - arr.begin();
+		}();
+
+		constexpr auto need_to_read_current_val = [=](auto const& bit) {
+			return (!(bit.MOD == BitMod::WrOnly) && !(bit.MOD == BitMod::RdSet) &&
+							!(num_of_bit_to_mod == BitList::WRITABLE_BIT_NUM));
 		};
 
 		if constexpr ((need_to_read_current_val(GET_BIT<BitIdx>()) && ...)) {
@@ -340,6 +351,12 @@ class Register {
 
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
+
+	// public:
+	// template <BitListIdx... BitIdx, typename... ValueTypes>
+	// constexpr void writeBit(ValueTypes&&... t_param) const noexcept {
+	// 	writeBit<BitIdx...>(std::forward<ValueTypes>(t_param)...);
+	// }
 
 	/**
 	 * [writeBit description]
@@ -480,7 +497,24 @@ using AtomicReg = Register<BitList, BitIdx, IoOp, true>;
                                                                                   \
 	 private:                                                                       \
 		static constexpr std::tuple BIT_LIST = make_bit_list_from_input(__VA_ARGS__); \
+                                                                                  \
+	 public:                                                                        \
+		static constexpr auto LIST_SIZE = std::tuple_size_v<decltype(BIT_LIST)>;      \
+                                                                                  \
+		static constexpr auto WRITABLE_BIT_NUM = calc_writable_bit_num(BIT_LIST);     \
 	};
+
+/**
+ * [constexpr  description]
+ * @param  t_input [description]
+ * @return         [description]
+ */
+template <typename... BitInput>
+static constexpr auto calc_writable_bit_num(std::tuple<BitInput...> const&) {
+	constexpr auto writable = [](auto const& t_mod) { return t_mod != BitMod::RdOnly; };
+
+	return (writable(BitInput::MOD) + ...);
+}
 
 /**
  * @brief		This function takes variadic input bit and turn it to tuple of bits
@@ -499,4 +533,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

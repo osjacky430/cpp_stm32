@@ -25,7 +25,7 @@ constexpr void setup_dma() noexcept {
 
 	rcc::enable_periph_clk<rcc::PeriphClk::Dma1>();
 
-	DmaBuilder<dma::Port::DMA1, dma::Stream::Stream5>{}
+	DmaBuilder<dma::Port::DMA1, dma::Stream::Stream5>()
 		.transferDir(PeriphAddress_t{p_addr}, MemoryAddress_t{(std::uintptr_t)m_addr})
 		.txDataNum(1)
 		.selectChannel(dma::Channel::Channel4)
@@ -49,10 +49,10 @@ int main() {
 	while (true) {
 		led.toggle();
 
-		while (!dma::get_interrupt_flag<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>()) {
+		while (!dma::get_tx_complete_flag<dma::Port::DMA1, dma::Stream::Stream5>()) {
 		}
-
-		dma::clear_interrupt_flag<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>();
+		//
+		dma::clear_tx_complete_flag<dma::Port::DMA1, dma::Stream::Stream5>();
 		// auto const [user_input, nl] = pc.receive(2_byte, Waiting<true>);
 		pc << array[0] << "\n\r";
 	}

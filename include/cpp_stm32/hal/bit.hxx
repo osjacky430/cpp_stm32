@@ -26,12 +26,23 @@
 
 namespace cpp_stm32 {
 
+/**
+ * [Bit description]
+ * @param  t_pos [description]
+ * @return       [description]
+ *
+ * @note 		Settable  (Writing 1 is meaningful): WrOnly, RdWr, RdSet, RdClrWr1
+ * 					Clearable (Writing 0 is meaningful): WrOnly, RdWr
+ * 					Writable (Writing 0/1 is meaningful): WrOnly, RdWr, RdSet, RdClrWr1
+ */
 enum class BitMod {
-	RdOnly	 = 0x100,
-	WrOnly	 = 0x010,
-	RdWr		 = 0x110,
-	RdSet		 = 0x111,
-	RdClrWr1 = 0x112,
+	RdOnly	 = 0x100, /*!< Software can only read this bit. */
+	WrOnly	 = 0x010, /*!< Software can only write to this bit. Reading this bit returns the reset value. */
+	RdWr		 = 0x110, /*!< Software can read and write to this bit. */
+	RdSet		 = 0x111, /*!< Software can read as well as set this bit. Writing 0 has no effect on the bit value.*/
+	RdClrWr1 = 0x112, /*!< Software can read as well as clear this bit by writing 1.
+												 Writing 0 has no effect on the bit value.*/
+
 };
 
 template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::RdWr>
@@ -143,4 +154,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32
