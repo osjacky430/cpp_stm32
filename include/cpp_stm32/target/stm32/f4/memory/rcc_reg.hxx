@@ -97,11 +97,12 @@ enum class PeriphClk : std::uint32_t {
 	Dma2,
 	/*APB1*/
 	Usart2,
+	/*Usart 3, Uart4, Uart5*/
 	Pwr,
 
 	/*APB2*/
 	Usart1,
-
+	Usart6,
 };
 
 enum class ClkSrc : std::uint32_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
@@ -124,7 +125,7 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc
 
 namespace cpp_stm32::rcc::reg {
 
@@ -322,4 +323,4 @@ static constexpr Register<RccBdcrInfo, BdcrBit> BDCR{BASE_ADDR, 0x70U};
 
 /**@}*/
 
-}	// namespace cpp_stm32::rcc::reg
+}	 // namespace cpp_stm32::rcc::reg

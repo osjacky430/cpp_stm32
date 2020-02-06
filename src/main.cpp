@@ -12,9 +12,6 @@
 #include "cpp_stm32/target/stm32/f4/dma.hxx"
 
 using namespace cpp_stm32;
-using namespace driver;
-using namespace gpio;
-using namespace usart;
 
 auto array = std::array<std::uint8_t, 20>{};
 
@@ -39,6 +36,10 @@ constexpr void setup_dma() noexcept {
 }
 
 int main() {
+	using namespace driver;
+	using namespace gpio;
+	using namespace usart;
+
 	sys::Clock::init<rcc::ClkSrc::Hse>();
 
 	Usart const pc{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
@@ -49,10 +50,8 @@ int main() {
 	while (true) {
 		led.toggle();
 
-		while (!dma::get_tx_complete_flag<dma::Port::DMA1, dma::Stream::Stream5>()) {
-		}
-		//
-		dma::clear_tx_complete_flag<dma::Port::DMA1, dma::Stream::Stream5>();
+		auto const dma_state = dma::DmaStateManager<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>();
+
 		// auto const [user_input, nl] = pc.receive(2_byte, Waiting<true>);
 		pc << array[0] << "\n\r";
 	}

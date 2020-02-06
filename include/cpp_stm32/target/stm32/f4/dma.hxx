@@ -254,6 +254,11 @@ constexpr auto get_tx_data_num() noexcept {
 template <Port DMA, Stream Str>
 constexpr auto clear_tx_complete_flag = clear_interrupt_flag<DMA, Str, InterruptFlag::TCI>;
 
+/**
+ * @brief   This function get transfer complete interrupt flag
+ * @tparam  Port    ::Port
+ * @tparam  Stream  ::Stream
+ */
 template <Port DMA, Stream Str>
 constexpr auto get_tx_complete_flag = get_interrupt_flag<DMA, Str, InterruptFlag::TCI>;
 
@@ -265,6 +270,11 @@ constexpr auto get_tx_complete_flag = get_interrupt_flag<DMA, Str, InterruptFlag
 template <Port DMA, Stream Str>
 constexpr auto clear_half_tx_flag = clear_interrupt_flag<DMA, Str, InterruptFlag::HTI>;
 
+/**
+ * @brief   This function get half transfer interrupt flag
+ * @tparam  Port    ::Port
+ * @tparam  Stream  ::Stream
+ */
 template <Port DMA, Stream Str>
 constexpr auto get_half_tx_flag = get_interrupt_flag<DMA, Str, InterruptFlag::HTI>;
 
@@ -356,7 +366,7 @@ class DmaBuilder {
 	 * [resetDMA description]
 	 * @return [description]
 	 */
-	static constexpr auto resetDMA() noexcept {
+	static constexpr void resetDMA() noexcept {
 		reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::EN>();
 
 		while (is_enabled<DMA, Str>()) {
@@ -497,6 +507,17 @@ class DmaBuilder {
 
 		enable<DMA, Str>();
 	}
+};
+
+template <Port DMA, Stream Str, InterruptFlag Flag>
+class DmaStateManager {
+ public:
+	[[nodiscard]] constexpr DmaStateManager() noexcept {
+		while (!get_interrupt_flag<DMA, Str, Flag>()) {
+		}
+	}
+
+	~DmaStateManager() noexcept { clear_interrupt_flag<DMA, Str, Flag>(); }
 };
 
 }	 // namespace cpp_stm32::dma

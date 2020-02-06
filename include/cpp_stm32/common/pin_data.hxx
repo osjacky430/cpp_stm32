@@ -22,6 +22,7 @@
 
 namespace cpp_stm32 {
 
+// this is substitution of std::tuple due to nonconstexpr assignment of std::tuple, rename and complete it in the future
 template <typename... Args>
 class PinData {
  private:

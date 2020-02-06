@@ -22,10 +22,23 @@
 
 #include "cpp_stm32/utility/literal_op.hxx"
 
+#include "cpp_stm32/target/stm32/f4/dma.hxx"
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
+
+#define SET_USART_TX_DATA(pinname, usart) \
+	UsartPinData { pinname, usart, AF<usart>, RCC<usart>, IRQ<usart>, TX_DMA<usart> }
+
+#define SET_USART_RX_DATA(pinname, usart) \
+	UsartPinData { pinname, usart, AF<usart>, RCC<usart>, IRQ<usart>, RX_DMA<usart> }
+
+namespace cpp_stm32::dma {
+
+using DmaData = PinData<Port, Stream, Channel>;
+
+}	 // namespace cpp_stm32::dma
 
 namespace cpp_stm32::usart {
 
@@ -33,37 +46,108 @@ class PinMap {
  private:
 	using PinName = gpio::PinName;
 
-	using UsartPinData = PinData<PinName, Port, gpio::AltFunc, rcc::PeriphClk, IrqNum>;
+	using UsartPinData = PinData<PinName, Port, gpio::AltFunc, rcc::PeriphClk, IrqNum, dma::DmaData>;
 
+	template <Port USART>
+	static constexpr auto AF = []() {
+		if constexpr (USART == Port::Usart1 || USART == Port::Usart2 || USART == Port::Usart3 || USART == Port::Uart5) {
+			return gpio::AltFunc::AF7;
+		} else {
+			return gpio::AltFunc::AF8;
+		}
+	}();
+
+	template <Port USART>
+	static constexpr auto RCC = []() {
+		switch (USART) {
+			case Port::Usart1:
+				return rcc::PeriphClk::Usart1;
+			case Port::Usart2:
+				return rcc::PeriphClk::Usart2;
+			case Port::Usart3:
+				// return rcc::PeriphClk::Usart3;
+			case Port::Uart4:
+				// return rcc::PeriphClk::Uart4;
+			case Port::Uart5:
+				// return rcc::PeriphClk::Usart5;
+			case Port::Usart6:
+				return rcc::PeriphClk::Usart6;
+		}
+	}();
+
+	template <Port USART>
+	static constexpr auto IRQ = []() {
+		switch (USART) {
+			case Port::Usart1:
+				return IrqNum::Usart1Global;
+			case Port::Usart2:
+				return IrqNum::Usart2Global;
+			case Port::Usart3:
+				return IrqNum::Usart3Global;
+			case Port::Uart4:
+				// return IrqNum::Uart4Global;
+			case Port::Uart5:
+				// return IrqNum::Uart5Global
+			case Port::Usart6:
+				// return IrqNum::Usart6Global
+				break;
+		}
+	}();
+
+	template <Port USART>
+	static constexpr auto TX_DMA = []() {
+		switch (USART) {
+			case Port::Usart1:
+				break;
+			case Port::Usart2:
+				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream6, dma::Channel::Channel4};
+		}
+	}();
+
+	template <Port USART>
+	static constexpr auto RX_DMA = []() {
+		switch (USART) {
+			case Port::Usart1:
+				break;
+			case Port::Usart2:
+				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream5, dma::Channel::Channel4};
+		}
+	}();
+
+	// @todo refine it, does this table contain too much information(?)
 	static constexpr std::array TX_PIN_TABLE{
-		UsartPinData{PinName::PA_2, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
+		SET_USART_TX_DATA(PinName::PA_2, Port::Usart2),
 	};
 
 	static constexpr std::array RX_PIN_TABLE{
-		UsartPinData{PinName::PA_3, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
+		SET_USART_RX_DATA(PinName::PA_3, Port::Usart2),
 	};
 
-	static constexpr auto USART_PIN_NAME_TABLE = std::tuple{TX_PIN_TABLE, RX_PIN_TABLE};
+	template <PinName Pin>
+	static constexpr auto PREDICATE = [](auto const& t_pin_data) { return t_pin_data[0_ic] == Pin; };
+
+	template <std::size_t... Idx>
+	static constexpr auto RETURN_PIN_DATA(UsartPinData const& iter, std::index_sequence<Idx...> const&) {
+		return std::tuple{iter[size_c<Idx>{}]...};
+	}
 
  public:
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getTxPinData() noexcept {
-		auto const iter = *cstd::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(),
-																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
+		constexpr auto iter = *cstd::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};
+		return RETURN_PIN_DATA(iter, detail::Interval<1, 5>{});
 	}
 
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getRxPinData() noexcept {
-		auto const iter = *cstd::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(),
-																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
+		constexpr auto iter = *cstd::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};
+		return RETURN_PIN_DATA(iter, detail::Interval<1, 5>{});
 	}
 };
 
-}	// namespace cpp_stm32::usart
+}	 // namespace cpp_stm32::usart
 
 namespace cpp_stm32::gpio {
 
@@ -100,7 +184,7 @@ class PinMap {
 	}
 };
 
-}	// namespace cpp_stm32::gpio
+}	 // namespace cpp_stm32::gpio
 
 namespace cpp_stm32::rcc {
 
@@ -185,4 +269,4 @@ class ClkRegMap {
 	}
 };
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc
