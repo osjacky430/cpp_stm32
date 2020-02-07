@@ -49,7 +49,7 @@
                                                                                                           \
 		template <std::uint32_t Val>                                                                          \
 		static constexpr auto findDivisionFactor = []() {                                                     \
-			constexpr auto iter_pos = cstd::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(), \
+			constexpr auto iter_pos = detail::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(), \
 																							[](auto const& t_pair) { return t_pair.first == Val; });    \
 			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                             \
 			return iter_pos->second;                                                                            \

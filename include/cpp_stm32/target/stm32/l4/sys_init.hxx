@@ -25,7 +25,7 @@
 #include "cpp_stm32/target/stm32/l4/pwr.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 
-#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 #include "sys_info.hpp"
@@ -72,7 +72,7 @@ static constexpr std::array MSI_FREQ_TABLE{
 	100_KHz, 200_KHz, 400_KHz, 800_KHz, 1_MHz, 2_MHz, 4_MHz, 8_MHz, 16_MHz, 24_MHz, 32_MHz, 48_MHz,
 };
 
-static_assert(cstd::find(MSI_FREQ_TABLE.begin(), MSI_FREQ_TABLE.end(), MSI_CLK_FREQ) != MSI_FREQ_TABLE.end());
+static_assert(detail::find(MSI_FREQ_TABLE.begin(), MSI_FREQ_TABLE.end(), MSI_CLK_FREQ) != MSI_FREQ_TABLE.end());
 
 /**@}*/
 

@@ -22,7 +22,8 @@
 
 namespace cpp_stm32 {
 
-// this is substitution of std::tuple due to nonconstexpr assignment of std::tuple, rename and complete it in the future
+// this is substitution of std::tuple due to nonconstexpr assignment of std::tuple in c++17, rename and complete it in
+// the future
 template <typename... Args>
 class PinData {
  private:
@@ -43,6 +44,7 @@ class PinData {
 		return std::get<Idx>(argTup);
 	}
 
+	// assume all assignable
 	constexpr void operator=(PinData<Args...> const& t_data) noexcept {
 		element_eq(t_data, std::make_index_sequence<sizeof...(Args)>{});
 	}

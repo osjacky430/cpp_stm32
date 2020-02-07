@@ -21,7 +21,7 @@
 #include <iterator>
 #include <utility>
 
-namespace cpp_stm32::cstd {
+namespace cpp_stm32::detail {
 
 template <class ForwardIt, class Generator>
 constexpr void generate(ForwardIt first, ForwardIt last, Generator g) {
@@ -128,12 +128,12 @@ constexpr void iter_swap(ForwardIt1 a, ForwardIt2 b) {
 
 template <class ForwardIt, class UnaryPredicate>
 constexpr ForwardIt partition(ForwardIt first, ForwardIt last, UnaryPredicate p) {
-	first = cstd::find_if_not(first, last, p);
+	first = detail::find_if_not(first, last, p);
 	if (first == last) return first;
 
 	for (ForwardIt i = first + 1; i != last; ++i) {
 		if (p(*i)) {
-			cstd::iter_swap(i, first);
+			detail::iter_swap(i, first);
 			++first;
 		}
 	}
@@ -145,8 +145,8 @@ constexpr void quick_sort(RAIt first, RAIt last, Compare cmp = Compare{}) {
 	auto const N = last - first;
 	if (N <= 1) return;
 	auto const pivot	 = *(first + N / 2);
-	auto const middle1 = cstd::partition(first, last, [=](auto const& elem) { return cmp(elem, pivot); });
-	auto const middle2 = cstd::partition(middle1, last, [=](auto const& elem) { return !cmp(pivot, elem); });
+	auto const middle1 = detail::partition(first, last, [=](auto const& elem) { return cmp(elem, pivot); });
+	auto const middle2 = detail::partition(middle1, last, [=](auto const& elem) { return !cmp(pivot, elem); });
 	quick_sort(first, middle1, cmp);
 	quick_sort(middle2, last, cmp);
 }
@@ -177,4 +177,4 @@ constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, Bin
 	return result;
 }
 
-}	 // namespace cpp_stm32::cstd
+}	 // namespace cpp_stm32::detail

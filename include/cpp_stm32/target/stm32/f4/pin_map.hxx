@@ -36,7 +36,7 @@
 
 namespace cpp_stm32::dma {
 
-using DmaData = PinData<Port, Stream, Channel>;
+using DmaData = PinData<Port, Stream, Channel, PeriphAddress_t>;
 
 }	 // namespace cpp_stm32::dma
 
@@ -100,7 +100,8 @@ class PinMap {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream6, dma::Channel::Channel4};
+				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream6, dma::Channel::Channel4,
+														dma::PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
 		}
 	}();
 
@@ -110,7 +111,8 @@ class PinMap {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream5, dma::Channel::Channel4};
+				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream5, dma::Channel::Channel4,
+														dma::PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
 		}
 	}();
 
@@ -134,16 +136,30 @@ class PinMap {
  public:
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getTxPinData() noexcept {
-		constexpr auto iter = *cstd::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(), PREDICATE<Pin>);
+		constexpr auto iter = *detail::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return RETURN_PIN_DATA(iter, detail::Interval<1, 5>{});
+		return RETURN_PIN_DATA(iter, detail::Interval<1, 4>{});
 	}
 
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getRxPinData() noexcept {
-		constexpr auto iter = *cstd::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(), PREDICATE<Pin>);
+		constexpr auto iter = *detail::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return RETURN_PIN_DATA(iter, detail::Interval<1, 5>{});
+		return RETURN_PIN_DATA(iter, detail::Interval<1, 4>{});
+	}
+
+	template <PinName Pin>
+	[[nodiscard]] static constexpr auto getTxDmaData() noexcept {
+		constexpr auto iter = *detail::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(), PREDICATE<Pin>);
+
+		return RETURN_PIN_DATA(iter, std::index_sequence<5>{});
+	}
+
+	template <PinName Pin>
+	[[nodiscard]] static constexpr auto getRxDmaData() noexcept {
+		constexpr auto iter = *detail::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(), PREDICATE<Pin>);
+
+		return RETURN_PIN_DATA(iter, std::index_sequence<5>{});
 	}
 };
 

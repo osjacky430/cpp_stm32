@@ -45,7 +45,7 @@ class PinMap {
  public:
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getTxPinData() noexcept {
-		auto const iter = *cstd::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(),
+		auto const iter = *detail::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(),
 																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
 
 		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};
@@ -53,7 +53,7 @@ class PinMap {
 
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getRxPinData() noexcept {
-		auto const iter = *cstd::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(),
+		auto const iter = *detail::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(),
 																		 [](auto const& pin_data) { return pin_data[0_ic] == Pin; });
 
 		return std::tuple{iter[1_ic], iter[2_ic], iter[3_ic], iter[4_ic]};

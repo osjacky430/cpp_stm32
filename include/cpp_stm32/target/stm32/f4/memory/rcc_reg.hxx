@@ -23,7 +23,7 @@
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
-#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/detail/algorithm.hxx"
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 

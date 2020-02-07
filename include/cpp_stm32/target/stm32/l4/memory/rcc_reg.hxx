@@ -22,7 +22,7 @@
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 #include "cpp_stm32/utility/macro.hxx"

@@ -23,7 +23,13 @@ namespace cpp_stm32 {
 /**
  *
  */
-template <typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
+template <class T>
+static constexpr bool is_scoped_enum = !std::is_convertible_v<T, std::underlying_type_t<T>> && std::is_enum_v<T>;
+
+/**
+ *
+ */
+template <typename Enum, typename = std::enable_if_t<is_scoped_enum<Enum>>>
 constexpr auto to_underlying(Enum t_e) noexcept {
 	return static_cast<std::underlying_type_t<Enum>>(t_e);
 }
@@ -34,7 +40,7 @@ constexpr auto to_underlying(Enum t_e) noexcept {
  * @param 	rhs 	Right hand side
  * @return 	Numeric value of AND operation of lhs and rhs
  */
-template <typename Enum>
+template <typename Enum, typename = std::enable_if_t<is_scoped_enum<Enum>>>
 constexpr auto operator&(Enum const& lhs, Enum const& rhs) noexcept {
 	return Enum{to_underlying(lhs) & to_underlying(rhs)};
 }
@@ -45,7 +51,7 @@ constexpr auto operator&(Enum const& lhs, Enum const& rhs) noexcept {
  * @param 	rhs 	Right hand side
  * @return 	Numeric value of OR operation of lhs and rhs
  */
-template <typename Enum>
+template <typename Enum, typename = std::enable_if_t<is_scoped_enum<Enum>>>
 constexpr auto operator|(Enum const& lhs, Enum const& rhs) noexcept {
 	return Enum{to_underlying(lhs) | to_underlying(rhs)};
 }
@@ -56,10 +62,10 @@ constexpr auto operator|(Enum const& lhs, Enum const& rhs) noexcept {
  * @param 	rhs 	Right hand side
  * @return 	Numeric value of OR operation of lhs and rhs
  */
-template <typename Enum>
+template <typename Enum, typename = std::enable_if_t<is_scoped_enum<Enum>>>
 constexpr Enum& operator|=(Enum& lhs, Enum rhs) noexcept {
 	lhs = lhs | rhs;
 	return lhs;
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

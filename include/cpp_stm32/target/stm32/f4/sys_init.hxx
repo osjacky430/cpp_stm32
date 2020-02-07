@@ -22,7 +22,7 @@
 #include "cpp_stm32/target/stm32/f4/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 
-#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 // user specific include
@@ -134,7 +134,7 @@ class Clock {
 		};
 
 		constexpr auto pllp_iter =
-			cstd::find_if(PllP::AVAIL_DIVISION_FACTOR.begin(), PllP::AVAIL_DIVISION_FACTOR.end(), pllp_satisfy_constraint);
+			detail::find_if(PllP::AVAIL_DIVISION_FACTOR.begin(), PllP::AVAIL_DIVISION_FACTOR.end(), pllp_satisfy_constraint);
 		constexpr auto pllp = pllp_iter->first;
 		constexpr auto plln = static_cast<std::uint32_t>(plln_over_pllp * pllp);
 

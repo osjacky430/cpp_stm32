@@ -23,7 +23,7 @@
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/mmio.hxx"
-#include "cpp_stm32/utility/constexpr_algo.hxx"
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
@@ -215,7 +215,7 @@ class Register {
 	template <BitListIdx BitIdx, BitListIdx... BitIdxList>
 	static constexpr auto bitIdxOrder() noexcept {
 		auto const bit_idx_list = std::array{BitIdxList...};
-		return cstd::find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
+		return detail::find(bit_idx_list.begin(), bit_idx_list.end(), BitIdx) - bit_idx_list.begin();
 	}
 
 	/**
@@ -227,8 +227,8 @@ class Register {
 	constexpr decltype(auto) readCurrentVal(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
 		constexpr auto num_of_bit_to_mod = []() {
 			auto arr = std::array{BitIdx...};
-			cstd::sort(arr, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
-			return cstd::unique(arr.begin(), arr.end()) - arr.begin();
+			detail::sort(arr, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
+			return detail::unique(arr.begin(), arr.end()) - arr.begin();
 		}();
 
 		constexpr auto need_to_read_current_val = [=](auto const& bit) {
@@ -405,7 +405,7 @@ class Register {
 			return false;
 		}();
 
-		constexpr bool bits_in_same_access_unit = (cstd::array_count(mod_n, true) == 1);
+		constexpr bool bits_in_same_access_unit = (detail::array_count(mod_n, true) == 1);
 
 		return bits_in_same_access_unit && !mod_and_isolated_in_same_byte;
 	}

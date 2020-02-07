@@ -44,4 +44,4 @@ static constexpr bool is_specialization = false;
 template <template <typename...> class Ref, typename... Args>
 static constexpr bool is_specialization<Ref<Args...>, Ref> = true;
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

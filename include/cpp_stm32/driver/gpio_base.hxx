@@ -50,7 +50,7 @@ class PinGroupingHelper {
 		using gpio::Port;
 		auto port_list = std::array{gpio::PinMap::getPort(PIN_NAME_LIST[Idx])...};
 		std::array<Port, PORT_NUM> result_port_list{};
-		cstd::unique_copy(port_list.begin(), port_list.end(), result_port_list.begin(),
+		detail::unique_copy(port_list.begin(), port_list.end(), result_port_list.begin(),
 											[](auto const& lhs, auto const& rhs) { return lhs == rhs; });
 		return result_port_list;
 	}
@@ -71,8 +71,8 @@ class PinGroupingHelper {
 	 */
 	static constexpr auto calcPortNum() noexcept {
 		auto port_list = std::array{gpio::PinMap::getPort(PinNames)...};
-		cstd::sort(port_list, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
-		return cstd::unique(port_list.begin(), port_list.end()) - port_list.begin();
+		detail::sort(port_list, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
+		return detail::unique(port_list.begin(), port_list.end()) - port_list.begin();
 	}
 
 	/**
@@ -81,7 +81,7 @@ class PinGroupingHelper {
 	 */
 	static constexpr auto genPinNameList() noexcept {
 		auto pin_name_list = std::array{PinNames...};
-		cstd::sort(pin_name_list,
+		detail::sort(pin_name_list,
 							 [](auto const& lhs, auto const& rhs) { return (to_underlying(lhs) < to_underlying(rhs)); });
 		return pin_name_list;
 	}

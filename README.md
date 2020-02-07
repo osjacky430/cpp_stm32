@@ -1,15 +1,42 @@
-# Cpp for STM32
-A project for fun, which literally implements stm32 driver using pure c++, primarily c++17. This project is inspired by Jason Turner's talk "Rich Code for Tiny Computers: A Simple Commodore 64 Games in C++17."
-## Recent ideas
-Since there are alot of things going on here, I need to make a list of recent ideas in order to remember the thought process and current progress.
-- Thread safety (i.e. concurrency, race condition) needs to be investigated in the future, as for now I don't have much knowledge regarding this part.
-- The implementation of interrupt is not so satisfying, but can't come up with a better idea so far.
-- Extending/Refining SVD, since the SVD files provided by ST is poorly written for generating correct register file. However, this is extremely time consuming.
-- In addition to providing C style API, also consider making some C++ style API, such as builder.
-## References
-- [Odin Holmes “Concurrency Challenges of Interrupt Service Routines”](https://www.youtube.com/watch?v=gcRdG7dGMOw)
-- [A Possible Future of Embedded Software Development - Odin Holmes](https://www.youtube.com/watch?v=fsMmh8F8uV0)
-- [Jason Turner “Rich Code for Tiny Computers: A Simple Commodore 64 Game in C++17”](https://www.youtube.com/watch?v=zBkNBP00wJE)
-- [Writing better embedded Software - Dan Saks](https://www.youtube.com/watch?v=3VtGCPIoBfs&t=2123s)
-- [Modern C++ in Embedded Systems](https://www.youtube.com/watch?v=1l2g2dAobXA)
-- [CppCon 2018: Michael Caisse “Modern C++ in Embedded Systems - The Saga Continues”](https://www.youtube.com/watch?v=LfRLQ7IChtg)
+# cpp_stm32
+A project that implements stm32 driver using c++17, inspired by Jason Turner's talk "Rich Code for Tiny Computers: A Simple Commodore 64 Games in C++17.". This driver aims to have smaller code size, better performance,  easy to use hard to misuse, and higher level of abstraction, compare to that of driver written in C99.
+
+Currently, the driver only support (not fully):
+- stm32f446re
+- stm32l432kc
+- stm32f303k8 (in the future)
+- stm32f746ng (in the future)
+
+## Getting Started
+
+### Prerequisites
+cpp_stm32 requires the following things to be installed:
+- C++17 compiler: the driver is tested with arm-none-eabi-gcc 9.2.1 and arm-none-eabi-gcc 8.3.1, you can download the compiler from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
+- [CMake](https://cmake.org/download/)
+- [make](https://www.gnu.org/software/make/)
+### Building
+Clone the repository, and then build it:
+```
+git clone https://github.com/osjacky430/cpp_stm32
+mkdir build && cd build
+cmake -G "Unix Makefiles" ..
+cmake --build ./
+```
+
+The driver has ```main.cpp``` in ```src``` directory, which contains a small example code, to make sure that the driver can be built and link correctly. (todo: move them to example file in the future)
+
+To build with your MCU, you need to modify the following file: (todo: config via command line input)
+- CMakeLists.txt: change ```TARGET_DIR```, ```LINKER_SCRIPT``` and ```TARGET_PROCESSOR```
+
+```
+set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
+                      Change to your target device directory ^^^^^^^^
+
+set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
+              Change to your target linker script ^^^^^^^^^^^^^^
+
+set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
+      Change to your target processor ^^^^^^^^^^
+```
+### Tunable Options
+Currently Under construction...
