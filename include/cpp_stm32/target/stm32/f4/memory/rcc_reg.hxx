@@ -20,10 +20,10 @@
 #include <cstdint>
 #include <utility>
 
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
-#include "cpp_stm32/detail/algorithm.hxx"
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
@@ -97,7 +97,10 @@ enum class PeriphClk : std::uint32_t {
 	Dma2,
 	/*APB1*/
 	Usart2,
-	/*Usart 3, Uart4, Uart5*/
+	Usart3,
+	Uart4,
+	Uart5,
+
 	Pwr,
 
 	/*APB2*/
@@ -223,9 +226,11 @@ static constexpr Register<RccAhb1RstInfo, Ahb1RstBit> AHB1RST{BASE_ADDR, 0x10U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb1RstInfo, Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
+SETUP_REGISTER_INFO(RccApb1RstInfo,	 //
+										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{18}}, Binary<>{BitPos_t{19}}, Binary<>{BitPos_t{20}},
+										Binary<>{BitPos_t{28}})
 
-enum class Apb1RstBit { Usart2Rst, PwrRst };
+enum class Apb1RstBit { Usart2Rst, Usart3Rst, Uart4Rst, Uart5Rst, PwrRst };
 
 static constexpr Register<RccApb1RstInfo, Apb1RstBit> APB1RST{BASE_ADDR, 0x20U};
 
@@ -236,9 +241,9 @@ static constexpr Register<RccApb1RstInfo, Apb1RstBit> APB1RST{BASE_ADDR, 0x20U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}})
+SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}})
 
-enum class Apb2RstBit { Usart1Rst };
+enum class Apb2RstBit { Usart1Rst, Usart6Rst };
 
 static constexpr Register<RccApb2RstInfo, Apb2RstBit> APB2RST{BASE_ADDR, 0x24U};
 
@@ -282,9 +287,11 @@ static constexpr Register<RccAhb1EnrInfo, Ahb1EnrBit> AHB1ENR{BASE_ADDR, 0x30U};
  */
 
 SETUP_REGISTER_INFO(RccApb1EnrInfo, /**/
-										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{28}})
+										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{18}}, Binary<>{BitPos_t{19}}, Binary<>{BitPos_t{20}},
+										Binary<>{BitPos_t{28}})
 
-enum class Apb1EnrBit { Usart2En, PwrEn };
+// @todo maybe change to rcc::PeriphClk as index?
+enum class Apb1EnrBit { Usart2En, Usart3En, Uart4En, Uart5En, PwrEn };
 
 static constexpr Register<RccApb1EnrInfo, Apb1EnrBit> APB1ENR{BASE_ADDR, 0x40U};
 
@@ -295,9 +302,9 @@ static constexpr Register<RccApb1EnrInfo, Apb1EnrBit> APB1ENR{BASE_ADDR, 0x40U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}})
+SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}})
 
-enum class Apb2EnrBit { Usart1En };
+enum class Apb2EnrBit { Usart1En, Usart6En };
 
 static constexpr Register<RccApb2EnrInfo, Apb2EnrBit> APB2ENR{BASE_ADDR, 0x44U};
 

@@ -71,7 +71,7 @@ enum class PinName { PA_1, PA_2, PA_3, PA_5, PB_1, PB_2, PB_3, Total, NC };
 
 namespace cpp_stm32::gpio::reg {
 
-constexpr auto BASE_ADDR(gpio::Port const& t_port) noexcept {
+constexpr auto BASE_ADDR(Port const& t_port) noexcept {
 	return memory_at(PeriphAddr::Ahb1Base, 0x0400U * to_underlying(t_port));
 }
 
@@ -84,11 +84,37 @@ using GpioReg = Register<BitList, gpio::Pin, IoOp, Atomicity>;
  */
 
 SETUP_REGISTER_INFO(GpioModerInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, gpio::Mode>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, Mode>>(detail::Interval<0, 30, 2>{}));
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(Port) + 0x00U)> MODER{BASE_ADDR(Port), 0x00U};
+template <Port GPIO>
+static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(GPIO) + 0x00U)> MODER{BASE_ADDR(GPIO), 0x00U};
 
+/**@}*/
+
+/**
+ * @defgroup	GPIOA_OTYPER_GROUP		GPIO port output type register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(OTYPERBitList, /**/
+										CREATE_LIST_OF_BITS<Bit<1, OutputType>>(detail::Interval<0, 15, 1>{}))
+
+template <Port GPIO>
+static constexpr GpioReg<OTYPERBitList, atomicity(BASE_ADDR(GPIO) + 0x04U)> OTYPER{BASE_ADDR(GPIO), 0x04U};
+/**@}*/
+
+/**
+ * @defgroup	GPIOA_OSPEEDR_GROUP		GPIO port output speed register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(OSPEEDRBitList, /**/
+										CREATE_LIST_OF_BITS<Bit<2, OutputSpeed>>(detail::Interval<0, 30, 2>{}))
+
+template <Port GPIO>
+static constexpr GpioReg<OSPEEDRBitList, atomicity(BASE_ADDR(GPIO) + 0x08U)> OSPEEDR{BASE_ADDR(GPIO), 0x08U};
 /**@}*/
 
 /**
@@ -97,10 +123,10 @@ static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(Port) + 0x00U)> MODE
  */
 
 SETUP_REGISTER_INFO(GpioPupdInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, gpio::Pupd>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, Pupd>>(detail::Interval<0, 30, 2>{}));
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(Port) + 0x0CU)> PUPDR{BASE_ADDR(Port), 0x0CU};
+template <Port GPIO>
+static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(GPIO) + 0x0CU)> PUPDR{BASE_ADDR(GPIO), 0x0CU};
 
 /**@}*/
 
@@ -112,8 +138,8 @@ static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(Port) + 0x0CU)> PUPDR
 SETUP_REGISTER_INFO(GpioOdrInfo, /**/
 										CREATE_LIST_OF_BITS<Bit<1>>(detail::Interval<0, 15>{}));
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(Port) + 0x14U)> ODR{BASE_ADDR(Port), 0x14U};
+template <Port GPIO>
+static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(GPIO) + 0x14U)> ODR{BASE_ADDR(GPIO), 0x14U};
 
 /**@}*/
 
@@ -125,8 +151,8 @@ static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(Port) + 0x14U)> ODR{BA
 SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
 										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(detail::Interval<0, 31>{}));
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(Port) + 0x18U)> BSRR{BASE_ADDR(Port), 0x18U};
+template <Port GPIO>
+static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(GPIO) + 0x18U)> BSRR{BASE_ADDR(GPIO), 0x18U};
 
 /**@}*/
 
@@ -136,26 +162,14 @@ static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(Port) + 0x18U)> BSRR{
  */
 
 SETUP_REGISTER_INFO(GpioAfrInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<4, gpio::AltFunc>>(detail::Interval<0, 28, 4>{}));
+										CREATE_LIST_OF_BITS<Bit<4, AltFunc>>(detail::Interval<0, 28, 4>{}));
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(Port) + 0x20U)> AFRL{BASE_ADDR(Port), 0x20U};
+template <Port GPIO>
+static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x20U)> AFRL{BASE_ADDR(GPIO), 0x20U};
 
-template <gpio::Port Port>
-static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(Port) + 0x24U)> AFRH{BASE_ADDR(Port), 0x24U};
+template <Port GPIO>
+static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x24U)> AFRH{BASE_ADDR(GPIO), 0x24U};
 
 /**@}*/
-
-/**
- * @defgroup BRR_GROUP		GPIO Bit Reset Register declaration
- *
- * @note @ref STM32F302xx, STM32F303xx and STM32F313xx advanced ARM-based 32-bit MCUs.pdf
- * @{
- */
-
-class GpioBrrInfo;
-
-template <gpio::Port Port>
-static constexpr GpioReg<GpioBrrInfo, atomicity(BASE_ADDR(Port) + 0x28U)> BASE_BRR{BASE_ADDR(Port), 0x28U};
 
 }	 // namespace cpp_stm32::gpio::reg

@@ -19,6 +19,7 @@
 #include <tuple>
 
 #include "cpp_stm32/common/gpio.hxx"
+#include "cpp_stm32/detail/builder.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
 
 namespace cpp_stm32::gpio {
@@ -78,7 +79,7 @@ constexpr void toggle() noexcept {
 }
 
 /**
- * @brief    This function handles the setup of alternate function
+ * @brief     This function handles the setup of alternate function
  * @tparam    Port    ::Port
  * @tparam    Pins    ::Pin
  * @param     t_af    ::AltFunc
@@ -111,5 +112,76 @@ constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 		reg::AFRH<InputPort>.template writeBit<high_pin_group(Pins)...>(t_af);
 	}
 }
+
+/**
+ * @brief			This function set output type and output speed of GPIO
+ * @tparam    Port     ::Port
+ * @tparam    Pins   	 ::Pin
+ * @param  		t_otype  ::OutputType
+ * @param 		t_ospeed ::OutputSpeed
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void set_output_options(OutputType t_otype, OutputSpeed t_ospeed) noexcept {
+	reg::OTYPER<InputPort>.template writeBit<Pins...>(t_otype);
+	reg::OSPEEDR<InputPort>.template writeBit<Pins...>(t_ospeed);
+}
+
+/**
+ * @brief			This function set output type of GPIO
+ * @tparam    Port    ::Port
+ * @tparam    Pins    ::Pin
+ * @param  		t_mode  ::OutputType
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void set_output_type(OutputType const& t_otype) noexcept {
+	reg::OTYPER<InputPort>.template writeBit<Pins...>(t_otype);
+}
+
+/**
+ * @brief			This function set output speed of GPIO
+ * @tparam    Port    ::Port
+ * @tparam    Pins    ::Pin
+ * @param  		t_mode  ::OutputSpeed
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void set_output_speed(OutputSpeed const& t_ospeed) noexcept {
+	reg::OSPEEDR<InputPort>.template writeBit<Pins...>(t_ospeed);
+}
+
+/**
+ *
+ */
+template <Port InputPort, Pin... Pins>
+class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
+ public:
+	[[nodiscard]] constexpr GpioBuilder() noexcept {}
+
+	[[nodiscard]] constexpr auto mode(Mode const& t_mode) const noexcept {
+		set_mode<InputPort, Pins...>(t_mode);
+		return *this;
+	}
+
+	[[nodiscard]] constexpr auto pullupPulldown(Pupd const& t_pupd) const noexcept {
+		set_pupd<InputPort, Pins...>(t_pupd);
+		return *this;
+	}
+
+	[[nodiscard]] constexpr auto alternateFunction(AltFunc const& t_af) const noexcept {
+		set_alternate_function<InputPort, Pins...>(t_af);
+		return *this;
+	}
+
+	[[nodiscard]] constexpr auto outputType(OutputType const& t_otype) const noexcept {
+		set_output_type<InputPort, Pins...>();
+		return *this;
+	}
+
+	[[nodiscard]] constexpr auto outputSpeed(OutputSpeed const& t_ospeed) const noexcept {
+		set_output_speed<InputPort, Pins...>();
+		return *this;
+	}
+
+	constexpr auto build() const noexcept {}
+};
 
 }	 // namespace cpp_stm32::gpio

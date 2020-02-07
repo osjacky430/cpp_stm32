@@ -28,11 +28,15 @@
 #include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
 
-#define SET_USART_TX_DATA(pinname, usart) \
-	UsartPinData { pinname, usart, AF<usart>, RCC<usart>, IRQ<usart>, TX_DMA<usart> }
+#define SET_USART_TX_DATA(pinname, usart)                                                                         \
+	UsartPinData {                                                                                                  \
+		pinname, usart, AF[to_underlying(usart)], RCC[to_underlying(usart)], IRQ[to_underlying(usart)], TX_DMA<usart> \
+	}
 
-#define SET_USART_RX_DATA(pinname, usart) \
-	UsartPinData { pinname, usart, AF<usart>, RCC<usart>, IRQ<usart>, RX_DMA<usart> }
+#define SET_USART_RX_DATA(pinname, usart)                                                                         \
+	UsartPinData {                                                                                                  \
+		pinname, usart, AF[to_underlying(usart)], RCC[to_underlying(usart)], IRQ[to_underlying(usart)], RX_DMA<usart> \
+	}
 
 namespace cpp_stm32::dma {
 
@@ -44,75 +48,40 @@ namespace cpp_stm32::usart {
 
 class PinMap {
  private:
-	using PinName = gpio::PinName;
+	using PinName	 = gpio::PinName;
+	using AltFunc	 = gpio::AltFunc;
+	using UsartClk = rcc::PeriphClk;
 
-	using UsartPinData = PinData<PinName, Port, gpio::AltFunc, rcc::PeriphClk, IrqNum, dma::DmaData>;
+	using UsartPinData = PinData<PinName, Port, AltFunc, UsartClk, IrqNum, dma::DmaData>;
 
-	template <Port USART>
-	static constexpr auto AF = []() {
-		if constexpr (USART == Port::Usart1 || USART == Port::Usart2 || USART == Port::Usart3 || USART == Port::Uart5) {
-			return gpio::AltFunc::AF7;
-		} else {
-			return gpio::AltFunc::AF8;
-		}
-	}();
+	static constexpr std::array AF{AltFunc::AF7, AltFunc::AF7, AltFunc::AF7, AltFunc::AF8, AltFunc::AF7, AltFunc::AF8};
 
-	template <Port USART>
-	static constexpr auto RCC = []() {
-		switch (USART) {
-			case Port::Usart1:
-				return rcc::PeriphClk::Usart1;
-			case Port::Usart2:
-				return rcc::PeriphClk::Usart2;
-			case Port::Usart3:
-				// return rcc::PeriphClk::Usart3;
-			case Port::Uart4:
-				// return rcc::PeriphClk::Uart4;
-			case Port::Uart5:
-				// return rcc::PeriphClk::Usart5;
-			case Port::Usart6:
-				return rcc::PeriphClk::Usart6;
-		}
-	}();
+	static constexpr std::array RCC{UsartClk::Usart1, UsartClk::Usart2, UsartClk::Usart3,
+																	UsartClk::Uart4,	UsartClk::Uart5,	UsartClk::Usart6};
 
-	template <Port USART>
-	static constexpr auto IRQ = []() {
-		switch (USART) {
-			case Port::Usart1:
-				return IrqNum::Usart1Global;
-			case Port::Usart2:
-				return IrqNum::Usart2Global;
-			case Port::Usart3:
-				return IrqNum::Usart3Global;
-			case Port::Uart4:
-				// return IrqNum::Uart4Global;
-			case Port::Uart5:
-				// return IrqNum::Uart5Global
-			case Port::Usart6:
-				// return IrqNum::Usart6Global
-				break;
-		}
-	}();
+	static constexpr std::array IRQ{IrqNum::Usart1Global, IrqNum::Usart2Global, IrqNum::Usart3Global};
 
 	template <Port USART>
 	static constexpr auto TX_DMA = []() {
+		using namespace dma;
 		switch (USART) {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream6, dma::Channel::Channel4,
-														dma::PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
+				return DmaData{dma::Port::DMA1, Stream::Stream6, Channel::Channel4,
+											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
 		}
 	}();
 
 	template <Port USART>
 	static constexpr auto RX_DMA = []() {
+		using namespace dma;
 		switch (USART) {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return dma::DmaData{dma::Port::DMA1, dma::Stream::Stream5, dma::Channel::Channel4,
-														dma::PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
+				return DmaData{dma::Port::DMA1, Stream::Stream5, Channel::Channel4,
+											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
 		}
 	}();
 
@@ -215,9 +184,14 @@ class ClkRegMap {
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::Dma2Rst},
 		/*APB1*/
 		std::pair{reg::APB1RST, reg::Apb1RstBit::Usart2Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::Usart3Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::Uart4Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::Uart5Rst},
+
 		std::pair{reg::APB1RST, reg::Apb1RstBit::PwrRst},
 		/*APB2*/
 		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart1Rst},
+		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart6Rst},
 	};
 
 	static constexpr std::tuple PERIPH_CLK_EN_TABLE{
@@ -229,9 +203,14 @@ class ClkRegMap {
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::Dma2En},
 		/*APB1*/
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Usart2En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Usart3En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Uart4En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Uart5En},
+
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::PwrEn},
 		/*APB2*/
 		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart1En},
+		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart6En},
 	};
 
 	static constexpr std::tuple OSC_ON_TABLE{

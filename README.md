@@ -15,8 +15,9 @@ cpp_stm32 requires the following things to be installed:
 - [CMake](https://cmake.org/download/)
 - [make](https://www.gnu.org/software/make/)
 ### Building
-Clone the repository, and then build it:
+Clone the repository, and then build it, make sure the toolchain path is in ```PATH```
 ```
+export PATH="$PATH:/path/to/arm-none-eabi-gcc/bin"
 git clone https://github.com/osjacky430/cpp_stm32
 mkdir build && cd build
 cmake -G "Unix Makefiles" ..

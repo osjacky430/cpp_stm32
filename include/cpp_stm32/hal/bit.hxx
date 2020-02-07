@@ -58,7 +58,7 @@ class Bit {
 
 	// currently support only integral type and struct that implement get() method
 	// @todo change get() to operator() so that it support lambda(?)
-	constexpr auto operator()(DataType const& t_val) const noexcept {
+	[[nodiscard]] constexpr auto operator()(DataType const& t_val) const noexcept {
 		if constexpr (std::is_enum_v<DataType>) {
 			return (to_underlying(t_val) << pos) & mask;
 		} else if constexpr (std::is_integral_v<DataType>) {

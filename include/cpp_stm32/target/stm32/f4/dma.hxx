@@ -17,6 +17,7 @@
 #pragma once
 
 #include "cpp_stm32/common/dma.hxx"
+#include "cpp_stm32/detail/builder.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/dma_reg.hxx"
 
 namespace cpp_stm32::dma {
@@ -63,9 +64,7 @@ template <Port DMA, Stream Str>
  */
 template <Port DMA, Stream Str>
 constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::DIR>(t_dir);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::DIR>(t_dir);
 }
 
 /**
@@ -73,9 +72,7 @@ constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void set_priority(StreamPriority const& t_prior) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PL>(t_prior);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PL>(t_prior);
 }
 
 /**
@@ -84,9 +81,7 @@ constexpr void set_priority(StreamPriority const& t_prior) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MSIZE>(t_size);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MSIZE>(t_size);
 }
 
 /**
@@ -95,9 +90,7 @@ constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void set_periph_data_size(DataSize const& t_size) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PSIZE>(t_size);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PSIZE>(t_size);
 }
 
 /**
@@ -105,9 +98,7 @@ constexpr void set_periph_data_size(DataSize const& t_size) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void enable_mem_increment() noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::MINC>();
-	}
+	reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::MINC>();
 }
 
 /**
@@ -123,9 +114,7 @@ constexpr void disable_mem_increment() noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void enable_periph_increment() noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::PINC>();
-	}
+	reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::PINC>();
 }
 
 /**
@@ -142,9 +131,7 @@ constexpr void disable_periph_increment() noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void enable_periph_fix_increment() noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::PINC, reg::SxCRField::PINCOS>();
-	}
+	reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::PINC, reg::SxCRField::PINCOS>();
 }
 
 /**
@@ -152,9 +139,7 @@ constexpr void enable_periph_fix_increment() noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void enable_circular_mode() noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::CIRC>();
-	}
+	reg::SxCR<DMA, Str>.template setBit<reg::SxCRField::CIRC>();
 }
 
 /**
@@ -163,9 +148,7 @@ constexpr void enable_circular_mode() noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void channel_select(Channel const& t_ch) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CHSEL>(t_ch);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CHSEL>(t_ch);
 }
 
 /**
@@ -174,9 +157,7 @@ constexpr void channel_select(Channel const& t_ch) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void set_memory_burst(BurstSize const& t_bs) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MBURST>(t_bs);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MBURST>(t_bs);
 }
 
 /**
@@ -185,9 +166,7 @@ constexpr void set_memory_burst(BurstSize const& t_bs) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void set_periph_burst(BurstSize const& t_bs) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PBURST>(t_bs);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PBURST>(t_bs);
 }
 
 /**
@@ -195,9 +174,7 @@ constexpr void set_periph_burst(BurstSize const& t_bs) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr void double_buffer_set_target(std::uint8_t const& t_mem) noexcept {
-	if (!is_enabled<DMA, Str>()) {
-		reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CT>(t_mem);
-	}
+	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CT>(t_mem);
 }
 
 /**
@@ -333,7 +310,7 @@ constexpr void reset() noexcept {
  *          10. active the stream
  */
 template <Port DMA, Stream Str>
-class DmaBuilder {
+class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
  private:
 	Channel m_channelSelect{Channel::Channel0};
 	TransferDir m_transferDirection{TransferDir::PeriphToMem};

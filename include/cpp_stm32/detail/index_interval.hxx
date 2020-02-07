@@ -36,6 +36,11 @@ struct IdxInterval {
 	using IdxIntervalType = typename IdxIntervalImpl<interval, start, end - interval, end>::IdxIntervalType;
 };
 
+template <std::size_t start, std::size_t interval>
+struct IdxInterval<start, start, interval> {
+	using IdxIntervalType = std::index_sequence<start>;
+};
+
 template <std::size_t start, std::size_t end, std::size_t interval = 1>
 using Interval = typename IdxInterval<start, end, interval>::IdxIntervalType;
 
