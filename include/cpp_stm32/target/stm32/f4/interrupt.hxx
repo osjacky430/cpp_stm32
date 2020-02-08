@@ -45,7 +45,7 @@
 		Interrupt<IrqNum::Usart1Global>::interrupt, Interrupt<IrqNum::Usart2Global>::interrupt,                           \
 		Interrupt<IrqNum::Usart3Global>::interrupt, Interrupt<IrqNum::Exti5_10>::interrupt
 
-#define NVIC_IRQ_NUM 91
+#define NVIC_IRQ_NUM 96
 
 namespace cpp_stm32::interrupt {
 
@@ -96,8 +96,8 @@ static constexpr auto IRQ_TABLE = std::array{
 	rtc_wakeup_isr,		 flash_isr,					rcc_isr,
 	exti0_isr,				 exti1_isr,					exti2_isr,
 	exti3_isr,				 exti4_isr,					dma1_stream0_isr,
-	dma1_stream1_isr,	 dma1_stream2_isr,	dma1_stream3_isr,
-	dma1_stream4_isr,	 dma1_stream5_isr,	dma1_stream6_isr,
+	dma1_stream1_isr,	dma1_stream2_isr,	dma1_stream3_isr,
+	dma1_stream4_isr,	dma1_stream5_isr,	dma1_stream6_isr,
 	adc_isr,					 can1_tx_isr,				can1_rx0_isr,
 	can1_rx1_isr,			 can1_sce_isr,			exti9_5_isr,
 	tim1_brk_tim9_isr, tim1_up_tim10_isr, tim1_trg_com_tim11_isr,
@@ -108,7 +108,7 @@ static constexpr auto IRQ_TABLE = std::array{
 	usart3_isr,				 exti5_10_isr,
 };
 
-}	 // namespace cpp_stm32::interrupt
+}	// namespace cpp_stm32::interrupt
 
 namespace cpp_stm32 {
 
@@ -157,4 +157,4 @@ enum class IrqNum : std::uint8_t {
 	NvicIrqTotal
 };
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

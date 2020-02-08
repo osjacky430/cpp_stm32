@@ -106,7 +106,7 @@ class Usart {
 	constexpr auto receivable() const noexcept { return usart::is_rx_empty<USART_PORT>(); }
 
 	template <std::uint8_t BC = 1, bool Wait = false>
-	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	 = 1_byte,
+	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	= 1_byte,
 																			 [[maybe_unused]] Waiting_t<Wait> const& t_w = Waiting<false>) const noexcept {
 		std::array<std::uint8_t, BC> ret_val{};
 		detail::generate(ret_val.begin(), ret_val.end(),
@@ -159,9 +159,9 @@ class Usart {
 			auto const critical_section = create_critical_section();
 			constexpr Callback<interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)]> cb;
 			Interrupt<USART_IRQ_NUM>::attach(cb);
-		}	 // end critical section
+		}	// end critical section
 
-		nvic_enable_irq<USART_IRQ_NUM>();
+		nvic::enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();
 	}
 
@@ -170,11 +170,11 @@ class Usart {
 		{
 			auto const critical_section = create_critical_section();
 			Interrupt<USART_IRQ_NUM>::attach(t_cb);
-		}	 // end critical section
+		}	// end critical section
 
-		nvic_enable_irq<USART_IRQ_NUM>();
+		nvic::enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

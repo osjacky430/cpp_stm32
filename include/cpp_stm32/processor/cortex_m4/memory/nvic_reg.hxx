@@ -25,6 +25,10 @@ namespace cpp_stm32 {
 
 enum class IrqNum : std::uint8_t;
 
+}
+
+namespace cpp_stm32::nvic::reg {
+
 static constexpr auto NVIC_BASE = to_underlying(Scs::NvicBase);
 
 static constexpr auto NVIC_GROUP_OFFSET(IrqNum const& IRQn) { return 0x04U * to_underlying(IRQn) / 32U; }
@@ -115,4 +119,4 @@ enum class NvicStirBit { IntId };
 static constexpr Register<NvicStirInfo, NvicStirBit> NVIC_STIR{NVIC_BASE, 0xD00};
 /**@}*/
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32::nvic::reg

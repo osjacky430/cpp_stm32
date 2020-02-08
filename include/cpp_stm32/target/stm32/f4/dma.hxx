@@ -124,7 +124,7 @@ template <Port DMA, Stream Str>
 constexpr void disable_periph_increment() noexcept {
 	reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::PINC>();
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma
 
 /**
  * [enable_periph_fix_increment description]
@@ -272,6 +272,41 @@ constexpr void enable() noexcept {
 }
 
 /**
+ * [is_irq_enabled description]
+ * @return [description]
+ */
+template <Port DMA, Stream Str, InterruptFlag Flag>
+constexpr auto is_irq_enabled() noexcept {
+	if constexpr (Flag != InterruptFlag::FEI) {
+		return get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField{to_underlying(Flag)}>(ValueOnly));
+	} else {
+		return get<0>(reg::SxFCR<DMA, Str>.template readBit<reg::SxFCRField::FEIE>(ValueOnly));
+	}
+}
+
+/**
+ *  @brief  This function enables dma direct mode
+ *
+ *  @note    DMDIS = 0 --> Direct mode is NOT disabled (i.e. enabled)
+ *           DMDIS = 1 --> Direct mode is disabled (i.e. disabled)
+ */
+template <Port DMA, Stream Str>
+constexpr void enable_direct_mode() noexcept {
+	reg::SxFCR<DMA, Str>.template clearBit<reg::SxFCRField::DMDIS>();
+}
+
+/**
+ *  @brief  This function disables dma direct mode
+ *
+ *  @note    DMDIS = 0 --> Direct mode is NOT disabled (i.e. enabled)
+ *           DMDIS = 1 --> Direct mode is disabled (i.e. disabled)
+ */
+template <Port DMA, Stream Str>
+constexpr void disable_direct_mode() noexcept {
+	reg::SxFCR<DMA, Str>.template setBit<reg::SxFCRField::DMDIS>();
+}
+
+/**
  * [reset description]
  */
 template <Port DMA, Stream Str>
@@ -290,6 +325,19 @@ constexpr void reset() noexcept {
 
 	clear_interrupt_flag<DMA, Str, InterruptFlag::FEI, InterruptFlag::DMEI, InterruptFlag::TEI, InterruptFlag::HTI,
 											 InterruptFlag::TCI>();
+}
+
+/**
+ * [enable_irq description]
+ */
+template <Port DMA, Stream Str, InterruptFlag... Flags>
+constexpr void enable_irq() noexcept {
+	if constexpr (((Flags == InterruptFlag::FEI) || ...)) {
+		// @todo finish here
+		reg::SxFCR<DMA, Str>.template setBit<reg::SxFCRField::FEIE>();
+	} else {
+		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField{Flags}...>();
+	}
 }
 
 /**
@@ -334,7 +382,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	std::uint8_t m_fifoErrorIrq{false};
 	FifoThreshold m_fifoThreshold{FifoThreshold::Half};
 
-	std::uint8_t m_directModeDisabledErrorIrq{false};
+	std::uint8_t m_directModeErrorIrq{false};
 	std::uint8_t m_transferErrorIrq{false};
 	std::uint8_t m_halfTransferIrq{false};
 	std::uint8_t m_transferCompleteIrq{false};
@@ -354,7 +402,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	}
 
  public:
-	constexpr DmaBuilder() noexcept { resetDMA(); }
+	[[nodiscard]] constexpr DmaBuilder() noexcept { resetDMA(); }
 
 	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
 		m_transferDirection = TransferDir::PeriphToMem;
@@ -458,11 +506,11 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	template <InterruptFlag... Flags>
 	[[nodiscard]] constexpr auto enableInterrupt() noexcept {
 		// @todo find a better way to do this
-		m_fifoErrorIrq							 = ((Flags == InterruptFlag::FEI) || ...);
-		m_directModeDisabledErrorIrq = ((Flags == InterruptFlag::DMEI) || ...);
-		m_transferErrorIrq					 = ((Flags == InterruptFlag::TEI) || ...);
-		m_halfTransferIrq						 = ((Flags == InterruptFlag::HTI) || ...);
-		m_transferCompleteIrq				 = ((Flags == InterruptFlag::TCI) || ...);
+		m_fifoErrorIrq				= ((Flags == InterruptFlag::FEI) || ...);
+		m_directModeErrorIrq	= ((Flags == InterruptFlag::DMEI) || ...);
+		m_transferErrorIrq		= ((Flags == InterruptFlag::TEI) || ...);
+		m_halfTransferIrq			= ((Flags == InterruptFlag::HTI) || ...);
+		m_transferCompleteIrq = ((Flags == InterruptFlag::TCI) || ...);
 
 		return *this;
 	}
@@ -477,7 +525,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
                                      SxCRField::PFCTRL, SxCRField::DIR, SxCRField::CIRC, SxCRField::PINC, SxCRField::MINC,
                                      SxCRField::PSIZE, SxCRField::MSIZE, SxCRField::PINCOS, SxCRField::PL, SxCRField::DBM,
                                      SxCRField::CT, SxCRField::PBURST, SxCRField::MBURST, SxCRField::CHSEL>(
-			std::uint8_t{0}, m_directModeDisabledErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq,
+			std::uint8_t{0}, m_directModeErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq,
       m_flowControl, m_transferDirection, m_circularMode, m_periphIncrementMode, m_memoryIncrementMode,
       m_peripheralDataSize, m_memoryDataSize, m_periphFixIncr, m_streamPriority, m_doubleBuffer,
       m_currentTarget, m_peripheralBurstSize, m_memoryBurstSize, m_channelSelect);
@@ -497,4 +545,4 @@ class DmaStateManager {
 	~DmaStateManager() noexcept { clear_interrupt_flag<DMA, Str, Flag>(); }
 };
 
-}	 // namespace cpp_stm32::dma
+}	// namespace cpp_stm32::dma

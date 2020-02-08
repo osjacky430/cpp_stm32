@@ -30,48 +30,48 @@ namespace cpp_stm32::detail {
 
 [[gnu::always_inline]] inline void disable_all_interrupts() noexcept {
 	__asm volatile(
-		"mov r0 #1   \n"	// move 1 to r0
-		"msr PRIMASK r0"	// move the content of r0 into PRIMASK
-		:									// no output
-		:									// no input
-		: "memory"				// performs memory reads or writes to items other than those
-											// listed in the input and output operands
+		"mov r0, #1   \n\t"	// move 1 to r0
+		"msr primask, r0"		 // move the content of r0 into PRIMASK
+		:										 // no output
+		:										 // no input
+		: "memory"					 // performs memory reads or writes to items other than those
+												 // listed in the input and output operands
 	);
 }
 
 [[gnu::always_inline]] inline void enable_all_interrupts() noexcept {
 	__asm volatile(
-		"mov r0 #0   \n"	// move 0 to r0
-		"msr PRIMASK r0"	// move the content of r0 into PRIMASK
-		:									// no output
-		:									// no input
+		"mov r0, #0   \n\t"	// move 0 to r0
+		"msr primask, r0"		 // move the content of r0 into PRIMASK
+		:										 // no output
+		:										 // no input
 		: "memory");
 }
 
 [[gnu::always_inline]] inline auto all_interrupts_disabled() noexcept {
 	std::uint32_t is_disabled = 0;
-	__asm volatile("mrs %0 PRIMASK" : "=r"(is_disabled));
+	__asm volatile("mrs %0, PRIMASK" : "=r"(is_disabled));
 	// 0 => all interrupts not disabled
 	// 1 => all interrupts disabled
 	return is_disabled;
 }
 
 [[gnu::always_inline]] inline void set_interrupt_mask_priority(int t_priority) noexcept {
-	__asm volatile("msr BASEPRI %0 \n"	// move the content of r0 into BASEPRI
-								 :										// no output
-								 : "r"(t_priority)		//
-								 : "memory"						//
+	__asm volatile("msr BASEPRI, %0 \n"	// move the content of r0 into BASEPRI
+								 :										 // no output
+								 : "r"(t_priority)		 //
+								 : "memory"						 //
 	);
 }
 
 [[gnu::always_inline]] inline auto get_interrupt_mask_priority() noexcept {
 	std::uint8_t ret_val = 0;
-	__asm volatile("mrs %0 BASEPRI" : "=r"(ret_val));
+	__asm volatile("mrs %0, BASEPRI" : "=r"(ret_val));
 
 	return ret_val;
 }
 
-}	 // namespace cpp_stm32::detail
+}	// namespace cpp_stm32::detail
 
 namespace cpp_stm32 {
 
@@ -111,4 +111,4 @@ template <std::uint8_t Priority = 0>
 	return CriticalSection{};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

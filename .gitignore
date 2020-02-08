@@ -1,6 +1,9 @@
 # osx file
 .DS_Store
 
+# example folder under construction
+example/
+
 # build folder
 build/
 

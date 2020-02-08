@@ -12,8 +12,12 @@
 #include "cpp_stm32/target/stm32/f4/dma.hxx"
 
 using namespace cpp_stm32;
+using namespace driver;
+using namespace gpio;
+using namespace usart;
 
-auto array = std::array<std::uint8_t, 20>{};
+char array[20];
+Usart const pc{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
 
 constexpr void setup_dma() noexcept {
 	using namespace dma;
@@ -21,40 +25,45 @@ constexpr void setup_dma() noexcept {
 	constexpr auto m_addr = &array[0];
 
 	rcc::enable_periph_clk<rcc::PeriphClk::Dma1>();
+	nvic::enable_irq<IrqNum::Dma1Stream5Global>();
 
 	DmaBuilder<dma::Port::DMA1, dma::Stream::Stream5>()
 		.transferDir(PeriphAddress_t{p_addr}, MemoryAddress_t{(std::uintptr_t)m_addr})
-		.txDataNum(1)
+		.txDataNum(5)
 		.selectChannel(dma::Channel::Channel4)
-		.streamPriority(dma::StreamPriority::Low)
+		.streamPriority(dma::StreamPriority::VeryHigh)
 		.memoryDataWidth(DataSize::Byte)
+		.memoryIncrementMode(true)
 		.circularMode(true)
 		.perihperalDataWidth(DataSize::Byte)
+		.enableInterrupt<dma::InterruptFlag::TCI>()
 		.build();
 
 	usart::enable_rx_dma<usart::Port::Usart2>();
 }
 
+DigitalOut<PinName::PA_5> led;
+
 int main() {
-	using namespace driver;
-	using namespace gpio;
-	using namespace usart;
-
 	sys::Clock::init<rcc::ClkSrc::Hse>();
-
-	Usart const pc{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
-	DigitalOut<PinName::PA_5> led;
 
 	setup_dma();
 
 	while (true) {
+		constexpr auto SOME_INTERVAL = 10000000;
+		for (int i = 0; i < SOME_INTERVAL; ++i) {
+			__asm("nop");
+		}
+
 		led.toggle();
-
-		auto const dma_state = dma::DmaStateManager<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>();
-
-		// auto const [user_input, nl] = pc.receive(2_byte, Waiting<true>);
-		pc << array[0] << "\n\r";
+		// pc << array << "\n\r";
 	}
 
 	return 0;
+}
+
+void interrupt::dma1_stream5_isr() noexcept {
+	pc << "DMA TCI IRQ FIRE\n\r";
+
+	auto const dma_state = dma::DmaStateManager<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>();
 }

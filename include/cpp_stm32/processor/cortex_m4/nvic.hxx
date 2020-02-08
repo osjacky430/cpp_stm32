@@ -19,54 +19,54 @@
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/nvic_reg.hxx"
 
-namespace cpp_stm32 {
+namespace cpp_stm32::nvic {
 
 template <IrqNum IRQn>
-constexpr void nvic_enable_irq() noexcept {
-	NVIC_ISER<IRQn>.template writeBit<NVIC_IRQ_BIT_POS(IRQn)>();
+constexpr void enable_irq() noexcept {
+	reg::NVIC_ISER<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
 }
 
 template <IrqNum IRQn>
-[[nodiscard]] constexpr bool nvic_is_irq_enabled() noexcept {
-	return get<0>(NVIC_ISER<IRQn>.template readBit<NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly));
+[[nodiscard]] constexpr bool is_irq_enabled() noexcept {
+	return get<0>(reg::NVIC_ISER<IRQn>.template readBit<reg::NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly));
 }
 
 template <IrqNum IRQn>
-constexpr void nvic_disable_irq() noexcept {
-	NVIC_ICER<IRQn>.template writeBit<NVIC_IRQ_BIT_POS(IRQn)>();
+constexpr void disable_irq() noexcept {
+	reg::NVIC_ICER<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
 }
 
 template <IrqNum IRQn>
-constexpr auto nvic_is_irq_pending() noexcept {
-	return NVIC_ISPR<IRQn>.template readBit<NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly);
+constexpr auto is_irq_pending() noexcept {
+	return reg::NVIC_ISPR<IRQn>.template readBit<reg::NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly);
 }
 
 template <IrqNum IRQn>
-constexpr void nvic_set_irq_pending() noexcept {
-	NVIC_ISPR<IRQn>.template writeBit<NVIC_IRQ_BIT_POS(IRQn)>();
+constexpr void set_irq_pending() noexcept {
+	reg::NVIC_ISPR<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
 }
 
 template <IrqNum IRQn>
-constexpr void nvic_clear_pending_irq() noexcept {
-	NVIC_ICPR<IRQn>.template writeBit<NVIC_IRQ_BIT_POS(IRQn)>();
+constexpr void clear_pending_irq() noexcept {
+	reg::NVIC_ICPR<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
 }
 
 template <IrqNum IRQn>
-[[nodiscard]] constexpr auto nvic_is_irq_active() noexcept {
-	return NVIC_IABR<IRQn>.template readBit<NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly);
+[[nodiscard]] constexpr auto is_irq_active() noexcept {
+	return reg::NVIC_IABR<IRQn>.template readBit<reg::NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly);
 }
 
 template <IrqNum IRQn>
-constexpr void nvic_gen_software_interrupt() noexcept {
-	NVIC_STIR.writeBit<NvicStirBit::IntId>(to_underlying(IRQn));
+constexpr void gen_software_interrupt() noexcept {
+	reg::NVIC_STIR.writeBit<reg::NvicStirBit::IntId>(to_underlying(IRQn));
 }
 
 template <IrqNum IRQn>
-constexpr void nvic_set_irq_priority(std::uint8_t const& t_priority) noexcept {
+constexpr void set_irq_priority(std::uint8_t const& t_priority) noexcept {
 	if constexpr (to_underlying(IRQn) <= 0) {
 	} else {
-		NVIC_IPR<IRQn>.writeBit<NvicIprBit::Ip>(t_priority);
+		reg::NVIC_IPR<IRQn>.writeBit<reg::NvicIprBit::Ip>(t_priority);
 	}
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32::nvic

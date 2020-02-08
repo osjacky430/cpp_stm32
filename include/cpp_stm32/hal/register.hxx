@@ -21,9 +21,9 @@
 #include <type_traits>
 #include <utility>
 
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/mmio.hxx"
-#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 
@@ -444,7 +444,7 @@ class Register {
 	[[nodiscard]] constexpr auto readBit(ValueOnlyType /*unused*/) const noexcept {
 		static_assert((GET_BIT<BitIdx>().isReadable() && ...));
 
-		auto const reg_val = readCurrentVal<BitIdx...>();
+		auto const reg_val = readReg<BitIdx...>();
 		return BitGroup{extractBitValue<BitIdx>(reg_val)...};
 	}
 
@@ -533,4 +533,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

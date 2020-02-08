@@ -61,7 +61,7 @@ namespace cpp_stm32::interrupt {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart3_isr() noexcept;
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti5_10_isr() noexcept;
 
-}	 // namespace cpp_stm32::interrupt
+}	// namespace cpp_stm32::interrupt
 
 namespace cpp_stm32 {
 
