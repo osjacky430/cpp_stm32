@@ -55,15 +55,13 @@ int main() {
 			__asm("nop");
 		}
 
-		led.toggle();
-		// pc << array << "\n\r";
+		pc << array << "\n\r";
 	}
 
 	return 0;
 }
 
 void interrupt::dma1_stream5_isr() noexcept {
-	pc << "DMA TCI IRQ FIRE\n\r";
-
 	auto const dma_state = dma::DmaStateManager<dma::Port::DMA1, dma::Stream::Stream5, dma::InterruptFlag::TCI>();
+	led.toggle();
 }

@@ -31,8 +31,8 @@ namespace cpp_stm32::nvic::reg {
 
 static constexpr auto NVIC_BASE = to_underlying(Scs::NvicBase);
 
-static constexpr auto NVIC_GROUP_OFFSET(IrqNum const& IRQn) { return 0x04U * to_underlying(IRQn) / 32U; }
-static constexpr auto NVIC_IP_GROUP_OFFSET(IrqNum const& IRQn) { return 0x04U * to_underlying(IRQn) / 4U; }
+static constexpr auto NVIC_GROUP_OFFSET(IrqNum const& IRQn) { return 0x04U * (to_underlying(IRQn) / 32U); }
+static constexpr auto NVIC_IP_GROUP_OFFSET(IrqNum const& IRQn) { return 0x04U * (to_underlying(IRQn) / 4U); }
 static constexpr auto NVIC_IRQ_BIT_POS(IrqNum const& IRQn) {
 	enum class NvicIdx : std::uint32_t {};
 
@@ -119,4 +119,4 @@ enum class NvicStirBit { IntId };
 static constexpr Register<NvicStirInfo, NvicStirBit> NVIC_STIR{NVIC_BASE, 0xD00};
 /**@}*/
 
-}	// namespace cpp_stm32::nvic::reg
+}	 // namespace cpp_stm32::nvic::reg

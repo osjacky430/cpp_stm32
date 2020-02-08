@@ -124,7 +124,7 @@ template <Port DMA, Stream Str>
 constexpr void disable_periph_increment() noexcept {
 	reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::PINC>();
 
-}	// namespace cpp_stm32::dma
+}	 // namespace cpp_stm32::dma
 
 /**
  * [enable_periph_fix_increment description]
@@ -545,4 +545,4 @@ class DmaStateManager {
 	~DmaStateManager() noexcept { clear_interrupt_flag<DMA, Str, Flag>(); }
 };
 
-}	// namespace cpp_stm32::dma
+}	 // namespace cpp_stm32::dma
