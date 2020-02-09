@@ -39,6 +39,10 @@ enum class DataSize { Byte, HalfWord, Word };
 enum class BurstSize { Single, Incr4, Incr8, Incr16 };
 enum class FifoThreshold { OneFourths, Half, ThreeFourths, Full };
 enum class FlowControl { DMA, Peripheral };
+
+using PeriphBurstSize_t = StrongType<BurstSize, struct PeriphBurstSize>;
+using MemoryBurstSize_t = StrongType<BurstSize, struct MemoryBurstSize>;
+
 }	 // namespace cpp_stm32::dma
 
 namespace cpp_stm32::dma::reg {

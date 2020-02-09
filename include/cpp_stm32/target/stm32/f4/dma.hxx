@@ -367,21 +367,16 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	std::uint8_t m_periphIncrementMode{false};
 	std::uint8_t m_periphFixIncr{false};
 	DataSize m_peripheralDataSize{DataSize::Byte};
-	BurstSize m_peripheralBurstSize{BurstSize::Single};
 
 	std::uint8_t m_memoryIncrementMode{false};
 	DataSize m_memoryDataSize{DataSize::Byte};
-	BurstSize m_memoryBurstSize{BurstSize::Single};
 
 	std::uint8_t m_flowControl{0};
 	std::uint8_t m_circularMode{false};
 	std::uint8_t m_doubleBuffer{false};
 	std::uint8_t m_currentTarget{0};
 
-	std::uint8_t m_directModeDisabled{false};
 	std::uint8_t m_fifoErrorIrq{false};
-	FifoThreshold m_fifoThreshold{FifoThreshold::Half};
-
 	std::uint8_t m_directModeErrorIrq{false};
 	std::uint8_t m_transferErrorIrq{false};
 	std::uint8_t m_halfTransferIrq{false};
@@ -451,11 +446,6 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto memoryBurstTransfer(BurstSize const& t_bs) noexcept {
-		m_memoryBurstSize = t_bs;
-		return *this;
-	}
-
 	[[nodiscard]] constexpr auto memoryDataWidth(DataSize const& t_ds) noexcept {
 		m_memoryDataSize = t_ds;
 		return *this;
@@ -476,11 +466,6 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto peripheralBurstTransfer(BurstSize const& t_bs) noexcept {
-		m_peripheralBurstSize = t_bs;
-		return *this;
-	}
-
 	[[nodiscard]] constexpr auto perihperalDataWidth(DataSize const& t_ds) noexcept {
 		m_peripheralDataSize = t_ds;
 		return *this;
@@ -497,9 +482,13 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto configFIFO(FifoThreshold const& t_fts) noexcept {
-		m_directModeDisabled = true;
-		m_fifoThreshold			 = t_fts;
+	[[nodiscard]] constexpr auto configFIFO(FifoThreshold const& t_fts, PeriphBurstSize_t const& t_pb,
+																					MemoryBurstSize_t const& t_mb) noexcept {
+		using namespace reg;
+
+		SxFCR<DMA, Str>.template writeBit<SxFCRField::FTH, SxFCRField::DMDIS>(t_fts, std::uint8_t{1});
+		SxCR<DMA, Str>.template writeBit<SxCRField::PBURST, SxCRField::MBURST>(t_pb.get(), t_mb.get());
+
 		return *this;
 	}
 
@@ -518,17 +507,16 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	constexpr void build() noexcept {
 		using namespace reg;
 
-		SxFCR<DMA, Str>.template writeBit<SxFCRField::FTH, SxFCRField::DMDIS, SxFCRField::FEIE>(
-			m_fifoThreshold, m_directModeDisabled, m_fifoErrorIrq);
+		SxFCR<DMA, Str>.template writeBit<SxFCRField::FEIE>(m_fifoErrorIrq);
 
-		SxCR<DMA, Str>.template writeBit<SxCRField::EN, SxCRField::DMEIE, SxCRField::TEIE, SxCRField::HTIE, SxCRField::TCIE,   //
+		SxCR<DMA, Str>.template writeBit<SxCRField::DMEIE, SxCRField::TEIE, SxCRField::HTIE, SxCRField::TCIE,   //
                                      SxCRField::PFCTRL, SxCRField::DIR, SxCRField::CIRC, SxCRField::PINC, SxCRField::MINC,
                                      SxCRField::PSIZE, SxCRField::MSIZE, SxCRField::PINCOS, SxCRField::PL, SxCRField::DBM,
-                                     SxCRField::CT, SxCRField::PBURST, SxCRField::MBURST, SxCRField::CHSEL>(
-			std::uint8_t{0}, m_directModeErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq,
+                                     SxCRField::CT, SxCRField::CHSEL>(
+			m_directModeErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq,
       m_flowControl, m_transferDirection, m_circularMode, m_periphIncrementMode, m_memoryIncrementMode,
       m_peripheralDataSize, m_memoryDataSize, m_periphFixIncr, m_streamPriority, m_doubleBuffer,
-      m_currentTarget, m_peripheralBurstSize, m_memoryBurstSize, m_channelSelect);
+      m_currentTarget, m_channelSelect);
 
 		enable<DMA, Str>();
 	}
