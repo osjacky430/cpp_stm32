@@ -319,9 +319,9 @@ class Register {
 		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueTypes>() && ...));
 		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
 
-		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_param) {
+		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_p) {
 			constexpr auto bit		= GET_BIT<t_bit_idx()>();
-			auto const val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_param);
+			auto const val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_p);
 			return bit(val_to_mod);
 		};
 
@@ -372,9 +372,9 @@ class Register {
 		static_assert(sizeof...(Avoid) != 0);
 		constexpr auto thread_safety = ThreadSafe<true, getThreadSafeAccess<BitIdx...>(t_is)>{};
 
-		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_param) {
+		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_p) {
 			constexpr auto bit		= GET_BIT<t_bit_idx()>();
-			auto const val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_param);
+			auto const val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_p);
 			return bit(val_to_mod);
 		};
 
@@ -533,4 +533,4 @@ static constexpr auto make_bit_list_from_input = [](auto const&... t_val) {
 	return std::tuple_cat(check_input_and_make_tuple(t_val)...);
 };
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

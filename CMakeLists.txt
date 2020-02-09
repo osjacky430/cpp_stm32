@@ -1,36 +1,59 @@
+###################################################
+#                cpp_stm32 library                #
+###################################################
 cmake_minimum_required(VERSION 3.11.4 FATAL_ERROR)
 
+set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
+project(cpp_stm32 DESCRIPTION "Pure c++17 implementation of stm32 driver"
+                  LANGUAGES CXX)
+
+###################################################
+#                 target MCU path                 #
+###################################################
 set(PROCESSOR_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/processor")
 
 set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
 set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
 set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
 
-# set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32l432kc.ld")
-set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
+###################################################
+#             library compile options             #
+###################################################
+# MCU specific compiler flags, see https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
+set(STM32F4_FLAGS -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mcpu=cortex-m4)
+set(WARNING_FLAGS -Wall -Wextra -Wredundant-decls -Wundef -Wshadow)
+set(OPTIMIZATION_FLAGS -ffunction-sections -fno-common -fdata-sections -Os)
+set(CXX_FEATURE_FLAGS -fno-exceptions -fno-rtti)
+set(UTILITY_FLAGS -v -g)  # verbose and debug
+set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 
-project(CppForStm32 LANGUAGES CXX)
-
-set(GENERATE_MAP_FILE "-Xlinker -Map=linker_output.map")
-set(PRINT_MEM_USAGE "-Xlinker --print-memory-usage")
-set(OPTIMIZE_FOR_DEBUG "-Og")
-set(OPTIMIZE_FOR_SIZE "-Os")
-set(OPTIMIZE_MAX "-O3")
-set(OPTIMIZE_NONE "-O0")
-
-set(CMAKE_FLAG_SET True CACHE BOOL "" FORCE)
-
-if (${CMAKE_FLAG_SET})
-set(CMAKE_CXX_FLAGS "-v ${CMAKE_CXX_FLAGS} ${OPTIMIZE_FOR_SIZE}" CACHE STRING "" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles ${LINKER_SCRIPT} ${GENERATE_MAP_FILE} ${PRINT_MEM_USAGE}" CACHE STRING "" FORCE)
-endif()
-
-include_directories(${TARGET_DIR})  # cpp driver target
-include_directories(${CMAKE_SOURCE_DIR}/include/)
-include_directories(${CMAKE_SOURCE_DIR}/src)  # sys info header
-link_directories(${PROCESSOR_DIR}) # to link linker script
-
+###################################################
+#          add library, target properties         #
+###################################################
 add_library(cpp_stm32 ${TARGET_PROCESSOR}/source/vector_table.cxx)
-add_executable(main.elf src/main.cpp)
-target_link_libraries(main.elf cpp_stm32)
-add_custom_target(main.bin ALL ${CMAKE_OBJCOPY} -Obinary main.elf main.bin DEPENDS main.elf)
+target_include_directories(cpp_stm32
+  INTERFACE
+    ${CMAKE_SOURCE_DIR}/../src
+  PUBLIC
+    ${TARGET_DIR}
+    ${CMAKE_SOURCE_DIR}/../include/
+)
+target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
+target_compile_features(cpp_stm32 PUBLIC cxx_std_17)
+target_compile_options(cpp_stm32
+  PUBLIC
+    ${WARNING_FLAGS}
+    ${STM32F4_FLAGS}
+    ${OPTIMIZATION_FLAGS}
+    ${CXX_FEATURE_FLAGS}
+    ${UTILITY_FLAGS}
+    ${NEWLIB_FLAGS}
+)
+target_link_options(cpp_stm32
+  INTERFACE
+    ${NEWLIB_FLAGS}
+    -nostartfiles
+    "SHELL: ${LINKER_SCRIPT}"
+    "SHELL: -Xlinker --print-memory-usage"
+    "SHELL: -Xlinker -Map=linker_output.map"
+)
