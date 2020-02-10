@@ -21,11 +21,11 @@
 
 namespace cpp_stm32::dma {
 
-enum class Port { DMA1, DMA2 };
-enum class Stream { Stream0, Stream1, Stream2, Stream3, Stream4, Stream5, Stream6, Stream7 };
-enum class Channel { Channel0, Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7 };
+enum class Port : std::uint8_t { DMA1, DMA2 };
+enum class Stream : std::uint8_t { Stream0, Stream1, Stream2, Stream3, Stream4, Stream5, Stream6, Stream7 };
+enum class Channel : std::uint8_t { Channel0, Channel1, Channel2, Channel3, Channel4, Channel5, Channel6, Channel7 };
 
-enum class InterruptFlag {
+enum class InterruptFlag : std::uint8_t {
 	FEI,	/*!< Stream x FIFO error interrupt flag */
 	DMEI, /*!< Stream x direct mode error interrupt flag */
 	TEI,	/*!< Stream x transfer error interrupt flag */
@@ -33,12 +33,12 @@ enum class InterruptFlag {
 	TCI,	/*!< Stream x transfer complete interrupt flag */
 };
 
-enum class TransferDir { PeriphToMem, MemToPeriph, MemToMem };
-enum class StreamPriority { Low, Medium, High, VeryHigh };
-enum class DataSize { Byte, HalfWord, Word };
-enum class BurstSize { Single, Incr4, Incr8, Incr16 };
-enum class FifoThreshold { OneFourths, Half, ThreeFourths, Full };
-enum class FlowControl { DMA, Peripheral };
+enum class TransferDir : std::uint8_t { PeriphToMem, MemToPeriph, MemToMem };
+enum class StreamPriority : std::uint8_t { Low, Medium, High, VeryHigh };
+enum class DataSize : std::uint8_t { Byte, HalfWord, Word };
+enum class BurstSize : std::uint8_t { Single, Incr4, Incr8, Incr16 };
+enum class FifoThreshold : std::uint8_t { OneFourths, Half, ThreeFourths, Full };
+enum class FlowControl : std::uint8_t { DMA, Peripheral };
 
 using PeriphBurstSize_t = StrongType<BurstSize, struct PeriphBurstSize>;
 using MemoryBurstSize_t = StrongType<BurstSize, struct MemoryBurstSize>;
@@ -140,7 +140,7 @@ SETUP_REGISTER_INFO(SxCRBitList,													 /**/
 										Binary<>{BitPos_t{2}},								 // TEIE
 										Binary<>{BitPos_t{3}},								 // HTIE
 										Binary<>{BitPos_t{4}},								 // TCIE
-										Binary<>{BitPos_t{5}},								 // PFCTRL
+										Bit<1, FlowControl>{BitPos_t{5}},			 // PFCTRL
 										Bit<2, TransferDir>{BitPos_t{6}},			 // DIR
 										Binary<>{BitPos_t{8}},								 // CIRC
 										Binary<>{BitPos_t{9}},								 // PINC

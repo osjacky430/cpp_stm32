@@ -40,16 +40,16 @@
 
 namespace cpp_stm32::dma {
 
-using DmaData = PinData<Port, Stream, IrqNum, Channel, PeriphAddress_t>;
+using DmaData = PinData<Port, Stream, IrqNum, Channel, PeriphAddress_t, DataSize>;
 
-}	// namespace cpp_stm32::dma
+}	 // namespace cpp_stm32::dma
 
 namespace cpp_stm32::usart {
 
 class PinMap {
  private:
-	using PinName	= gpio::PinName;
-	using AltFunc	= gpio::AltFunc;
+	using PinName	 = gpio::PinName;
+	using AltFunc	 = gpio::AltFunc;
 	using UsartClk = rcc::PeriphClk;
 
 	using UsartPinData = PinData<PinName, Port, AltFunc, UsartClk, IrqNum, dma::DmaData>;
@@ -68,8 +68,12 @@ class PinMap {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return DmaData{dma::Port::DMA1, Stream::Stream6, IrqNum::Dma1Stream6Global, Channel::Channel4,
-											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
+				return DmaData{dma::Port::DMA1,
+											 Stream::Stream6,
+											 IrqNum::Dma1Stream6Global,
+											 Channel::Channel4,
+											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()},
+											 dma::DataSize::Byte};	// peripheral data size
 		}
 	}();
 
@@ -80,8 +84,12 @@ class PinMap {
 			case Port::Usart1:
 				break;
 			case Port::Usart2:
-				return DmaData{dma::Port::DMA1, Stream::Stream5, IrqNum::Dma1Stream5Global, Channel::Channel4,
-											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()}};
+				return DmaData{dma::Port::DMA1,
+											 Stream::Stream5,
+											 IrqNum::Dma1Stream5Global,
+											 Channel::Channel4,
+											 PeriphAddress_t{usart::reg::DR<USART>.memoryAddr()},
+											 dma::DataSize::Byte};	// peripheral data size
 		}
 	}();
 
@@ -132,7 +140,7 @@ class PinMap {
 	}
 };
 
-}	// namespace cpp_stm32::usart
+}	 // namespace cpp_stm32::usart
 
 namespace cpp_stm32::gpio {
 
@@ -169,7 +177,7 @@ class PinMap {
 	}
 };
 
-}	// namespace cpp_stm32::gpio
+}	 // namespace cpp_stm32::gpio
 
 namespace cpp_stm32::rcc {
 
@@ -264,4 +272,4 @@ class ClkRegMap {
 	}
 };
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc

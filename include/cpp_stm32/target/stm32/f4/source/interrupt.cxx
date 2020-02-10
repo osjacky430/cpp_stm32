@@ -19,49 +19,49 @@
 
 namespace cpp_stm32::interrupt {
 
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void wwdg_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pvd_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tamp_stamp_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void rtc_wakeup_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void flash_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void rcc_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti0_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti1_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti2_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti3_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti4_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream0_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream1_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream2_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream3_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream4_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream5_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream6_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void adc_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_tx_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_rx0_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_rx1_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_sce_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti9_5_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_brk_tim9_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_up_tim10_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_trg_com_tim11_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_cc_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim2_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim3_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim4_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c1_ev_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c1_er_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c2_ev_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c2_er_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void spi1_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void spi2_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart1_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart2_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart3_isr() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti5_10_isr() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void wwdg() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pvd() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tamp_stamp() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void rtc_wakeup() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void flash() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void rcc() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti0() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti1() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti2() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti3() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti4() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream0() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream1() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream2() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream3() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream4() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream5() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void dma1_stream6() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void adc() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_tx() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_rx0() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_rx1() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void can1_sce() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti9_5() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_brk_tim9() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_up_tim10() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_trg_com_tim11() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim1_cc() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim2() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim3() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void tim4() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c1_ev() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c1_er() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c2_ev() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void i2c2_er() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void spi1() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void spi2() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart1() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart2() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart3() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti5_10() noexcept;
 
-}	// namespace cpp_stm32::interrupt
+}	 // namespace cpp_stm32::interrupt
 
 namespace cpp_stm32 {
 

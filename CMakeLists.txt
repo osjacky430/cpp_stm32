@@ -1,10 +1,11 @@
 ###################################################
 #                cpp_stm32 library                #
 ###################################################
-cmake_minimum_required(VERSION 3.11.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.11.4...3.16.1 FATAL_ERROR)
 
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
 project(cpp_stm32 DESCRIPTION "Pure c++17 implementation of stm32 driver"
+                  HOMEPAGE_URL "https://github.com/osjacky430/cpp_stm32"
                   LANGUAGES CXX)
 
 ###################################################
@@ -30,7 +31,11 @@ set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 ###################################################
 #          add library, target properties         #
 ###################################################
-add_library(cpp_stm32 ${TARGET_PROCESSOR}/source/vector_table.cxx)
+add_library(cpp_stm32 STATIC)
+target_sources(cpp_stm32
+  PRIVATE
+    ${TARGET_PROCESSOR}/source/vector_table.cxx
+)
 target_include_directories(cpp_stm32
   INTERFACE
     ${CMAKE_SOURCE_DIR}/../src

@@ -49,66 +49,66 @@
 
 namespace cpp_stm32::interrupt {
 
-void wwdg_isr() noexcept;
-void pvd_isr() noexcept;
-void tamp_stamp_isr() noexcept;
-void rtc_wakeup_isr() noexcept;
-void flash_isr() noexcept;
-void rcc_isr() noexcept;
-void exti0_isr() noexcept;
-void exti1_isr() noexcept;
-void exti2_isr() noexcept;
-void exti3_isr() noexcept;
-void exti4_isr() noexcept;
-void dma1_stream0_isr() noexcept;
-void dma1_stream1_isr() noexcept;
-void dma1_stream2_isr() noexcept;
-void dma1_stream3_isr() noexcept;
-void dma1_stream4_isr() noexcept;
-void dma1_stream5_isr() noexcept;
-void dma1_stream6_isr() noexcept;
-void adc_isr() noexcept;
-void can1_tx_isr() noexcept;
-void can1_rx0_isr() noexcept;
-void can1_rx1_isr() noexcept;
-void can1_sce_isr() noexcept;
-void exti9_5_isr() noexcept;
-void tim1_brk_tim9_isr() noexcept;
-void tim1_up_tim10_isr() noexcept;
-void tim1_trg_com_tim11_isr() noexcept;
-void tim1_cc_isr() noexcept;
-void tim2_isr() noexcept;
-void tim3_isr() noexcept;
-void tim4_isr() noexcept;
-void i2c1_ev_isr() noexcept;
-void i2c1_er_isr() noexcept;
-void i2c2_ev_isr() noexcept;
-void i2c2_er_isr() noexcept;
-void spi1_isr() noexcept;
-void spi2_isr() noexcept;
-void usart1_isr() noexcept;
-void usart2_isr() noexcept;
-void usart3_isr() noexcept;
-void exti5_10_isr() noexcept;
+void wwdg() noexcept;
+void pvd() noexcept;
+void tamp_stamp() noexcept;
+void rtc_wakeup() noexcept;
+void flash() noexcept;
+void rcc() noexcept;
+void exti0() noexcept;
+void exti1() noexcept;
+void exti2() noexcept;
+void exti3() noexcept;
+void exti4() noexcept;
+void dma1_stream0() noexcept;
+void dma1_stream1() noexcept;
+void dma1_stream2() noexcept;
+void dma1_stream3() noexcept;
+void dma1_stream4() noexcept;
+void dma1_stream5() noexcept;
+void dma1_stream6() noexcept;
+void adc() noexcept;
+void can1_tx() noexcept;
+void can1_rx0() noexcept;
+void can1_rx1() noexcept;
+void can1_sce() noexcept;
+void exti9_5() noexcept;
+void tim1_brk_tim9() noexcept;
+void tim1_up_tim10() noexcept;
+void tim1_trg_com_tim11() noexcept;
+void tim1_cc() noexcept;
+void tim2() noexcept;
+void tim3() noexcept;
+void tim4() noexcept;
+void i2c1_ev() noexcept;
+void i2c1_er() noexcept;
+void i2c2_ev() noexcept;
+void i2c2_er() noexcept;
+void spi1() noexcept;
+void spi2() noexcept;
+void usart1() noexcept;
+void usart2() noexcept;
+void usart3() noexcept;
+void exti5_10() noexcept;
 
 static constexpr auto IRQ_TABLE = std::array{
-	wwdg_isr,					 pvd_isr,						tamp_stamp_isr,
-	rtc_wakeup_isr,		 flash_isr,					rcc_isr,
-	exti0_isr,				 exti1_isr,					exti2_isr,
-	exti3_isr,				 exti4_isr,					dma1_stream0_isr,
-	dma1_stream1_isr,	dma1_stream2_isr,	dma1_stream3_isr,
-	dma1_stream4_isr,	dma1_stream5_isr,	dma1_stream6_isr,
-	adc_isr,					 can1_tx_isr,				can1_rx0_isr,
-	can1_rx1_isr,			 can1_sce_isr,			exti9_5_isr,
-	tim1_brk_tim9_isr, tim1_up_tim10_isr, tim1_trg_com_tim11_isr,
-	tim1_cc_isr,			 tim2_isr,					tim3_isr,
-	tim4_isr,					 i2c1_ev_isr,				i2c1_er_isr,
-	i2c2_ev_isr,			 i2c2_er_isr,				spi1_isr,
-	spi2_isr,					 usart1_isr,				usart2_isr,
-	usart3_isr,				 exti5_10_isr,
+	wwdg,					 pvd,						tamp_stamp,
+	rtc_wakeup,		 flash,					rcc,
+	exti0,				 exti1,					exti2,
+	exti3,				 exti4,					dma1_stream0,
+	dma1_stream1,	 dma1_stream2,	dma1_stream3,
+	dma1_stream4,	 dma1_stream5,	dma1_stream6,
+	adc,					 can1_tx,				can1_rx0,
+	can1_rx1,			 can1_sce,			exti9_5,
+	tim1_brk_tim9, tim1_up_tim10, tim1_trg_com_tim11,
+	tim1_cc,			 tim2,					tim3,
+	tim4,					 i2c1_ev,				i2c1_er,
+	i2c2_ev,			 i2c2_er,				spi1,
+	spi2,					 usart1,				usart2,
+	usart3,				 exti5_10,
 };
 
-}	// namespace cpp_stm32::interrupt
+}	 // namespace cpp_stm32::interrupt
 
 namespace cpp_stm32 {
 
@@ -157,4 +157,4 @@ enum class IrqNum : std::uint8_t {
 	NvicIrqTotal
 };
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

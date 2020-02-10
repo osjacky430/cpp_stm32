@@ -352,12 +352,6 @@ class Register {
 		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
 	}
 
-	// public:
-	// template <BitListIdx... BitIdx, typename... ValueTypes>
-	// constexpr void writeBit(ValueTypes&&... t_param) const noexcept {
-	// 	writeBit<BitIdx...>(std::forward<ValueTypes>(t_param)...);
-	// }
-
 	/**
 	 * [writeBit description]
 	 * @param t_param [description]

@@ -11,3 +11,4 @@ Since there are alot of things going on here, I need to make a list of recent id
 - [Writing better embedded Software - Dan Saks](https://www.youtube.com/watch?v=3VtGCPIoBfs&t=2123s)
 - [Modern C++ in Embedded Systems](https://www.youtube.com/watch?v=1l2g2dAobXA)
 - [CppCon 2018: Michael Caisse “Modern C++ in Embedded Systems - The Saga Continues”](https://www.youtube.com/watch?v=LfRLQ7IChtg)
+- [Oh No! More Modern CMake - Deniz Bahadir - Meeting C++ 2019](https://youtu.be/y9kSr5enrSk)

@@ -39,13 +39,13 @@ constexpr void clear_interrupt_flag() noexcept {
  * @return [description]
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
-[[nodiscard]] constexpr bool get_interrupt_flag() noexcept {
+[[nodiscard]] constexpr auto get_interrupt_flag() noexcept {
 	if constexpr (to_underlying(Str) <= 3) {
-		return get<0>(
-			reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(ValueOnly));
+		return reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(
+			ValWithPos);
 	} else {
-		return get<0>(
-			reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(ValueOnly));
+		return reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
+			ValWithPos);
 	}
 }
 
@@ -333,11 +333,16 @@ constexpr void reset() noexcept {
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 constexpr void enable_irq() noexcept {
 	if constexpr (((Flags == InterruptFlag::FEI) || ...)) {
-		// @todo finish here
 		reg::SxFCR<DMA, Str>.template setBit<reg::SxFCRField::FEIE>();
-	} else {
-		reg::SxCR<DMA, Str>.template setBit<reg::SxCRField{Flags}...>();
 	}
+
+	constexpr auto get_rest_irq_flags = [](auto const& t_flag) {
+		if (t_flag != InterruptFlag::FEI) {
+			return reg::SxCRField{t_flag};
+		}
+	};
+
+	reg::SxCR<DMA, Str>.template setBit<get_rest_irq_flags(Flags)...>();
 }
 
 /**
@@ -361,26 +366,26 @@ template <Port DMA, Stream Str>
 class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
  private:
 	Channel m_channelSelect{Channel::Channel0};
-	TransferDir m_transferDirection{TransferDir::PeriphToMem};
+	TransferDir m_transferDir{TransferDir::PeriphToMem};
 	StreamPriority m_streamPriority{StreamPriority::Low};
 
-	std::uint8_t m_periphIncrementMode{false};
-	std::uint8_t m_periphFixIncr{false};
+	bool m_periphIncrementMode{false};
+	bool m_periphFixIncr{false};
 	DataSize m_peripheralDataSize{DataSize::Byte};
 
-	std::uint8_t m_memoryIncrementMode{false};
+	bool m_memoryIncrementMode{false};
 	DataSize m_memoryDataSize{DataSize::Byte};
 
-	std::uint8_t m_flowControl{0};
-	std::uint8_t m_circularMode{false};
-	std::uint8_t m_doubleBuffer{false};
-	std::uint8_t m_currentTarget{0};
+	FlowControl m_flowControl{FlowControl::DMA};
+	bool m_circularMode{false};
+	bool m_doubleBuffer{false};
+	bool m_currentTarget{0};
 
-	std::uint8_t m_fifoErrorIrq{false};
-	std::uint8_t m_directModeErrorIrq{false};
-	std::uint8_t m_transferErrorIrq{false};
-	std::uint8_t m_halfTransferIrq{false};
-	std::uint8_t m_transferCompleteIrq{false};
+	bool m_fifoErrorIrq{false};
+	bool m_directModeErrorIrq{false};
+	bool m_transferErrorIrq{false};
+	bool m_halfTransferIrq{false};
+	bool m_transferCompleteIrq{false};
 
 	/**
 	 * [resetDMA description]
@@ -400,7 +405,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	[[nodiscard]] constexpr DmaBuilder() noexcept { resetDMA(); }
 
 	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
-		m_transferDirection = TransferDir::PeriphToMem;
+		m_transferDir = TransferDir::PeriphToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_to.get());
@@ -409,7 +414,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	}
 
 	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, PeriphAddress_t const& t_to) noexcept {
-		m_transferDirection = TransferDir::MemToPeriph;
+		m_transferDir = TransferDir::MemToPeriph;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_to.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_from.get());
@@ -418,7 +423,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	}
 
 	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
-		m_transferDirection = TransferDir::MemToMem;
+		m_transferDir = TransferDir::MemToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_to.get());
@@ -441,8 +446,8 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto memoryIncrementMode(bool const& t_incr) noexcept {
-		m_memoryIncrementMode = t_incr;
+	[[nodiscard]] constexpr auto enableMemIncrement() noexcept {
+		m_memoryIncrementMode = true;
 		return *this;
 	}
 
@@ -451,18 +456,18 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto peripheralFlowControl(FlowControl const& t_fc) noexcept {
-		m_flowControl = to_underlying(t_fc);	// @todo: change underlying type of the register
+	[[nodiscard]] constexpr auto enablePeriphFlowControl() noexcept {
+		m_flowControl = FlowControl::Peripheral;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto peripheralIncrementMode(bool const& t_incr) noexcept {
+	[[nodiscard]] constexpr auto enablePeriphIncrement(bool const& t_incr) noexcept {
 		m_periphIncrementMode = t_incr;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto perihperalFixIncrement(bool const& t_fix_incr) noexcept {
-		m_periphFixIncr = t_fix_incr;
+	[[nodiscard]] constexpr auto enablePerihpFixIncrement() noexcept {
+		m_periphFixIncr = true;
 		return *this;
 	}
 
@@ -471,8 +476,8 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto circularMode(bool const& t_c) noexcept {
-		m_circularMode = t_c;
+	[[nodiscard]] constexpr auto useCircularMode() noexcept {
+		m_circularMode = true;
 		return *this;
 	}
 
@@ -507,30 +512,21 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	constexpr void build() noexcept {
 		using namespace reg;
 
-		SxFCR<DMA, Str>.template writeBit<SxFCRField::FEIE>(m_fifoErrorIrq);
+		SxFCR<DMA, Str>.template writeBit<SxFCRField::FEIE>(std::uint8_t{m_fifoErrorIrq});
 
 		SxCR<DMA, Str>.template writeBit<SxCRField::DMEIE, SxCRField::TEIE, SxCRField::HTIE, SxCRField::TCIE,   //
-                                     SxCRField::PFCTRL, SxCRField::DIR, SxCRField::CIRC, SxCRField::PINC, SxCRField::MINC,
-                                     SxCRField::PSIZE, SxCRField::MSIZE, SxCRField::PINCOS, SxCRField::PL, SxCRField::DBM,
-                                     SxCRField::CT, SxCRField::CHSEL>(
-			m_directModeErrorIrq, m_transferErrorIrq, m_halfTransferIrq, m_transferCompleteIrq,
-      m_flowControl, m_transferDirection, m_circularMode, m_periphIncrementMode, m_memoryIncrementMode,
-      m_peripheralDataSize, m_memoryDataSize, m_periphFixIncr, m_streamPriority, m_doubleBuffer,
-      m_currentTarget, m_channelSelect);
+		                                 SxCRField::PFCTRL, SxCRField::DIR, SxCRField::CIRC, SxCRField::PINC,
+		                                 SxCRField::MINC, SxCRField::PSIZE, SxCRField::MSIZE, SxCRField::PINCOS,
+		                                 SxCRField::PL, SxCRField::DBM, SxCRField::CT, SxCRField::CHSEL
+																		 >(
+			std::uint8_t{m_directModeErrorIrq}, std::uint8_t{m_transferErrorIrq}, std::uint8_t{m_halfTransferIrq}, std::uint8_t{m_transferCompleteIrq},
+		 	m_flowControl, m_transferDir, std::uint8_t{m_circularMode}, std::uint8_t{m_periphIncrementMode},
+		  std::uint8_t{m_memoryIncrementMode}, m_peripheralDataSize, m_memoryDataSize, std::uint8_t{m_periphFixIncr},
+		  m_streamPriority, std::uint8_t{m_doubleBuffer}, std::uint8_t{m_currentTarget}, m_channelSelect
+		);
 
 		enable<DMA, Str>();
 	}
-};
-
-template <Port DMA, Stream Str, InterruptFlag Flag>
-class DmaStateManager {
- public:
-	[[nodiscard]] constexpr DmaStateManager() noexcept {
-		while (!get_interrupt_flag<DMA, Str, Flag>()) {
-		}
-	}
-
-	~DmaStateManager() noexcept { clear_interrupt_flag<DMA, Str, Flag>(); }
 };
 
 }	 // namespace cpp_stm32::dma
