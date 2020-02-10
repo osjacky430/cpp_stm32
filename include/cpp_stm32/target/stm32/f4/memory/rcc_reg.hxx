@@ -85,7 +85,7 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PPRE, /**/
 																		 std::pair{16, 0b111});
 
 /**
- * [memory_at description]
+ *	@enum 	PeriphClk
  */
 enum class PeriphClk : std::uint32_t {
 	/*AHB1*/
@@ -135,7 +135,7 @@ namespace cpp_stm32::rcc::reg {
 static constexpr auto BASE_ADDR = memory_at(PeriphAddr::Ahb1Base, 0x3800U);
 
 /**
- * @defgroup	CR_GROUP		RCC Control Register Group
+ * @defgroup	RCC_CR_GROUP		RCC Control Register Group
  *
  * @{
  */
@@ -163,7 +163,7 @@ static constexpr Register<RccCrInfo, CrBit> CR{BASE_ADDR, 0};
 /** @}*/
 
 /**
- * @defgroup	PLLCFGR_GROUP		RCC PLL Configuration Register Group
+ * @defgroup	RCC_PLLCFGR_GROUP		RCC PLL Configuration Register Group
  * @{
  */
 
@@ -177,7 +177,7 @@ static constexpr Register<RccPllcfgrBitInfo, PllCfgBit> PLLCFGR{BASE_ADDR, 0x04U
 /** @}*/
 
 /**
- * @defgroup	CFG_GROUP		RCC Configuration Group
+ * @defgroup	RCC_CFG_GROUP		RCC Configuration Group
  *
  * @{
  */
@@ -192,7 +192,7 @@ static constexpr Register<RccCfgInfo, CfgBit> CFGR{BASE_ADDR, 0x08U};
 /**@} */
 
 /**
- * @defgroup	AHB1RST_GROUP		RCC AHB1 Reset Register Group
+ * @defgroup	RCC_AHB1RST_GROUP		RCC AHB1 Reset Register Group
  * @{
  */
 
@@ -222,7 +222,7 @@ static constexpr Register<RccAhb1RstInfo, Ahb1RstBit> AHB1RST{BASE_ADDR, 0x10U};
 /**@}*/
 
 /**
- * @defgroup	APB1RST_GROUP		RCC APB1 Reset Register Group
+ * @defgroup	RCC_APB1RST_GROUP		RCC APB1 Reset Register Group
  * @{
  */
 
@@ -237,7 +237,7 @@ static constexpr Register<RccApb1RstInfo, Apb1RstBit> APB1RST{BASE_ADDR, 0x20U};
 /**@}*/
 
 /**
- * @defgroup APB2RST_GROUP		RCC APB2 Reset Register Group
+ * @defgroup RCC_APB2RST_GROUP		RCC APB2 Reset Register Group
  * @{
  */
 
@@ -250,7 +250,7 @@ static constexpr Register<RccApb2RstInfo, Apb2RstBit> APB2RST{BASE_ADDR, 0x24U};
 /**@}*/
 
 /**
- * @defgroup	AHB1ENR_GROUP		RCC AHB1 Enable Register Group
+ * @defgroup	RCC_AHB1ENR_GROUP		RCC AHB1 Enable Register Group
  * @{
  */
 
@@ -282,7 +282,7 @@ static constexpr Register<RccAhb1EnrInfo, Ahb1EnrBit> AHB1ENR{BASE_ADDR, 0x30U};
 /**@}*/
 
 /**
- * @defgroup	APB1ENR_GROUP		RCC APB1 Enable Register Group
+ * @defgroup	RCC_APB1ENR_GROUP		RCC APB1 Enable Register Group
  * @{
  */
 
@@ -298,7 +298,7 @@ static constexpr Register<RccApb1EnrInfo, Apb1EnrBit> APB1ENR{BASE_ADDR, 0x40U};
 /**@}*/
 
 /**
- * @defgroup APB2ENR_GROUP		RCC APB2 Enable Register Group
+ * @defgroup RCC_APB2ENR_GROUP		RCC APB2 Enable Register Group
  * @{
  */
 
@@ -311,7 +311,7 @@ static constexpr Register<RccApb2EnrInfo, Apb2EnrBit> APB2ENR{BASE_ADDR, 0x44U};
 /**@}*/
 
 /**
- * @defgroup	BDCR_GROUP		RCC Backup Domain Control Register Group
+ * @defgroup	RCC_BDCR_GROUP		RCC Backup Domain Control Register Group
  *
  * @{
  */

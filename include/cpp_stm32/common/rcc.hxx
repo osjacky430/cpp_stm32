@@ -18,6 +18,10 @@
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
+/**
+ * @namespace   cpp_stm32::rcc
+ * @brief       Reset and Clock Control Namespace
+ */
 namespace cpp_stm32::rcc {
 
 template <std::uint32_t Val>

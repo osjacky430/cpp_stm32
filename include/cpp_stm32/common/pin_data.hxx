@@ -20,6 +20,10 @@
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
+/**
+ *  @namespace cpp_stm32
+ *  @brief     Library Top Namespace
+ */
 namespace cpp_stm32 {
 
 // this is substitution of std::tuple due to nonconstexpr assignment of std::tuple in c++17, rename and complete it in

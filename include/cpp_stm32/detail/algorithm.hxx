@@ -21,6 +21,12 @@
 #include <iterator>
 #include <utility>
 
+/**
+ * @namespace 	cpp_stm32::detail
+ * @brief				Detail implementation namespace
+ *
+ * @note 				DO NOT USE DETAIL NAMESPACE
+ */
 namespace cpp_stm32::detail {
 
 template <class ForwardIt, class Generator>

@@ -18,9 +18,13 @@
 
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
+/**
+ * @namespace     cpp_stm32::dma
+ * @brief         Direct Memory Address Namespace
+ */
 namespace cpp_stm32::dma {
 
 using PeriphAddress_t = StrongType<std::uintptr_t, struct PeripherAddress>;
 using MemoryAddress_t = StrongType<std::uintptr_t, struct MemoryAddress>;
 
-}	// namespace cpp_stm32::dma
+}	 // namespace cpp_stm32::dma

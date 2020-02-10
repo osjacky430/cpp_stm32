@@ -18,7 +18,7 @@
 
 /**
  * @namespace  cpp_stm32::gpio
- * @brief      contains common definition for gpio
+ * @brief      General Purpose Input Output Namespace
  */
 namespace cpp_stm32::gpio {
 

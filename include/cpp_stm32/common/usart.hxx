@@ -22,7 +22,8 @@
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
 /**
- *	@namespace	common
+ *	@namespace	cpp_stm32::usart
+ *	@brief 			Universal Synchronous Asynchronous Recever Transmiter Namespace
  */
 namespace cpp_stm32::usart {
 
@@ -40,7 +41,7 @@ using Baudrate_t = StrongType<std::uint64_t, struct Baudrate>;
  * @defgroup 		BAUD_LITERAL_OP_GROUP		Baudrate related literal operators
  * @brief				These literal operators create ::Baudrate_t instance according to input baudrate
  * @param 			t_baud input baudrate
- * @return 			see ::Baudrate_t
+ * @return 			Baudrate_t
  *
  * @{
  */

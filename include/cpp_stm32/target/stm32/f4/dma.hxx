@@ -35,23 +35,39 @@ constexpr void clear_interrupt_flag() noexcept {
 }
 
 /**
- * [get_interrupt_flag description]
- * @return [description]
+ * @brief		This function returns dma status
+ * @tparam 	DMA			@ref dma::Port
+ * @tparam 	Str 		@ref dma::Stream
+ * @tparam 	Flags		@ref dma::InterruptFlag
+ * @return  DMA status
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 [[nodiscard]] constexpr auto get_interrupt_flag() noexcept {
-	if constexpr (to_underlying(Str) <= 3) {
-		return reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(
-			ValWithPos);
+	if constexpr (sizeof...(Flags) == 1) {
+		if constexpr (to_underlying(Str) <= 3) {
+			return get<0>(
+				reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(ValueOnly));
+		} else {
+			return get<0>(
+				reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
+					ValueOnly));
+		}
 	} else {
-		return reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
-			ValWithPos);
+		if constexpr (to_underlying(Str) <= 3) {
+			return reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(
+				ValWithPos);
+		} else {
+			return reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
+				ValWithPos);
+		}
 	}
 }
 
 /**
- * [is_enabled description]
- * @return [description]
+ * @brief 		This function checks if DMA is enabled
+ * @tparam 		DMA 	@ref dma::Port
+ * @tparam		Str		@ref dma::Stream
+ * @return 		true if DMA is enabled, false otherwise
  */
 template <Port DMA, Stream Str>
 [[nodiscard]] constexpr bool is_enabled() noexcept {
@@ -59,8 +75,10 @@ template <Port DMA, Stream Str>
 }
 
 /**
- * [set_tx_direction description]
- * @param t_dir [description]
+ * @brief 		This function sets transfer direcition of DMA
+ * @tparam 		DMA 		@ref dma::Port
+ * @tparam		Str			@ref dma::Stream
+ * @param 		t_dir 	@ref dma::TransferDir
  */
 template <Port DMA, Stream Str>
 constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
@@ -68,7 +86,10 @@ constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
 }
 
 /**
- * [enable_tx_complete_irq description]
+ * @brief 		This function sets DMA stream priority
+ * @tparam 		DMA 		@ref dma::Port
+ * @tparam		Str			@ref dma::Stream
+ * @param 		t_prior	@ref dma::StreamPriority
  */
 template <Port DMA, Stream Str>
 constexpr void set_priority(StreamPriority const& t_prior) noexcept {
@@ -76,8 +97,10 @@ constexpr void set_priority(StreamPriority const& t_prior) noexcept {
 }
 
 /**
- * [set_memory_size description]
- * @param size [description]
+ * @brief 		This function sets memory data size
+ * @tparam 		DMA 		@ref dma::Port
+ * @tparam		Str			@ref dma::Stream
+ * @param 		size  	@ref dma::DataSize
  */
 template <Port DMA, Stream Str>
 constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
@@ -328,7 +351,8 @@ constexpr void reset() noexcept {
 }
 
 /**
- * [enable_irq description]
+ * 	@brief 		This function enables the interrupt of dma
+ * 	@tparam 	Port
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 constexpr void enable_irq() noexcept {

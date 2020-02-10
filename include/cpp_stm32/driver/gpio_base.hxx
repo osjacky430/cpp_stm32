@@ -51,7 +51,7 @@ class PinGroupingHelper {
 		auto port_list = std::array{gpio::PinMap::getPort(PIN_NAME_LIST[Idx])...};
 		std::array<Port, PORT_NUM> result_port_list{};
 		detail::unique_copy(port_list.begin(), port_list.end(), result_port_list.begin(),
-											[](auto const& lhs, auto const& rhs) { return lhs == rhs; });
+												[](auto const& lhs, auto const& rhs) { return lhs == rhs; });
 		return result_port_list;
 	}
 
@@ -82,7 +82,7 @@ class PinGroupingHelper {
 	static constexpr auto genPinNameList() noexcept {
 		auto pin_name_list = std::array{PinNames...};
 		detail::sort(pin_name_list,
-							 [](auto const& lhs, auto const& rhs) { return (to_underlying(lhs) < to_underlying(rhs)); });
+								 [](auto const& lhs, auto const& rhs) { return (to_underlying(lhs) < to_underlying(rhs)); });
 		return pin_name_list;
 	}
 
@@ -169,7 +169,7 @@ class PinGroupingHelper {
  * @brief This class provides a more advance gpio utility, this class is used by other
  *        driver class.
  *
- * @tparam  PinNames @ref PinName
+ * @tparam  PinNames gpio::PinName
  */
 template <gpio::PinName... PinNames>
 class GpioUtil {
@@ -251,7 +251,7 @@ class GpioUtil {
 	/**
 	 * @brief    This function handles the setup of alternate function, for implementation
 	 *           detail, see @ref modeSetupIdxThruPin
-	 * @param    t_af   @ref AltFunc
+	 * @param    t_af   @ref gpio::AltFunc
 	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void alternateFuncSteupThruPin(size_c<Num> const& /*unused*/,
@@ -265,7 +265,7 @@ class GpioUtil {
 	/**
 	 * @brief    This function handles the setup of alternate function, for implementation detail,
 	 *           see @ref modeSetupIdxThruPort
-	 * @param    t_af  @ref AltFunc
+	 * @param    t_af  @ref gpio::AltFunc
 	 */
 	template <std::size_t... Idx>
 	static constexpr void alternateFuncSetupThruPort(std::index_sequence<Idx...> const& /*unused*/,
@@ -281,8 +281,8 @@ class GpioUtil {
 
 	/**
 	 * @brief  This function is the public interface of gpio mode setup
-	 * @param t_mode @ref Mode
-	 * @param t_pupd @ref Pupd
+	 * @param t_mode @ref gpio::Mode
+	 * @param t_pupd @ref gpio::Pupd
 	 */
 	static constexpr void modeSetup(gpio::Mode const& t_mode, gpio::Pupd const& t_pupd) noexcept {
 		modeSetupIdxThruPort(IdxThruPort{}, t_mode, t_pupd);
@@ -295,7 +295,7 @@ class GpioUtil {
 
 	/**
 	 * @brief  This function is the public interface of gpio set alternate function
-	 * @param t_af  @ref AltFunc
+	 * @param  t_af  @ref gpio::AltFunc
 	 */
 	static constexpr void alternateFuncSetup(gpio::AltFunc const& t_af) noexcept {
 		alternateFuncSetupThruPort(IdxThruPort{}, t_af);

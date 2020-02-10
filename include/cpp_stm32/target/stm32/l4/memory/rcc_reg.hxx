@@ -20,9 +20,9 @@
 
 #include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
 
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 #include "cpp_stm32/utility/macro.hxx"
@@ -60,7 +60,8 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllR, /**/
 																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
 
 /**
- * @enum
+ * @enum 		PeriphClk
+ * @brief		It is used @ref rcc::enable_periph_clk and @ref rcc::reset_periph_clk
  */
 enum class PeriphClk : std::uint32_t {
 

@@ -18,6 +18,10 @@
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
+/**
+ * @namespace     cpp_stm32::flash
+ * @brief         Flash Namespace
+ */
 namespace cpp_stm32::flash {
 
 template <std::uint32_t Val>

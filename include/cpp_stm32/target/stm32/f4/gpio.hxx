@@ -22,13 +22,16 @@
 #include "cpp_stm32/detail/builder.hxx"
 #include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
 
+/**
+ * @namespace cpp_stm32::gpio
+ */
 namespace cpp_stm32::gpio {
 
 /**
  * @brief   This function handles the setup of mode
- * @tparam  Port      ::Port
- * @tparam  Pins      ::Pin
- * @param   t_mode    ::Mode
+ * @tparam  InputPort @ref gpio::Port
+ * @tparam  Pins      @ref gpio::Pin
+ * @param   t_mode    @ref gpio::Mode
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_mode(Mode const& t_mode) noexcept {
@@ -37,9 +40,9 @@ constexpr void set_mode(Mode const& t_mode) noexcept {
 
 /**
  * @brief   This function handles the setup of pullup/pulldown
- * @tparam  Port    ::Port
- * @tparam  Pins    ::Pin
- * @param   t_pupd  ::Pupd
+ * @tparam  InputPort @ref gpio::Port
+ * @tparam  Pins    	@ref gpio::Pin
+ * @param   t_pupd  	@ref gpio::Pupd
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_pupd(Pupd const& t_pupd) noexcept {
@@ -48,10 +51,10 @@ constexpr void set_pupd(Pupd const& t_pupd) noexcept {
 
 /**
  * @brief   This function handles the setup of mode and pullup/pulldown
- * @tparam  Port      ::Port
- * @tparam  Pins      ::Pin
- * @param   t_mode    ::Mode
- * @param   t_pupd    ::Pupd
+ * @tparam  InputPort @ref gpio::Port
+ * @tparam  Pins      @ref gpio::Pin
+ * @param   t_mode    @ref gpio::Mode
+ * @param   t_pupd    @ref gpio::Pupd
  */
 template <Port InputPort, Pin... Pins>
 constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
@@ -61,8 +64,8 @@ constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
 
 /**
  * @brief   This function toggles gpio pins atomically
- * @tparam  Port      ::Port
- * @tparam  Pins      ::Pin
+ * @tparam  InputPort @ref gpio::Port
+ * @tparam  Pins      @ref gpio::Pin
  */
 template <Port InputPort, Pin... Pins>
 constexpr void toggle() noexcept {
@@ -80,9 +83,9 @@ constexpr void toggle() noexcept {
 
 /**
  * @brief     This function handles the setup of alternate function
- * @tparam    Port    ::Port
- * @tparam    Pins    ::Pin
- * @param     t_af    ::AltFunc
+ * @tparam    InputPort @ref gpio::Port
+ * @tparam    Pins    	@ref gpio::Pin
+ * @param     t_af    	@ref gpio::AltFunc
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
@@ -115,10 +118,10 @@ constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 
 /**
  * @brief			This function set output type and output speed of GPIO
- * @tparam    Port     ::Port
- * @tparam    Pins   	 ::Pin
- * @param  		t_otype  ::OutputType
- * @param 		t_ospeed ::OutputSpeed
+ * @tparam    InputPort @ref gpio::Port
+ * @tparam    Pins   	 	@ref gpio::Pin
+ * @param  		t_otype  	@ref gpio::OutputType
+ * @param 		t_ospeed 	@ref gpio::OutputSpeed
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_output_options(OutputType t_otype, OutputSpeed t_ospeed) noexcept {
@@ -128,9 +131,9 @@ constexpr void set_output_options(OutputType t_otype, OutputSpeed t_ospeed) noex
 
 /**
  * @brief			This function set output type of GPIO
- * @tparam    Port    ::Port
- * @tparam    Pins    ::Pin
- * @param  		t_mode  ::OutputType
+ * @tparam    InputPort @ref gpio::Port
+ * @tparam    Pins    	@ref gpio::Pin
+ * @param  		t_mode  	@ref gpio::OutputType
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_output_type(OutputType const& t_otype) noexcept {
@@ -139,9 +142,9 @@ constexpr void set_output_type(OutputType const& t_otype) noexcept {
 
 /**
  * @brief			This function set output speed of GPIO
- * @tparam    Port    ::Port
- * @tparam    Pins    ::Pin
- * @param  		t_mode  ::OutputSpeed
+ * @tparam    InputPort @ref gpio::Port
+ * @tparam    Pins    	@ref gpio::Pin
+ * @param  		t_mode  	@ref gpio::OutputSpeed
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_output_speed(OutputSpeed const& t_ospeed) noexcept {

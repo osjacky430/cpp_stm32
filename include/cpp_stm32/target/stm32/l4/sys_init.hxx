@@ -59,7 +59,7 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
 /**@}*/
 
 /**
- * @defgroup
+ * @defgroup	MSI_CLK_DEF	 MSI Clock
  * @note maybe we can deduce MSI clk freq from other input?
  * @{
  */
