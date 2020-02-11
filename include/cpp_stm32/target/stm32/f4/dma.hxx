@@ -243,7 +243,7 @@ constexpr void set_tx_data_num(std::uint16_t const& t_num) noexcept {
  */
 template <Port DMA, Stream Str>
 constexpr auto get_tx_data_num() noexcept {
-	return reg::SxNDTR<DMA, Str>.template readBit<reg::SxNDTRField::NDT>(ValueOnly);
+	return get<0>(reg::SxNDTR<DMA, Str>.template readBit<reg::SxNDTRField::NDT>(ValueOnly));
 }
 
 /**
@@ -370,8 +370,10 @@ constexpr void enable_irq() noexcept {
 }
 
 /**
- * [DmaBuilder description]
+ * @class 	 DmaBuilder
+ * @brief 	 Builder class that offers alternative ways to setup DMA
  *
+ * @todo 		 reduce overhead as mush as possible
  * @note     Stream configuration procedure
  *           1. disable stream if is enabled, wait until the stream is disabled
  *           2. set peripheral port register address

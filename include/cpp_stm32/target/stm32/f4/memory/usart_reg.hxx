@@ -43,6 +43,8 @@ enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
 enum class Parity : std::uint8_t { Even, Odd, None };
 enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
 
+enum class InterruptFlag : std::uint8_t { PE, FE, NF, ORE, IDLE, RXNE, TC, TXE, LBD, CTS };
+
 }	 // namespace cpp_stm32::usart
 
 namespace cpp_stm32::usart::reg {
@@ -74,10 +76,10 @@ SETUP_REGISTER_INFO(UsartSrInfo, /**/
 										StatusBit<1>{BitPos_t{3}}, StatusBit<1>{BitPos_t{4}}, Binary<>{BitPos_t{5}}, Binary<>{BitPos_t{6}},
 										StatusBit<1>{BitPos_t{7}}, Binary<>{BitPos_t{8}}, Binary<>{BitPos_t{9}})
 
-enum class SrBit { PE, FE, NF, OrE, Idle, RxNE, TC, TxE, LBD, CTS };
+// enum class SrBit { PE, FE, NF, OrE, Idle, RxNE, TC, TxE, LBD, CTS };
 
 template <Port InputPort>
-static constexpr Register<UsartSrInfo, SrBit> SR{BASE_ADDR(InputPort), 0x00U};
+static constexpr Register<UsartSrInfo, InterruptFlag> SR{BASE_ADDR(InputPort), 0x00U};
 /**@}*/
 
 /**

@@ -30,7 +30,7 @@ constexpr auto set_baudrate(Baudrate_t const& t_baud) noexcept {
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	= usart_div & 0xF;
+	std::uint8_t const fraction	 = usart_div & 0xF;
 
 	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
@@ -78,7 +78,7 @@ constexpr void send(std::uint8_t const& data) noexcept {
 }
 
 template <Port InputPort>
-constexpr auto receive() noexcept {
+[[nodiscard]] constexpr auto receive() noexcept {
 	return get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
 }
 
@@ -86,12 +86,12 @@ template <Port InputPort>
 constexpr auto is_tx_empty() noexcept {
 	// 0: data is not transferred to shift register
 	// 1: data is transferred to shift register
-	return get<0>(reg::SR<InputPort>.template readBit<reg::SrBit::TxE>(ValueOnly)) != 0;
+	return get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::TXE>(ValueOnly)) != 0;
 }
 
 template <Port InputPort>
 constexpr auto is_rx_empty() noexcept {
-	return get<0>(reg::SR<InputPort>.template readBit<reg::SrBit::RxNE>(ValueOnly)) == 0;
+	return get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::RXNE>(ValueOnly)) == 0;
 }
 
 template <Port InputPort>
@@ -132,6 +132,23 @@ constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> co
 	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(Stop);
 }
 
+template <Port InputPort, InterruptFlag Flag>
+constexpr void enable_irq() noexcept {
+	constexpr auto is_error_irq = []() {
+		return Flag == InterruptFlag::FE || Flag == InterruptFlag::ORE || Flag == InterruptFlag::NF;
+	};
+
+	if constexpr (Flag == InterruptFlag::CTS) {
+		reg::CR3<InputPort>.template setBit<reg::Cr3Bit::CTSIE>();
+	} else if constexpr (Flag == InterruptFlag::LBD) {
+		reg::CR2<InputPort>.template setBit<reg::Cr2Bit::LBDIE>();
+	} else if constexpr (is_error_irq()) {
+		reg::CR3<InputPort>.template setBit<reg::Cr3Bit::EIE>();
+	} else {
+		reg::CR1<InputPort>.template setBit<reg::Cr1Bit{Flag}>();
+	}
+}
+
 template <Port InputPort>
 constexpr void enable_tx_dma() noexcept {
 	reg::CR3<InputPort>.template setBit<reg::Cr3Bit::DMAT>();
@@ -143,9 +160,10 @@ constexpr void enable_rx_dma() noexcept {
 }
 
 template <Port InputPort>
-constexpr void enable_txe_irq() noexcept {
-	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
-}
+constexpr auto enable_idle_irq = enable_irq<InputPort, InterruptFlag::IDLE>;
+
+template <Port InputPort>
+constexpr auto enable_txe_irq = enable_irq<InputPort, InterruptFlag::TXE>;
 
 template <Port InputPort>
 constexpr void enable_half_duplex() noexcept {
@@ -157,4 +175,13 @@ constexpr void disable_half_duplex() noexcept {
 	reg::CR3<InputPort>.template clearBit<reg::Cr3Bit::HDSel>();
 }
 
-}	// namespace cpp_stm32::usart
+template <Port InputPort, InterruptFlag... Flags>
+constexpr auto get_interrupt_flag() noexcept {
+	if constexpr (sizeof...(Flags) == 1) {
+		return get<0>(reg::SR<InputPort>.template readBit<Flags...>(ValueOnly));
+	} else {
+		return reg::SR<InputPort>.template readBit<Flags...>(ValWithPos);
+	}
+}
+
+}	 // namespace cpp_stm32::usart

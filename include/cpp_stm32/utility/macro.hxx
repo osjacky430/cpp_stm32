@@ -42,25 +42,25 @@
  * @param  ClassName 	Class name
  * @param  VARARGS    division factor - register value pair
  */
-#define SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(ClassName, ...)                                              \
-	struct ClassName {                                                                                      \
-		std::uint32_t const m_value;                                                                          \
-		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                       \
-                                                                                                          \
-		template <std::uint32_t Val>                                                                          \
-		static constexpr auto findDivisionFactor = []() {                                                     \
+#define SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(ClassName, ...)                                                \
+	struct ClassName {                                                                                        \
+		std::uint32_t const m_value;                                                                            \
+		static constexpr std::array AVAIL_DIVISION_FACTOR{__VA_ARGS__};                                         \
+                                                                                                            \
+		template <std::uint32_t Val>                                                                            \
+		static constexpr auto findDivisionFactor = []() {                                                       \
 			constexpr auto iter_pos = detail::find_if(AVAIL_DIVISION_FACTOR.begin(), AVAIL_DIVISION_FACTOR.end(), \
-																							[](auto const& t_pair) { return t_pair.first == Val; });    \
-			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                             \
-			return iter_pos->second;                                                                            \
-		};                                                                                                    \
-                                                                                                          \
-		template <std::uint32_t Val>                                                                          \
-		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept                       \
-			: m_value(findDivisionFactor<Val>()) {}                                                             \
-                                                                                                          \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                          \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                 \
+																								[](auto const& t_pair) { return t_pair.first == Val; });    \
+			static_assert(iter_pos != AVAIL_DIVISION_FACTOR.end());                                               \
+			return iter_pos->second;                                                                              \
+		};                                                                                                      \
+                                                                                                            \
+		template <std::uint32_t Val>                                                                            \
+		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept                         \
+			: m_value(findDivisionFactor<Val>()) {}                                                               \
+                                                                                                            \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                            \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                   \
 	}
 
 /**

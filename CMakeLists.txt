@@ -56,6 +56,7 @@ target_compile_options(cpp_stm32
 )
 target_link_options(cpp_stm32
   INTERFACE
+    ${STM32F4_FLAGS}
     ${NEWLIB_FLAGS}
     -nostartfiles
     "SHELL: ${LINKER_SCRIPT}"

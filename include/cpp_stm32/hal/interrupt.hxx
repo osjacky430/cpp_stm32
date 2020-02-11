@@ -44,8 +44,7 @@ static constexpr void WRAP_TO_C_STYLE_FUNC(void* const /**/) noexcept {
 }
 
 /**
- * [void  description]
- * @param [name] [description]
+ *
  */
 template <IrqNum IRQn>
 class Interrupt {
@@ -56,7 +55,7 @@ class Interrupt {
 	static std::pair<CStyleThisPtr, WrapperFuncPtr> m_callback;
 
  public:
-	explicit constexpr Interrupt() noexcept {}
+	constexpr Interrupt() noexcept {}
 
 	static constexpr void interrupt() noexcept {
 		auto const [class_ptr, c_style_wrapper_func] = m_callback;

@@ -24,6 +24,7 @@
 #include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/hal/callback.hxx"
+#include "cpp_stm32/utility/macro.hxx"
 #include "cpp_stm32/utility/serial.hxx"
 
 // target specific include
@@ -78,6 +79,13 @@ class Usart {
 	static constexpr auto USART_GPIO_AF = UsartTx<TX>::TX_AF;
 	static constexpr auto USART_IRQ_NUM = UsartTx<TX>::TX_IRQ;
 
+	static constexpr void USART_IRQ() noexcept {
+		constexpr auto default_irq = interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)];
+		default_irq();
+	}
+
+	// static inline auto USART_CB_ARRAY = std::array<int, 2 /*tx & rx*/>{};
+
  public:
 	explicit constexpr Usart(usart::Baudrate_t const& t_baud) noexcept {}
 
@@ -99,6 +107,11 @@ class Usart {
 		usart::set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
 
 		usart::enable<USART_PORT>();
+
+		{
+			auto const critical_section = create_critical_section();
+			Interrupt<USART_IRQ_NUM>::attach(Callback<USART_IRQ>{});
+		}	 // end critical section
 	}
 
 	constexpr auto sendable() const noexcept { return usart::is_tx_empty<USART_PORT>(); }
@@ -106,7 +119,7 @@ class Usart {
 	constexpr auto receivable() const noexcept { return usart::is_rx_empty<USART_PORT>(); }
 
 	template <std::uint8_t BC = 1, bool Wait = false>
-	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	= 1_byte,
+	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	 = 1_byte,
 																			 [[maybe_unused]] Waiting_t<Wait> const& t_w = Waiting<false>) const noexcept {
 		std::array<std::uint8_t, BC> ret_val{};
 		detail::generate(ret_val.begin(), ret_val.end(),
@@ -154,27 +167,12 @@ class Usart {
 		return *this;
 	}
 
-	constexpr void setTxeInterrupt() const noexcept {
-		{
-			auto const critical_section = create_critical_section();
-			constexpr Callback<interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)]> cb;
-			Interrupt<USART_IRQ_NUM>::attach(cb);
-		}	// end critical section
-
-		nvic::enable_irq<USART_IRQ_NUM>();
-		usart::enable_txe_irq<USART_PORT>();
-	}
-
 	template <auto F>
-	constexpr void setTxeInterrupt(Callback<F> const& t_cb) const noexcept {
-		{
-			auto const critical_section = create_critical_section();
-			Interrupt<USART_IRQ_NUM>::attach(t_cb);
-		}	// end critical section
-
+	constexpr void attachTxeIRQ(Callback<F> const& t_cb) const noexcept {
 		nvic::enable_irq<USART_IRQ_NUM>();
 		usart::enable_txe_irq<USART_PORT>();
+		// register callback to callback array
 	}
 };
 
-}	// namespace cpp_stm32::driver
+}	 // namespace cpp_stm32::driver
