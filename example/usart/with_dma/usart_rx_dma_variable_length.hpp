@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 
 #include "sys_init.hxx"
 
@@ -68,10 +69,11 @@ constexpr void setup_dma() noexcept {
 
 	Rcc::enable_periph_clk<Rcc::PeriphClk::Dma1>();
 	Nvic::enable_irq<cpp_stm32::IrqNum::Dma1Stream5Global>();
+	Nvic::enable_irq<cpp_stm32::IrqNum::Usart2Global>();
 
 	Dma::reset<DMA, Str>();
 	Dma::set_tx_mode<DMA, Str>(Dma::TransferDir::PeriphToMem);
-	Dma::set_tx_data_num<DMA, Str>(5);
+	Dma::set_tx_data_num<DMA, Str>(MAX_BUFFER_SIZE);
 	Dma::channel_select<DMA, Str>(Dma::Channel::Channel4);
 	Dma::set_memory_data_size<DMA, Str>(Dma::DataSize::Byte);
 	Dma::set_periph_data_size<DMA, Str>(Dma::DataSize::Byte);
@@ -98,7 +100,7 @@ int main() {
 			__asm("nop");
 		}
 
-		pc << processed_data << "\n\r";
+		pc << processed_data << "\n\t";
 	}
 
 	return 0;
@@ -108,24 +110,23 @@ static std::size_t old_pos{0}, last_processed_idx{0};
 
 template <auto State>
 constexpr void process_buffer() noexcept {
-	auto const current_pos = MAX_BUFFER_SIZE - Dma::get_tx_data_num<DMA, Str>();
-	auto const pos_diff		 = current_pos - old_pos;
+	auto const current_pos = MAX_BUFFER_SIZE - Dma::get_tx_data_num<DMA, Str>();	// current dma buffer pointer position
+	std::int8_t const pos_diff = current_pos - old_pos;	 // buffer received since last time process
 
-	if (current_pos != old_pos) {
+	if (constexpr auto buffer_head = std::begin(buffer); pos_diff != 0) {
 		if (pos_diff > 0) {
-			std::copy(&buffer[old_pos], &buffer[current_pos], &processed_data[last_processed_idx]);
+			std::copy(buffer_head + old_pos, buffer_head + current_pos, &processed_data[last_processed_idx]);
 
 		} else {
-			std::copy(&buffer[old_pos], &buffer[MAX_BUFFER_SIZE - old_pos], processed_data);
-
-			if (current_pos > 0) {
-				std::copy(&buffer[0], &buffer[current_pos], processed_data);
-			}
+			// pos_diff < 0 only when TC complete, where current_pos goes to the beginnig of the buffer
+			std::copy(buffer_head + old_pos, std::end(buffer), &processed_data[last_processed_idx]);
 		}
 	}
 
+	// once transfer complete happens, check whether the packet  transfer is finished or not,
+	// if not finished, record last processed index and start copy from there next time
 	if constexpr (State == ReceiverState::TransferComplete) {
-		if (pos_diff > PACKET_LEN_IDX) {
+		if (pos_diff >= PACKET_LEN_IDX) {	 // packet recieved including packet length information
 			int const total_packet		= processed_data[PACKET_LEN_IDX] + 2;
 			int const packet_received = pos_diff - PACKET_HEADER_NUM - PACKET_ID_NUM - PACKET_LEN_NUM;
 
@@ -170,5 +171,7 @@ void cpp_stm32::interrupt::usart2() noexcept {
 	if (Usart::get_interrupt_flag<Usart::Port::Usart2, Usart::InterruptFlag::IDLE>()) {
 		[[gnu::unused]] auto const clear_idle = Usart::receive<Usart::Port::Usart2>();
 		process_buffer<ReceiverState::Idle>();
+
+		led.toggle();
 	}
 }

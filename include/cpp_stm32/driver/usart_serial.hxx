@@ -97,7 +97,7 @@ class Usart {
 		rcc::enable_periph_clk<USART_RCC>();
 
 		GpioUtil<TX, RX>::enableAllGpioClk();
-		GpioUtil<TX, RX>::modeSetup(gpio::Mode::AltFunc, Pupd::None);
+		GpioUtil<TX, RX>::modeSetup(gpio::Mode::AltFunc, Pupd::PullUp);
 		GpioUtil<TX, RX>::alternateFuncSetup(USART_GPIO_AF);
 
 		usart::set_baudrate<USART_PORT>(t_baud);
