@@ -49,6 +49,12 @@ enum class ReceiverState { TransferComplete, HalfTransfer, Idle };
 constexpr auto DMA = Dma::Port::DMA1;
 constexpr auto Str = Dma::Stream::Stream5;
 
+bool packet_finish	= false; /* Signal to send */
+bool packet_tx_lock = false; /* Lock proccessed_data when transferring */
+
+/**/
+static std::size_t old_pos{0}, last_processed_idx{0};
+
 /* Global Storage for DMA destination */
 static constexpr std::size_t MAX_BUFFER_SIZE = 20;
 std::array<char, MAX_BUFFER_SIZE> buffer;
@@ -95,18 +101,25 @@ int main() {
 	setup_dma();
 
 	while (true) {
-		constexpr auto SOME_INTERVAL = 10000000;
+		constexpr auto SOME_INTERVAL = 1000000;
 		for (int i = 0; i < SOME_INTERVAL; ++i) {
 			__asm("nop");
 		}
 
-		pc << processed_data << "\n\t";
+		if (packet_finish) {
+			packet_finish	 = false;
+			packet_tx_lock = true;
+
+			pc << processed_data << "\n\t";
+			std::fill(std::begin(processed_data), std::end(processed_data), 0);
+			last_processed_idx = 0;
+
+			packet_tx_lock = false;
+		}
 	}
 
 	return 0;
 }
-
-static std::size_t old_pos{0}, last_processed_idx{0};
 
 template <auto State>
 constexpr void process_buffer() noexcept {
@@ -115,41 +128,30 @@ constexpr void process_buffer() noexcept {
 
 	if (constexpr auto buffer_head = std::begin(buffer); pos_diff != 0) {
 		if (pos_diff > 0) {
+			while (packet_tx_lock) {
+			}
 			std::copy(buffer_head + old_pos, buffer_head + current_pos, &processed_data[last_processed_idx]);
-
+			last_processed_idx = pos_diff;
 		} else {
 			// pos_diff < 0 only when TC complete, where current_pos goes to the beginnig of the buffer
+			while (packet_tx_lock) {
+			}
 			std::copy(buffer_head + old_pos, std::end(buffer), &processed_data[last_processed_idx]);
+
+			auto const packet_copied = MAX_BUFFER_SIZE - old_pos;
+			std::copy(buffer_head, buffer_head + current_pos, &processed_data[packet_copied + last_processed_idx]);
+			last_processed_idx = packet_copied + current_pos;
 		}
 	}
 
-	// once transfer complete happens, check whether the packet  transfer is finished or not,
-	// if not finished, record last processed index and start copy from there next time
-	if constexpr (State == ReceiverState::TransferComplete) {
-		if (pos_diff >= PACKET_LEN_IDX) {	 // packet recieved including packet length information
-			int const total_packet		= processed_data[PACKET_LEN_IDX] + 2;
-			int const packet_received = pos_diff - PACKET_HEADER_NUM - PACKET_ID_NUM - PACKET_LEN_NUM;
-
-			if (packet_received < total_packet) {
-				// packet transfer isn't finish, but reach to the end of the buffer
-				last_processed_idx = pos_diff;
-			} else {
-				// packet transfer finished, and also reach to the end of the buffer
-				last_processed_idx = 0;
-			}
-		} else {
-			// the length of the packet is still unknown, but we have already reach to the end of the buffer
-			last_processed_idx = pos_diff;
-		}
-
+	if (current_pos == MAX_BUFFER_SIZE) {
 		old_pos = 0;
-	} else if constexpr (State == ReceiverState::Idle) {
-		// transfer maybe aborted, or transfer finished, reset processed_idx
-		last_processed_idx = 0;
-		old_pos						 = current_pos;
-	} else if constexpr (State == ReceiverState::HalfTransfer) {
-		last_processed_idx = pos_diff;
-		old_pos						 = current_pos;
+	} else {
+		old_pos = current_pos;
+	}
+
+	if constexpr (State == ReceiverState::Idle) {
+		packet_finish = true;	 // transfer maybe aborted, or transfer finished, star parsing data
 	}
 }
 
@@ -171,7 +173,5 @@ void cpp_stm32::interrupt::usart2() noexcept {
 	if (Usart::get_interrupt_flag<Usart::Port::Usart2, Usart::InterruptFlag::IDLE>()) {
 		[[gnu::unused]] auto const clear_idle = Usart::receive<Usart::Port::Usart2>();
 		process_buffer<ReceiverState::Idle>();
-
-		led.toggle();
 	}
 }
