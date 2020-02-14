@@ -190,4 +190,17 @@ constexpr auto get_interrupt_flag() noexcept {
 	}
 }
 
+template <Port InputPort, InterruptFlag Flag>
+constexpr auto clear_interrupt_flag() noexcept {
+	if constexpr (Flag != InterruptFlag::LBD || Flag != InterruptFlag::CTS) {
+		if constexpr (Flag == InterruptFlag::PE) {
+			wait_rx_not_empty<InputPort>();
+		}
+		[[gnu::unused]] auto const temp_sr = get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::IDLE>(ValueOnly));
+		[[gnu::unused]] auto const temp_dr = get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
+	} else {
+		// @TODO finish in the future
+	}
+}
+
 }	 // namespace cpp_stm32::usart

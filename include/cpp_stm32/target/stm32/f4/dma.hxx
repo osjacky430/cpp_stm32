@@ -29,7 +29,10 @@
 namespace cpp_stm32::dma {
 
 /**
- * [clear_interrupt_flag description]
+ * @brief 	This function clears the interrupt flags
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @tparam 	Flags @ref dma::InterruptFlag
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 constexpr void clear_interrupt_flag() noexcept {
@@ -114,8 +117,10 @@ constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
 }
 
 /**
- * [set_periph_data_size description]
- * @param t_size [description]
+ * @brief 	This function sets peripheral data size
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_size 	@ref dma::DataSize
  */
 template <Port DMA, Stream Str>
 constexpr void set_periph_data_size(DataSize const& t_size) noexcept {
@@ -123,7 +128,9 @@ constexpr void set_periph_data_size(DataSize const& t_size) noexcept {
 }
 
 /**
- * [enable_tx_complete_irq description]
+ * @brief 	This function enables memory increment mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void enable_mem_increment() noexcept {
@@ -131,7 +138,9 @@ constexpr void enable_mem_increment() noexcept {
 }
 
 /**
- * [disable_mem_increment description]
+ * @brief 	This function disables memoy increment mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void disable_mem_increment() noexcept {
@@ -139,7 +148,9 @@ constexpr void disable_mem_increment() noexcept {
 }
 
 /**
- * [enable_periph_increment description]
+ * @brief 	This function enables peripheral increment mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void enable_periph_increment() noexcept {
@@ -147,16 +158,19 @@ constexpr void enable_periph_increment() noexcept {
 }
 
 /**
- * [disable_periph_increment description]
+ * @brief 	This function disables peripheral increment mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void disable_periph_increment() noexcept {
 	reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::PINC>();
-
-}	 // namespace cpp_stm32::dma
+}
 
 /**
- * [enable_periph_fix_increment description]
+ * @brief 	This function set peripheral increment type to fix increment
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void enable_periph_fix_increment() noexcept {
@@ -164,7 +178,9 @@ constexpr void enable_periph_fix_increment() noexcept {
 }
 
 /**
- * [enable_circular_mode description]
+ * @brief 	This function enables circular mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void enable_circular_mode() noexcept {
@@ -172,8 +188,10 @@ constexpr void enable_circular_mode() noexcept {
 }
 
 /**
- * [channel_select description]
- * @param t_ch [description]
+ * @brief 	This function set the channel select of DMA
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_cj 	@ref dma::Channel
  */
 template <Port DMA, Stream Str>
 constexpr void channel_select(Channel const& t_ch) noexcept {

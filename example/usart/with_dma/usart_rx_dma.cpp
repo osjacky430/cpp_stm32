@@ -50,20 +50,6 @@ constexpr void setup_dma() noexcept {
 	Rcc::enable_periph_clk<Rcc::PeriphClk::Dma1>();
 	Nvic::enable_irq<cpp_stm32::IrqNum::Dma1Stream5Global>();
 
-	// reset<DMA, Str>();
-	// set_tx_mode<DMA, Str>(TransferDir::PeriphToMem);
-	// set_tx_data_num<DMA, Str>(5);
-	// channel_select<DMA, Str>(Channel::Channel4);
-	// set_memory_data_size<DMA, Str>(DataSize::Byte);
-	// set_periph_data_size<DMA, Str>(DataSize::Byte);
-	// enable_mem_increment<DMA, Str>();
-	// enable_circular_mode<DMA, Str>();
-	// set_address<DMA, Str>(MemoryAddress_t{(std::uintptr_t)m_addr});
-	// set_address<DMA, Str>(PeriphAddress_t{p_addr});
-	// set_priority<DMA, Str>(StreamPriority::Low);
-	// enable_irq<DMA, Str, InterruptFlag::TCI>();
-	// enable<DMA, Str>();
-
 	Dma::DmaBuilder<DMA, Str>()
 		.transferDir(Dma::PeriphAddress_t{p_addr}, Dma::MemoryAddress_t{(std::uintptr_t)m_addr})
 		.txDataNum(5)
