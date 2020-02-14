@@ -199,8 +199,10 @@ constexpr void channel_select(Channel const& t_ch) noexcept {
 }
 
 /**
- * [set_memory_burst description]
- * @param t_bs [description]
+ * @brief 	This function set memory burst size
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_bs 	@ref dma::BurstSize
  */
 template <Port DMA, Stream Str>
 constexpr void set_memory_burst(BurstSize const& t_bs) noexcept {
@@ -208,8 +210,10 @@ constexpr void set_memory_burst(BurstSize const& t_bs) noexcept {
 }
 
 /**
- * [set_memory_burst description]
- * @param t_bs [description]
+ * @brief 	This function set peripheral burst size
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_bs  @ref dma::BurstSize
  */
 template <Port DMA, Stream Str>
 constexpr void set_periph_burst(BurstSize const& t_bs) noexcept {
@@ -217,7 +221,10 @@ constexpr void set_periph_burst(BurstSize const& t_bs) noexcept {
 }
 
 /**
- * [set_current_target description]
+ * @brief 	This function set current target in double buffer mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_mem		memory target, 0 for M0 and 1 for M1, see @ref reg::SxM0AR and @ref reg::SxM1AR
  */
 template <Port DMA, Stream Str>
 constexpr void double_buffer_set_target(std::uint8_t const& t_mem) noexcept {
@@ -225,8 +232,10 @@ constexpr void double_buffer_set_target(std::uint8_t const& t_mem) noexcept {
 }
 
 /**
- * [set_mem_addr description]
- * @param t_mem_addr [description]
+ * @brief 	This function set DMA memory address
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_mem_addr memory address, @see dma::MemoryAddress_t
  */
 template <Port DMA, Stream Str>
 constexpr void set_address(MemoryAddress_t const& t_mem_addr) noexcept {
@@ -234,8 +243,10 @@ constexpr void set_address(MemoryAddress_t const& t_mem_addr) noexcept {
 }
 
 /**
- * [set_mem_addr description]
- * @param t_mem_addr [description]
+ * @brief 	This function set DMA memory address in double buffer mode
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_mem_addr memory address 0 and memory address 1, @see dma::MemoryAddress_t
  */
 template <Port DMA, Stream Str>
 constexpr void set_address(MemoryAddress_t const& t_mem0, MemoryAddress_t const& t_mem1) noexcept {
@@ -244,8 +255,10 @@ constexpr void set_address(MemoryAddress_t const& t_mem0, MemoryAddress_t const&
 }
 
 /**
- * [set_address description]
- * @param t_periph_addr [description]
+ * @brief 	This function set DMA peripheral address
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_mem_addr memory address, @see Register::memAddr, dma::PeriphAddress_t
  */
 template <Port DMA, Stream Str>
 constexpr void set_address(PeriphAddress_t const& t_periph_addr) noexcept {
@@ -253,8 +266,10 @@ constexpr void set_address(PeriphAddress_t const& t_periph_addr) noexcept {
 }
 
 /**
- * [set_tx_data_num description]
- * @param t_num [description]
+ * @brief 	This function set number of data to transfer of DMA
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @param 	t_num 	number between 0 and 65535
  */
 template <Port DMA, Stream Str>
 constexpr void set_tx_data_num(std::uint16_t const& t_num) noexcept {
@@ -262,8 +277,10 @@ constexpr void set_tx_data_num(std::uint16_t const& t_num) noexcept {
 }
 
 /**
- * [get_tx_data_num description]
- * @return [description]
+ * @brief 	This function returns number of data to transfer of DMA
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ * @return  number between 0 and 65535
  */
 template <Port DMA, Stream Str>
 [[nodiscard]] constexpr auto get_tx_data_num() noexcept {
@@ -272,38 +289,40 @@ template <Port DMA, Stream Str>
 
 /**
  * @brief   This function clears transfer complete interrupt flag
- * @tparam  Port    ::Port
- * @tparam  Stream  ::Stream
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr auto clear_tx_complete_flag = clear_interrupt_flag<DMA, Str, InterruptFlag::TCI>;
 
 /**
  * @brief   This function get transfer complete interrupt flag
- * @tparam  Port    ::Port
- * @tparam  Stream  ::Stream
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr auto get_tx_complete_flag = get_interrupt_flag<DMA, Str, InterruptFlag::TCI>;
 
 /**
  * @brief   This function clears half transfer interrupt flag
- * @tparam  Port    ::Port
- * @tparam  Stream  ::Stream
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr auto clear_half_tx_flag = clear_interrupt_flag<DMA, Str, InterruptFlag::HTI>;
 
 /**
  * @brief   This function get half transfer interrupt flag
- * @tparam  Port    ::Port
- * @tparam  Stream  ::Stream
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr auto get_half_tx_flag = get_interrupt_flag<DMA, Str, InterruptFlag::HTI>;
 
 /**
- * [enable description]
+ * @brief 	This fi=unction disables DMA
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void disable() noexcept {
@@ -311,7 +330,9 @@ constexpr void disable() noexcept {
 }
 
 /**
- * [enable description]
+ * @brief 	This function enables DMA
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str>
 constexpr void enable() noexcept {
@@ -319,8 +340,8 @@ constexpr void enable() noexcept {
 }
 
 /**
- * [is_irq_enabled description]
- * @return [description]
+ * @brief 	This function return DMA interrupt status
+ * @return  non zero value -> true , zero -> false
  */
 template <Port DMA, Stream Str, InterruptFlag Flag>
 constexpr auto is_irq_enabled() noexcept {
@@ -344,6 +365,8 @@ constexpr void enable_direct_mode() noexcept {
 
 /**
  *  @brief  This function disables dma direct mode
+ *  @tparam 	DMA 	@ref dma::Port
+ *  @tparam 	Str 	@ref dma::Stream
  *
  *  @note    DMDIS = 0 --> Direct mode is NOT disabled (i.e. enabled)
  *           DMDIS = 1 --> Direct mode is disabled (i.e. disabled)
@@ -354,7 +377,11 @@ constexpr void disable_direct_mode() noexcept {
 }
 
 /**
- * [reset description]
+ * @brief 	This function resete all dma register to its default value
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ *
+ * @note		The stream may take time to be disabled (ongoing transfer is completed first).
  */
 template <Port DMA, Stream Str>
 constexpr void reset() noexcept {
@@ -376,7 +403,8 @@ constexpr void reset() noexcept {
 
 /**
  * 	@brief 		This function enables the interrupt of dma
- * 	@tparam 	Port
+ *  @tparam 	DMA 	@ref dma::Port
+ *  @tparam 	Str 	@ref dma::Stream
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 constexpr void enable_irq() noexcept {
@@ -395,6 +423,9 @@ constexpr void enable_irq() noexcept {
 
 /**
  * @class 	 DmaBuilder
+ * @tparam 	DMA 	@ref dma::Port
+ * @tparam 	Str 	@ref dma::Stream
+ *
  * @brief 	 Builder class that offers alternative ways to setup DMA
  *
  * @todo 		 reduce overhead as mush as possible
