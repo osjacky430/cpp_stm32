@@ -39,5 +39,14 @@ set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
 set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
       Change to your target processor ^^^^^^^^^^
 ```
+**UPDATE: input file is added for command line configuration, still experimenting.** The basic usage will be:
+```
+export PATH="$PATH:/path/to/arm-none-eabi-gcc/bin"
+git clone https://github.com/osjacky430/cpp_stm32
+mkdir build && cd build
+cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
+cmake --build ./
+```
+
 ### Tunable Options
 Currently Under construction...

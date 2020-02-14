@@ -1,0 +1,12 @@
+###################################################
+#                 target MCU path                 #
+###################################################
+set(PROCESSOR_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/processor")
+set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
+set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
+set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
+
+###################################################
+#               MCU compile options               #
+###################################################
+set(BOARD_FLAGS -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mcpu=cortex-m4)

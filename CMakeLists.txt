@@ -1,7 +1,10 @@
 ###################################################
 #                cpp_stm32 library                #
 ###################################################
-cmake_minimum_required(VERSION 3.11.4...3.16.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15.2...3.16.1 FATAL_ERROR)
+
+set(TARGET_BOARD "stm32f446re" CACHE STRING "Target MCU")
+include(${CMAKE_SOURCE_DIR}/board/${TARGET_BOARD}.in)
 
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
 project(cpp_stm32 DESCRIPTION "Pure c++17 implementation of stm32 driver"
@@ -9,19 +12,8 @@ project(cpp_stm32 DESCRIPTION "Pure c++17 implementation of stm32 driver"
                   LANGUAGES CXX)
 
 ###################################################
-#                 target MCU path                 #
-###################################################
-set(PROCESSOR_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/processor")
-
-set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
-set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
-set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
-
-###################################################
 #             library compile options             #
 ###################################################
-# MCU specific compiler flags, see https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html
-set(STM32F4_FLAGS -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mcpu=cortex-m4)
 set(WARNING_FLAGS -Wall -Wextra -Wredundant-decls -Wundef -Wshadow)
 set(OPTIMIZATION_FLAGS -ffunction-sections -fno-common -fdata-sections -Os)
 set(CXX_FEATURE_FLAGS -fno-exceptions -fno-rtti)
@@ -38,17 +30,17 @@ target_sources(cpp_stm32
 )
 target_include_directories(cpp_stm32
   INTERFACE
-    ${CMAKE_SOURCE_DIR}/../src
+    ${CMAKE_SOURCE_DIR}/src
   PUBLIC
     ${TARGET_DIR}
-    ${CMAKE_SOURCE_DIR}/../include/
+    ${CMAKE_SOURCE_DIR}/include/
 )
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_compile_features(cpp_stm32 PUBLIC cxx_std_17)
 target_compile_options(cpp_stm32
   PUBLIC
     ${WARNING_FLAGS}
-    ${STM32F4_FLAGS}
+    ${BOARD_FLAGS}
     ${OPTIMIZATION_FLAGS}
     ${CXX_FEATURE_FLAGS}
     ${UTILITY_FLAGS}
@@ -56,10 +48,17 @@ target_compile_options(cpp_stm32
 )
 target_link_options(cpp_stm32
   INTERFACE
-    ${STM32F4_FLAGS}
+    ${BOARD_FLAGS}
     ${NEWLIB_FLAGS}
     -nostartfiles
     "SHELL: ${LINKER_SCRIPT}"
     "SHELL: -Xlinker --print-memory-usage"
     "SHELL: -Xlinker -Map=linker_output.map"
 )
+
+###################################################
+#        link library to application exampe       #
+###################################################
+# add_executable(main.elf ${CMAKE_SOURCE_DIR}/src/main.cpp)
+# target_link_libraries(main.elf PRIVATE cpp_stm32)
+# add_custom_target(main.bin ALL ${CMAKE_OBJCOPY} -Obinary main.elf main.bin DEPENDS main.elf)
