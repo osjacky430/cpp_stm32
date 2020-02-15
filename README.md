@@ -23,9 +23,6 @@ mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 cmake --build ./
 ```
-
-The driver has ```main.cpp``` in ```src``` directory, which contains a small example code, to make sure that the driver can be built and link correctly. (todo: move them to example file in the future)
-
 To build with your MCU, you need to modify the following file: (todo: config via command line input)
 - CMakeLists.txt: change ```TARGET_DIR```, ```LINKER_SCRIPT``` and ```TARGET_PROCESSOR```
 
@@ -42,11 +39,14 @@ set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
 **UPDATE: input file is added for command line configuration, still experimenting.** The basic usage will be:
 ```
 export PATH="$PATH:/path/to/arm-none-eabi-gcc/bin"
-git clone https://github.com/osjacky430/cpp_stm32
 mkdir build && cd build
 cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
 cmake --build ./
 ```
+(Todo: add build example)
 
 ### Tunable Options
+Currently Under construction...
+
+### Link library to your application
 Currently Under construction...
