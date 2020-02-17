@@ -40,12 +40,13 @@ target_include_directories(cpp_stm32
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_compile_features(cpp_stm32 PUBLIC cxx_std_17)
 target_compile_options(cpp_stm32
-  PUBLIC
+  PRIVATE
     ${WARNING_FLAGS}
+    ${UTILITY_FLAGS}
+  PUBLIC
     ${BOARD_FLAGS}
     ${OPTIMIZATION_FLAGS}
     ${CXX_FEATURE_FLAGS}
-    ${UTILITY_FLAGS}
     ${NEWLIB_FLAGS}
 )
 target_link_options(cpp_stm32

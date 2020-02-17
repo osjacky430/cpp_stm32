@@ -1,5 +1,8 @@
 #pragma once
 
+// @TODO need to deal with false case
+#define COMPILE_TIME_CLOCK_CONFIG true /*!< If the project doesn't change clock speed during runtime, set to true*/
+
 #define MHz *1000000U
 
 #define HSE_CLK_FREQ (8 MHz)

@@ -80,6 +80,7 @@ static constexpr auto Atomic = Atomic_t<b>{};
  * @tparam	Access			Access flag indicating whicj MMIO operation is suitable to read/write
  *
  * @note		Need to add some sfinae or static_assert to ensure the user don't mess up with it
+ * @todo 		Consider policy base implementation?
  */
 template <typename BitList, typename BitListIdx, Access IoOp = Access::Word | Access::HalfWord | Access::Byte,
 					bool atomicity = false>

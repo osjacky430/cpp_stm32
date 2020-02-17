@@ -8,7 +8,7 @@ Currently, the driver only support (not fully):
 - stm32f746ng (in the future)
 
 ## Getting Started
-
+These instructions will get you a copy of the project up and running on your target board.
 ### Prerequisites
 cpp_stm32 requires the following things to be installed:
 - C++17 compiler: the driver is tested with arm-none-eabi-gcc 9.2.1 and arm-none-eabi-gcc 8.3.1, you can download the compiler from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
@@ -44,7 +44,8 @@ cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
 cmake --build ./
 ```
 (Todo: add build example)
-
+### System Clock Configuration File
+Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)
 ### Tunable Options
 Currently Under construction...
 

@@ -412,13 +412,15 @@ constexpr void enable_irq() noexcept {
 		reg::SxFCR<DMA, Str>.template setBit<reg::SxFCRField::FEIE>();
 	}
 
-	constexpr auto get_rest_irq_flags = [](auto const& t_flag) {
-		if (t_flag != InterruptFlag::FEI) {
-			return reg::SxCRField{t_flag};
-		}
-	};
+	if constexpr (sizeof...(Flags) > 1) {
+		constexpr auto get_rest_irq_flags = [](auto const& t_flag) {
+			if (t_flag != InterruptFlag::FEI) {
+				return reg::SxCRField{t_flag};
+			}
+		};
 
-	reg::SxCR<DMA, Str>.template setBit<get_rest_irq_flags(Flags)...>();
+		reg::SxCR<DMA, Str>.template setBit<get_rest_irq_flags(Flags)...>();
+	}
 }
 
 /**
@@ -468,10 +470,6 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	bool m_halfTransferIrq{false};
 	bool m_transferCompleteIrq{false};
 
-	/**
-	 * [resetDMA description]
-	 * @return [description]
-	 */
 	static constexpr void resetDMA() noexcept {
 		reg::SxCR<DMA, Str>.template clearBit<reg::SxCRField::EN>();
 
