@@ -23,7 +23,7 @@
 #pragma once
 
 #include "cpp_stm32/common/usart.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
+#include "cpp_stm32/target/stm32/f4/register/usart.hxx"
 
 #include "sys_info.hpp"
 

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 /**
  * @namespace  cpp_stm32::gpio
  * @brief      General Purpose Input Output Namespace
@@ -28,7 +30,7 @@ namespace cpp_stm32::gpio {
  *          differs from Manufacture to Manufacture, e.g., for STMicroelectronics, the
  *          port is named in alphabetic order; for TI, the port is named in numeric order.
  */
-enum class Port;
+enum class Port : std::uint8_t;
 
 /**
  * @enum    Pin
@@ -36,13 +38,13 @@ enum class Port;
  *          Manufacture to Manufacture, e.g., for STMicroelectronics, a port contains 16 pins
  *          , as for TI, a port contains 8 pins.
  */
-enum class Pin;
+enum class Pin : std::uint8_t;
 
-enum class Mode;
-enum class Pupd;
-enum class OutputType;
-enum class OutputSpeed;
-enum class AltFunc;
+enum class Mode : std::uint8_t;
+enum class Pupd : std::uint8_t;
+enum class OutputType : std::uint8_t;
+enum class OutputSpeed : std::uint8_t;
+enum class AltFunc : std::uint8_t;
 
 enum class PinName;
 

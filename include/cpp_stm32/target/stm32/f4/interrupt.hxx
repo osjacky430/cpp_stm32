@@ -43,7 +43,7 @@
 		Interrupt<IrqNum::I2c1Er>::interrupt, Interrupt<IrqNum::I2c2Ev>::interrupt, Interrupt<IrqNum::I2c2Er>::interrupt, \
 		Interrupt<IrqNum::Spi1Global>::interrupt, Interrupt<IrqNum::Spi2Global>::interrupt,                               \
 		Interrupt<IrqNum::Usart1Global>::interrupt, Interrupt<IrqNum::Usart2Global>::interrupt,                           \
-		Interrupt<IrqNum::Usart3Global>::interrupt, Interrupt<IrqNum::Exti5_10>::interrupt
+		Interrupt<IrqNum::Usart3Global>::interrupt, Interrupt<IrqNum::Exti10_15>::interrupt
 
 #define NVIC_IRQ_NUM 96
 
@@ -89,7 +89,7 @@ void spi2() noexcept;
 void usart1() noexcept;
 void usart2() noexcept;
 void usart3() noexcept;
-void exti5_10() noexcept;
+void exti10_15() noexcept;
 
 static constexpr auto IRQ_TABLE = std::array{
 	wwdg,					 pvd,						tamp_stamp,
@@ -105,7 +105,7 @@ static constexpr auto IRQ_TABLE = std::array{
 	tim4,					 i2c1_ev,				i2c1_er,
 	i2c2_ev,			 i2c2_er,				spi1,
 	spi2,					 usart1,				usart2,
-	usart3,				 exti5_10,
+	usart3,				 exti10_15,
 };
 
 }	 // namespace cpp_stm32::interrupt
@@ -153,7 +153,7 @@ enum class IrqNum : std::uint8_t {
 	Usart1Global,
 	Usart2Global,
 	Usart3Global,
-	Exti5_10,
+	Exti10_15,
 	NvicIrqTotal
 };
 

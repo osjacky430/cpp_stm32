@@ -26,7 +26,8 @@
 
 #include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/detail/builder.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/gpio_reg.hxx"
+
+#include "cpp_stm32/target/stm32/f4/register/gpio.hxx"
 
 /**
  * @namespace cpp_stm32::gpio

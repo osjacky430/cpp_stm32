@@ -59,7 +59,7 @@ namespace cpp_stm32::interrupt {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart1() noexcept;
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart2() noexcept;
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void usart3() noexcept;
-[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti5_10() noexcept;
+[[gnu::weak, gnu::alias("_Z12null_handlerv")]] void exti10_15() noexcept;
 
 }	 // namespace cpp_stm32::interrupt
 

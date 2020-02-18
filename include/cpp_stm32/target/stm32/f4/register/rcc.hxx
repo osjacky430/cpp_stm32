@@ -23,7 +23,7 @@
 #include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+#include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
 
 #include "cpp_stm32/utility/integral_constant.hxx"
 
@@ -91,6 +91,7 @@ enum class PeriphClk : std::uint32_t {
 	/*AHB1*/
 	GpioA,
 	GpioB,
+	GpioC,
 	/*GpioC ~ GpioF*/
 
 	Dma1,
@@ -106,6 +107,7 @@ enum class PeriphClk : std::uint32_t {
 	/*APB2*/
 	Usart1,
 	Usart6,
+	SysCfg,
 };
 
 enum class ClkSrc : std::uint32_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
@@ -241,9 +243,9 @@ static constexpr Register<RccApb1RstInfo, Apb1RstBit> APB1RST{BASE_ADDR, 0x20U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}})
+SETUP_REGISTER_INFO(RccApb2RstInfo, Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}}, Binary<>{BitPos_t{14}})
 
-enum class Apb2RstBit { Usart1Rst, Usart6Rst };
+enum class Apb2RstBit { Usart1Rst, Usart6Rst, SysCfgRst };
 
 static constexpr Register<RccApb2RstInfo, Apb2RstBit> APB2RST{BASE_ADDR, 0x24U};
 
@@ -302,9 +304,12 @@ static constexpr Register<RccApb1EnrInfo, Apb1EnrBit> APB1ENR{BASE_ADDR, 0x40U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}}, Binary<>{BitPos_t{5}})
+SETUP_REGISTER_INFO(RccApb2EnrInfo, Binary<>{BitPos_t{4}},	// Usart1
+										Binary<>{BitPos_t{5}},									// Usart6
+										Binary<>{BitPos_t{14}}									// SysCfg
+)
 
-enum class Apb2EnrBit { Usart1En, Usart6En };
+enum class Apb2EnrBit { Usart1En, Usart6En, SysCfgEn };
 
 static constexpr Register<RccApb2EnrInfo, Apb2EnrBit> APB2ENR{BASE_ADDR, 0x44U};
 

@@ -73,21 +73,34 @@ template <bool b>
 static constexpr auto Atomic = Atomic_t<b>{};
 
 /**
+ *
+ */
+template <typename BitListIdx>
+struct DefaultIdxPolicy {
+	static constexpr auto TO_IDX(BitListIdx const t_idx) noexcept { return to_underlying(t_idx); }
+};
+
+/**
+ *
+ */
+static constexpr auto DefaultAccess = Access::Word | Access::HalfWord | Access::Byte;
+
+/**
  * @class 	Register
  * @brief		This class is abstraction of register.
  * @tparam  BitList			List of bit in the register, see @ref Bit
  * @tparam	BitListIdx	The way to index through the list of bit, this should be a scoped enum.
- * @tparam	Access			Access flag indicating whicj MMIO operation is suitable to read/write
+ * @tparam	Access			Access flag indicating which MMIO operation is suitable to read/write
  *
  * @note		Need to add some sfinae or static_assert to ensure the user don't mess up with it
  * @todo 		Consider policy base implementation?
  */
-template <typename BitList, typename BitListIdx, Access IoOp = Access::Word | Access::HalfWord | Access::Byte,
-					bool atomicity = false>
+template <typename BitList, typename BitListIdx, Access IoOp = DefaultAccess, bool atomicity = false,
+					typename IdxPolicy = DefaultIdxPolicy<BitListIdx>>
 class Register {
  private:
 	template <BitListIdx Idx>
-	static constexpr auto GET_BIT = get_bit<BitList, to_underlying(Idx)>;
+	static constexpr auto GET_BIT = get_bit<BitList, IdxPolicy::TO_IDX(Idx)>;
 
 	template <BitListIdx Idx>
 	using BitIdx_c = std::integral_constant<BitListIdx, Idx>;

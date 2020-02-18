@@ -21,8 +21,9 @@
 #include <utility>
 
 #include "cpp_stm32/common/rcc.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map.hxx"
+
+#include "cpp_stm32/target/stm32/f4/register/rcc.hxx"
 
 namespace cpp_stm32::rcc {
 
@@ -128,4 +129,4 @@ static constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE co
 	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc

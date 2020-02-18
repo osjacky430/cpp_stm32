@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cpp_stm32/target/stm32/f4/memory/pwr_reg.hxx"
+#include "cpp_stm32/target/stm32/f4/register/pwr.hxx"
 
 namespace cpp_stm32::pwr {
 

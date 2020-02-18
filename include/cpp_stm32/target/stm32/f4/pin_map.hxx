@@ -22,11 +22,12 @@
 
 #include "cpp_stm32/utility/literal_op.hxx"
 
-#include "cpp_stm32/target/stm32/f4/dma.hxx"
-#include "cpp_stm32/target/stm32/f4/gpio.hxx"
+#include "cpp_stm32/target/stm32/f4/define/dma.hxx"
+#include "cpp_stm32/target/stm32/f4/define/gpio.hxx"
+
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/rcc_reg.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/usart_reg.hxx"
+#include "cpp_stm32/target/stm32/f4/register/rcc.hxx"
+#include "cpp_stm32/target/stm32/f4/register/usart.hxx"
 
 #define SET_USART_TX_DATA(pinname, usart)                                                                         \
 	UsartPinData {                                                                                                  \
@@ -155,14 +156,47 @@ class PinMap {
 	static constexpr auto PinTable = []() {
 		std::array<PortPinPair, to_underlying(PinName::Total)> temp{};
 
+		/* GPIO A */
 		temp[to_underlying(PinName::PA_1)] = PortPinPair{Port::PortA, Pin::Pin1};
 		temp[to_underlying(PinName::PA_2)] = PortPinPair{Port::PortA, Pin::Pin2};
 		temp[to_underlying(PinName::PA_3)] = PortPinPair{Port::PortA, Pin::Pin3};
 		temp[to_underlying(PinName::PA_5)] = PortPinPair{Port::PortA, Pin::Pin5};
 
-		temp[to_underlying(PinName::PB_1)] = PortPinPair{Port::PortB, Pin::Pin1};
-		temp[to_underlying(PinName::PB_2)] = PortPinPair{Port::PortB, Pin::Pin2};
-		temp[to_underlying(PinName::PB_3)] = PortPinPair{Port::PortB, Pin::Pin3};
+		/* GPIO B */
+		temp[to_underlying(PinName::PB_0)]	= PortPinPair{Port::PortB, Pin::Pin0};
+		temp[to_underlying(PinName::PB_1)]	= PortPinPair{Port::PortB, Pin::Pin1};
+		temp[to_underlying(PinName::PB_2)]	= PortPinPair{Port::PortB, Pin::Pin2};
+		temp[to_underlying(PinName::PB_3)]	= PortPinPair{Port::PortB, Pin::Pin3};
+		temp[to_underlying(PinName::PB_4)]	= PortPinPair{Port::PortB, Pin::Pin4};
+		temp[to_underlying(PinName::PB_5)]	= PortPinPair{Port::PortB, Pin::Pin5};
+		temp[to_underlying(PinName::PB_6)]	= PortPinPair{Port::PortB, Pin::Pin6};
+		temp[to_underlying(PinName::PB_7)]	= PortPinPair{Port::PortB, Pin::Pin7};
+		temp[to_underlying(PinName::PB_8)]	= PortPinPair{Port::PortB, Pin::Pin8};
+		temp[to_underlying(PinName::PB_9)]	= PortPinPair{Port::PortB, Pin::Pin9};
+		temp[to_underlying(PinName::PB_10)] = PortPinPair{Port::PortB, Pin::Pin10};
+		temp[to_underlying(PinName::PB_11)] = PortPinPair{Port::PortB, Pin::Pin11};
+		temp[to_underlying(PinName::PB_12)] = PortPinPair{Port::PortB, Pin::Pin12};
+		temp[to_underlying(PinName::PB_13)] = PortPinPair{Port::PortB, Pin::Pin13};
+		temp[to_underlying(PinName::PB_14)] = PortPinPair{Port::PortB, Pin::Pin14};
+		temp[to_underlying(PinName::PB_15)] = PortPinPair{Port::PortB, Pin::Pin15};
+
+		/* GPIO C */
+		temp[to_underlying(PinName::PC_0)]	= PortPinPair{Port::PortC, Pin::Pin0};
+		temp[to_underlying(PinName::PC_1)]	= PortPinPair{Port::PortC, Pin::Pin1};
+		temp[to_underlying(PinName::PC_2)]	= PortPinPair{Port::PortC, Pin::Pin2};
+		temp[to_underlying(PinName::PC_3)]	= PortPinPair{Port::PortC, Pin::Pin3};
+		temp[to_underlying(PinName::PC_4)]	= PortPinPair{Port::PortC, Pin::Pin4};
+		temp[to_underlying(PinName::PC_5)]	= PortPinPair{Port::PortC, Pin::Pin5};
+		temp[to_underlying(PinName::PC_6)]	= PortPinPair{Port::PortC, Pin::Pin6};
+		temp[to_underlying(PinName::PC_7)]	= PortPinPair{Port::PortC, Pin::Pin7};
+		temp[to_underlying(PinName::PC_8)]	= PortPinPair{Port::PortC, Pin::Pin8};
+		temp[to_underlying(PinName::PC_9)]	= PortPinPair{Port::PortC, Pin::Pin9};
+		temp[to_underlying(PinName::PC_10)] = PortPinPair{Port::PortC, Pin::Pin10};
+		temp[to_underlying(PinName::PC_11)] = PortPinPair{Port::PortC, Pin::Pin11};
+		temp[to_underlying(PinName::PC_12)] = PortPinPair{Port::PortC, Pin::Pin12};
+		temp[to_underlying(PinName::PC_13)] = PortPinPair{Port::PortC, Pin::Pin13};
+		temp[to_underlying(PinName::PC_14)] = PortPinPair{Port::PortC, Pin::Pin14};
+		temp[to_underlying(PinName::PC_15)] = PortPinPair{Port::PortC, Pin::Pin15};
 
 		return temp;
 	}();
@@ -187,6 +221,7 @@ class ClkRegMap {
 		/*AHB1*/
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::GpioARst},
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::GpioBRst},
+		std::pair{reg::AHB1RST, reg::Ahb1RstBit::GpioCRst},
 
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::Dma1Rst},
 		std::pair{reg::AHB1RST, reg::Ahb1RstBit::Dma2Rst},
@@ -200,12 +235,14 @@ class ClkRegMap {
 		/*APB2*/
 		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart1Rst},
 		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart6Rst},
+		std::pair{reg::APB2RST, reg::Apb2RstBit::SysCfgRst},
 	};
 
 	static constexpr std::tuple PERIPH_CLK_EN_TABLE{
 		/*AHB1*/
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::GpioAEn},
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::GpioBEn},
+		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::GpioCEn},
 
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::Dma1En},
 		std::pair{reg::AHB1ENR, reg::Ahb1EnrBit::Dma2En},
@@ -219,6 +256,7 @@ class ClkRegMap {
 		/*APB2*/
 		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart1En},
 		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart6En},
+		std::pair{reg::APB2ENR, reg::Apb2EnrBit::SysCfgEn},
 	};
 
 	static constexpr std::tuple OSC_ON_TABLE{

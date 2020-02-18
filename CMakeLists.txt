@@ -70,7 +70,9 @@ target_link_options(cpp_stm32
 ###################################################
 if (${BUILD_DOC})
   find_package(Doxygen)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/documentation/)
+  if (DOXYGEN_FOUND)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/documentation/)
+  endif()
 endif()
 
 ###################################################

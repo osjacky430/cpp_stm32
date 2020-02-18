@@ -18,9 +18,9 @@
 
 #include <cstdint>
 
-namespace cpp_stm32::stm32::f4 {
+namespace cpp_stm32::scb {
 
-class [[gnu::packed]] ScbExceptionStackFrame {
+class [[gnu::packed]] ExceptionStackFrame {
 	std::uint32_t r0;
 	std::uint32_t r1;
 	std::uint32_t r2;
@@ -32,6 +32,6 @@ class [[gnu::packed]] ScbExceptionStackFrame {
 	std::uint32_t xpsr;
 };
 
-constexpr void scb_set_priority_grouping() noexcept {}
+constexpr void set_priority_grouping() noexcept {}
 
-}	 // namespace cpp_stm32::stm32::f4
+}	 // namespace cpp_stm32::scb

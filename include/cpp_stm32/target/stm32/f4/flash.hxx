@@ -19,7 +19,7 @@
 #include <array>
 #include <tuple>
 
-#include "cpp_stm32/target/stm32/f4/memory/flash_reg.hxx"
+#include "cpp_stm32/target/stm32/f4/register/flash.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
@@ -101,4 +101,4 @@ constexpr void config_access_ctl(Latency const& t_cpu) noexcept {
 	reg::ACR.template writeBit<reg::AcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
-}	// namespace cpp_stm32::flash
+}	 // namespace cpp_stm32::flash

@@ -1,5 +1,5 @@
 /**
- * @file  stm32/f4/memory/gpio_reg.hxx
+ * @file  stm32/f4/register/gpio_reg.hxx
  * @brief	This file contains gpio registers.
  */
 
@@ -25,56 +25,11 @@
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/memory_map.hxx"
+
+#include "cpp_stm32/target/stm32/f4/define/gpio.hxx"
+#include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
 
 #include "cpp_stm32/detail/index_interval.hxx"
-
-namespace cpp_stm32::gpio {
-
-enum class Port { PortA, PortB, PortC, PortD, PortE, PortF, PortG, PortH, Total };
-
-enum class Pin {
-	Pin0,
-	Pin1,
-	Pin2,
-	Pin3,
-	Pin4,
-	Pin5,
-	Pin6,
-	Pin7,
-	Pin8,
-	Pin9,
-	Pin10,
-	Pin11,
-	Pin12,
-	Pin13,
-	Pin14,
-	Pin15,
-	Total
-};
-
-/**
- * @enum 	Mode
- * @brief	Gpio Mode
- */
-enum class Mode {
-	Input,	 /*!< Input mode */
-	Output,	 /*!< Output mode */
-	AltFunc, /*!< Alternate Function mode*/
-	Analog	 /*!< Analog mode*/
-};
-
-enum class Pupd { None, PullUp, PullDown };
-enum class OutputType { PushPull, OpenDrain };
-enum class OutputSpeed { Low, Medium, Fast, High };
-enum class AltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15 };
-
-/**
- * @enum  PinName
- */
-enum class PinName { PA_1, PA_2, PA_3, PA_5, PB_1, PB_2, PB_3, Total, NC };
-
-}	 // namespace cpp_stm32::gpio
 
 namespace cpp_stm32::gpio::reg {
 

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "cpp_stm32/common/dma.hxx"
 #include "cpp_stm32/detail/builder.hxx"
-#include "cpp_stm32/target/stm32/f4/memory/dma_reg.hxx"
+
+#include "cpp_stm32/target/stm32/f4/register/dma.hxx"
 
 namespace cpp_stm32::dma {
 

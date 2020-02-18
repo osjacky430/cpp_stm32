@@ -33,6 +33,7 @@ struct IdxIntervalImpl<interval, start, start, seq...> {
 
 template <std::size_t start, std::size_t end, std::size_t interval>
 struct IdxInterval {
+	// static_assert((end - start + 1) % interval == 0);
 	using IdxIntervalType = typename IdxIntervalImpl<interval, start, end - interval, end>::IdxIntervalType;
 };
 
