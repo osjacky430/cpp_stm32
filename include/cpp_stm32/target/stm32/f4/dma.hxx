@@ -88,9 +88,12 @@ template <Port DMA, Stream Str>
  * @tparam 		DMA 		@ref dma::Port
  * @tparam		Str			@ref dma::Stream
  * @param 		t_dir 	@ref dma::TransferDir
+ *
+ * @note 			Mem to mem transfer mode is only availabe when DMA == Port::DMA2
+ * @todo 			Improve static checking
  */
 template <Port DMA, Stream Str>
-constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
+constexpr void set_tx_mode(TransferDir const t_dir) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::DIR>(t_dir);
 }
 
@@ -101,7 +104,7 @@ constexpr void set_tx_mode(TransferDir const& t_dir) noexcept {
  * @param 		t_prior	@ref dma::StreamPriority
  */
 template <Port DMA, Stream Str>
-constexpr void set_priority(StreamPriority const& t_prior) noexcept {
+constexpr void set_priority(StreamPriority const t_prior) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PL>(t_prior);
 }
 
@@ -110,9 +113,11 @@ constexpr void set_priority(StreamPriority const& t_prior) noexcept {
  * @tparam 		DMA 		@ref dma::Port
  * @tparam		Str			@ref dma::Stream
  * @param 		size  	@ref dma::DataSize
+ *
+ * @note 			In direct mode, set memory data size is useless, only peripheral data size is relevant
  */
 template <Port DMA, Stream Str>
-constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
+constexpr void set_memory_data_size(DataSize const t_size) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MSIZE>(t_size);
 }
 
@@ -121,9 +126,11 @@ constexpr void set_memory_data_size(DataSize const& t_size) noexcept {
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_size 	@ref dma::DataSize
+ *
+ * @note 		In direct mode, set memory data size is useless, only peripheral data size is relevant
  */
 template <Port DMA, Stream Str>
-constexpr void set_periph_data_size(DataSize const& t_size) noexcept {
+constexpr void set_periph_data_size(DataSize const t_size) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PSIZE>(t_size);
 }
 
@@ -188,91 +195,95 @@ constexpr void enable_circular_mode() noexcept {
 }
 
 /**
- * @brief 	This function set the channel select of DMA
+ * @brief 	This function sets the channel select of DMA
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_cj 	@ref dma::Channel
  */
 template <Port DMA, Stream Str>
-constexpr void channel_select(Channel const& t_ch) noexcept {
+constexpr void channel_select(Channel const t_ch) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CHSEL>(t_ch);
 }
 
 /**
- * @brief 	This function set memory burst size
+ * @brief 	This function sets memory burst size
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_bs 	@ref dma::BurstSize
+ *
+ * @note 		Only available in FIFO mode
  */
 template <Port DMA, Stream Str>
-constexpr void set_memory_burst(BurstSize const& t_bs) noexcept {
+constexpr void set_memory_burst(BurstSize const t_bs) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::MBURST>(t_bs);
 }
 
 /**
- * @brief 	This function set peripheral burst size
+ * @brief 	This function sets peripheral burst size
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_bs  @ref dma::BurstSize
+ *
+ * @note 		Only available in FIFO mode
  */
 template <Port DMA, Stream Str>
-constexpr void set_periph_burst(BurstSize const& t_bs) noexcept {
+constexpr void set_periph_burst(BurstSize const t_bs) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::PBURST>(t_bs);
 }
 
 /**
- * @brief 	This function set current target in double buffer mode
+ * @brief 	This function sets current target in double buffer mode
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_mem		memory target, 0 for M0 and 1 for M1, see @ref reg::SxM0AR and @ref reg::SxM1AR
  */
 template <Port DMA, Stream Str>
-constexpr void double_buffer_set_target(std::uint8_t const& t_mem) noexcept {
+constexpr void double_buffer_set_target(std::uint8_t const t_mem) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::CT>(t_mem);
 }
 
 /**
- * @brief 	This function set DMA memory address
+ * @brief 	This function sets DMA memory address
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_mem_addr memory address, @see dma::MemoryAddress_t
  */
 template <Port DMA, Stream Str>
-constexpr void set_address(MemoryAddress_t const& t_mem_addr) noexcept {
+constexpr void set_address(MemoryAddress_t const t_mem_addr) noexcept {
 	reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_mem_addr.get());
 }
 
 /**
- * @brief 	This function set DMA memory address in double buffer mode
+ * @brief 	This function sets DMA memory address in double buffer mode
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_mem_addr memory address 0 and memory address 1, @see dma::MemoryAddress_t
  */
 template <Port DMA, Stream Str>
-constexpr void set_address(MemoryAddress_t const& t_mem0, MemoryAddress_t const& t_mem1) noexcept {
+constexpr void set_address(MemoryAddress_t const t_mem0, MemoryAddress_t const t_mem1) noexcept {
 	reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_mem0.get());
 	reg::SxM1AR<DMA, Str>.template writeBit<reg::SxM1ARField::M1A>(t_mem1.get());
 }
 
 /**
- * @brief 	This function set DMA peripheral address
+ * @brief 	This function sets DMA peripheral address
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_mem_addr memory address, @see Register::memAddr, dma::PeriphAddress_t
  */
 template <Port DMA, Stream Str>
-constexpr void set_address(PeriphAddress_t const& t_periph_addr) noexcept {
+constexpr void set_address(PeriphAddress_t const t_periph_addr) noexcept {
 	reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_periph_addr.get());
 }
 
 /**
- * @brief 	This function set number of data to transfer of DMA
+ * @brief 	This function sets number of data to transfer of DMA
  * @tparam 	DMA 	@ref dma::Port
  * @tparam 	Str 	@ref dma::Stream
  * @param 	t_num 	number between 0 and 65535
  */
 template <Port DMA, Stream Str>
-constexpr void set_tx_data_num(std::uint16_t const& t_num) noexcept {
+constexpr void set_tx_data_num(std::uint16_t const t_num) noexcept {
 	reg::SxNDTR<DMA, Str>.template writeBit<reg::SxNDTRField::NDT>(t_num);
 }
 
@@ -413,7 +424,7 @@ constexpr void enable_irq() noexcept {
 	}
 
 	if constexpr (sizeof...(Flags) > 1) {
-		constexpr auto get_rest_irq_flags = [](auto const& t_flag) {
+		constexpr auto get_rest_irq_flags = [](auto const t_flag) {
 			if (t_flag != InterruptFlag::FEI) {
 				return reg::SxCRField{t_flag};
 			}
@@ -430,7 +441,7 @@ constexpr void enable_irq() noexcept {
  *
  * @brief 	 Builder class that offers alternative ways to setup DMA
  *
- * @todo 		 reduce overhead as mush as possible
+ * @todo 		 reduce overhead as mush as possible, and also improve static checking
  * @note     Stream configuration procedure
  *           1. disable stream if is enabled, wait until the stream is disabled
  *           2. set peripheral port register address
@@ -483,7 +494,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
  public:
 	[[nodiscard]] constexpr DmaBuilder() noexcept { resetDMA(); }
 
-	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const t_from, MemoryAddress_t const t_to) noexcept {
 		m_transferDir = TransferDir::PeriphToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
@@ -492,7 +503,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, PeriphAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const t_from, PeriphAddress_t const t_to) noexcept {
 		m_transferDir = TransferDir::MemToPeriph;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_to.get());
@@ -501,7 +512,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const& t_from, MemoryAddress_t const& t_to) noexcept {
+	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const t_from, MemoryAddress_t const t_to) noexcept {
 		m_transferDir = TransferDir::MemToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
@@ -510,17 +521,17 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto txDataNum(std::uint16_t const& t_ndt) noexcept {
+	[[nodiscard]] constexpr auto txDataNum(std::uint16_t const t_ndt) noexcept {
 		reg::SxNDTR<DMA, Str>.template writeBit<reg::SxNDTRField::NDT>(t_ndt);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto selectChannel(Channel const& t_ch) noexcept {
+	[[nodiscard]] constexpr auto selectChannel(Channel const t_ch) noexcept {
 		m_channelSelect = t_ch;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto streamPriority(StreamPriority const& t_str) noexcept {
+	[[nodiscard]] constexpr auto streamPriority(StreamPriority const t_str) noexcept {
 		m_streamPriority = t_str;
 		return *this;
 	}
@@ -530,7 +541,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto memoryDataWidth(DataSize const& t_ds) noexcept {
+	[[nodiscard]] constexpr auto memoryDataWidth(DataSize const t_ds) noexcept {
 		m_memoryDataSize = t_ds;
 		return *this;
 	}
@@ -540,7 +551,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto enablePeriphIncrement(bool const& t_incr) noexcept {
+	[[nodiscard]] constexpr auto enablePeriphIncrement(bool const t_incr) noexcept {
 		m_periphIncrementMode = t_incr;
 		return *this;
 	}
@@ -550,7 +561,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto perihperalDataWidth(DataSize const& t_ds) noexcept {
+	[[nodiscard]] constexpr auto perihperalDataWidth(DataSize const t_ds) noexcept {
 		m_peripheralDataSize = t_ds;
 		return *this;
 	}
@@ -560,14 +571,14 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto doubleBufferTarget(std::uint8_t const& t_target) noexcept {
+	[[nodiscard]] constexpr auto doubleBufferTarget(std::uint8_t const t_target) noexcept {
 		m_doubleBuffer	= true;
 		m_currentTarget = t_target;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto configFIFO(FifoThreshold const& t_fts, PeriphBurstSize_t const& t_pb,
-																					MemoryBurstSize_t const& t_mb) noexcept {
+	[[nodiscard]] constexpr auto configFIFO(FifoThreshold const t_fts, PeriphBurstSize_t const t_pb,
+																					MemoryBurstSize_t const t_mb) noexcept {
 		using namespace reg;
 
 		SxFCR<DMA, Str>.template writeBit<SxFCRField::FTH, SxFCRField::DMDIS>(t_fts, std::uint8_t{1});

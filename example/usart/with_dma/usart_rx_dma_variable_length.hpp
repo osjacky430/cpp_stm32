@@ -107,9 +107,8 @@ int main() {
 		}
 
 		if (packet_finish) {
-			auto const critical_sec = cpp_stm32::create_critical_section();
-			packet_finish						= false;
-			packet_tx_lock					= true;
+			packet_finish	 = false;
+			packet_tx_lock = true;
 
 			pc << processed_data << "\n\t";
 			std::fill(std::begin(processed_data), std::end(processed_data), 0);
@@ -152,7 +151,7 @@ constexpr void process_buffer() noexcept {
 	}
 
 	if constexpr (State == ReceiverState::Idle) {
-		packet_finish = true;	 // transfer maybe aborted, or transfer finished, star parsing data
+		packet_finish = true;	 // transfer maybe aborted, or transfer finished, start parsing data
 	}
 }
 

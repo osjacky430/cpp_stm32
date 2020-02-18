@@ -5,33 +5,35 @@
 
 namespace cpp_stm32::exti {
 
-enum class Line {
-	Line22,
-	Line21,
-	Line20,
-	Line19,
-	Line18,
-	Line17,
-	Line16,
-	Line15,
-	Line14,
-	Line13,
-	Line12,
-	Line11,
-	Line10,
-	Line9,
-	Line8,
-	Line7,
-	Line6,
-	Line5,
-	Line4,
-	Line3,
-	Line2,
+enum class Line : std::uint8_t {
+	Line0,
 	Line1,
-	Line0
+	Line2,
+	Line3,
+	Line4,
+	Line5,
+	Line6,
+	Line7,
+	Line8,
+	Line9,
+	Line10,
+	Line11,
+	Line12,
+	Line13,
+	Line14,
+	Line15,
+	Line16,
+	Line17,
+	Line18,
+	Line19,
+	Line20,
+	Line21,
+	Line22,
 };
 
-}
+enum class TriggerType : std::uint8_t { Rise, Fall, Both };
+
+}	 // namespace cpp_stm32::exti
 
 namespace cpp_stm32::exti::reg {
 

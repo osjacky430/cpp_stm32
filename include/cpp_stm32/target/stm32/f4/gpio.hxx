@@ -40,7 +40,7 @@ namespace cpp_stm32::gpio {
  * @param   t_mode    @ref gpio::Mode
  */
 template <Port InputPort, Pin... Pins>
-constexpr void set_mode(Mode const& t_mode) noexcept {
+constexpr void set_mode(Mode const t_mode) noexcept {
 	reg::MODER<InputPort>.template writeBit<Pins...>(t_mode);
 }
 
@@ -51,7 +51,7 @@ constexpr void set_mode(Mode const& t_mode) noexcept {
  * @param   t_pupd  	@ref gpio::Pupd
  */
 template <Port InputPort, Pin... Pins>
-constexpr void set_pupd(Pupd const& t_pupd) noexcept {
+constexpr void set_pupd(Pupd const t_pupd) noexcept {
 	reg::PUPDR<InputPort>.template writeBit<Pins...>(t_pupd);
 }
 
@@ -63,7 +63,7 @@ constexpr void set_pupd(Pupd const& t_pupd) noexcept {
  * @param   t_pupd    @ref gpio::Pupd
  */
 template <Port InputPort, Pin... Pins>
-constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
+constexpr void mode_setup(Mode const t_mode, Pupd const t_pupd) noexcept {
 	reg::MODER<InputPort>.template writeBit<Pins...>(t_mode);
 	reg::PUPDR<InputPort>.template writeBit<Pins...>(t_pupd);
 }
@@ -94,10 +94,10 @@ constexpr void toggle() noexcept {
  * @param     t_af    	@ref gpio::AltFunc
  */
 template <Port InputPort, Pin... Pins>
-constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
+constexpr void set_alternate_function(AltFunc const t_af) noexcept {
 	constexpr auto Pin7 = Pin::Pin7;
 
-	[[maybe_unused]] constexpr auto cast_to_int = [](auto const& t_val) {
+	[[maybe_unused]] constexpr auto cast_to_int = [](auto const t_val) {
 		return to_underlying(t_val);
 	};	// to prevent internal compiler error
 
@@ -142,7 +142,7 @@ constexpr void set_output_options(OutputType t_otype, OutputSpeed t_ospeed) noex
  * @param  		t_mode  	@ref gpio::OutputType
  */
 template <Port InputPort, Pin... Pins>
-constexpr void set_output_type(OutputType const& t_otype) noexcept {
+constexpr void set_output_type(OutputType const t_otype) noexcept {
 	reg::OTYPER<InputPort>.template writeBit<Pins...>(t_otype);
 }
 
@@ -153,7 +153,7 @@ constexpr void set_output_type(OutputType const& t_otype) noexcept {
  * @param  		t_mode  	@ref gpio::OutputSpeed
  */
 template <Port InputPort, Pin... Pins>
-constexpr void set_output_speed(OutputSpeed const& t_ospeed) noexcept {
+constexpr void set_output_speed(OutputSpeed const t_ospeed) noexcept {
 	reg::OSPEEDR<InputPort>.template writeBit<Pins...>(t_ospeed);
 }
 
@@ -165,27 +165,27 @@ class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
  public:
 	[[nodiscard]] constexpr GpioBuilder() noexcept {}
 
-	[[nodiscard]] constexpr auto mode(Mode const& t_mode) const noexcept {
+	[[nodiscard]] constexpr auto mode(Mode const t_mode) const noexcept {
 		set_mode<InputPort, Pins...>(t_mode);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto pullupPulldown(Pupd const& t_pupd) const noexcept {
+	[[nodiscard]] constexpr auto pullupPulldown(Pupd const t_pupd) const noexcept {
 		set_pupd<InputPort, Pins...>(t_pupd);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto alternateFunction(AltFunc const& t_af) const noexcept {
+	[[nodiscard]] constexpr auto alternateFunction(AltFunc const t_af) const noexcept {
 		set_alternate_function<InputPort, Pins...>(t_af);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto outputType(OutputType const& t_otype) const noexcept {
+	[[nodiscard]] constexpr auto outputType(OutputType const t_otype) const noexcept {
 		set_output_type<InputPort, Pins...>();
 		return *this;
 	}
 
-	[[nodiscard]] constexpr auto outputSpeed(OutputSpeed const& t_ospeed) const noexcept {
+	[[nodiscard]] constexpr auto outputSpeed(OutputSpeed const t_ospeed) const noexcept {
 		set_output_speed<InputPort, Pins...>();
 		return *this;
 	}

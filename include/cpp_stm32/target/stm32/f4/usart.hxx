@@ -35,13 +35,13 @@ namespace cpp_stm32::usart {
  * @param  t_baud 		@ref usart::Baudrate_t
  */
 template <Port InputPort>
-constexpr void set_baudrate(Baudrate_t const& t_baud) noexcept {
+constexpr void set_baudrate(Baudrate_t const t_baud) noexcept {
 	constexpr auto clk_freq = (InputPort == Port::Usart1 || InputPort == Port::Usart6 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
 
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	= usart_div & 0xF;
+	std::uint8_t const fraction	 = usart_div & 0xF;
 
 	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
@@ -52,7 +52,7 @@ constexpr void set_baudrate(Baudrate_t const& t_baud) noexcept {
  * @param 	t_d_bit 	@ref usart::DataBit
  */
 template <Port InputPort>
-constexpr void set_databit(DataBit const& t_d_bit) noexcept {
+constexpr void set_databit(DataBit const t_d_bit) noexcept {
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M>(t_d_bit);
 }
 
@@ -62,12 +62,12 @@ constexpr void set_databit(DataBit const& t_d_bit) noexcept {
  * @param 	t_flow_ctl 	@ref usart::HardwareFlowControl
  *
  * @todo 	  static_assert (UART4 and UART5)
- * @note 	  Maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value so that t_flow_ctl &
- * 					mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl & mask = 0 when t_flow_ctl = none, e.g. ctl = 1, rts =
+ * @note 	  Maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value so that t_flow_ctl
+ * 					mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl  mask = 0 when t_flow_ctl = none, e.g. ctl = 1, rts =
  * 					3, none = 4
  */
 template <Port InputPort>
-constexpr void set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noexcept {
+constexpr void set_hardware_flow_ctl(HardwareFlowControl const t_flow_ctl) noexcept {
 	std::uint8_t const cts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
 	std::uint8_t const rts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
 
@@ -80,7 +80,7 @@ constexpr void set_hardware_flow_ctl(HardwareFlowControl const& t_flow_ctl) noex
  * @param 	t_mode		@ref usart::Mode
  */
 template <Port InputPort>
-constexpr void set_transfer_mode(Mode const& t_mode) noexcept {
+constexpr void set_transfer_mode(Mode const t_mode) noexcept {
 	std::uint8_t const tx_en = (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
 	std::uint8_t const rx_en = (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
 
@@ -93,7 +93,7 @@ constexpr void set_transfer_mode(Mode const& t_mode) noexcept {
  * @param 	t_parity	@ref usart::Parity
  */
 template <Port InputPort>
-constexpr void set_parity(Parity const& t_parity) noexcept {
+constexpr void set_parity(Parity const t_parity) noexcept {
 	std::uint8_t const pe = (t_parity != Parity::None);
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(pe, t_parity);
 }
@@ -106,7 +106,7 @@ constexpr void set_parity(Parity const& t_parity) noexcept {
  * @todo 		static_assert	UART StopBit
  */
 template <Port InputPort, Stopbit StopBit>
-constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
+constexpr void set_stopbit(StopBit_t<StopBit> const /*unused*/) noexcept {
 	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(StopBit);
 }
 
@@ -116,7 +116,7 @@ constexpr void set_stopbit(StopBit_t<StopBit> const& /*unused*/) noexcept {
  * @param 	data	 8 bits data
  */
 template <Port InputPort>
-constexpr void send(std::uint8_t const& data) noexcept {
+constexpr void send(std::uint8_t const data) noexcept {
 	reg::DR<InputPort>.template writeBit<reg::DrBit::Dr>(data);
 }
 
@@ -191,7 +191,7 @@ constexpr void wait_rx_not_empty() noexcept {
  * @param 	t_data 8 bits data
  */
 template <Port InputPort>
-constexpr void send_blocking(std::uint8_t const& t_data) noexcept {
+constexpr void send_blocking(std::uint8_t const t_data) noexcept {
 	send<InputPort>(t_data);
 	wait_tx_rdy<InputPort>();
 }
@@ -217,7 +217,7 @@ constexpr auto receive_blocking() noexcept {
  * @todo 		All strong type or all scoped enum is preferred
  */
 template <Port InputPort, usart::Stopbit Stop>
-constexpr void set_dps(DataBit const& t_d, Parity const& t_p, StopBit_t<Stop> const& /*unused*/) noexcept {
+constexpr void set_dps(DataBit const t_d, Parity const t_p, StopBit_t<Stop> const /*unused*/) noexcept {
 	std::uint8_t const pe = (t_p != Parity::None);
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(t_d, pe, t_p);
 	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(Stop);
@@ -338,4 +338,4 @@ constexpr auto clear_interrupt_flag() noexcept {
 template <Port InputPort>
 class UsartBuilder {};
 
-}	// namespace cpp_stm32::usart
+}	 // namespace cpp_stm32::usart

@@ -45,15 +45,17 @@ enum class BitMod {
 
 };
 
+/**
+ * [Bit description]
+ *
+ */
 template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::RdWr>
-class Bit {
- public:
+struct Bit {
 	static constexpr auto MOD		 = Mod;
 	static constexpr auto LENGTH = L;
 	std::uint32_t const pos;
 	std::uint32_t const mask;
 
- public:
 	constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1ULL << LENGTH) - 1U) << pos) {}
 
 	// currently support only integral type and struct that implement get() method
@@ -87,6 +89,9 @@ using Binary = Bit<1, std::uint8_t, Mod>;
 template <std::uint32_t L, typename DataType = std::uint8_t>
 using StatusBit = Bit<L, DataType, BitMod::RdOnly>;
 
+/**
+ *	@note 	replace with self implemented tuple?
+ */
 template <typename... Args>
 class BitGroup {
 	// to somehow suppress strange warning
