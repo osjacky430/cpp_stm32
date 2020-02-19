@@ -6,6 +6,7 @@
 namespace cpp_stm32::i2c::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_i2c) {
+	switch(t_i2c) {
 	case Port::I2C3:
 		return 0x40005c00U;
 	case Port::I2C2:
@@ -13,6 +14,7 @@ static constexpr auto BASE_ADDR(Port const& t_i2c) {
 	case Port::I2C1:
 		return 0x40005400U;
 }
+	}
 
 /**
  * @defgroup	I2C1_CR1_GROUP		Control register 1 group

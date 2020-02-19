@@ -6,11 +6,13 @@
 namespace cpp_stm32::dma::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_dma) {
+	switch(t_dma) {
 	case Port::DMA2:
 		return 0x40026400U;
 	case Port::DMA1:
 		return 0x40026000U;
 }
+	}
 
 /**
  * @defgroup	DMA1_LISR_GROUP		low interrupt status register group

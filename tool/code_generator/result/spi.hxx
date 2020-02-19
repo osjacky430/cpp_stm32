@@ -6,6 +6,7 @@
 namespace cpp_stm32::spi::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_spi) {
+	switch(t_spi) {
 	case Port::SPI1:
 		return 0x40013000U;
 	case Port::SPI2:
@@ -15,6 +16,7 @@ static constexpr auto BASE_ADDR(Port const& t_spi) {
 	case Port::SPI4:
 		return 0x40013400U;
 }
+	}
 
 /**
  * @defgroup	SPI4_CR1_GROUP		control register 1 group

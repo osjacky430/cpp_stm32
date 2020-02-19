@@ -6,6 +6,7 @@
 namespace cpp_stm32::tim::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_tim) {
+	switch(t_tim) {
 	case Port::TIM1:
 		return 0x40010000U;
 	case Port::TIM8:
@@ -35,6 +36,7 @@ static constexpr auto BASE_ADDR(Port const& t_tim) {
 	case Port::TIM7:
 		return 0x40001400U;
 }
+	}
 
 /**
  * @defgroup	TIM7_CR1_GROUP		control register 1 group

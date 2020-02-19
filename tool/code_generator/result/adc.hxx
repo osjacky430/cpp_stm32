@@ -6,6 +6,7 @@
 namespace cpp_stm32::adc::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_adc) {
+	switch(t_adc) {
 	case Port::ADC1:
 		return 0x40012000U;
 	case Port::ADC2:
@@ -15,6 +16,7 @@ static constexpr auto BASE_ADDR(Port const& t_adc) {
 	case Port::C_ADC:
 		return 0x40012300U;
 }
+	}
 
 /**
  * @defgroup	C_ADC_CSR_GROUP		ADC Common status register group

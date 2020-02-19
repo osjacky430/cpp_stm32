@@ -6,6 +6,7 @@
 namespace cpp_stm32::usb_otg_hs::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_usb_otg_hs) {
+	switch(t_usb_otg_hs) {
 	case Port::OTG_HS_GLOBAL:
 		return 0x40040000U;
 	case Port::OTG_HS_HOST:
@@ -15,6 +16,7 @@ static constexpr auto BASE_ADDR(Port const& t_usb_otg_hs) {
 	case Port::OTG_HS_PWRCLK:
 		return 0x40040e00U;
 }
+	}
 
 /**
  * @defgroup	OTG_HS_PWRCLK_OTG_HS_PCGCR_GROUP		Power and clock gating control register group

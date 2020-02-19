@@ -6,6 +6,7 @@
 namespace cpp_stm32::gpio::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_gpio) {
+	switch(t_gpio) {
 	case Port::GPIOH:
 		return 0x40021c00U;
 	case Port::GPIOG:
@@ -23,6 +24,7 @@ static constexpr auto BASE_ADDR(Port const& t_gpio) {
 	case Port::GPIOA:
 		return 0x40020000U;
 }
+	}
 
 /**
  * @defgroup	GPIOA_MODER_GROUP		GPIO port mode register group

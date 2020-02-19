@@ -1,6 +1,6 @@
 /**
- * @file  driver/digitalout.hxx
- * @brief	Advance control of GPIO output mode class
+ * @file  driver/digital_irq.hxx
+ * @brief	Advance control of GPIO input mode external interrupt class
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -22,40 +22,30 @@
 
 #pragma once
 
-#include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
-#include "cpp_stm32/utility/utility.hxx"
 
 #include "device.hxx"
 
-/**
- * @namespace   cpp_stm32::driver
- * @brief       contains advance control class over peripheral
- */
 namespace cpp_stm32::driver {
 
-/**
- * @class   DigitalOut
- * @brief   This class is a specialization of GpioUtil, it provides advance GPIO output control
- */
-template <gpio::PinName... PinNames>
-class DigitalOut {
+// @todo finish this
+template <gpio::PinName Pin>
+class DigitalIrq {
  public:
-	/**
-	 * @brief  Default constructor, it enables rcc peripheral clock, and setup gpio mode to output, no pull
-	 */
-	constexpr DigitalOut() noexcept {
+	template <auto F>
+	explicit constexpr DigitalIrq(Callback<F> const& t_cb, exti::TriggerType const t_trigger) noexcept {
 		using gpio::Mode, gpio::Pupd;
 
-		GpioUtil<PinNames...>::enableAllGpioClk();
-		GpioUtil<PinNames...>::modeSetup(Mode::Output, Pupd::None);
-	}
+		GpioUtil<Pin>::enableAllGpioClk();
+		GpioUtil<Pin>::modeSetup(Mode::Input, Pupd::None);
 
-	/**
-	 * @brief   Toggle the input pin name
-	 * @todo    This can be extended to only toggle certain pins in input pin list
-	 */
-	constexpr void toggle() const noexcept { GpioUtil<PinNames...>::toggle(); }
+		// exti::set_trigger_type<>(t_trigger);
+
+		{
+			auto const critical_section = create_critical_section();
+			// Interrupt<>::attach(t_cb);
+		}
+	}
 };
 
 }	 // namespace cpp_stm32::driver

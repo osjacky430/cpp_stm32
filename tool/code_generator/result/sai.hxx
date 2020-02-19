@@ -6,11 +6,13 @@
 namespace cpp_stm32::sai::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_sai) {
+	switch(t_sai) {
 	case Port::SAI1:
 		return 0x40015800U;
 	case Port::SAI2:
 		return 0x40015c00U;
 }
+	}
 
 /**
  * @defgroup	SAI2_BCR1_GROUP		BConfiguration register 1 group

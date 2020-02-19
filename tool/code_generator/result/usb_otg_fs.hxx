@@ -6,6 +6,7 @@
 namespace cpp_stm32::usb_otg_fs::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_usb_otg_fs) {
+	switch(t_usb_otg_fs) {
 	case Port::OTG_FS_GLOBAL:
 		return 0x50000000U;
 	case Port::OTG_FS_HOST:
@@ -15,6 +16,7 @@ static constexpr auto BASE_ADDR(Port const& t_usb_otg_fs) {
 	case Port::OTG_FS_PWRCLK:
 		return 0x50000e00U;
 }
+	}
 
 /**
  * @defgroup	OTG_FS_PWRCLK_FS_PCGCCTL_GROUP		OTG_FS power and clock gating control register (OTG_FS_PCGCCTL) group

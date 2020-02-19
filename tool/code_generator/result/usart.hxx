@@ -6,6 +6,7 @@
 namespace cpp_stm32::usart::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_usart) {
+	switch(t_usart) {
 	case Port::USART6:
 		return 0x40011400U;
 	case Port::USART1:
@@ -19,6 +20,7 @@ static constexpr auto BASE_ADDR(Port const& t_usart) {
 	case Port::UART5:
 		return 0x40005000U;
 }
+	}
 
 /**
  * @defgroup	UART5_SR_GROUP		Status register group

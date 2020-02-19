@@ -6,11 +6,13 @@
 namespace cpp_stm32::can::reg {
 
 static constexpr auto BASE_ADDR(Port const& t_can) {
+	switch(t_can) {
 	case Port::CAN1:
 		return 0x40006400U;
 	case Port::CAN2:
 		return 0x40006800U;
 }
+	}
 
 /**
  * @defgroup	CAN2_MCR_GROUP		master control register group

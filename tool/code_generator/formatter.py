@@ -173,8 +173,8 @@ class RegFileMaker:
 
         if len(self.peripheral_address[peripheral.group_name]) != 1:
             register_type_str = 'template <Port %s>\n' % peripheral.group_name
-            register_type_str += 'static constexpr Register<%sBitList, %s> %s{BASE_ADDR(%s), 0x%02xU};' \
-                                 % (register.name, idx_str, register.name, peripheral.group_name, register.address_offset)
+            register_type_str += 'static constexpr Register<{}BitList, {}> {}{{BASE_ADDR({}), 0x{:02x}U}};' \
+                .format(register.name, idx_str, register.name, peripheral.group_name, register.address_offset)
         else:
             register_type_str = 'static constexpr Register<%sBitList, %s> %s{%s, 0x%02xU};' \
                                  % (register.name, idx_str, register.name, 'BASE_ADDR', register.address_offset)
@@ -189,11 +189,12 @@ class RegFileMaker:
         if len(addr_port_list) == 1:
             base_address_str += ' = 0x%08xU;\n\n' % addr_port_list[0][0]
         else:
-            base_address_str += '(Port const& t_%s) {\n'\
-                                '\tswitch(t_%s) {' % peripheral.group_name.lower()
+            base_address_str += '(Port const& t_{}) {{\n' \
+                                '\tswitch(t_{}) {{\n'.format(peripheral.group_name.lower(),
+                                                             peripheral.group_name.lower())
             for addr, port in addr_port_list:
-                base_address_str += '\tcase Port::%s:\n' \
-                                    '\t\treturn 0x%08xU;\n' % (port, addr)
+                base_address_str += '\tcase Port::{}:\n' \
+                                    '\t\treturn 0x{:08x}U;\n'.format(port, addr)
             base_address_str += '}\n\t}\n\n'
 
         self.file.write(base_address_str)
@@ -214,7 +215,7 @@ class RegFileMaker:
 
     def create_file(self):
         for peripheral in self.device.peripherals:
-            filename = peripheral.group_name.lower() + '_reg.hxx'
+            filename = peripheral.group_name.lower() + '.hxx'
 
             with open(filename, 'w+') as self.file:
                 self.__gen_reg_file(peripheral)
