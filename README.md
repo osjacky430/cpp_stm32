@@ -1,7 +1,7 @@
 # cpp_stm32
 A project that implements stm32 driver using c++17, inspired by Jason Turner's talk "Rich Code for Tiny Computers: A Simple Commodore 64 Games in C++17.". This driver aims to have smaller code size, better performance,  easy to use hard to misuse, and higher level of abstraction, compare to that of driver written in C99.
 
-Currently, the driver only support (not fully):
+Currently, the driver only tested (not fully):
 - stm32f446re
 - stm32l432kc
 - stm32f303k8 (in the future)

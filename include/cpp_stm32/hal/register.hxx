@@ -22,6 +22,7 @@
 #include <utility>
 
 #include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/mmio.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
@@ -349,6 +350,33 @@ class Register {
 
 	/**
 	 * @brief		This function set multiple bits to corresponding values
+	 * @tparam	BitIdx			Variadic template parameter that contains the positions of bits.
+	 * @tparam	ValueTypes	Variadic template parameter that contains the type to be set for each bit in BitIdx.
+	 * @param 	t_param 		@see detail::Tuple. Since @ref readBit returns BitGroup, this
+	 * 											function also takes BitGroup as paramter for simplicity.
+	 */
+	template <BitListIdx... BitIdx, typename... ValueTypes>
+	constexpr void writeBit(detail::Tuple<ValueTypes...> const& t_param) const noexcept {
+		static_assert(sizeof...(BitIdx) == sizeof...(ValueTypes));
+		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueTypes>() && ...));
+		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
+
+		constexpr auto mod_val_for_each_bit = [](auto const& t_bit_idx, auto const& t_p) {
+			constexpr auto bit		= GET_BIT<t_bit_idx()>();
+			auto const val_to_mod = get<bitIdxOrder<t_bit_idx(), BitIdx...>()>(t_p);
+			return bit(val_to_mod);
+		};
+
+		auto const current_val = readCurrentVal<BitIdx...>();
+
+		auto const mod_val				= (... | mod_val_for_each_bit(BitIdx_c<BitIdx>{}, t_param));
+		constexpr auto clear_mask = ~(... | GET_BIT<BitIdx>().mask);
+
+		readReg<BitIdx...>() = ((current_val & clear_mask) | mod_val);
+	}
+
+	/**
+	 * @brief		This function set multiple bits to corresponding values
 	 * @tparam	ValueTypes	Variadic template parameter that contains the type to be set to for each bit in BitIdx.
 	 * @param 	t_param			Input value to be set.
 	 */
@@ -454,6 +482,19 @@ class Register {
 
 		auto const reg_val = readReg<BitIdx...>();
 		return BitGroup{extractBitValue<BitIdx>(reg_val)...};
+	}
+
+	/**
+	 * @brief		This function reads bits and return BitGroup
+	 * @param  	ValueOnlyType  	Overload tag, see @ref ValueOnlyType
+	 * @return 	Bits value wrapped in Tuple, @see detail::Tuple
+	 */
+	template <BitListIdx... BitIdx>
+	[[nodiscard]] constexpr auto _readBit_tmp(ValueOnlyType /*unused*/) const noexcept {
+		static_assert((GET_BIT<BitIdx>().isReadable() && ...));
+
+		auto const reg_val = readReg<BitIdx...>();
+		return detail::Tuple{extractBitValue<BitIdx>(reg_val)...};
 	}
 
 	/**

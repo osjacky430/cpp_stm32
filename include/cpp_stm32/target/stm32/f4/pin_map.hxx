@@ -230,6 +230,9 @@ class ClkRegMap {
 		std::pair{reg::APB1RST, reg::Apb1RstBit::Usart3Rst},
 		std::pair{reg::APB1RST, reg::Apb1RstBit::Uart4Rst},
 		std::pair{reg::APB1RST, reg::Apb1RstBit::Uart5Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::I2c1Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::I2c2Rst},
+		std::pair{reg::APB1RST, reg::Apb1RstBit::I2c3Rst},
 
 		std::pair{reg::APB1RST, reg::Apb1RstBit::PwrRst},
 		/*APB2*/
@@ -251,6 +254,9 @@ class ClkRegMap {
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Usart3En},
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Uart4En},
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::Uart5En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::I2c1En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::I2c2En},
+		std::pair{reg::APB1ENR, reg::Apb1EnrBit::I2c3En},
 
 		std::pair{reg::APB1ENR, reg::Apb1EnrBit::PwrEn},
 		/*APB2*/

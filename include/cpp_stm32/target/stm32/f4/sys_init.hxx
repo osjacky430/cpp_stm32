@@ -105,6 +105,12 @@ static constexpr auto APB1_FREQ_MAX_OVERDRIVE		 = 45_MHz;
 static constexpr auto APB2_FREQ_MAX_NO_OVERDRIVE = 84_MHz;
 static constexpr auto APB2_FREQ_MAX_OVERDRIVE		 = 90_MHz;
 
+static_assert(APB1_CLK_FREQ <= APB1_FREQ_MAX_OVERDRIVE);
+
+/**
+ * @class   Clock
+ * @brief
+ */
 class Clock {
  private:
 	static constexpr std::uint64_t AHB_CLK_FREQ_ = AHB_CLK_FREQ;

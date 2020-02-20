@@ -202,25 +202,8 @@ SETUP_REGISTER_INFO(SR1BitList,									/**/
 										Binary<>{BitPos_t{15}}			// SMBALERT
 )
 
-enum class SR1Field {
-	SB,				/*!< Start bit (Master mode)*/
-	ADDR,			/*!< Address sent (master mode)/matched (slave mode)*/
-	BTF,			/*!< Byte transfer finished*/
-	ADD10,		/*!< 10-bit header sent (Master mode)*/
-	STOPF,		/*!< Stop detection (slave mode)*/
-	RxNE,			/*!< Data register not empty (receivers)*/
-	TxE,			/*!< Data register empty (transmitters)*/
-	BERR,			/*!< Bus error*/
-	ARLO,			/*!< Arbitration lost (master mode)*/
-	AF,				/*!< Acknowledge failure*/
-	OVR,			/*!< Overrun/Underrun*/
-	PECERR,		/*!< PEC Error in reception*/
-	TIMEOUT,	/*!< Timeout or Tlow error*/
-	SMBALERT, /*!< SMBus alert*/
-};
-
 template <Port I2C>
-static constexpr Register<SR1BitList, SR1Field> SR1{BASE_ADDR(I2C), 0x14U};
+static constexpr Register<SR1BitList, InterruptFlag> SR1{BASE_ADDR(I2C), 0x14U};
 /**@}*/
 
 /**
@@ -264,7 +247,7 @@ static constexpr Register<SR2BitList, SR2Field> SR2{BASE_ADDR(I2C), 0x18U};
 SETUP_REGISTER_INFO(CCRBitList,														/**/
 										Bit<12, std::uint16_t>{BitPos_t{0}},	// CCR
 										Binary<>{BitPos_t{14}},								// DUTY
-										Binary<>{BitPos_t{15}}								// F_S
+										Bit<1, MasterMode>{BitPos_t{15}}			// F_S
 )
 
 enum class CCRField {
@@ -292,7 +275,7 @@ enum class TRISEField {
 };
 
 template <Port I2C>
-static constexpr Register<TRISEBitList, TRISEField> TRISE{BASE_ADDR(I2C), 0x20U};
+static constexpr Register<TRISEBitList, TRISEField> TRISE{BASE_ADDR(I2C), 0x20U, ResetVal_t{0x0002U}};
 /**@}*/
 
 /**

@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <tuple>
+
 namespace cpp_stm32::detail {
 
 constexpr int to_number(char c) noexcept { return static_cast<int>(c) - static_cast<int>('0'); }
@@ -30,8 +33,20 @@ constexpr int decimal_pow() noexcept {
 }
 
 template <typename... num, std::size_t... Idx>
-constexpr auto str_to_num(std::tuple<num...> const& str, std::index_sequence<Idx...> const&) noexcept {
+constexpr auto str_to_int(std::tuple<num...> const& str, std::index_sequence<Idx...> const&) noexcept {
 	return ((to_number(std::get<Idx>(str)) * decimal_pow<sizeof...(Idx) - Idx - 1>()) + ...);
 }
 
-}	// namespace cpp_stm32::detail
+template <char... num>
+constexpr bool str_literal_is_int = []() {
+	return ((static_cast<int>('0') <= static_cast<int>(num) && static_cast<int>(num) <= static_cast<int>('9')) && ...);
+}();
+
+template <char... num>
+constexpr bool str_literal_is_float = []() {
+	return (((static_cast<int>('0') <= static_cast<int>(num) && static_cast<int>(num) <= static_cast<int>('9')) ||
+					 num == '.') &&
+					...);
+}();
+
+}	 // namespace cpp_stm32::detail

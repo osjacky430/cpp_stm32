@@ -27,17 +27,35 @@ namespace cpp_stm32 {
 constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
-constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
+constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
+
+template <char... num>
+constexpr auto operator"" _kHz() noexcept {
+	static_assert(detail::str_literal_is_int<num...>);
+
+	constexpr auto freq = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{}) * 1000;
+	return Frequency<freq>{};
+}
+
+template <char... num>
+constexpr auto operator"" _ns() noexcept {
+	static_assert(detail::str_literal_is_int<num...>);
+
+	constexpr auto Sec = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	return Second<Sec>{};
+}
 
 template <char... num>
 constexpr auto operator"" _ic() noexcept {
-	constexpr auto idx = detail::str_to_num(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	static_assert(detail::str_literal_is_int<num...>);
+
+	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return size_c<idx>{};
 }
 
 template <char... num>
 constexpr auto operator"" _byte() noexcept {
-	constexpr auto idx = detail::str_to_num(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return ByteCount<idx>{};
 }
 

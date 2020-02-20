@@ -149,6 +149,9 @@ struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl
  */
 template <typename... Elems>
 class Tuple : public TupleImpl<0, Elems...> {
+	template <typename... Elems_>
+	friend constexpr auto operator~(Tuple<Elems_...>&) noexcept;
+
  private:
 	using Inherited = TupleImpl<0, Elems...>;
 
@@ -172,18 +175,35 @@ class Tuple : public TupleImpl<0, Elems...> {
 		return *this;
 	}
 
+	/**
+	 * @brief  	Operator[] for Tuple, which takes integral constant as index
+	 * @param   integral constant
+	 * @return  const reference to element at index
+	 */
 	template <std::size_t Idx>
 	[[nodiscard]] constexpr auto const& operator[](
 		std::integral_constant<std::size_t, Idx> const& /*unused*/) const noexcept {
 		return this->TupleImpl<Idx, Elems...>::HEAD_VAL(*this);
 	}
+
+	/**
+	 * @brief  	Operator[] for Tuple, which takes integral constant as index
+	 * @param   integral constant
+	 * @return  reference to element at index
+	 */
+	template <std::size_t Idx>
+	[[nodiscard]] constexpr auto& operator[](std::integral_constant<std::size_t, Idx>& /*unused*/) noexcept {
+		return this->TupleImpl<Idx, Elems...>::HEAD_VAL(*this);
+	}
 };
 
+// tuple get implementation, non const version
 template <std::size_t Idx, typename Head, typename... Tails>
 constexpr Head& get_impl(TupleImpl<Idx, Head, Tails...>& t_tup) noexcept {
 	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
 }
 
+// tuple get implementation, const version
 template <std::size_t Idx, typename Head, typename... Tails>
 constexpr Head const& get_impl(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept {
 	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
@@ -215,6 +235,34 @@ constexpr Head const& get(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept 
 template <std::size_t Idx, typename Head, typename... Tails>
 constexpr Head& get(Tuple<Head, Tails...>& t_tup) noexcept {
 	return get_impl(t_tup);
+}
+
+// tuple nand implementation
+template <typename Tup, std::size_t... Idx>
+[[nodiscard]] constexpr auto nand_impl(Tup const& t_tup, std::index_sequence<Idx...> const /* unused */) {
+	return Tuple{~get<Idx>(t_tup)...};
+};
+
+/**
+ * @brief		Helper type to identify if all elements can apply NAND operator, this is verified by checking if it is
+ *  				integral type.
+ * @tparam  Elems 	Variadic template parameter
+ *
+ * @todo 		Extend it so that it can support custom class with nand operator overloading
+ */
+template <typename... Elems>
+constexpr bool is_nand_operable = (std::is_integral_v<Elems> && ...);
+
+/**
+ * @brief  	Operator NAND for Tuple
+ * @tparam  Elems 	Variadic template parameter
+ * @param		t_tup 	@ref Tuple
+ *
+ * @return  Tuple with all element NANDed
+ */
+template <typename... Elems, typename = std::enable_if_t<is_nand_operable<Elems...>>>
+[[nodiscard]] constexpr auto operator~(Tuple<Elems...> const& t_tup) noexcept {
+	return nand_impl<Tuple<Elems...>>(t_tup, std::make_index_sequence<sizeof...(Elems)>{});
 }
 
 }	 // namespace cpp_stm32::detail
