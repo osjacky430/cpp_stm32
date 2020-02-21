@@ -162,13 +162,13 @@ constexpr void process_buffer() noexcept {
 }
 
 void cpp_stm32::interrupt::dma1_stream5() noexcept {
-	if (Dma::get_tx_complete_flag<DMA, Str>()) {
+	if (auto const [tc_flag] = Dma::get_tx_complete_flag<DMA, Str>(); tc_flag != 0) {
 		Dma::clear_tx_complete_flag<DMA, Str>();
 
 		process_buffer<ReceiverState::TransferComplete>();
 	}
 
-	if (Dma::get_half_tx_flag<DMA, Str>()) {
+	if (auto const [ht_flag] = Dma::get_half_tx_flag<DMA, Str>(); ht_flag != 0) {
 		Dma::clear_half_tx_flag<DMA, Str>();
 
 		process_buffer<ReceiverState::HalfTransfer>();
@@ -176,7 +176,8 @@ void cpp_stm32::interrupt::dma1_stream5() noexcept {
 }
 
 void cpp_stm32::interrupt::usart2() noexcept {
-	if (Usart::get_interrupt_flag<Usart::Port::Usart2, Usart::InterruptFlag::IDLE>()) {
+	if (auto const [idle_flag] = Usart::get_interrupt_flag<Usart::Port::Usart2, Usart::InterruptFlag::IDLE>();
+			idle_flag != 0) {
 		[[gnu::unused]] auto const clear_idle = Usart::receive<Usart::Port::Usart2>();
 		process_buffer<ReceiverState::Idle>();
 	}

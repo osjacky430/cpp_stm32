@@ -97,7 +97,7 @@ constexpr void config_access_ctl(Latency const& t_cpu) noexcept {
 		}
 	};
 
-	auto const val_to_set = BitGroup{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
+	std::tuple const val_to_set{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	 // fill the rest with 1 or 0
 	reg::ACR.template writeBit<reg::AcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 

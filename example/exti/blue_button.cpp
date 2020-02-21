@@ -20,6 +20,8 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <tuple>
+
 #include "cpp_stm32/target/stm32/f4/exti.hxx"
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/nvic.hxx"
@@ -62,7 +64,7 @@ int main() {
 }
 
 void cpp_stm32::interrupt::exti10_15() noexcept {
-	if (get<0>(Exti::is_active<Exti::Line::Line13>())) {
+	if (std::get<0>(Exti::is_active<Exti::Line::Line13>())) {
 		Gpio::toggle<Gpio::Port::PortA, Gpio::Pin::Pin5>();
 		Exti::clear_active_flag<Exti::Line::Line13>();
 	}

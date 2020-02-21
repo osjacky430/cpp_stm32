@@ -89,7 +89,7 @@ int main() {
 }
 
 void cpp_stm32::interrupt::dma1_stream5() noexcept {
-	if (Dma::get_tx_complete_flag<Dma::Port::DMA1, Dma::Stream::Stream5>()) {
+	if (auto const [tc_flag] = Dma::get_tx_complete_flag<Dma::Port::DMA1, Dma::Stream::Stream5>(); tc_flag != 0) {
 		Dma::clear_tx_complete_flag<Dma::Port::DMA1, Dma::Stream::Stream5>();
 
 		led.toggle();

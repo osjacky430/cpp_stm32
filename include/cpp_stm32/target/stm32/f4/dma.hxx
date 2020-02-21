@@ -52,23 +52,11 @@ constexpr void clear_interrupt_flag() noexcept {
  */
 template <Port DMA, Stream Str, InterruptFlag... Flags>
 [[nodiscard]] constexpr auto get_interrupt_flag() noexcept {
-	if constexpr (sizeof...(Flags) == 1) {
-		if constexpr (to_underlying(Str) <= 3) {
-			return get<0>(
-				reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(ValueOnly));
-		} else {
-			return get<0>(
-				reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
-					ValueOnly));
-		}
+	if constexpr (to_underlying(Str) <= 3) {
+		return reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(ValueOnly);
 	} else {
-		if constexpr (to_underlying(Str) <= 3) {
-			return reg::LISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str)}...>(
-				ValWithPos);
-		} else {
-			return reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
-				ValWithPos);
-		}
+		return reg::HISR<DMA>.template readBit<InterruptFlag{to_underlying(Flags) * 4U + to_underlying(Str) - 4}...>(
+			ValueOnly);
 	}
 }
 
@@ -80,7 +68,7 @@ template <Port DMA, Stream Str, InterruptFlag... Flags>
  */
 template <Port DMA, Stream Str>
 [[nodiscard]] constexpr bool is_enabled() noexcept {
-	return get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField::EN>(ValueOnly));
+	return std::get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField::EN>(ValueOnly));
 }
 
 /**
@@ -295,7 +283,7 @@ constexpr void set_tx_data_num(std::uint16_t const t_num) noexcept {
  */
 template <Port DMA, Stream Str>
 [[nodiscard]] constexpr auto get_tx_data_num() noexcept {
-	return get<0>(reg::SxNDTR<DMA, Str>.template readBit<reg::SxNDTRField::NDT>(ValueOnly));
+	return std::get<0>(reg::SxNDTR<DMA, Str>.template readBit<reg::SxNDTRField::NDT>(ValueOnly));
 }
 
 /**
@@ -357,9 +345,9 @@ constexpr void enable() noexcept {
 template <Port DMA, Stream Str, InterruptFlag Flag>
 constexpr auto is_irq_enabled() noexcept {
 	if constexpr (Flag != InterruptFlag::FEI) {
-		return get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField{to_underlying(Flag)}>(ValueOnly));
+		return std::get<0>(reg::SxCR<DMA, Str>.template readBit<reg::SxCRField{to_underlying(Flag)}>(ValueOnly));
 	} else {
-		return get<0>(reg::SxFCR<DMA, Str>.template readBit<reg::SxFCRField::FEIE>(ValueOnly));
+		return std::get<0>(reg::SxFCR<DMA, Str>.template readBit<reg::SxFCRField::FEIE>(ValueOnly));
 	}
 }
 

@@ -28,7 +28,7 @@ constexpr void enable_irq() noexcept {
 
 template <IrqNum IRQn>
 [[nodiscard]] constexpr bool is_irq_enabled() noexcept {
-	return get<0>(reg::NVIC_ISER<IRQn>.template readBit<reg::NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly));
+	return std::get<0>(reg::NVIC_ISER<IRQn>.template readBit<reg::NVIC_IRQ_BIT_POS(IRQn)>(ValueOnly));
 }
 
 template <IrqNum IRQn>

@@ -19,6 +19,7 @@
 #include <tuple>
 
 #include "cpp_stm32/common/gpio.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
 #include "cpp_stm32/target/stm32/l4/memory/gpio_reg.hxx"
 
@@ -71,7 +72,7 @@ constexpr void toggle() noexcept {
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
 	auto const m_odr	 = reg::ODR<Port>.template readBit<Pins...>(ValueOnly);
-	auto const mod_val = bit_group_cat(~m_odr, m_odr);
+	auto const mod_val = std::tuple_cat(~m_odr, m_odr);
 
 	// this is a bit hacky IMO, but can't come up with a better idea
 	// @todo perhap add index rule in register class
@@ -90,10 +91,6 @@ template <Port Port, Pin... Pins>
 constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 	constexpr auto Pin7 = Pin::Pin7;
 
-	[[maybe_unused]] constexpr auto cast_to_int = [](auto const& t_val) {
-		return to_underlying(t_val);
-	};	// to prevent internal compiler error
-
 	if constexpr (((Pins <= Pin7) || ...)) {
 		constexpr auto low_pin_group = [](Pin t_pin) {
 			if (t_pin <= Pin7) {
@@ -107,7 +104,8 @@ constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
 	if constexpr (((Pins > Pin7) || ...)) {
 		constexpr auto high_pin_group = [](Pin t_pin) {
 			if (t_pin > Pin7) {
-				return Pin{cast_to_int(t_pin) - 8};
+				std::uint8_t const a = static_cast<std::underlying_type_t<Pin>>(t_pin) - 8U;
+				return Pin{a};
 			}
 		};
 

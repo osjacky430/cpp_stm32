@@ -24,6 +24,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
+
 #include "cpp_stm32/target/stm32/f4/register/i2c.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
@@ -62,6 +65,15 @@ constexpr void reset() noexcept {
 	disable<I2C>();
 
 	reg::CR1<I2C>.template setBit<reg::CR1Field::SWRST>();
+}
+
+/**
+ * @brief 	This function reads status register 1 of I2C
+ * @return  std::tuple of required bit
+ */
+template <Port I2C, InterruptFlag... Flags>
+constexpr auto get_interrupt_flag() {
+	return reg::SR1<I2C>.template readBit<Flags...>(ValueOnly);
 }
 
 /**
@@ -115,6 +127,24 @@ constexpr void terminate_stop_condition() noexcept {
 }
 
 /**
+ * @brief   This function enables I2C to return acknowledge after a byte is received
+ * @tparam  I2C @ref i2c::Port
+ */
+template <Port I2C>
+constexpr void enable_ack() noexcept {
+	reg::CR1<I2C>.template setBit<reg::CR1Field::ACK>();
+}
+
+/**
+ * @brief   This function disables acknowledging after a byte is received
+ * @tparam  I2C @ref i2c::Port
+ */
+template <Port I2C>
+constexpr void disable_ack() noexcept {
+	reg::CR1<I2C>.template clearBit<reg::CR1Field::ACK>();
+}
+
+/**
  * @brief   This function sets own address
  * @tparam  I2C @ref i2c::Port
  * @tparam  AM  @ref i2c::SlaveAddressMode
@@ -155,6 +185,20 @@ constexpr void disable_dual_address() noexcept {
 }
 
 /**
+ * @brief			This function reads status register 2 of I2C
+ * @return  	std::tuple of required master status
+ *
+ * @note    	Calling this function after calling @ref i2c::get_interrupt_flag clears the ADDR flag, even if the ADDR
+ * 						flag was set after reading @ref i2c::get_interrupt_flag. Consequently, this function must be called only
+ * 						when ADDR is found set in I2C_SR1 or when the STOPF bit is cleared.
+ * @todo  		Rename it
+ */
+template <Port I2C, I2CStatus... Flags>
+constexpr auto get_i2c_status() noexcept {
+	return reg::SR2<I2C>.template readBit<Flags...>(ValueOnly);
+}
+
+/**
  * @brief   This function writes the perihperal clock frequency to the register
  * @tparam  I2C @ref i2c::Port
  *
@@ -174,15 +218,80 @@ constexpr void write_periph_clk_freq() noexcept {
 }
 
 /**
+ * @brief 	This function initiates transfer process by sending slave address.
+ * @tparam  I2C		@ref i2c::Port
+ */
+template <Port I2C, typename SlaveAddrType>
+constexpr void initiaite_comm_process(SlaveAddrType const t_slave, Command const t_cmd) noexcept {
+	constexpr bool is_7_bit	 = std::is_same_v<SlaveAddrType, SlaveAddr7_t>;
+	constexpr bool is_10_bit = std::is_same_v<SlaveAddrType, SlaveAddr10_t>;
+	constexpr auto wait_busy = []() {
+		while (std::get<0>(get_i2c_status<I2C, I2CStatus::BUSY>()) != 0) {
+		}
+	};
+	constexpr auto wait_start_bit = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::SB>()) != 1) {
+		}
+	};
+	constexpr auto wait_address_bit = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::ADDR>())) {
+		}
+	};
+	constexpr auto set_read_write_cmd = [](std::uint8_t const t_s, Command const t_wr) {
+		return static_cast<std::uint8_t>(t_s << 1 | to_underlying(t_wr));
+	};
+
+	static_assert(is_7_bit || is_10_bit);
+
+	wait_busy();	// Setting the START bit causes the interface to generate a Start condition and to switch to Master mode
+								// (MSL bit set) when the BUSY bit is cleared.
+	if (t_cmd == Command::Read) {
+		enable_ack<I2C>();
+	}
+
+	generate_start_condition<I2C>();	// In master mode, setting the START bit causes the interface to generate a ReStart
+																		// condition at the end of the current byte transfer.
+	wait_start_bit();
+
+	if constexpr (is_7_bit) {
+		reg::DR<I2C>.template writeBit<reg::DRField::DR>(set_read_write_cmd(t_slave.get(), t_cmd));
+	} else {
+		// @todo finish
+		constexpr auto header_10_bit = []() {};
+	}
+
+	wait_address_bit();
+}
+
+/**
  * @brief   This function writes byte to data register
  * @tparam  I2C @ref i2c::Port
  * @param   t_data  Data to transmit
  *
  * @todo    handle transfer process
  */
-template <Port I2C>
-constexpr void send(std::uint8_t const t_data) noexcept {
-	reg::DR<I2C>.template writeBit<reg::DRField::DR>(t_data);
+template <Port I2C, typename SlaveAddrType, std::size_t N, std::uint8_t BC>
+constexpr void send_blocking(SlaveAddrType const t_slave, std::array<std::uint8_t, N> const& t_data,
+														 ByteCount<BC> const /* unused */) noexcept {
+	static_assert(BC <= N);
+	constexpr auto wait_byte_tx_finish = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::BTF>()) != 1) {
+		}
+	};
+	constexpr auto transfer_byte = [wait_byte_tx_finish](std::uint8_t const t_to_send) {
+		wait_byte_tx_finish();
+		reg::DR<I2C>.template writeBit<reg::DRField::DR>(t_to_send);
+	};
+
+	initiaite_comm_process<I2C>(t_slave, Command::Write);
+
+	// @todo, the flag is arbitrarily chosen, which makes the purpose of this line of code unclear, improve this
+	// @note: Address sent (Master) = 0: No end of address transmission, cleared by reading SR1 then SR2
+	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+
+	std::for_each(t_data.begin(), t_data.end(), transfer_byte);
+
+	generate_stop_condition<I2C>();
 }
 
 /**
@@ -192,9 +301,101 @@ constexpr void send(std::uint8_t const t_data) noexcept {
  *
  * @todo    handle receive process
  */
-template <Port I2C>
-constexpr auto receive() noexcept {
-	return reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly);
+template <Port I2C, typename SlaveAddrType, std::uint8_t BC>
+[[nodiscard]] constexpr std::array<std::uint8_t, BC> receive_blocking(SlaveAddrType const t_slave,
+																																			ByteCount<BC> const /*unused*/) noexcept {
+	constexpr auto wait_rxne = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::RxNE>()) != 1) {
+		}
+	};
+	constexpr auto rcv_byte = [wait_rxne]() {
+		wait_rxne();
+		return std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	};
+
+	std::array<std::uint8_t, BC> ret_val{};
+
+	initiaite_comm_process<I2C>(t_slave, Command::Read);
+
+	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+
+	std::generate_n(ret_val.begin(), BC - 1, rcv_byte);
+
+	disable_ack<I2C>();
+	ret_val[BC - 1] = rcv_byte();
+	generate_stop_condition<I2C>();
+
+	/* The procedure below is follows the reference manual RM0390, however, IMO, it doesn't achieve anything.
+	// See (STM32F10xxx I2C optimized examples) AN2824, and (STM32F446xx advanced Arm-based 32-bit MCUs) RM0390
+	//
+	// if constexpr (BC == 1) {
+	// 	// In case a single byte has to be received, the Acknowledge disable is made before ADDR flag is cleared, and the
+	// 	// STOP condition generation is made after data received.
+	// 	disable_ack<I2C>();
+	// 	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+	//
+	// 	ret_val[0] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	//
+	// 	generate_stop_condition<I2C>();
+	// } else if (BC == 2) {
+	// 	// For 2-byte reception:
+	// 	//	1. Wait until ADDR = 1 (SCL stretched low until the ADDR flag is cleared)
+	// 	//  2. Set ACK low, set POS high
+	// 	//  3. Clear ADDR flag
+	// 	//  4. Wait until BTF = 1 (Data 1 in DR, Data2 in shift register, SCL stretched low until a data 1 is read)
+	// 	//  5. Set STOP high
+	// 	//  6. Read data 1 and 2
+	//
+	// 	disable_ack<I2C>();
+	// 	reg::CR1<I2C>.template setBit<reg::CR1Field::POS>();
+	//
+	// 	// @todo, the flag is arbitrarily chosen, which makes the purpose of this line of code unclear, improve this
+	// 	// @note: ADDR bit (Master) when = 0: No end of address transmission. ADDR bit is cleared by reading SR1 then SR2
+	// 	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+	//
+	// 	wait_byte_tx_finish();
+	// 	generate_stop_condition<I2C>();
+	//
+	// 	ret_val[0] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	// 	ret_val[1] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	// } else {
+	// 	// For N > 2 byte reception, from N-2 data reception
+	// 	// 	1. Wait until BTF = 1 (data N-2 in DR, data N-1 in shift register, SCL stretched low until data N-2 is read)
+	// 	//  2. Set ACK low
+	// 	//  3. Read data N-2
+	// 	//  4. Wait until BTF = 1 (data N-1 in DR, data N in shift register, SCL stretched low until a data N-1 is read)
+	// 	//  5. Set STOP high
+	// 	//  6. Read data N-1 and N
+	//
+	// 	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+	//
+	// 	// using raw loop instead of std algorithm as it can only increment iterator by one (poor algorithm)
+	// 	for (int i = 0; i < BC - 3; i += 2) {
+	// 		wait_rxne();
+	// 		ret_val[i] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	//
+	//    // wait byte transfer finish
+	// 		while(std::get<0>(reg::SR1<I2C>.template readBit<reg::SR1Field::BTF>(ValueOnly)) != 1) {
+	//		}
+	//    ret_val[i + 1] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	// 	}
+	//
+	// 	// To generate the nonacknowledge pulse after the last received data byte, the ACK bit
+	// 	// must be cleared just after reading the second last data byte (after second last event).
+	// 	while(std::get<0>(reg::SR1<I2C>.template readBit<reg::SR1Field::BTF>(ValueOnly)) != 1) {
+	//	}
+	// 	disable_ack<I2C>();
+	//	ret_val[BC - 3] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));	// 3rd last byte
+	//
+	// 	// In order to generate the Stop/Restart condition, software must set the STOP/START after reading the second last
+	// 	// data byte (after the second last RxNE event).
+	// 	generate_stop_condition<I2C>();
+	// 	ret_val[BC - 2] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));	// 2nd last byte
+	//  ret_val[BC - 1] = std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));	// last byte
+	// }
+	*/
+
+	return ret_val;
 }
 
 /**
@@ -318,24 +519,6 @@ constexpr void enable_clock_stretch() noexcept {
 template <Port I2C>
 constexpr void disable_clock_stretch() noexcept {
 	reg::CR1<I2C>.template setBit<reg::CR1Field::NOSTRETCH>();
-}
-
-/**
- * @brief   This function enables I2C to return acknowledge after a byte is received
- * @tparam  I2C @ref i2c::Port
- */
-template <Port I2C>
-constexpr void enable_ack() noexcept {
-	reg::CR1<I2C>.template setBit<reg::CR1Field::ACK>();
-}
-
-/**
- * @brief   This function disables acknowledging after a byte is received
- * @tparam  I2C @ref i2c::Port
- */
-template <Port I2C>
-constexpr void disable_ack() noexcept {
-	reg::CR1<I2C>.template clearBit<reg::CR1Field::ACK>();
 }
 
 /**

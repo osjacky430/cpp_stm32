@@ -223,19 +223,8 @@ SETUP_REGISTER_INFO(SR2BitList,							/**/
 										Bit<8>{BitPos_t{8}}			// PEC
 )
 
-enum class SR2Field {
-	MSL,				/*!< Master/slave*/
-	BUSY,				/*!< Bus busy*/
-	TRA,				/*!< Transmitter/receiver*/
-	GENCALL,		/*!< General call address (Slave mode)*/
-	SMBDEFAULT, /*!< SMBus device default address (Slave mode)*/
-	SMBHOST,		/*!< SMBus host header (Slave mode)*/
-	DUALF,			/*!< Dual flag (Slave mode)*/
-	PEC,				/*!< Packet error checking register*/
-};
-
 template <Port I2C>
-static constexpr Register<SR2BitList, SR2Field> SR2{BASE_ADDR(I2C), 0x18U};
+static constexpr Register<SR2BitList, I2CStatus> SR2{BASE_ADDR(I2C), 0x18U};
 /**@}*/
 
 /**

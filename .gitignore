@@ -6,6 +6,7 @@ src/
 
 # build folder
 build/
+example_bin/
 
 # documentation folder
 documentation/

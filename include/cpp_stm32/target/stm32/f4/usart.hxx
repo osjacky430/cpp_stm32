@@ -127,7 +127,7 @@ constexpr void send(std::uint8_t const data) noexcept {
  */
 template <Port InputPort>
 [[nodiscard]] constexpr auto receive() noexcept {
-	return get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
+	return std::get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
 }
 
 /**
@@ -140,7 +140,7 @@ template <Port InputPort>
  */
 template <Port InputPort>
 constexpr auto is_tx_empty() noexcept {
-	return get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::TXE>(ValueOnly)) != 0;
+	return std::get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::TXE>(ValueOnly)) != 0;
 }
 
 /**
@@ -153,7 +153,7 @@ constexpr auto is_tx_empty() noexcept {
  */
 template <Port InputPort>
 constexpr auto is_rx_empty() noexcept {
-	return get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::RXNE>(ValueOnly)) == 0;
+	return std::get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::RXNE>(ValueOnly)) == 0;
 }
 
 /**
@@ -204,7 +204,7 @@ constexpr void send_blocking(std::uint8_t const t_data) noexcept {
 template <Port InputPort>
 constexpr auto receive_blocking() noexcept {
 	wait_rx_not_empty<InputPort>();
-	return get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
+	return std::get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
 }
 
 /**
@@ -304,11 +304,7 @@ constexpr void disable_half_duplex() noexcept {
  */
 template <Port InputPort, InterruptFlag... Flags>
 constexpr auto get_interrupt_flag() noexcept {
-	if constexpr (sizeof...(Flags) == 1) {
-		return get<0>(reg::SR<InputPort>.template readBit<Flags...>(ValueOnly));
-	} else {
-		return reg::SR<InputPort>.template readBit<Flags...>(ValWithPos);
-	}
+	return reg::SR<InputPort>.template readBit<Flags...>(ValueOnly);
 }
 
 /**
@@ -322,8 +318,8 @@ constexpr auto clear_interrupt_flag() noexcept {
 		if constexpr (Flag == InterruptFlag::PE) {
 			wait_rx_not_empty<InputPort>();
 		}
-		[[gnu::unused]] auto const temp_sr = get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::IDLE>(ValueOnly));
-		[[gnu::unused]] auto const temp_dr = get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
+		[[gnu::unused]] auto const sr = std::get<0>(reg::SR<InputPort>.template readBit<InterruptFlag::IDLE>(ValueOnly));
+		[[gnu::unused]] auto const dr = std::get<0>(reg::DR<InputPort>.template readBit<reg::DrBit::Dr>(ValueOnly));
 	} else {
 		// @TODO finish in the future
 	}

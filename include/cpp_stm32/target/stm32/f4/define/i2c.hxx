@@ -24,6 +24,8 @@
 
 #include <cstdint>
 
+#include "cpp_stm32/utility/strongly_typed.hxx"
+
 namespace cpp_stm32::i2c {
 
 enum class Port : std::uint8_t { I2C3, I2C2, I2C1 };
@@ -47,6 +49,18 @@ enum class InterruptFlag : std::uint8_t {
 	PECERR,		/*!< PEC Error in reception*/
 	TIMEOUT,	/*!< Timeout or Tlow error*/
 	SMBALERT, /*!< SMBus alert*/
+};
+
+// @todo rename it
+enum class I2CStatus : std::uint8_t {
+	MSL,				/*!< Master/slave*/
+	BUSY,				/*!< Bus busy*/
+	TRA,				/*!< Transmitter/receiver*/
+	GENCALL,		/*!< General call address (Slave mode)*/
+	SMBDEFAULT, /*!< SMBus device default address (Slave mode)*/
+	SMBHOST,		/*!< SMBus host header (Slave mode)*/
+	DUALF,			/*!< Dual flag (Slave mode)*/
+	PEC,				/*!< Packet error checking register*/
 };
 
 /**
@@ -83,5 +97,13 @@ constexpr auto CHECK_DNF(std::uint32_t const t_fplck, std::uint8_t const t_DNF) 
 		}
 	}
 }
+
+/**
+ *
+ */
+using SlaveAddr7_t	= StrongType<std::uint8_t, struct SlaveAddr7Bit>;
+using SlaveAddr10_t = StrongType<std::uint16_t, struct SlaveAddr10Bit>;
+
+enum class Command : std::uint8_t { Write, Read };
 
 }	 // namespace cpp_stm32::i2c

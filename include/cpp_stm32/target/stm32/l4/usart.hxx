@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>
+#include <tuple>
 #include <type_traits>
 
 #include "cpp_stm32/common/usart.hxx"
@@ -45,8 +46,7 @@ constexpr void set_databit(usart::DataBit const& t_d_bit) noexcept {
 	std::uint8_t const m1 = (to_underlying(t_d_bit) & 0b10) != 0;
 	std::uint8_t const m0 = (to_underlying(t_d_bit) & 0b01);
 
-	auto const val_to_write = BitGroup{m1, m0};
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0>(val_to_write);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0>(m1, m0);
 }
 
 template <Port InputPort>
@@ -56,29 +56,29 @@ constexpr void set_hardware_flow_ctl(usart::HardwareFlowControl const& t_flow_ct
 	// maybe we can set these two bits to t_flow_ctl, as long as we assign special enum value
 	// so that t_flow_ctl & mask = 1 when t_flow_ctl = cts or rts, and t_flow_ctl & mask = 0 when
 	// t_flow_ctl = none, e.g. ctl = 1, rts = 3, none = 4
-	std::uint8_t const cts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
-	std::uint8_t const rts	= (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
-	auto const val_to_write = BitGroup{rts, cts};
-	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(val_to_write);
+	std::uint8_t const cts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::CTS)) != 0;
+	std::uint8_t const rts = (to_underlying(t_flow_ctl) & to_underlying(HardwareFlowControl::RTS)) != 0;
+
+	reg::CR3<InputPort>.template writeBit<reg::Cr3Bit::RTSE, reg::Cr3Bit::CTSE>(rts, cts);
 }
 
 template <Port InputPort>
 constexpr void set_transfer_mode(usart::Mode const& t_mode) noexcept {
 	using usart::Mode;
 
-	std::uint8_t const txe	= (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
-	std::uint8_t const rxe	= (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
-	auto const val_to_write = BitGroup{txe, rxe};
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(val_to_write);
+	std::uint8_t const txe = (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
+	std::uint8_t const rxe = (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
+
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(txe, rxe);
 }
 
 template <Port InputPort>
 constexpr void set_parity(usart::Parity const& t_parity) noexcept {
 	using usart::Parity;
 
-	std::uint8_t const pe		= (t_parity != Parity::None);
-	auto const val_to_write = BitGroup{pe, t_parity};
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(val_to_write);
+	std::uint8_t const pe = (t_parity != Parity::None);
+
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(pe, t_parity);
 }
 
 template <Port InputPort, usart::Stopbit StopBit>
@@ -92,21 +92,22 @@ constexpr void send(std::uint8_t const& t_data) noexcept {
 	reg::TDR<InputPort>.template writeBit<reg::TDrBit::TDr>(t_data);
 }
 
+// get<0> -> remove or std::get<0>
 template <Port InputPort>
 constexpr auto receive() noexcept {
-	return get<0>(reg::RDR<InputPort>.template readBit<reg::RDrBit::RDr>(ValueOnly));
+	return std::get<0>(reg::RDR<InputPort>.template readBit<reg::RDrBit::RDr>(ValueOnly));
 }
 
 template <Port InputPort>
 constexpr auto is_tx_empty() noexcept {
 	// 0: data is not transferred to shift register
 	// 1: data is transferred to shift register
-	return get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::TxE>(ValueOnly)) != 0;
+	return std::get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::TxE>(ValueOnly)) != 0;
 }
 
 template <Port InputPort>
 constexpr auto is_rx_empty() noexcept {
-	return get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::RxNE>(ValueOnly)) == 0;
+	return std::get<0>(reg::ISR<InputPort>.template readBit<reg::ISrBit::RxNE>(ValueOnly)) == 0;
 }
 
 template <Port InputPort>
@@ -129,7 +130,7 @@ constexpr auto send_blocking(std::uint8_t const& t_data) noexcept {
 
 template <Port InputPort>
 constexpr void enable() noexcept {
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::UE>();
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::UE>();
 }
 
 template <Port InputPort, usart::Stopbit Stop>
@@ -141,20 +142,19 @@ constexpr void set_dps(usart::DataBit const& t_d, usart::Parity const& t_p,
 	std::uint8_t const d1 = (to_underlying(t_d) & 0b10) != 0;
 	std::uint8_t const d0 = (to_underlying(t_d) & 0b01);
 
-	auto const val_to_write = BitGroup{d1, d0, pe, t_p};
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(
-		val_to_write);
+	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::M1, reg::Cr1Bit::M0, reg::Cr1Bit::PCE, reg::Cr1Bit::PS>(d1, d0, pe,
+																																																						 t_p);
 	reg::CR2<InputPort>.template writeBit<reg::Cr2Bit::Stop>(Stop);
 }
 
 template <Port InputPort>
 constexpr void enable_txe_irq() noexcept {
-	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TxEIE>();
+	reg::CR1<InputPort>.template setBit<reg::Cr1Bit::TxEIE>();
 }
 
 template <Port InputPort, reg::IcrBit flag>
 constexpr void clear_flag() noexcept {
-	reg::ICR<InputPort>.template writeBit<flag>();
+	reg::ICR<InputPort>.template setBit<flag>();
 }
 
 }	 // namespace cpp_stm32::usart

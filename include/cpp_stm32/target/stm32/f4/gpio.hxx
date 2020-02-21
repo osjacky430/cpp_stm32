@@ -26,6 +26,7 @@
 
 #include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/detail/builder.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 
 #include "cpp_stm32/target/stm32/f4/register/gpio.hxx"
 
@@ -76,10 +77,12 @@ constexpr void mode_setup(Mode const t_mode, Pupd const t_pupd) noexcept {
  */
 template <Port InputPort, Pin... Pins>
 constexpr void toggle() noexcept {
+	using namespace detail;
+
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
 	auto const m_odr	 = reg::ODR<InputPort>.template readBit<Pins...>(ValueOnly);
-	auto const mod_val = bit_group_cat(~m_odr, m_odr);
+	auto const mod_val = std::tuple_cat(~m_odr, m_odr);
 
 	// this is a bit hacky IMO, but can't come up with a better idea
 	// @todo perhap add index rule in register class

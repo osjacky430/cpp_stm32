@@ -24,15 +24,15 @@ enum class VoltageScale { Scale1Mode = 0b11, Scale2Mode = 0b10, Scale3Mode = 0b0
 
 // only set when pll is enabled
 // @ref https://community.st.com/s/question/0D50X0000A4qUmwSQE/more-documentation-about-vosrdy
-constexpr auto is_vos_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::VosRdy>(ValueOnly)); }
+constexpr auto is_vos_rdy() noexcept { return std::get<0>(reg::CSR.readBit<reg::CsrBit::VosRdy>(ValueOnly)); }
 
 constexpr void enable_overdrive() noexcept { reg::CR.setBit<reg::CrBit::OdEn>(); }
 
 constexpr void enable_overdrive_switch() noexcept { reg::CR.setBit<reg::CrBit::OdSwEn>(); }
 
-constexpr auto is_overdrive_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::OdrRdy>(ValueOnly)); }
+constexpr auto is_overdrive_rdy() noexcept { return std::get<0>(reg::CSR.readBit<reg::CsrBit::OdrRdy>(ValueOnly)); }
 
-constexpr auto is_overdrive_switch_rdy() noexcept { return get<0>(reg::CSR.readBit<reg::CsrBit::OdrSwRdy>(ValueOnly)); }
+constexpr auto is_overdrive_switch_rdy() noexcept { return std::get<0>(reg::CSR.readBit<reg::CsrBit::OdrSwRdy>(ValueOnly)); }
 
 constexpr void wait_vos_rdy() noexcept {
 	while (is_vos_rdy() != 1) {

@@ -25,9 +25,9 @@
 
 namespace cpp_stm32::gpio {
 
-enum class Port { PortA, PortB, PortC, PortD, PortE, PortH, Total };
+enum class Port : std::uint8_t { PortA, PortB, PortC, PortD, PortE, PortH, Total };
 
-enum class Pin {
+enum class Pin : std::uint8_t {
 	Pin0,
 	Pin1,
 	Pin2,
@@ -50,17 +50,34 @@ enum class Pin {
 /**
  * @enum Mode
  */
-enum class Mode {
+enum class Mode : std::uint8_t {
 	Input,	 /*!< Input mode */
 	Output,	 /*!< Output mode */
 	AltFunc, /*!< Alternate Function mode*/
 	Analog	 /*!< Analog mode*/
 };
 
-enum class Pupd { None, PullUp, PullDown };
-enum class OutputType { PushPull, OpenDrain };
-enum class OutputSpeed { Low, Medium, Fast, High };
-enum class AltFunc { AF0, AF1, AF2, AF3, AF4, AF5, AF6, AF7, AF8, AF9, AF10, AF11, AF12, AF13, AF14, AF15 };
+enum class Pupd : std::uint8_t { None, PullUp, PullDown };
+enum class OutputType : std::uint8_t { PushPull, OpenDrain };
+enum class OutputSpeed : std::uint8_t { Low, Medium, Fast, High };
+enum class AltFunc : std::uint8_t {
+	AF0,
+	AF1,
+	AF2,
+	AF3,
+	AF4,
+	AF5,
+	AF6,
+	AF7,
+	AF8,
+	AF9,
+	AF10,
+	AF11,
+	AF12,
+	AF13,
+	AF14,
+	AF15
+};
 
 /**
  * @enum  PinName

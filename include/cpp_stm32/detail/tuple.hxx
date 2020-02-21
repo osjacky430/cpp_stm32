@@ -23,7 +23,10 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <cstddef>
+#include <tuple>
 #include <utility>
 
 namespace cpp_stm32::detail {
@@ -170,6 +173,19 @@ class Tuple : public TupleImpl<0, Elems...> {
 	template <bool = sizeof...(Elems) >= 1>
 	explicit constexpr Tuple(Elems const&... t_elems) noexcept : Inherited(t_elems...) {}
 
+	/**
+	 * @brief  	Construct Tuple with std::tuple
+	 * @param  	t_tup std::tuple
+	 */
+	explicit constexpr Tuple(std::tuple<Elems...> const& t_tup) noexcept {
+		// @todo
+	}
+
+	/**
+	 * @brief		Operator= for Tuple
+	 * @param   t_tup 	the other Tuple
+	 * @return  itself
+	 */
 	constexpr Tuple& operator=(Tuple const& t_tup) noexcept {
 		Inherited::operator=(t_tup);
 		return *this;
@@ -240,7 +256,7 @@ constexpr Head& get(Tuple<Head, Tails...>& t_tup) noexcept {
 // tuple nand implementation
 template <typename Tup, std::size_t... Idx>
 [[nodiscard]] constexpr auto nand_impl(Tup const& t_tup, std::index_sequence<Idx...> const /* unused */) {
-	return Tuple{~get<Idx>(t_tup)...};
+	return Tup{~get<Idx>(t_tup)...};
 };
 
 /**
@@ -254,15 +270,31 @@ template <typename... Elems>
 constexpr bool is_nand_operable = (std::is_integral_v<Elems> && ...);
 
 /**
- * @brief  	Operator NAND for Tuple
+ * @brief  	Operator NAND for std::tuple
  * @tparam  Elems 	Variadic template parameter
- * @param		t_tup 	@ref Tuple
+ * @param		t_tup 	std::tuple
  *
- * @return  Tuple with all element NANDed
+ * @return  std::tuple with all element NANDed
  */
 template <typename... Elems, typename = std::enable_if_t<is_nand_operable<Elems...>>>
-[[nodiscard]] constexpr auto operator~(Tuple<Elems...> const& t_tup) noexcept {
-	return nand_impl<Tuple<Elems...>>(t_tup, std::make_index_sequence<sizeof...(Elems)>{});
+[[nodiscard]] constexpr auto operator~(std::tuple<Elems...> const& t_tup) noexcept {
+	return nand_impl<std::tuple<Elems...>>(t_tup, std::make_index_sequence<sizeof...(Elems)>{});
+}
+
+// Tuple to tuple implementation
+template <typename... Elems, std::size_t... Idx>
+[[nodiscard]] constexpr auto to_std_tup_impl(Tuple<Elems...> const& t_tup, std::index_sequence<Idx...> const) noexcept {
+	return std::tuple{get<Idx>(t_tup)...};
+}
+
+/**
+ * @brief 		This function transforms self implemented Tuple to std::tuple
+ * @param  		t_tup	Tuple
+ * @return    std::tuple
+ */
+template <typename... Elems>
+[[nodiscard]] constexpr auto to_std_tuple(Tuple<Elems...> const& t_tup) noexcept {
+	return to_std_tup_impl(t_tup, std::make_index_sequence<sizeof...(Elems)>{});
 }
 
 }	 // namespace cpp_stm32::detail
