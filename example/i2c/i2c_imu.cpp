@@ -22,41 +22,92 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <charconv>
+
+#include "cpp_stm32/driver/usart_serial.hxx"
+
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/i2c.hxx"
-#include "cpp_stm32/target/stm32/f4/nvic.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
-namespace Rcc	 = cpp_stm32::rcc;
-namespace Gpio = cpp_stm32::gpio;
-namespace Nvic = cpp_stm32::nvic;
-namespace I2c	 = cpp_stm32::i2c;
-namespace Sys	 = cpp_stm32::sys;
+namespace Rcc		= cpp_stm32::rcc;
+namespace Gpio	= cpp_stm32::gpio;
+namespace I2c		= cpp_stm32::i2c;
+namespace Sys		= cpp_stm32::sys;
+namespace Usart = cpp_stm32::usart;
+
+namespace Driver = cpp_stm32::driver;
 
 using cpp_stm32::operator"" _kHz;
+using cpp_stm32::operator"" _byte;
+using Usart::operator"" _Baud;
+
+Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v<Gpio::PinName::PA_3>, 115200_Baud};
 
 constexpr auto I2C = I2c::Port::I2C1;
 
+/* IMU defines */
+constexpr auto XM_SAD = 0b0011110, GYRO_SAD = 0b1101010;
+
+enum class RegisterMap {
+	WHO_AM_I = 0xF,
+	/* GYRO Register map */
+
+	/* Accelerometer Register map */
+
+};
+
+/* setup led */
+constexpr void setup_led() noexcept {
+	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioA>();
+	Gpio::mode_setup<Gpio::Port::PortA, Gpio::Pin::Pin5>(Gpio::Mode::Output, Gpio::Pupd::None);
+}
+
+/* setup i2c */
 constexpr void setup_i2c() noexcept {
-	Rcc::enable_periph_clk<Rcc::PeriphClk::I2c1>();
+	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioC>();
+	Gpio::mode_setup<Gpio::Port::PortC, Gpio::Pin::Pin8, Gpio::Pin::Pin9>(Gpio::Mode::Output, Gpio::Pupd::None);
+	Gpio::set<Gpio::Port::PortC, Gpio::Pin::Pin8, Gpio::Pin::Pin9>();
+
 	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioB>();
 
-	Gpio::mode_setup<Gpio::Port::PortB, Gpio::Pin::Pin8, Gpio::Pin::Pin9>(Gpio::Mode::AltFunc, Gpio::Pupd::None);
 	Gpio::set_alternate_function<Gpio::Port::PortB, Gpio::Pin::Pin8, Gpio::Pin::Pin9>(Gpio::AltFunc::AF4);
+	Gpio::set_output_type<Gpio::Port::PortB, Gpio::Pin::Pin8, Gpio::Pin::Pin9>(Gpio::OutputType::OpenDrain);
+	Gpio::mode_setup<Gpio::Port::PortB, Gpio::Pin::Pin8, Gpio::Pin::Pin9>(Gpio::Mode::AltFunc, Gpio::Pupd::PullUp);
 
-	I2c::config_scl_clock<I2C, I2c::MasterMode::FM>(400_kHz);
+	I2c::reset<I2C>();
+
+	Rcc::enable_periph_clk<Rcc::PeriphClk::I2c1>();
 	I2c::write_periph_clk_freq<I2C>();
+	I2c::config_scl_clock<I2C, I2c::MasterMode::FM>(400_kHz);
 	I2c::write_max_rising_time<I2C, I2c::MasterMode::FM>();
+	I2c::set_address_mode<I2C, I2c::SlaveAddressMode::SevenBits>();
 	I2c::set_digital_noise_filter<I2C, I2c::MasterMode::FM, 15>();
 	I2c::enable<I2C>();
 }
 
+std::array<char, 10> str;
+
 int main() {
 	Sys::Clock::init<Rcc::ClkSrc::Hse>();
 
+	setup_led();
 	setup_i2c();
 
 	while (true) {
+		constexpr auto SOME_INTERVAL = 1000000;
+		for (int i = 0; i < SOME_INTERVAL; ++i) {
+			__asm("nop");
+		}
+
+		Gpio::toggle<Gpio::Port::PortA, Gpio::Pin::Pin5>();
+
+		constexpr std::array tx = {cpp_stm32::to_underlying(RegisterMap::WHO_AM_I)};
+		auto const [gyro_id]		= I2c::xfer_blocking<I2C>(I2c::SlaveAddr7_t{GYRO_SAD}, 1_byte, tx.begin(), tx.end());
+
+		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), gyro_id); ec == std::errc()) {
+			pc << std::string_view(str.data(), p - str.data()) << "\n\r";	// this will print "212"
+		}
 	}
 }
