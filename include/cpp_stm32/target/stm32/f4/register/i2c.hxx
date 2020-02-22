@@ -224,7 +224,7 @@ SETUP_REGISTER_INFO(SR2BitList,							/**/
 )
 
 template <Port I2C>
-static constexpr Register<SR2BitList, I2CStatus> SR2{BASE_ADDR(I2C), 0x18U};
+static constexpr Register<SR2BitList, Status> SR2{BASE_ADDR(I2C), 0x18U};
 /**@}*/
 
 /**

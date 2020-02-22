@@ -24,6 +24,7 @@
 
 namespace cpp_stm32 {
 
+// @todo change to return Frequency<freq>
 constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }

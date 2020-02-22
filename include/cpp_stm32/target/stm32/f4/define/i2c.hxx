@@ -52,7 +52,7 @@ enum class InterruptFlag : std::uint8_t {
 };
 
 // @todo rename it
-enum class I2CStatus : std::uint8_t {
+enum class Status : std::uint8_t {
 	MSL,				/*!< Master/slave*/
 	BUSY,				/*!< Bus busy*/
 	TRA,				/*!< Transmitter/receiver*/
@@ -68,7 +68,7 @@ enum class I2CStatus : std::uint8_t {
  * @ref     https://www.nxp.com/docs/en/user-guide/UM10204.pdf
  */
 constexpr auto FM_MAX_TRISE = 300;	 // ns
-constexpr auto SM_MAX_TRISE = 1000;	// ns
+constexpr auto SM_MAX_TRISE = 1000;	 // ns
 
 /**
  *
@@ -104,6 +104,6 @@ constexpr auto CHECK_DNF(std::uint32_t const t_fplck, std::uint8_t const t_DNF) 
 using SlaveAddr7_t	= StrongType<std::uint8_t, struct SlaveAddr7Bit>;
 using SlaveAddr10_t = StrongType<std::uint16_t, struct SlaveAddr10Bit>;
 
-enum class Command : std::uint8_t { Write = 0, Read = 1 };
+enum class Command : std::uint8_t { Write = 0, Read = 1, ReadAfterWrite };
 
-}	// namespace cpp_stm32::i2c
+}	 // namespace cpp_stm32::i2c
