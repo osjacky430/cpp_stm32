@@ -158,6 +158,11 @@ constexpr void set_output_speed(OutputSpeed const t_ospeed) noexcept {
 	reg::OSPEEDR<InputPort>.template writeBit<Pins...>(t_ospeed);
 }
 
+template <Port InputPort, Pin... Pins>
+constexpr void set() noexcept {
+	reg::BSRR<InputPort>.template setBit<Pins...>();
+}
+
 /**
  *
  */

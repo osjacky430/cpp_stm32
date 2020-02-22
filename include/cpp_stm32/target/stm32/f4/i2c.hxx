@@ -65,6 +65,7 @@ constexpr void reset() noexcept {
 	disable<I2C>();
 
 	reg::CR1<I2C>.template setBit<reg::CR1Field::SWRST>();
+	reg::CR1<I2C>.template clearBit<reg::CR1Field::SWRST>();
 }
 
 /**
@@ -270,10 +271,8 @@ constexpr void initiaite_comm_process(SlaveAddrType const t_slave, Command const
  *
  * @todo    handle transfer process
  */
-template <Port I2C, typename SlaveAddrType, std::size_t N, std::uint8_t BC>
-constexpr void send_blocking(SlaveAddrType const t_slave, std::array<std::uint8_t, N> const& t_data,
-														 ByteCount<BC> const /* unused */) noexcept {
-	static_assert(BC <= N);
+template <Port I2C, typename SlaveAddrType, typename RandIt>
+constexpr void send_blocking(SlaveAddrType const t_slave, RandIt t_begin, RandIt t_end) noexcept {
 	constexpr auto wait_byte_tx_finish = []() {
 		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::BTF>()) != 1) {
 		}
@@ -289,7 +288,7 @@ constexpr void send_blocking(SlaveAddrType const t_slave, std::array<std::uint8_
 	// @note: Address sent (Master) = 0: No end of address transmission, cleared by reading SR1 then SR2
 	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
 
-	std::for_each(t_data.begin(), t_data.end(), transfer_byte);
+	std::for_each(t_begin, t_end, transfer_byte);
 
 	generate_stop_condition<I2C>();
 }
@@ -398,6 +397,61 @@ template <Port I2C, typename SlaveAddrType, std::uint8_t BC>
 	return ret_val;
 }
 
+/**
+ * @brief    This function handles transmit and receive
+ * @tparam	 I2C @ref i2c::Port
+ *
+ * @param 	 t_slave  		Slave address
+ * @param    t_data 			Data to transfer
+ * @param    byte_count		Number of byte to receive
+ */
+template <Port I2C, typename SlaveAddrType, typename RandIt, std::uint8_t BC>
+[[nodiscard]] constexpr auto xfer_blocking(SlaveAddrType const t_slave, ByteCount<BC> const /*unused*/, RandIt begin,
+																					 RandIt end) {
+	constexpr auto wait_byte_tx_finish = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::BTF>()) != 1) {
+		}
+	};
+	constexpr auto transfer_byte = [wait_byte_tx_finish](std::uint8_t const t_to_send) {
+		wait_byte_tx_finish();
+		reg::DR<I2C>.template writeBit<reg::DRField::DR>(t_to_send);
+	};
+
+	constexpr auto wait_rxne = []() {
+		while (std::get<0>(get_interrupt_flag<I2C, InterruptFlag::RxNE>()) != 1) {
+		}
+	};
+	constexpr auto rcv_byte = [wait_rxne]() {
+		wait_rxne();
+		return std::get<0>(reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly));
+	};
+
+	initiaite_comm_process<I2C>(t_slave, Command::Write);
+
+	// @todo, the flag is arbitrarily chosen, which makes the purpose of this line of code unclear, improve this
+	// @note: Address sent (Master) = 0: No end of address transmission, cleared by reading SR1 then SR2
+	[[gnu::unused]] auto const [flag] = get_i2c_status<I2C, I2CStatus::BUSY>();
+
+	std::for_each(begin, end, transfer_byte);
+
+	if constexpr (BC > 0) {
+		initiaite_comm_process<I2C>(t_slave, Command::Read);
+
+		std::array<std::uint8_t, BC> ret_val{};
+
+		std::generate_n(ret_val.begin(), BC - 1, rcv_byte);
+
+		disable_ack<I2C>();
+		ret_val[BC - 1] = rcv_byte();
+
+		return ret_val;
+	}
+
+	generate_stop_condition<I2C>();
+}
+
+template <auto F>
+struct P {};
 /**
  * @brief   This function configures SCL of I2C
  * @tparam  I2C   @ref i2c::Port
