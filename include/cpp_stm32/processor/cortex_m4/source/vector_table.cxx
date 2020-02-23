@@ -14,6 +14,8 @@
 // You should have received a copy of the Lesser GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <algorithm>
+
 #include "cpp_stm32/processor/cortex_m4/vector_table.hxx"
 
 /**
@@ -58,6 +60,12 @@ using namespace cpp_stm32;
 	{
 		NVIC_INTERRUPT,
 	},
+
+	// []() {
+	// 	std::array<IrqVector::IrqFuncPtr, NVIC_IRQ_NUM> irq;
+	// 	std::fill(irq.begin(), irq.end(), blocking_handler);
+	// 	return irq;
+	// }(),
 };
 
 void reset_handler() {

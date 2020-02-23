@@ -235,7 +235,7 @@ static constexpr Register<SR2BitList, Status> SR2{BASE_ADDR(I2C), 0x18U};
 
 SETUP_REGISTER_INFO(CCRBitList,														/**/
 										Bit<12, std::uint16_t>{BitPos_t{0}},	// CCR
-										Binary<>{BitPos_t{14}},								// DUTY
+										Bit<1, DutyCycle>{BitPos_t{14}},			// DUTY
 										Bit<1, MasterMode>{BitPos_t{15}}			// F_S
 )
 

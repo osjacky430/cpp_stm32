@@ -1,9 +1,11 @@
 include(../build_binary.cmake)
 
+
 if (${BUILD_EXAMPLE} STREQUAL "ALL")
-  add_binary(i2c_imu)
+  add_binary(digitalout)
+  add_binary(ll_driver)
 else()
-  foreach(src ${i2c_files})
+  foreach(src ${gpio_output_files})
     add_binary(${src})
   endforeach()
 endif()

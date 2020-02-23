@@ -495,16 +495,16 @@ template <Port I2C, typename SlaveAddrType, typename RandIt, std::uint8_t BC>
  *
  *          \therefore CCR = t_{SCL} / ((C_{high} + C_{low}) * t_{pclk}).
  */
-template <Port I2C, MasterMode Mode, std::uint32_t Hz>
+template <Port I2C, MasterMode Mode, DutyCycle DC, std::uint32_t Hz>
 constexpr void config_scl_clock(Frequency<Hz> const /* unused */) noexcept {
 	using namespace reg;
 	// static_assert
-	constexpr std::uint8_t duty = (Hz == 400_k);
+
 	if constexpr (COMPILE_TIME_CLOCK_CONFIG) {
 		constexpr std::uint16_t t_ccr = []() {
 			constexpr auto t_SCL = 1000000000 / Hz;	 // to nano second
 			if constexpr (constexpr auto t_pclk = 1000000000 / APB1_CLK_FREQ; Mode == MasterMode::FM) {
-				if constexpr (duty == 1) {
+				if constexpr (DC == DutyCycle::NineToSixteen) {
 					return t_SCL / (25 * t_pclk);
 				} else {
 					return t_SCL / (3 * t_pclk);
@@ -514,7 +514,7 @@ constexpr void config_scl_clock(Frequency<Hz> const /* unused */) noexcept {
 			}
 		}();
 
-		CCR<I2C>.template writeBit<CCRField::CCR, CCRField::DUTY, CCRField::F_S>(t_ccr, duty, Mode);
+		CCR<I2C>.template writeBit<CCRField::CCR, CCRField::DUTY, CCRField::F_S>(t_ccr, DC, Mode);
 	} else {
 		// @todo finish this
 	}

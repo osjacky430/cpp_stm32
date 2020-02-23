@@ -71,6 +71,11 @@ constexpr auto FM_MAX_TRISE = 300;	 // ns
 constexpr auto SM_MAX_TRISE = 1000;	 // ns
 
 /**
+ * @enum
+ */
+enum class DutyCycle { OneToTwo, NineToSixteen };
+
+/**
  *
  */
 template <MasterMode Mode>

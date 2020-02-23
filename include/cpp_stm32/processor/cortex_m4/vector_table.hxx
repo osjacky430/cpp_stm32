@@ -16,10 +16,25 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 #include "interrupt.hxx"
+
+void reset_handler();
+void nmi_handler();
+void hard_fault_handler();
+void mem_manage_fault_handler();
+void bus_fault_handler();
+void usage_fault_handler();
+void service_call_handler();
+void debug_monitor_handler();
+void pending_service_call_handler();
+void system_clock_tick_handler();
+
+extern std::uint32_t STACK;
 
 struct [[gnu::packed]] IrqVector {
 	using IrqFuncPtr = void (*)();
@@ -42,19 +57,13 @@ struct [[gnu::packed]] IrqVector {
 
 	IrqFuncPtr const pendServiceCall;	 // pending service call handler
 	IrqFuncPtr const sysTick;					 // system tick handler
-	IrqFuncPtr const irq[NVIC_IRQ_NUM];
+
+	// IrqFuncPtr const irq[NVIC_IRQ_NUM];
+	std::array<IrqFuncPtr, NVIC_IRQ_NUM> const irq;
 };
 
-void reset_handler();
-void nmi_handler();
-void hard_fault_handler();
-void mem_manage_fault_handler();
-void bus_fault_handler();
-void usage_fault_handler();
-void service_call_handler();
-void debug_monitor_handler();
-void pending_service_call_handler();
-void system_clock_tick_handler();
+// Standard layout types is memcopy-able and the layout is sufficiently defined, this is added to ensure any changes
+// made in the future is safe and won't break the code.
+static_assert(std::is_standard_layout_v<IrqVector>);
 
-extern std::uint32_t STACK;
 extern IrqVector const irq_vector_table;

@@ -80,7 +80,7 @@ constexpr void setup_i2c() noexcept {
 
 	Rcc::enable_periph_clk<Rcc::PeriphClk::I2c1>();
 	I2c::write_periph_clk_freq<I2C>();
-	I2c::config_scl_clock<I2C, I2c::MasterMode::FM>(400_kHz);
+	I2c::config_scl_clock<I2C, I2c::MasterMode::FM, I2c::DutyCycle::NineToSixteen>(400_kHz);
 	I2c::write_max_rising_time<I2C, I2c::MasterMode::FM>();
 	I2c::set_address_mode<I2C, I2c::SlaveAddressMode::SevenBits>();
 	I2c::set_digital_noise_filter<I2C, I2c::MasterMode::FM, 15>();
@@ -107,7 +107,7 @@ int main() {
 		auto const [gyro_id]		= I2c::xfer_blocking<I2C>(I2c::SlaveAddr7_t{GYRO_SAD}, 1_byte, tx.begin(), tx.end());
 
 		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), gyro_id); ec == std::errc()) {
-			pc << std::string_view(str.data(), p - str.data()) << "\n\r";	// this will print "212"
+			pc << std::string_view(str.data(), p - str.data()) << "\n\r";	 // this will print "212"
 		}
 	}
 }

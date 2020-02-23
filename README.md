@@ -14,6 +14,7 @@ cpp_stm32 requires the following things to be installed:
 - C++17 compiler: the driver is tested with arm-none-eabi-gcc 9.2.1 and arm-none-eabi-gcc 8.3.1, you can download the compiler from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
 - [CMake](https://cmake.org/download/)
 - [make](https://www.gnu.org/software/make/)
+
 ### Building
 Clone the repository, and then build it, make sure the toolchain path is in ```PATH```
 ```
@@ -43,11 +44,20 @@ mkdir build && cd build
 cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
 cmake --build ./
 ```
-(Todo: add build example)
-### System Clock Configuration File
-Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)
+### Build Example
+To build the example, you must use the following syntax (at least currently):
+```
+cmake -DBUILD_EXAMPLE="<example_category>:<example_file_name>" (here goes the rest of the options ...)
+```
+The ```example_category``` are folders under ```example``` directory (e.g. ```gpio_output```, ```i2c``` etc.), and the ```example_file_name``` are the source files under ```example_category```, (e.g. ```digitalout```, ```ll_driver``` in ```gpio_output``` folder). Multiple example file names are separated by comma (**no whitespace**). An example to build ```digitalout``` and ```ll_driver``` in ```gpio_output``` will be like:
+```
+cmake -DBUILD_EXAMPLE="gpio_output:digitalout,ll_driver" -G "Unix Makefiles" ..
+```
 ### Tunable Options
 Currently Under construction...
 
 ### Link library to your application
 Currently Under construction...
+
+### System Clock Configuration File
+Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)
