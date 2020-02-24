@@ -2,8 +2,10 @@
  * @file  detail/tuple.hxx
  * @brief	self implementation of tuple
  *
- * @ref		https://stackoverflow.com/questions/4041447/how-is-stdtuple-implemented
- * @ref   https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/tuple
+ * @ref
+ * https://stackoverflow.com/questions/4041447/how-is-stdtuple-implemented
+ * @ref
+ * https://github.com/gcc-mirror/gcc/blob/master/libstdc%2B%2B-v3/include/std/tuple
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -25,7 +27,10 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
+#include <functional>
+#include <iterator>
 #include <tuple>
 #include <utility>
 
@@ -39,9 +44,10 @@ struct TupleImpl;
  * @param  t_tup [description]
  * @return       [description]
  *
- * @note  gcc implement tuple node by inheriting Head if Head is not final type (i.e., can't be inherited), if Head is
- * 				final type, then hold a instance of Head. In so doing, it can avoid instantiate class that holds large amount
- * 				of data (?)
+ * @note  gcc implement tuple node by inheriting Head if Head is not final type
+ * (i.e., can't be inherited), if Head is final type, then hold a instance of
+ * Head. In so doing, it can avoid instantiate class that holds large amount of
+ * data (?)
  */
 template <std::size_t i, typename Head>
 struct TupleNode {
@@ -67,13 +73,9 @@ struct TupleNode {
 	static constexpr const Head& HEAD_VAL(TupleNode const& t_tup) noexcept { return t_tup.val; }
 };
 
-template <std::size_t i>
-struct TupleImpl<i> {};
-
-template <std::size_t i, typename Head, typename... Tail>
-struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl<i + 1, Tail...> {
+template <std::size_t i, typename Head>
+struct TupleImpl<i, Head> : public TupleNode<i, Head> {
 	using TupleHead = TupleNode<i, Head>;
-	using TupleTail = TupleImpl<i + 1, Tail...>;
 
 	/**
 	 * @brief    This function always returns the head of the tuple, this is done recursively, non-const version
@@ -90,16 +92,67 @@ struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl
 	static constexpr Head const& HEAD_VAL(TupleImpl const& t_tup) noexcept { return TupleHead::HEAD_VAL(t_tup); }
 
 	/**
-	 * @brief    This function turn the input tuple to reference to base class TupleTail
+	 * @brief     Construct TupleImpl recursively
+	 */
+	constexpr TupleImpl() noexcept : TupleHead() {}
+
+	/**
+	 * @brief  		Default copy constructor
+	 * @param			The other Tuple
+	 */
+	constexpr TupleImpl(TupleImpl const&) = default;
+
+	/**
+	 * @brief  		Construct tuple with elements
+	 * @param  		t_head 	Head value
+	 * @param  		t_tail  The rest of value
+	 */
+	explicit constexpr TupleImpl(Head const& t_head) noexcept : TupleHead{t_head} {}
+
+	/**
+	 * @brief 		Construct tuple with the other tuple
+	 * @param   	t_tup  Tuple
+	 */
+	template <typename Elem>
+	constexpr TupleImpl(TupleImpl<i, Elem> const& t_tup) noexcept : TupleHead(TupleImpl<i, Elem>::HEAD_VAL(t_tup)) {}
+};
+
+template <std::size_t i, typename Head, typename... Tail>
+struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl<i + 1, Tail...> {
+	using TupleHead = TupleNode<i, Head>;
+	using TupleTail = TupleImpl<i + 1, Tail...>;
+
+	/**
+	 * @brief    This function always returns the head of the tuple, this is done
+	 * recursively, non-const version
 	 * @param    t_tup   Input tuple
-	 * @return   reference to TupleImpl base class, TupleTail, which consists of the rest of the element
+	 * @return   Head val
+	 */
+	static constexpr Head& HEAD_VAL(TupleImpl& t_tup) noexcept { return TupleHead::HEAD_VAL(t_tup); }
+
+	/**
+	 * @brief 	 This function always returns the head of the tuple, this is
+	 * done recursively, const version
+	 * @param    t_tup   Input tuple
+	 * @return   Head val
+	 */
+	static constexpr Head const& HEAD_VAL(TupleImpl const& t_tup) noexcept { return TupleHead::HEAD_VAL(t_tup); }
+
+	/**
+	 * @brief    This function turn the input tuple to reference to base class
+	 * TupleTail
+	 * @param    t_tup   Input tuple
+	 * @return   reference to TupleImpl base class, TupleTail, which consists of
+	 * the rest of the element
 	 */
 	static constexpr TupleTail& TAIL_VAL(TupleImpl& t_tup) noexcept { return t_tup; }
 
 	/**
-	 * @brief    This function turn the input tuple to reference to base class TupleTail, const version
+	 * @brief    This function turn the input tuple to reference to base class
+	 * TupleTail, const version
 	 * @param    t_tup   Input tuple
-	 * @return   reference to TupleImpl base class, TupleTail, which consists of the rest of the element
+	 * @return   reference to TupleImpl base class, TupleTail, which consists of
+	 * the rest of the element
 	 */
 	static constexpr TupleTail const& TAIL_VAL(TupleImpl const& t_tup) noexcept { return t_tup; }
 
@@ -107,6 +160,12 @@ struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl
 	 * @brief     Construct TupleImpl recursively
 	 */
 	constexpr TupleImpl() noexcept : TupleHead(), TupleTail() {}
+
+	/**
+	 * @brief  		Default copy constructor
+	 * @param			The other Tuple
+	 */
+	constexpr TupleImpl(TupleImpl const&) = default;
 
 	/**
 	 * @brief  		Construct tuple with elements
@@ -138,6 +197,47 @@ struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl
 	}
 };
 
+// tuple get implementation, non const version
+template <std::size_t Idx, typename Head, typename... Tails>
+constexpr Head& get_impl(TupleImpl<Idx, Head, Tails...>& t_tup) noexcept {
+	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
+}
+
+// tuple get implementation, const version
+template <std::size_t Idx, typename Head, typename... Tails>
+constexpr Head const& get_impl(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept {
+	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
+}
+
+/**
+ * @brief		This function gets the tuple element at index Idx const
+ * version
+ * @tparam  Idx 	Index
+ * @tparam 	Head  desire element type
+ * @tparam  Tails the rest of the type
+ *
+ * @param   t_tup Tuple to get the value
+ * @return  reference to the tuple element
+ */
+template <std::size_t Idx, typename Head, typename... Tails>
+constexpr Head const& get(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept {
+	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
+}
+
+/**
+ * @brief		This function gets the tuple element at index Idx const version
+ * @tparam  Idx 	Index
+ * @tparam 	Head  desire element type
+ * @tparam  Tails the rest of the type
+ *
+ * @param   t_tup Tuple to get the value
+ * @return  reference to the tuple element
+ */
+template <std::size_t Idx, typename Head, typename... Tails>
+constexpr Head& get(TupleImpl<Idx, Head, Tails...>& t_tup) noexcept {
+	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
+}
+
 /**
  * @brief  	Self implemented tuple due to some constexpr function is required but not yet constexpr in C++17
  * @tparam 	Elems Variadic template param
@@ -145,7 +245,7 @@ struct TupleImpl<i, Head, Tail...> : public TupleNode<i, Head>, public TupleImpl
  * @note 	instead of type aliasing, inheritance is better since for empty tuple, we dont need additional bracket, i.e.
  *
  * 				```
- * 				auto const tup = detail::Tuple{};  		// inheritnace
+ * 				auto const tup = detail::Tuple{}; 		// inheritnace
  * 				auto const tup = detail::Tuple<>{};	  // type alias, deduction guide can't help us either cause we are type
  * 																							// aliasing
  * 				```
@@ -198,8 +298,8 @@ class Tuple : public TupleImpl<0, Elems...> {
 	 */
 	template <std::size_t Idx>
 	[[nodiscard]] constexpr auto const& operator[](
-		std::integral_constant<std::size_t, Idx> const& /*unused*/) const noexcept {
-		return this->TupleImpl<Idx, Elems...>::HEAD_VAL(*this);
+		std::integral_constant<std::size_t, Idx> const /*unused*/) const noexcept {
+		return get<Idx>(*static_cast<TupleImpl<0, Elems...> const*>(this));
 	}
 
 	/**
@@ -208,25 +308,14 @@ class Tuple : public TupleImpl<0, Elems...> {
 	 * @return  reference to element at index
 	 */
 	template <std::size_t Idx>
-	[[nodiscard]] constexpr auto& operator[](std::integral_constant<std::size_t, Idx>& /*unused*/) noexcept {
-		return this->TupleImpl<Idx, Elems...>::HEAD_VAL(*this);
+	[[nodiscard]] constexpr auto& operator[](std::integral_constant<std::size_t, Idx> /*unused*/) noexcept {
+		return get<Idx>(*static_cast<TupleImpl<0, Elems...>*>(this));
 	}
 };
 
-// tuple get implementation, non const version
-template <std::size_t Idx, typename Head, typename... Tails>
-constexpr Head& get_impl(TupleImpl<Idx, Head, Tails...>& t_tup) noexcept {
-	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
-}
-
-// tuple get implementation, const version
-template <std::size_t Idx, typename Head, typename... Tails>
-constexpr Head const& get_impl(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept {
-	return TupleImpl<Idx, Head, Tails...>::HEAD_VAL(t_tup);
-}
-
 /**
- * @brief		This function gets the tuple element at index Idx const version
+ * @brief		This function gets the tuple element at index Idx
+ * non-const version
  * @tparam  Idx 	Index
  * @tparam 	Head  desire element type
  * @tparam  Tails the rest of the type
@@ -234,24 +323,15 @@ constexpr Head const& get_impl(TupleImpl<Idx, Head, Tails...> const& t_tup) noex
  * @param   t_tup Tuple to get the value
  * @return  reference to the tuple element
  */
-template <std::size_t Idx, typename Head, typename... Tails>
-constexpr Head const& get(TupleImpl<Idx, Head, Tails...> const& t_tup) noexcept {
-	return get_impl(t_tup);
-}
+// template <std::size_t Idx, typename Head, typename... Tails>
+// constexpr Head& get(Tuple<Head, Tails...>& t_tup) noexcept {
+//   return get_impl(static_cast<TupleImpl<Idx, Head, Tails...>&>(t_tup));
+// }
 
-/**
- * @brief		This function gets the tuple element at index Idx non-const version
- * @tparam  Idx 	Index
- * @tparam 	Head  desire element type
- * @tparam  Tails the rest of the type
- *
- * @param   t_tup Tuple to get the value
- * @return  reference to the tuple element
- */
-template <std::size_t Idx, typename Head, typename... Tails>
-constexpr Head& get(Tuple<Head, Tails...>& t_tup) noexcept {
-	return get_impl(t_tup);
-}
+// template <std::size_t Idx, typename Head, typename... Tails>
+// constexpr Head const& get(Tuple<Head, Tails...> const& t_tup) noexcept {
+//   return get_impl(t_tup);
+// }
 
 // tuple nand implementation
 template <typename Tup, std::size_t... Idx>
@@ -261,7 +341,7 @@ template <typename Tup, std::size_t... Idx>
 
 /**
  * @brief		Helper type to identify if all elements can apply NAND operator, this is verified by checking if it is
- *  				integral type.
+ * 					integral type.
  * @tparam  Elems 	Variadic template parameter
  *
  * @todo 		Extend it so that it can support custom class with nand operator overloading

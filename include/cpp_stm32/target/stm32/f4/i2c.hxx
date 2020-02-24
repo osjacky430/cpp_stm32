@@ -497,7 +497,7 @@ template <Port I2C, typename SlaveAddrType, typename RandIt, std::uint8_t BC>
  */
 template <Port I2C, MasterMode Mode, DutyCycle DC, std::uint32_t Hz>
 constexpr void config_scl_clock(Frequency<Hz> const /* unused */) noexcept {
-	using namespace reg;
+	using reg::CCR, reg::CCRField;
 	// static_assert
 
 	if constexpr (COMPILE_TIME_CLOCK_CONFIG) {
@@ -667,6 +667,48 @@ constexpr void disable_irq() noexcept {
 		reg::CR2<I2C>.template clearBit<reg::CR2Field::ITEVTEN>();
 	} else if constexpr (have_error_flag()) {
 		reg::CR2<I2C>.template clearBit<reg::CR2Field::ITERREN>();
+	}
+}
+
+/**
+ * @brief  	This function clears status flag
+ * @tparam 	I2C 	@ref i2c::Port
+ * @tparam  Flag 	@ref i2c::InterruptFlag
+ */
+template <Port I2C, InterruptFlag... Flags>
+constexpr void clear_status() noexcept {
+	constexpr auto rd_clear_w0_flag = [](InterruptFlag const t_flag) {
+		if ((to_underlying(t_flag) > to_underlying(InterruptFlag::TxE))) {
+			return t_flag;
+		}
+	};
+
+	constexpr auto is_tx_or_rxne_or_btf = [](InterruptFlag const t_flag) {
+		return t_flag == InterruptFlag::TxE || t_flag == InterruptFlag::RxNE || t_flag == InterruptFlag::BTF;
+	};
+
+	if constexpr (((Flags > InterruptFlag::TxE) || ...)) {
+		// Cleared by software writing 0
+		reg::SR1<I2C>.template clearBit<rd_clear_w0_flag(Flags)...>();
+	}
+
+	if constexpr ((is_tx_or_rxne_or_btf(Flags) || ...)) {
+		// Cleared by software reading or writing the DR register
+		{ [[gnu::unused]] auto const tmp = reg::DR<I2C>.template readBit<reg::DRField::DR>(ValueOnly); }
+	}
+
+	if constexpr (((Flags == InterruptFlag::SB || Flags == InterruptFlag::ADDR) || ...)) {
+		//
+		{ [[gnu::unused]] auto const tmp = reg::SR1<I2C>.template readBit<Flags...>(ValWithPos); }
+
+		if constexpr (((Flags == InterruptFlag::SB) || ...)) {
+			// Cleared by software by reading the SR1 register followed by writing the DR register
+			reg::DR<I2C>.template writeBit<reg::DRField::DR>(std::uint8_t{0});
+		} else {
+			// Cleared by software reading SR1 register followed reading SR2
+			// @note The bit to read is arbitrarily chosen, this should be changed in the future
+			{ [[gnu::unused]] auto const tmp = reg::SR2<I2C>.template readBit<Status::BUSY>(ValWithPos); }
+		}
 	}
 }
 

@@ -169,7 +169,7 @@ constexpr void set() noexcept {
 template <Port InputPort, Pin... Pins>
 class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
  public:
-	[[nodiscard]] constexpr GpioBuilder() noexcept {}
+	[[nodiscard]] constexpr GpioBuilder() noexcept = default;
 
 	[[nodiscard]] constexpr auto mode(Mode const t_mode) const noexcept {
 		set_mode<InputPort, Pins...>(t_mode);
@@ -187,12 +187,12 @@ class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
 	}
 
 	[[nodiscard]] constexpr auto outputType(OutputType const t_otype) const noexcept {
-		set_output_type<InputPort, Pins...>();
+		set_output_type<InputPort, Pins...>(t_otype);
 		return *this;
 	}
 
 	[[nodiscard]] constexpr auto outputSpeed(OutputSpeed const t_ospeed) const noexcept {
-		set_output_speed<InputPort, Pins...>();
+		set_output_speed<InputPort, Pins...>(t_ospeed);
 		return *this;
 	}
 

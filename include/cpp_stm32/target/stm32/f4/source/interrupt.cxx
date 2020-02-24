@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
+
 #include "cpp_stm32/hal/interrupt.hxx"
 
 namespace cpp_stm32::interrupt {
@@ -69,4 +70,4 @@ template <IrqNum IRQn>
 std::pair<void*, void (*)(void* const) noexcept> Interrupt<IRQn>::m_callback{
 	nullptr, &WRAP_TO_C_STYLE_FUNC<interrupt::IRQ_TABLE[to_underlying(IRQn)]>};
 
-}
+}	 // namespace cpp_stm32

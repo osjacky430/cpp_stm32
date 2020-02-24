@@ -25,7 +25,7 @@ namespace cpp_stm32 {
 
 enum class IrqNum : std::uint8_t;
 
-}
+}	 // namespace cpp_stm32
 
 namespace cpp_stm32::nvic::reg {
 

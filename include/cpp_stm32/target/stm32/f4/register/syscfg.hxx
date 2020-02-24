@@ -1,6 +1,6 @@
 /**
- * @file  stm32/f4/syscfg.hxx
- * @brief	SysCfg setup API for stm32f4
+ * @file  stm32/f4/register/syscfg.hxx
+ * @brief	SysCfg register for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -27,8 +27,6 @@
 
 #include "cpp_stm32/target/stm32/f4/define/exti.hxx"
 #include "cpp_stm32/target/stm32/f4/define/gpio.hxx"
-
-namespace cpp_stm32::syscfg {}
 
 namespace cpp_stm32::syscfg::reg {
 

@@ -29,7 +29,7 @@ namespace cpp_stm32::flash {
 
 SETUP_LOOKUP_TABLE_WITH_BOUND(Latency, 0, 15);
 
-}
+}	 // namespace cpp_stm32::flash
 
 namespace cpp_stm32::flash::reg {
 

@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/exti.hxx
- *@brief	This file contains exti class and enum define.
+ * @brief	EXTI class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

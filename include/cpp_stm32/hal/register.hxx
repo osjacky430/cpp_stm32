@@ -401,7 +401,7 @@ class Register {
 	 * @return     [description]
 	 */
 	template <Access access, BitListIdx... BitIdx, BitListIdx... IsolateIdx>
-	static constexpr auto IS_SEPARABLE(IsolateFrom_t<IsolateIdx...> const& t_a) noexcept {
+	static constexpr auto IS_SEPARABLE(IsolateFrom_t<IsolateIdx...> const /*unused*/) noexcept {
 		constexpr auto mod_n		 = viewRegByAccessMode<BitIdx..., access>();
 		constexpr auto isolate_n = viewRegByAccessMode<IsolateIdx..., access>();
 
@@ -477,7 +477,7 @@ class Register {
 	 * @return [description]
 	 */
 	template <BitListIdx BitIdx>
-	constexpr auto defaultVal() const noexcept {
+	[[nodiscard]] constexpr auto defaultVal() const noexcept {
 		constexpr auto bit		 = GET_BIT<BitIdx>();
 		auto const default_val = (bit.mask & m_resetVal) >> bit.pos;
 
@@ -518,7 +518,7 @@ using AtomicReg = Register<BitList, BitIdx, IoOp, true>;
  * @return         [description]
  */
 template <typename... BitInput>
-static constexpr auto calc_writable_bit_num(std::tuple<BitInput...> const&) {
+[[nodiscard]] static constexpr auto calc_writable_bit_num(std::tuple<BitInput...> const&) {
 	constexpr auto writable = [](auto const& t_mod) { return t_mod != BitMod::RdOnly; };
 
 	return (writable(BitInput::MOD) + ...);

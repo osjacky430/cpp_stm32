@@ -45,10 +45,10 @@
 		Interrupt<IrqNum::Usart1Global>::interrupt, Interrupt<IrqNum::Usart2Global>::interrupt,                           \
 		Interrupt<IrqNum::Usart3Global>::interrupt, Interrupt<IrqNum::Exti10_15>::interrupt
 
-#define NVIC_IRQ_NUM 96
+//
+constexpr auto NVIC_IRQ_NUM = 96;
 
 namespace cpp_stm32::interrupt {
-
 void wwdg() noexcept;
 void pvd() noexcept;
 void tamp_stamp() noexcept;

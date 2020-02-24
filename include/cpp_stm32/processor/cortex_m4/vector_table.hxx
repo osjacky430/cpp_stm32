@@ -48,12 +48,14 @@ struct [[gnu::packed]] IrqVector {
 	IrqFuncPtr const busFault;									 // bus fault handler
 	IrqFuncPtr const usageFault;								 // usage fault handler
 
-	IrqFuncPtr const exception7To10IsReserved[4];
+	std::array<IrqFuncPtr, 4> const exception7To10IsReserved;
+	// IrqFuncPtr const exception7To10IsReserved[4];
 
 	IrqFuncPtr const serviceCall;		// service call (SV) handler
 	IrqFuncPtr const debugMonitor;	// debug monitor handler
 
-	IrqFuncPtr const exception13IsReserved[1];
+	std::array<IrqFuncPtr, 1> const exception13IsReserved;
+	// IrqFuncPtr const exception13IsReserved[1];
 
 	IrqFuncPtr const pendServiceCall;	 // pending service call handler
 	IrqFuncPtr const sysTick;					 // system tick handler

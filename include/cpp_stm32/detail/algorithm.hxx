@@ -86,7 +86,9 @@ constexpr bool all_of(InputIt first, InputIt last, UnaryPredicate p) {
 
 template <class ForwardIt>
 constexpr ForwardIt unique(ForwardIt first, ForwardIt last) {
-	if (first == last) return last;
+	if (first == last) {
+		return last;
+	}
 
 	ForwardIt result = first;
 	while (++first != last) {
@@ -135,7 +137,9 @@ constexpr void iter_swap(ForwardIt1 a, ForwardIt2 b) {
 template <class ForwardIt, class UnaryPredicate>
 constexpr ForwardIt partition(ForwardIt first, ForwardIt last, UnaryPredicate p) {
 	first = detail::find_if_not(first, last, p);
-	if (first == last) return first;
+	if (first == last) {
+		return first;
+	}
 
 	for (ForwardIt i = first + 1; i != last; ++i) {
 		if (p(*i)) {

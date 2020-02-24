@@ -21,3 +21,5 @@
  */
 
 #pragma once
+
+#include "cpp_stm32/target/stm32/f4/pin_map/usart.hxx"

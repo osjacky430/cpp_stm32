@@ -39,7 +39,7 @@ static constexpr void WRAP_TO_C_STYLE_FUNC(void* const t_this_ptr) noexcept {
 }
 
 template <NormalFuncPtr Func>
-static constexpr void WRAP_TO_C_STYLE_FUNC(void* const /**/) noexcept {
+static constexpr void WRAP_TO_C_STYLE_FUNC(void* const /* unused */) noexcept {
 	Func();
 }
 
@@ -55,7 +55,7 @@ class Interrupt {
 	static std::pair<CStyleThisPtr, WrapperFuncPtr> m_callback;
 
  public:
-	constexpr Interrupt() noexcept {}
+	constexpr Interrupt() noexcept = default;
 
 	static constexpr void interrupt() noexcept {
 		auto const [class_ptr, c_style_wrapper_func] = m_callback;

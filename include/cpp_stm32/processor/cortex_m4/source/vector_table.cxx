@@ -27,7 +27,7 @@ int main();
 /**
  * [null_handler description]
  */
-void null_handler() { return; }
+void null_handler() {}
 
 /**
  * [blocking_handler description]
@@ -37,7 +37,7 @@ void blocking_handler() {
 	}
 }
 
-using namespace cpp_stm32;
+using cpp_stm32::Interrupt, cpp_stm32::IrqNum;
 
 [[gnu::section((".IrqVector"))]] IrqVector const irq_vector_table{
 	&STACK,
@@ -71,11 +71,20 @@ using namespace cpp_stm32;
 void reset_handler() {
 	using FuncPtr = void (*)();
 
-	extern FuncPtr __preinit_array_start, __preinit_array_end;
-	extern FuncPtr __init_array_start, __init_array_end;
-	extern FuncPtr __fini_array_start, __fini_array_end;
+	extern FuncPtr __preinit_array_start;
+	extern FuncPtr __preinit_array_end;
 
-	extern unsigned load_data_start_addr_, sdata_, edata_, ebss_;
+	extern FuncPtr __init_array_start;
+	extern FuncPtr __init_array_end;
+
+	extern FuncPtr __fini_array_start;
+	extern FuncPtr __fini_array_end;
+
+	extern unsigned load_data_start_addr_;
+	extern unsigned sdata_;
+	extern unsigned edata_;
+	extern unsigned ebss_;
+
 	volatile unsigned* src	= &load_data_start_addr_;
 	volatile unsigned* dest = &sdata_;
 

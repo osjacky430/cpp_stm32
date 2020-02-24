@@ -21,20 +21,20 @@
  * @param  LowerBound		Lower bound of division factor
  * @param  UpperBound		Upper bound of division factor
  */
-#define SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)                             \
-	struct ClassName {                                                                                 \
-		std::uint32_t const m_value;                                                                     \
-                                                                                                     \
-		static constexpr auto MAX = UpperBound;                                                          \
-		static constexpr auto MIN = LowerBound;                                                          \
-                                                                                                     \
-		template <std::uint32_t Val>                                                                     \
-		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept : m_value(Val) { \
-			static_assert(LowerBound <= Val && Val <= UpperBound);                                         \
-		}                                                                                                \
-                                                                                                     \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                     \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                            \
+#define SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)                                      \
+	struct ClassName {                                                                                          \
+		std::uint32_t const m_value;                                                                              \
+                                                                                                              \
+		static constexpr auto MAX = UpperBound;                                                                   \
+		static constexpr auto MIN = LowerBound;                                                                   \
+                                                                                                              \
+		template <std::uint32_t Val>                                                                              \
+		explicit constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept : m_value(Val) { \
+			static_assert(LowerBound <= Val && Val <= UpperBound);                                                  \
+		}                                                                                                         \
+                                                                                                              \
+		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                              \
+		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                     \
 	}
 
 /**
@@ -56,7 +56,7 @@
 		};                                                                                                      \
                                                                                                             \
 		template <std::uint32_t Val>                                                                            \
-		constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept                         \
+		explicit constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept                \
 			: m_value(findDivisionFactor<Val>()) {}                                                               \
                                                                                                             \
 		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                            \

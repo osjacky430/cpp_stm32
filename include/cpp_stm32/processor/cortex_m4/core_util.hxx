@@ -24,13 +24,13 @@ namespace cpp_stm32 {
 template <std::size_t Priority>
 using MaskPriority = std::integral_constant<std::uint8_t, Priority>;
 
-}
+}	 // namespace cpp_stm32
 
 namespace cpp_stm32::detail {
 
 [[gnu::always_inline]] inline void disable_all_interrupts() noexcept {
 	__asm volatile(
-		"mov r0, #1   \n\t"	// move 1 to r0
+		"mov r0, #1   \n\t"	 // move 1 to r0
 		"msr primask, r0"		 // move the content of r0 into PRIMASK
 		:										 // no output
 		:										 // no input
@@ -41,7 +41,7 @@ namespace cpp_stm32::detail {
 
 [[gnu::always_inline]] inline void enable_all_interrupts() noexcept {
 	__asm volatile(
-		"mov r0, #0   \n\t"	// move 0 to r0
+		"mov r0, #0   \n\t"	 // move 0 to r0
 		"msr primask, r0"		 // move the content of r0 into PRIMASK
 		:										 // no output
 		:										 // no input
@@ -57,7 +57,7 @@ namespace cpp_stm32::detail {
 }
 
 [[gnu::always_inline]] inline void set_interrupt_mask_priority(int t_priority) noexcept {
-	__asm volatile("msr BASEPRI, %0 \n"	// move the content of r0 into BASEPRI
+	__asm volatile("msr BASEPRI, %0 \n"	 // move the content of r0 into BASEPRI
 								 :										 // no output
 								 : "r"(t_priority)		 //
 								 : "memory"						 //
@@ -71,38 +71,36 @@ namespace cpp_stm32::detail {
 	return ret_val;
 }
 
-}	// namespace cpp_stm32::detail
+}	 // namespace cpp_stm32::detail
 
 namespace cpp_stm32 {
 
 template <std::uint8_t Priority = 0>
 [[nodiscard]] constexpr auto create_critical_section(
 	[[gnu::unused]] MaskPriority<Priority> const& t_mask = MaskPriority<0>{}) noexcept {
-	using namespace detail;
-
 	class CriticalSection {
 	 private:
 		std::uint32_t const m_interruptValue;
 
 	 public:
 		constexpr CriticalSection() noexcept
-			: m_interruptValue(Priority == 0 ? all_interrupts_disabled() : get_interrupt_mask_priority()) {
+			: m_interruptValue(Priority == 0 ? detail::all_interrupts_disabled() : detail::get_interrupt_mask_priority()) {
 			if constexpr (Priority != 0) {
 				static_assert(Priority & 0xF0);
-				set_interrupt_mask_priority(Priority);
+				detail::set_interrupt_mask_priority(Priority);
 			} else {
-				disable_all_interrupts();
+				detail::disable_all_interrupts();
 			}
 		}
 
 		~CriticalSection() noexcept {
 			if constexpr (Priority != 0) {
 				if (m_interruptValue == 0) {
-					set_interrupt_mask_priority(0);
+					detail::set_interrupt_mask_priority(0);
 				}
 			} else {
 				if (m_interruptValue == 0) {
-					enable_all_interrupts();
+					detail::enable_all_interrupts();
 				}
 			}
 		}
@@ -111,4 +109,4 @@ template <std::uint8_t Priority = 0>
 	return CriticalSection{};
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32
