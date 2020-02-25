@@ -40,10 +40,22 @@ class PinMap {
 		std::array<PortPinPair, to_underlying(PinName::Total)> temp{};
 
 		/* GPIO A */
-		temp[to_underlying(PinName::PA_1)] = PortPinPair{Port::PortA, Pin::Pin1};
-		temp[to_underlying(PinName::PA_2)] = PortPinPair{Port::PortA, Pin::Pin2};
-		temp[to_underlying(PinName::PA_3)] = PortPinPair{Port::PortA, Pin::Pin3};
-		temp[to_underlying(PinName::PA_5)] = PortPinPair{Port::PortA, Pin::Pin5};
+		temp[to_underlying(PinName::PA_0)]	= PortPinPair{Port::PortA, Pin::Pin0};
+		temp[to_underlying(PinName::PA_1)]	= PortPinPair{Port::PortA, Pin::Pin1};
+		temp[to_underlying(PinName::PA_2)]	= PortPinPair{Port::PortA, Pin::Pin2};
+		temp[to_underlying(PinName::PA_3)]	= PortPinPair{Port::PortA, Pin::Pin3};
+		temp[to_underlying(PinName::PA_4)]	= PortPinPair{Port::PortA, Pin::Pin4};
+		temp[to_underlying(PinName::PA_5)]	= PortPinPair{Port::PortA, Pin::Pin5};
+		temp[to_underlying(PinName::PA_6)]	= PortPinPair{Port::PortA, Pin::Pin6};
+		temp[to_underlying(PinName::PA_7)]	= PortPinPair{Port::PortA, Pin::Pin7};
+		temp[to_underlying(PinName::PA_8)]	= PortPinPair{Port::PortA, Pin::Pin8};
+		temp[to_underlying(PinName::PA_9)]	= PortPinPair{Port::PortA, Pin::Pin9};
+		temp[to_underlying(PinName::PA_10)] = PortPinPair{Port::PortA, Pin::Pin10};
+		temp[to_underlying(PinName::PA_11)] = PortPinPair{Port::PortA, Pin::Pin11};
+		temp[to_underlying(PinName::PA_12)] = PortPinPair{Port::PortA, Pin::Pin12};
+		temp[to_underlying(PinName::PA_13)] = PortPinPair{Port::PortA, Pin::Pin13};
+		temp[to_underlying(PinName::PA_14)] = PortPinPair{Port::PortA, Pin::Pin14};
+		temp[to_underlying(PinName::PA_15)] = PortPinPair{Port::PortA, Pin::Pin15};
 
 		/* GPIO B */
 		temp[to_underlying(PinName::PB_0)]	= PortPinPair{Port::PortB, Pin::Pin0};

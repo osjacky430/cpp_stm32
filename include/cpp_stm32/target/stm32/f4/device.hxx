@@ -18,6 +18,7 @@
 
 #include "cpp_stm32/target/stm32/f4/exti.hxx"
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
+#include "cpp_stm32/target/stm32/f4/i2c.hxx"
 #include "cpp_stm32/target/stm32/f4/interrupt.hxx"
 #include "cpp_stm32/target/stm32/f4/nvic.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map.hxx"

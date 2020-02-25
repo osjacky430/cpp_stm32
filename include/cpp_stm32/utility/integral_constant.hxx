@@ -45,15 +45,6 @@ using uint8_c = std::integral_constant<std::uint8_t, Val>;
 template <std::uint8_t BC>
 struct ByteCount {};
 
-enum class Significant : std::int8_t {
-	Mega	= 6,
-	Kilo	= 3,
-	Zero	= 0,
-	Milli = -3,
-	Micro = -6,
-	Nano	= -9,
-};
-
 // not sure
 template <std::uint32_t Q>
 struct Unit {

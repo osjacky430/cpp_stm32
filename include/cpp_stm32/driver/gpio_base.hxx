@@ -197,9 +197,8 @@ class GpioUtil {
 	 * @param t_pupd @ref Pupd
 	 */
 	template <std::size_t Num, std::size_t... Idx>
-	static constexpr void modeSetupIdxThruPin(size_c<Num> const& /*unused*/,
-																						std::index_sequence<Idx...> const& /*unused*/, gpio::Mode const& t_mode,
-																						gpio::Pupd const& t_pupd) noexcept {
+	static constexpr void modeSetupIdxThruPin(size_c<Num> const /*unused*/, std::index_sequence<Idx...> const /*unused*/,
+																						gpio::Mode const t_mode, gpio::Pupd const t_pupd) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(size_c<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
 		gpio::mode_setup<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_mode, t_pupd);
@@ -214,8 +213,8 @@ class GpioUtil {
 	 * @param t_pupd @ref Pupd
 	 */
 	template <std::size_t... Idx>
-	static constexpr void modeSetupIdxThruPort(std::index_sequence<Idx...> const& /*unused*/, gpio::Mode const& t_mode,
-																						 gpio::Pupd const& t_pupd) noexcept {
+	static constexpr void modeSetupIdxThruPort(std::index_sequence<Idx...> const /*unused*/, gpio::Mode const& t_mode,
+																						 gpio::Pupd const t_pupd) noexcept {
 		(modeSetupIdxThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>, t_mode, t_pupd), ...);
 	}
 
@@ -223,7 +222,8 @@ class GpioUtil {
 	 * @brief    This function handels gpio toggle, for implementation detail, see @ref modeSetupIdxThruPin
 	 */
 	template <std::size_t Num, std::size_t... Idx>
-	static constexpr void toggleIdxThruPin(size_c<Num> /*unused*/, std::index_sequence<Idx...> /*unused*/) noexcept {
+	static constexpr void toggleIdxThruPin(size_c<Num> const /*unused*/,
+																				 std::index_sequence<Idx...> const /*unused*/) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(size_c<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
 		gpio::toggle<gpio_port, std::get<Idx>(gpio_pin_group)...>();
@@ -233,7 +233,7 @@ class GpioUtil {
 	 * @brief    This function handels gpio toggle, for implementation detail, see @ref modeSetupIdxThruPort
 	 */
 	template <std::size_t... Idx>
-	static constexpr void toggleIdxThruPort(std::index_sequence<Idx...>) noexcept {
+	static constexpr void toggleIdxThruPort(std::index_sequence<Idx...> const /*unused*/) noexcept {
 		(toggleIdxThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
 	}
 
@@ -244,7 +244,7 @@ class GpioUtil {
 	 *           correct @ref PeriphClk enum entries
 	 */
 	template <std::size_t... Idx>
-	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...> /*unused*/) noexcept {
+	static constexpr void enableAllGpioClkImp(std::index_sequence<Idx...> const /*unused*/) noexcept {
 		(rcc::enable_periph_clk<static_cast<rcc::PeriphClk>(PinGrouper::getPort(size_c<Idx>{}))>(), ...);
 	}
 
@@ -254,9 +254,9 @@ class GpioUtil {
 	 * @param    t_af   @ref gpio::AltFunc
 	 */
 	template <std::size_t Num, std::size_t... Idx>
-	static constexpr void alternateFuncSteupThruPin(size_c<Num> const& /*unused*/,
-																									std::index_sequence<Idx...> const& /*unused*/,
-																									gpio::AltFunc const& t_af) noexcept {
+	static constexpr void alternateFuncSteupThruPin(size_c<Num> const /*unused*/,
+																									std::index_sequence<Idx...> const /*unused*/,
+																									gpio::AltFunc const t_af) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(size_c<Num>{});
 		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
 		gpio::set_alternate_function<gpio_port, std::get<Idx>(gpio_pin_group)...>(t_af);
@@ -268,9 +268,21 @@ class GpioUtil {
 	 * @param    t_af  @ref gpio::AltFunc
 	 */
 	template <std::size_t... Idx>
-	static constexpr void alternateFuncSetupThruPort(std::index_sequence<Idx...> const& /*unused*/,
-																									 gpio::AltFunc const& t_af) noexcept {
+	static constexpr void alternateFuncSetupThruPort(std::index_sequence<Idx...> const /*unused*/,
+																									 gpio::AltFunc const t_af) noexcept {
 		(alternateFuncSteupThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>, t_af), ...);
+	}
+
+	template <std::size_t Num, std::size_t... Idx>
+	static constexpr void setThruPin(size_c<Num> const t_sc, std::index_sequence<Idx...> const /*unused*/) noexcept {
+		constexpr auto gpio_port			= PinGrouper::getPort(t_sc);
+		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
+		gpio::set<gpio_port, std::get<Idx>(gpio_pin_group)...>();
+	}
+
+	template <std::size_t... Idx>
+	static constexpr void setThruPort(std::index_sequence<Idx...> const) noexcept {
+		(setThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
 	}
 
  public:
@@ -300,6 +312,11 @@ class GpioUtil {
 	static constexpr void alternateFuncSetup(gpio::AltFunc const& t_af) noexcept {
 		alternateFuncSetupThruPort(IdxThruPort{}, t_af);
 	}
+
+	/**
+	 * @brief   This function is the public interface of gpio set function
+	 */
+	static constexpr void set() noexcept { setThruPort(IdxThruPort{}); }
 };
 
 }	 // namespace cpp_stm32::driver

@@ -28,7 +28,7 @@
 
 namespace cpp_stm32::i2c {
 
-enum class Port : std::uint8_t { I2C3, I2C2, I2C1 };
+enum class Port : std::uint8_t { I2C1, I2C2, I2C3 };
 
 enum class SlaveAddressMode : std::uint8_t { SevenBits, TenBits };
 

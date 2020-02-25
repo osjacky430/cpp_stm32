@@ -89,8 +89,8 @@ class Usart {
  public:
 	explicit constexpr Usart(usart::Baudrate_t const& t_baud) noexcept {}
 
-	explicit constexpr Usart(UsartTx<TX> const& /*unused*/, UsartRx<RX> const& /*unused*/,
-													 usart::Baudrate_t const& t_baud) noexcept {
+	explicit constexpr Usart(UsartTx<TX> const /*unused*/, UsartRx<RX> const /*unused*/,
+													 usart::Baudrate_t const t_baud) noexcept {
 		using gpio::Pupd;
 		using usart::StopBit_v, usart::DataBit, usart::Parity, usart::HardwareFlowControl, usart::Stopbit;
 
@@ -138,13 +138,13 @@ class Usart {
 	}
 
 	template <typename T>
-	constexpr void send(Serializable<T> const& t_val) const noexcept {
+	constexpr void send(Serializable<T> const t_val) const noexcept {
 		for (auto const& val : t_val.serialize()) {
 			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}
 	}
 
-	constexpr auto operator<<(char const& t_val) const noexcept {
+	constexpr auto operator<<(char const t_val) const noexcept {
 		usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
 
 		return *this;
@@ -159,7 +159,7 @@ class Usart {
 	}
 
 	template <typename T>
-	constexpr auto operator<<(Serializable<T> const& t_struct) const noexcept {
+	constexpr auto operator<<(Serializable<T> const t_struct) const noexcept {
 		for (auto const& val : t_struct.serialize()) {
 			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}

@@ -1,6 +1,6 @@
 /**
- * @file  stm32/f4/dma.hxx
- * @brief	Dma setup API for stm32f4
+ * @file  stm32/f4/pin_map/usart.hxx
+ * @brief	USART Pin Mapping for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.
