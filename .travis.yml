@@ -8,7 +8,7 @@ os:
 
 before_install:
     - ./.travis-install-arm-gcc
-    - export PATH="$PATH:$HOME/gcc-arm-none-eabi-8-2019-q3-update/bin"
+    - export PATH="$PATH:$HOME/gcc-arm-none-eabi-9-2019-q4-major/bin"
 
 before_script:
     - arm-none-eabi-gcc --version
