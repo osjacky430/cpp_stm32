@@ -4,7 +4,7 @@ notification:
 language: C++
 
 os:
-    -linux
+    - linux
 
 before_install:
     - ./.travis-install-arm-gcc
@@ -22,11 +22,10 @@ install:
     ####################################
     - CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.17.0-rc1/cmake-3.17.0-rc1.tar.gz"
     - mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
-    - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-
+    - export PATH="${DEPS_DIR}/cmake/bin:${PATH}"
+    - cmake --version
 
 before_script:
-    - cmake --version
     - arm-none-eabi-gcc --version
     - arm-none-eabi-ld --version
 
