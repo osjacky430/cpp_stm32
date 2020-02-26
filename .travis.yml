@@ -1,0 +1,21 @@
+notification:
+    email: false
+
+language: C++
+
+os:
+    -linux
+
+before_install:
+    - ./.travis-install-arm-gcc
+    - export PATH="$PATH:$HOME/gcc-arm-none-eabi-8-2019-q3-update/bin"
+
+before_script:
+    - arm-none-eabi-gcc --version
+    - arm-none-eabi-ld --version
+
+script:
+    - cd $TRAVIS_BUILD_DIR
+    - mkdir build && cd build
+    - cmake -DBUILD_EXAMPLE="ALL" -G ""Unix Makefiles" ..
+    - cmake --build ./

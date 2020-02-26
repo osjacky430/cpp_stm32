@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e  # exit immediately if a command exits with a non-zero status
+set -x  # print commands and their arguments as they are executed
+
+pushd $HOME
+
+# bash -x: True if file exists and is executable.
+if [ ! -x gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc ]; then
+    wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2?revision=108bd959-44bd-4619-9c19-26187abf5225&la=en&hash=E788CE92E5DFD64B2A8C246BBA91A249CB8E2D2D -O gcc.tar.bz2
+    # wget -O: download as filename
+    # tar -x: extract files from an archive
+    # tar -j: filter the archive though bzip2
+    # tar -f: use archive file
+    tar -xjf gcc.tar.bz2
+fi
