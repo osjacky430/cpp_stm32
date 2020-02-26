@@ -10,7 +10,23 @@ before_install:
     - ./.travis-install-arm-gcc
     - export PATH="$PATH:$HOME/gcc-arm-none-eabi-9-2019-q4-major/bin"
 
+install:
+    - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+    - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+    ####################################
+    # install latest arm-none-eabi-gcc #
+    ####################################
+    # TODO
+    ####################################
+    # install latest cmake             #
+    ####################################
+    - CMAKE_URL = "https://github.com/Kitware/CMake/releases/download/v3.17.0-rc1/cmake-3.17.0-rc1.tar.Z"
+    - mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+    - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+
+
 before_script:
+    - cmake --version
     - arm-none-eabi-gcc --version
     - arm-none-eabi-ld --version
 
