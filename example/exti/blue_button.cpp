@@ -34,13 +34,16 @@ namespace Exti	 = cpp_stm32::exti;
 namespace SysCfg = cpp_stm32::syscfg;
 namespace Nvic	 = cpp_stm32::nvic;
 
+/**/
+void exti10_15() noexcept;
+
 constexpr void setup_led() noexcept {
 	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioA>();
 	Gpio::mode_setup<Gpio::Port::PortA, Gpio::Pin::Pin5>(Gpio::Mode::Output, Gpio::Pupd::None);
 }
 
 constexpr void setup_user_button_exti() noexcept {
-	Nvic::enable_irq<cpp_stm32::IrqNum::Exti10_15>();
+	Nvic::enable_irq<cpp_stm32::IrqNum::Exti10_15>(cpp_stm32::Callback<exti10_15>{});
 	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioC>();
 	Rcc::enable_periph_clk<Rcc::PeriphClk::SysCfg>();
 
@@ -63,7 +66,7 @@ int main() {
 	}
 }
 
-void cpp_stm32::interrupt::exti10_15() noexcept {
+void exti10_15() noexcept {
 	if (std::get<0>(Exti::is_active<Exti::Line::Line13>())) {
 		Gpio::toggle<Gpio::Port::PortA, Gpio::Pin::Pin5>();
 		Exti::clear_active_flag<Exti::Line::Line13>();

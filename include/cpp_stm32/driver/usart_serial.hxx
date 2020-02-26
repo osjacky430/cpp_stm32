@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <array>
+#include <charconv>
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -79,12 +81,27 @@ class Usart {
 	static constexpr auto USART_GPIO_AF = UsartTx<TX>::TX_AF;
 	static constexpr auto USART_IRQ_NUM = UsartTx<TX>::TX_IRQ;
 
-	static constexpr void USART_IRQ() noexcept {
-		constexpr auto default_irq = interrupt::IRQ_TABLE[to_underlying(USART_IRQ_NUM)];
-		default_irq();
-	}
+	static constexpr void USART_IRQ() noexcept {}
 
 	// static inline auto USART_CB_ARRAY = std::array<int, 2 /*tx & rx*/>{};
+
+	/**
+	 * @brief   	This function convert arithmetic type to string and output to usart
+	 * @param 		t_val Value to print
+	 *
+	 * @note  		floating point is not supported due to gcc hasn't implemented yet
+	 */
+	template <typename T>
+	constexpr void printValAsStr(T const t_val) const noexcept {
+		constexpr auto BUFFER_SIZE = 10;
+		std::array<char, BUFFER_SIZE> str{};
+
+		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), t_val); ec == std::errc()) {
+			for (auto const& val : std::string_view(str.data(), p - str.data())) {
+				usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
+			}
+		}
+	}
 
  public:
 	explicit constexpr Usart(usart::Baudrate_t const& t_baud) noexcept {}
@@ -107,11 +124,6 @@ class Usart {
 		usart::set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
 
 		usart::enable<USART_PORT>();
-
-		{
-			auto const critical_section = create_critical_section();
-			Interrupt<USART_IRQ_NUM>::attach(Callback<USART_IRQ>{});
-		}	 // end critical section
 	}
 
 	constexpr auto sendable() const noexcept { return usart::is_tx_empty<USART_PORT>(); }
@@ -127,11 +139,16 @@ class Usart {
 		return ret_val;
 	}
 
-	constexpr void send(char const& t_val) const noexcept {
-		usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
+	template <typename T, typename = std::enable_if_t<!std::is_pointer_v<T>>>
+	constexpr void send(T const t_val) const noexcept {
+		if constexpr (std::is_same_v<T, char>) {
+			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
+		} else {
+			printValAsStr(t_val);
+		}
 	}
 
-	constexpr void send(std::string_view const& t_str) const noexcept {
+	constexpr void send(std::string_view const t_str) const noexcept {
 		for (auto const& val : t_str) {
 			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}
@@ -144,13 +161,18 @@ class Usart {
 		}
 	}
 
-	constexpr auto operator<<(char const t_val) const noexcept {
-		usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
+	template <typename T, typename = std::enable_if_t<!std::is_pointer_v<T>>>
+	constexpr auto operator<<(T const t_val) const noexcept {
+		if constexpr (std::is_same_v<T, char>) {
+			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(t_val));
+		} else {
+			printValAsStr(t_val);
+		}
 
 		return *this;
 	}
 
-	constexpr auto operator<<(std::string_view const& t_str) const noexcept {
+	constexpr auto operator<<(std::string_view const t_str) const noexcept {
 		for (auto const& val : t_str) {
 			usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
 		}
@@ -169,7 +191,7 @@ class Usart {
 
 	template <auto F>
 	constexpr void attachTxeIRQ(Callback<F> const& t_cb) const noexcept {
-		nvic::enable_irq<USART_IRQ_NUM>();
+		nvic::enable_irq<USART_IRQ_NUM>(Callback<USART_IRQ>{});
 		usart::enable_txe_irq<USART_PORT>();
 		// register callback to callback array
 	}

@@ -46,9 +46,6 @@ using Usart::operator"" _Baud;
 
 constexpr auto I2C = I2c::Port::I2C1;
 
-constexpr auto BUFFER_SIZE = 10;
-std::array<char, BUFFER_SIZE> str;
-
 /* USART to send value returned from IMU to PC */
 Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v<Gpio::PinName::PA_3>, 115200_Baud};
 
@@ -74,8 +71,6 @@ int main() {
 
 		auto const [gyro_id] = imu.getID(Lsm9ds0::Sensor::Gyroscope);
 
-		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), gyro_id); ec == std::errc()) {
-			pc << std::string_view(str.data(), p - str.data()) << "\n\r";	 // this will print "212"
-		}
+		pc << gyro_id << "\n\r";
 	}
 }

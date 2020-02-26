@@ -16,14 +16,23 @@
 
 #pragma once
 
+#include "cpp_stm32/hal/callback.hxx"
+#include "cpp_stm32/hal/interrupt.hxx"
+
+#include "cpp_stm32/processor/cortex_m4/core_util.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/nvic_reg.hxx"
 
 namespace cpp_stm32::nvic {
 
-template <IrqNum IRQn>
-constexpr void enable_irq() noexcept {
+template <IrqNum IRQn, auto F>
+constexpr void enable_irq(Callback<F> const& t_cb) noexcept {
 	reg::NVIC_ISER<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
+
+	{
+		auto const critical_sec = create_critical_section();
+		Interrupt<IRQn>::attach(t_cb);
+	}	 // end critical section
 }
 
 template <IrqNum IRQn>
@@ -69,4 +78,4 @@ constexpr void set_irq_priority(std::uint8_t const& t_priority) noexcept {
 	}
 }
 
-}	// namespace cpp_stm32::nvic
+}	 // namespace cpp_stm32::nvic

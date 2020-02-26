@@ -41,7 +41,15 @@ class LSM9DS0 {
 	static constexpr std::array<std::uint8_t, 2> SLAVE_ADDR{0b1101010, 0b0011110};
 
 	// using COMM_t = std::conditional_t<SDO == Gpio::PinName::NC, I2C, SPI>
-	static inline auto COMM = Driver::I2C{Driver::I2cSDA<SDAPin>{}, Driver::I2cSCL<SCLPin>{}, 400_kHz};
+	static inline auto const COMM = []() {
+		// if constexpr (std::is_same_v<COMM_t, I2C>) {
+		auto const comm = Driver::I2C{Driver::I2cSDA<SDAPin>{}, Driver::I2cSCL<SCLPin>{}, 400_kHz};
+		// } else {
+		// init spi
+		// }
+
+		return comm;
+	}();
 
  public:
 	explicit constexpr LSM9DS0(GyroCs<CS_GYRO>, XMCs<CS_XM>, SDO<SDOPin>, SCL<SCLPin>, SDA<SDAPin>) noexcept {

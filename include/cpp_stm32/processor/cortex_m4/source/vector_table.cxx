@@ -57,15 +57,12 @@ using cpp_stm32::Interrupt, cpp_stm32::IrqNum;
 	},
 	pending_service_call_handler,
 	system_clock_tick_handler,
-	{
-		NVIC_INTERRUPT,
-	},
 
-	// []() {
-	// 	std::array<IrqVector::IrqFuncPtr, NVIC_IRQ_NUM> irq;
-	// 	std::fill(irq.begin(), irq.end(), blocking_handler);
-	// 	return irq;
-	// }(),
+	[]() {
+		std::array<IrqVector::IrqFuncPtr, NVIC_IRQ_NUM> irq;
+		std::fill(irq.begin(), irq.end(), blocking_handler);
+		return irq;
+	}(),
 };
 
 void reset_handler() {
@@ -124,5 +121,3 @@ void reset_handler() {
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void debug_monitor_handler();
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void pending_service_call_handler();
 [[gnu::weak, gnu::alias("_Z12null_handlerv")]] void system_clock_tick_handler();
-
-#include "source/interrupt.cxx"

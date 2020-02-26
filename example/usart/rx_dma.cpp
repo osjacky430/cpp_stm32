@@ -46,6 +46,9 @@ Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v
 /* For indication, whether interrupt is entered or not */
 Driver::DigitalOut<Gpio::PinName::PA_5> led;
 
+/**/
+void dma1_stream5() noexcept;
+
 constexpr void setup_dma() noexcept {
 	constexpr auto p_addr = Usart::reg::DR<Usart::Port::Usart2>.memoryAddr();
 	constexpr auto m_addr = &array[0];
@@ -54,7 +57,7 @@ constexpr void setup_dma() noexcept {
 	constexpr auto Str = Dma::Stream::Stream5;
 
 	Rcc::enable_periph_clk<Rcc::PeriphClk::Dma1>();
-	Nvic::enable_irq<cpp_stm32::IrqNum::Dma1Stream5Global>();
+	Nvic::enable_irq<cpp_stm32::IrqNum::Dma1Stream5Global>(cpp_stm32::Callback<dma1_stream5>{});
 
 	Dma::DmaBuilder<DMA, Str>()
 		.transferDir(Dma::PeriphAddress_t{p_addr}, Dma::MemoryAddress_t{(std::uintptr_t)m_addr})
@@ -88,7 +91,7 @@ int main() {
 	return 0;
 }
 
-void cpp_stm32::interrupt::dma1_stream5() noexcept {
+void dma1_stream5() noexcept {
 	if (auto const [tc_flag] = Dma::get_tx_complete_flag<Dma::Port::DMA1, Dma::Stream::Stream5>(); tc_flag != 0) {
 		Dma::clear_tx_complete_flag<Dma::Port::DMA1, Dma::Stream::Stream5>();
 

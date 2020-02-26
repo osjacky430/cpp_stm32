@@ -16,20 +16,30 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 
 namespace cpp_stm32 {
+
+enum class IrqNum : std::uint8_t;
 
 template <auto F>
 struct Callback;
 
 template <typename OwnerT, void (OwnerT::*F)()>
-struct Callback<F> {
+class Callback<F> {
 	using MethodHolder = OwnerT;
 
-	explicit constexpr Callback(OwnerT* const t_val) : thisPtr{t_val} {}
+	template <IrqNum IRQn>
+	friend class Interrupt;
 
 	OwnerT* const thisPtr;
+
+	Callback() = delete;
+
+ public:
+	explicit constexpr Callback(OwnerT* const t_val) : thisPtr{t_val} {}
+
 	constexpr auto invoke() const noexcept { return thisPtr != nullptr ? std::invoke(F, thisPtr) : void(); }
 };
 

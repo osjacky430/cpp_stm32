@@ -17,6 +17,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 
 #include "cpp_stm32/hal/callback.hxx"
 #include "cpp_stm32/utility/utility.hxx"
@@ -52,7 +53,7 @@ class Interrupt {
 	using WrapperFuncPtr = void (*)(void* const) noexcept;
 	using CStyleThisPtr	 = void*;
 
-	static std::pair<CStyleThisPtr, WrapperFuncPtr> m_callback;
+	static inline std::pair<CStyleThisPtr, WrapperFuncPtr> m_callback{nullptr, nullptr};
 
  public:
 	constexpr Interrupt() noexcept = default;

@@ -106,8 +106,6 @@ int main() {
 		constexpr std::array tx = {cpp_stm32::to_underlying(RegisterMap::WHO_AM_I)};
 		auto const [gyro_id]		= I2c::xfer_blocking<I2C>(I2c::SlaveAddr7_t{GYRO_SAD}, 1_byte, tx.begin(), tx.end());
 
-		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), gyro_id); ec == std::errc()) {
-			pc << std::string_view(str.data(), p - str.data()) << "\n\r";	 // this will print "212"
-		}
+		pc << gyro_id << "\n\r";
 	}
 }
