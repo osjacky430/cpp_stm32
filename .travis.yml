@@ -17,5 +17,5 @@ before_script:
 script:
     - cd $TRAVIS_BUILD_DIR
     - mkdir build && cd build
-    - cmake -DBUILD_EXAMPLE="ALL" -G ""Unix Makefiles" ..
+    - cmake -DBUILD_EXAMPLE="ALL" -G "Unix Makefiles" ..
     - cmake --build ./
