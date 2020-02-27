@@ -1,6 +1,7 @@
 function(add_binary src_file_name)
 
 add_executable(${src_file_name}.elf ${src_file_name}.cpp)
+target_include_directories(${src_file_name}.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${src_file_name}.elf PRIVATE cpp_stm32)
 add_custom_target(${src_file_name}.bin ALL ${CMAKE_OBJCOPY} -Obinary
                   ${src_file_name}.elf ${src_file_name}.bin DEPENDS ${src_file_name}.elf)
@@ -16,6 +17,8 @@ function(build_ex_from_arg_in example_name)
     else()
       string(REGEX REPLACE "," " " ${example_name}_files ${${example_name}_files})
       string(REGEX MATCHALL "[a-zA-Z0-9_]+|[a-zA-Z0-9_]+$" ${example_name}_files ${${example_name}_files})
+
+      target_include_directories(cpp_stm32 INTERFACE ${CMAKE_SOURCE_DIR}/example/${example_name})
       add_subdirectory(${example_name})
     endif()
   else()

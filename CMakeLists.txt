@@ -31,8 +31,6 @@ target_sources(cpp_stm32
     ${TARGET_PROCESSOR}/source/vector_table.cxx
 )
 target_include_directories(cpp_stm32
-  INTERFACE
-    ${CMAKE_SOURCE_DIR}/src
   PUBLIC
     ${TARGET_DIR}
     ${CMAKE_SOURCE_DIR}/include/
