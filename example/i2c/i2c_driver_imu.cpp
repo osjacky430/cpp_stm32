@@ -23,9 +23,8 @@
  */
 
 #include <array>
-#include <charconv>
 
-#include "cpp_stm32/driver/digitalOut.hxx"
+#include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/i2c.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
@@ -43,8 +42,6 @@ namespace Driver = cpp_stm32::driver;
 using cpp_stm32::operator"" _kHz;
 using cpp_stm32::operator"" _byte;
 using Usart::operator"" _Baud;
-
-constexpr auto I2C = I2c::Port::I2C1;
 
 /* USART to send value returned from IMU to PC */
 Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v<Gpio::PinName::PA_3>, 115200_Baud};
