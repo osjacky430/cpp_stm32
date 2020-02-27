@@ -55,6 +55,10 @@ The ```example_category``` are folders under ```example``` directory (e.g. ```gp
 ```
 cmake -DBUILD_EXAMPLE="gpio_output:digitalout,ll_driver" -G "Unix Makefiles" ..
 ```
+Since we want to build all example in gpio_output, we can also use the following syntax:
+```
+cmake -DBUILD_EXAMPLE="gpio_output:" -G "Unix Makefiles" ..
+```
 ### Tunable Options
 Currently Under construction...
 

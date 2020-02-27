@@ -58,10 +58,10 @@ enum class InterruptFlag : std::uint8_t {
 };
 
 /**
- * @enum 		TransferDir
+ * @enum 		TransferMode
  * @brief 	DMA transfer direction
  */
-enum class TransferDir : std::uint8_t {
+enum class TransferMode : std::uint8_t {
 	PeriphToMem, /*!< Perihperal to Memory */
 	MemToPeriph, /*!< Memory to Peripheral */
 	MemToMem,		 /*!< Memory to Memory */

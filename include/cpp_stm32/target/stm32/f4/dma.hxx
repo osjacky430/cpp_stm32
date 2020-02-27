@@ -75,13 +75,13 @@ template <Port DMA, Stream Str>
  * @brief 		This function sets transfer direcition of DMA
  * @tparam 		DMA 		@ref dma::Port
  * @tparam		Str			@ref dma::Stream
- * @param 		t_dir 	@ref dma::TransferDir
+ * @param 		t_dir 	@ref dma::TransferMode
  *
  * @note 			Mem to mem transfer mode is only availabe when DMA == Port::DMA2
  * @todo 			Improve static checking
  */
 template <Port DMA, Stream Str>
-constexpr void set_tx_mode(TransferDir const t_dir) noexcept {
+constexpr void set_transfer_mode(TransferMode const t_dir) noexcept {
 	reg::SxCR<DMA, Str>.template writeBit<reg::SxCRField::DIR>(t_dir);
 }
 
@@ -448,7 +448,7 @@ template <Port DMA, Stream Str>
 class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
  private:
 	Channel m_channelSelect{Channel::Channel0};
-	TransferDir m_transferDir{TransferDir::PeriphToMem};
+	TransferMode m_transferDir{TransferMode::PeriphToMem};
 	StreamPriority m_streamPriority{StreamPriority::Low};
 
 	bool m_periphIncrementMode{false};
@@ -483,7 +483,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	[[nodiscard]] constexpr DmaBuilder() noexcept { resetDMA(); }
 
 	[[nodiscard]] constexpr auto transferDir(PeriphAddress_t const t_from, MemoryAddress_t const t_to) noexcept {
-		m_transferDir = TransferDir::PeriphToMem;
+		m_transferDir = TransferMode::PeriphToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_to.get());
@@ -492,7 +492,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	}
 
 	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const t_from, PeriphAddress_t const t_to) noexcept {
-		m_transferDir = TransferDir::MemToPeriph;
+		m_transferDir = TransferMode::MemToPeriph;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_to.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_from.get());
@@ -501,7 +501,7 @@ class DmaBuilder : detail::Builder<DmaBuilder<DMA, Str>> {
 	}
 
 	[[nodiscard]] constexpr auto transferDir(MemoryAddress_t const t_from, MemoryAddress_t const t_to) noexcept {
-		m_transferDir = TransferDir::MemToMem;
+		m_transferDir = TransferMode::MemToMem;
 
 		reg::SxPAR<DMA, Str>.template writeBit<reg::SxPARField::PA>(t_from.get());
 		reg::SxM0AR<DMA, Str>.template writeBit<reg::SxM0ARField::M0A>(t_to.get());

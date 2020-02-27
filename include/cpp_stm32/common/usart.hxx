@@ -64,7 +64,7 @@ constexpr auto operator"" _MBaud(std::uint64_t t_baud) noexcept { return Baudrat
 enum class DataBit : std::uint8_t;
 enum class HardwareFlowControl : std::uint8_t;
 enum class OverSampling : std::uint8_t;
-enum class Mode : std::uint8_t;
+enum class TransferMode : std::uint8_t;
 enum class Parity : std::uint8_t;
 enum class Stopbit : std::uint8_t;
 

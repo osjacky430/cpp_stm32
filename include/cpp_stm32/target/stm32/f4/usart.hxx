@@ -77,12 +77,12 @@ constexpr void set_hardware_flow_ctl(HardwareFlowControl const t_flow_ctl) noexc
 /**
  * @brief 	This function sets transfer mode of USART
  * @tparam	InputPort @ref usart::Port
- * @param 	t_mode		@ref usart::Mode
+ * @param 	t_mode		@ref usart::TransferMode
  */
 template <Port InputPort>
-constexpr void set_transfer_mode(Mode const t_mode) noexcept {
-	std::uint8_t const tx_en = (to_underlying(t_mode) & to_underlying(Mode::TxOnly)) != 0;
-	std::uint8_t const rx_en = (to_underlying(t_mode) & to_underlying(Mode::RxOnly)) != 0;
+constexpr void set_transfer_mode(TransferMode const t_mode) noexcept {
+	std::uint8_t const tx_en = (to_underlying(t_mode) & to_underlying(TransferMode::TxOnly)) != 0;
+	std::uint8_t const rx_en = (to_underlying(t_mode) & to_underlying(TransferMode::RxOnly)) != 0;
 
 	reg::CR1<InputPort>.template writeBit<reg::Cr1Bit::TE, reg::Cr1Bit::RE>(tx_en, rx_en);
 }

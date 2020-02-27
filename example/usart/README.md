@@ -27,7 +27,7 @@ This example utilizes idle line interrupt and dma transfer interrupt to receive 
 
   | Port | Stream | Channel  | Transfer Mode           | Memory DataSize| Periph DataSize| Mem Increment | Circular Mode |
   |:----:|:------:|:--------:|:-----------------------:|:--------------:|:--------------:|:-------------:|:-------------:|
-  | DMA1 | Stream5| Channel4 | TransferDir::PeriphToMem| DataSize::Byte | DataSize::Byte |  Enabled      |   Enabled     |
+  | DMA1 | Stream5| Channel4 | TransferMode::PeriphToMem| DataSize::Byte | DataSize::Byte |  Enabled      |   Enabled     |
 
 - Interrupt Configuration
 

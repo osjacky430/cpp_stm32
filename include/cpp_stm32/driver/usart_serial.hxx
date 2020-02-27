@@ -120,7 +120,7 @@ class Usart {
 		usart::set_baudrate<USART_PORT>(t_baud);
 		usart::set_dps<USART_PORT>(DataBit::DataBit8, Parity::None, StopBit_v<Stopbit::Bit1>);
 
-		usart::set_transfer_mode<USART_PORT>(usart::Mode::TxRx);
+		usart::set_transfer_mode<USART_PORT>(usart::TransferMode::TxRx);
 		usart::set_hardware_flow_ctl<USART_PORT>(HardwareFlowControl::None);
 
 		usart::enable<USART_PORT>();

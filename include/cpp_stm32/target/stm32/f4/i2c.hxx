@@ -188,7 +188,7 @@ constexpr void disable_dual_address() noexcept {
 
 /**
  * @brief			This function reads status register 2 of I2C
- * @return  	std::tuple of required master status
+ * @return  	std::tuple of required status
  *
  * @note    	Calling this function after calling @ref i2c::get_interrupt_flag clears the ADDR flag, even if the ADDR
  * 						flag was set after reading @ref i2c::get_interrupt_flag. Consequently, this function must be called only

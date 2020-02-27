@@ -42,7 +42,7 @@ enum class OverSampling : std::uint8_t {
 enum class DataBit : std::uint8_t { DataBit8, DataBit9 };
 
 enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
-enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
+enum class TransferMode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
 enum class Parity : std::uint8_t { Even, Odd, None };
 enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
 

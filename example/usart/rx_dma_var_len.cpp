@@ -88,7 +88,7 @@ constexpr void setup_dma() noexcept {
 	Nvic::enable_irq<cpp_stm32::IrqNum::Usart2Global>(cpp_stm32::Callback<usart2>{});
 
 	Dma::reset<DMA, Str>();
-	Dma::set_tx_mode<DMA, Str>(Dma::TransferDir::PeriphToMem);
+	Dma::set_transfer_mode<DMA, Str>(Dma::TransferMode::PeriphToMem);
 	Dma::set_tx_data_num<DMA, Str>(MAX_BUFFER_SIZE);
 	Dma::channel_select<DMA, Str>(Dma::Channel::Channel4);
 	Dma::set_memory_data_size<DMA, Str>(Dma::DataSize::Byte);
