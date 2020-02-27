@@ -6,17 +6,17 @@ language: C++
 os:
     - linux
 
-before_install:
-    - ./.travis-install-arm-gcc
-    - export PATH="$PATH:$HOME/gcc-arm-none-eabi-9-2019-q4-major/bin"
-
 install:
     - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
     - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
     ####################################
     # install latest arm-none-eabi-gcc #
     ####################################
-    # TODO
+    - ARM_GCC_URL="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2?revision=108bd959-44bd-4619-9c19-26187abf5225&la=en&hash=E788CE92E5DFD64B2A8C246BBA91A249CB8E2D2D"
+    - mkdir arm-gcc && travis_retry wget --quiet -O ${ARM_GCC_URL} | tar --strip-components=1 -xj -C arm-gcc
+    - export PATH="${DEPS_DIR}/arm-gcc/bin:${PATH}"
+    - arm-none-eabi-gcc --version
+    - arm-none-eabi-ld --version
     ####################################
     # install latest cmake             #
     ####################################
@@ -24,10 +24,6 @@ install:
     - mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
     - export PATH="${DEPS_DIR}/cmake/bin:${PATH}"
     - cmake --version
-
-before_script:
-    - arm-none-eabi-gcc --version
-    - arm-none-eabi-ld --version
 
 script:
     - cd $TRAVIS_BUILD_DIR
