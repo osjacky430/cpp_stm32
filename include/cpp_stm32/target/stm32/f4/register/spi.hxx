@@ -30,7 +30,7 @@ SETUP_REGISTER_INFO(CR1BitList,															/**/
 										Binary<>{BitPos_t{0}},									// CPHA
 										Binary<>{BitPos_t{1}},									// CPOL
 										Binary<>{BitPos_t{2}},									// MSTR
-										Bit<3, SpiBaurdrate_t>{BitPos_t{3}},		// BR
+										Bit<3, Baudrate_t>{BitPos_t{3}},				// BR
 										Binary<>{BitPos_t{6}},									// SPE
 										Binary<>{BitPos_t{7}},									// LSBFIRST
 										Binary<>{BitPos_t{8}},									// SSI
@@ -86,7 +86,7 @@ enum class CR2Field {
 	SSOE,		 /*!< SS output enable*/
 	FRF,		 /*!< Frame format*/
 	ERRIE,	 /*!< Error interrupt enable*/
-	RXNEIE,	 /*!< RX buffer not empty interrupt enable*/
+	RXNEIE,	/*!< RX buffer not empty interrupt enable*/
 	TXEIE,	 /*!< Tx buffer empty interrupt enable*/
 };
 
@@ -123,7 +123,7 @@ static constexpr Register<SRBitList, Status> SR{BASE_ADDR(SPI), 0x08U};
  */
 
 SETUP_REGISTER_INFO(DRBitList,													 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	 // DR
+										Bit<16, std::uint16_t>{BitPos_t{0}}	// DR
 )
 
 enum class DRField {
@@ -141,7 +141,7 @@ static constexpr Register<DRBitList, DRField> DR{BASE_ADDR(SPI), 0x0cU};
  */
 
 SETUP_REGISTER_INFO(CRCPRBitList,												 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	 // CRCPOLY
+										Bit<16, std::uint16_t>{BitPos_t{0}}	// CRCPOLY
 )
 
 enum class CRCPRField {
@@ -159,7 +159,7 @@ static constexpr Register<CRCPRBitList, CRCPRField> CRCPR{BASE_ADDR(SPI), 0x10U}
  */
 
 SETUP_REGISTER_INFO(RXCRCRBitList,											 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	 // RxCRC
+										Bit<16, std::uint16_t>{BitPos_t{0}}	// RxCRC
 )
 
 enum class RXCRCRField {
@@ -177,7 +177,7 @@ static constexpr Register<RXCRCRBitList, RXCRCRField> RXCRCR{BASE_ADDR(SPI), 0x1
  */
 
 SETUP_REGISTER_INFO(TXCRCRBitList,											 /**/
-										Bit<16, std::uint16_t>{BitPos_t{0}}	 // TxCRC
+										Bit<16, std::uint16_t>{BitPos_t{0}}	// TxCRC
 )
 
 enum class TXCRCRField {
@@ -201,19 +201,19 @@ SETUP_REGISTER_INFO(I2SCFGRBitList,					 /**/
 										Bit<2>{BitPos_t{4}},		 // I2SSTD
 										Binary<>{BitPos_t{7}},	 // PCMSYNC
 										Bit<2>{BitPos_t{8}},		 // I2SCFG
-										Binary<>{BitPos_t{10}},	 // I2SE
+										Binary<>{BitPos_t{10}},	// I2SE
 										Binary<>{BitPos_t{11}}	 // I2SMOD
 )
 
 enum class I2SCFGRField {
 	CHLEN,	 /*!< Channel length (number of bits per audio channel)*/
-	DATLEN,	 /*!< Data length to be transferred*/
+	DATLEN,	/*!< Data length to be transferred*/
 	CKPOL,	 /*!< Steady state clock polarity*/
-	I2SSTD,	 /*!< I2S standard selection*/
+	I2SSTD,	/*!< I2S standard selection*/
 	PCMSYNC, /*!< PCM frame synchronization*/
-	I2SCFG,	 /*!< I2S configuration mode*/
+	I2SCFG,	/*!< I2S configuration mode*/
 	I2SE,		 /*!< I2S Enable*/
-	I2SMOD,	 /*!< I2S mode selection*/
+	I2SMOD,	/*!< I2S mode selection*/
 };
 
 template <Port SPI>
@@ -242,4 +242,4 @@ template <Port SPI>
 static constexpr Register<I2SPRBitList, I2SPRField> I2SPR{BASE_ADDR(SPI), 0x20U};
 /**@}*/
 
-}	 // namespace cpp_stm32::spi::reg
+}	// namespace cpp_stm32::spi::reg

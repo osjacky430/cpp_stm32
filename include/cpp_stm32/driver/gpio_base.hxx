@@ -89,7 +89,7 @@ class PinGroupingHelper {
 	static constexpr auto PORT_NUM			= calcPortNum();								 /*!< Number of port used */
 	static constexpr auto PIN_NAME_LIST = genPinNameList();							 /*!< List of pin name */
 	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{}); /*!< list of port according to pin name list */
-	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	 /*!< list of pin according to pin name list*/
+	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	/*!< list of pin according to pin name list*/
 
 	/**
 	 * @brief    This function collect pins with same port
@@ -273,6 +273,11 @@ class GpioUtil {
 		(alternateFuncSteupThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>, t_af), ...);
 	}
 
+	/**
+	 * [setThruPin description]
+	 * @param t_sc  [description]
+	 * @param const [description]
+	 */
 	template <std::size_t Num, std::size_t... Idx>
 	static constexpr void setThruPin(size_c<Num> const t_sc, std::index_sequence<Idx...> const /*unused*/) noexcept {
 		constexpr auto gpio_port			= PinGrouper::getPort(t_sc);
@@ -280,9 +285,34 @@ class GpioUtil {
 		gpio::set<gpio_port, std::get<Idx>(gpio_pin_group)...>();
 	}
 
+	/**
+	 * [setThruPort description]
+	 * @param const [description]
+	 */
 	template <std::size_t... Idx>
 	static constexpr void setThruPort(std::index_sequence<Idx...> const) noexcept {
 		(setThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
+	}
+
+	/**
+	 * [clearThruPin description]
+	 * @param t_sc  [description]
+	 * @param const [description]
+	 */
+	template <std::size_t Num, std::size_t... Idx>
+	static constexpr void clearThruPin(size_c<Num> const t_sc, std::index_sequence<Idx...> const /*unused*/) noexcept {
+		constexpr auto gpio_port			= PinGrouper::getPort(t_sc);
+		constexpr auto gpio_pin_group = std::get<Num>(PinGrouper::GPIO_GROUP_LIST);
+		gpio::clear<gpio_port, std::get<Idx>(gpio_pin_group)...>();
+	}
+
+	/**
+	 * [clearThruPort description]
+	 * @param const [description]
+	 */
+	template <std::size_t... Idx>
+	static constexpr void clearThruPort(std::index_sequence<Idx...> const /*unused*/) noexcept {
+		(clearThruPin(size_c<Idx>{}, GpioGroupTupIdxSeq<Idx>), ...);
 	}
 
  public:
@@ -317,6 +347,11 @@ class GpioUtil {
 	 * @brief   This function is the public interface of gpio set function
 	 */
 	static constexpr void set() noexcept { setThruPort(IdxThruPort{}); }
+
+	/**
+	 * @brief		This function is the public interface of gpio clear function
+	 */
+	static constexpr void clear() noexcept {};
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

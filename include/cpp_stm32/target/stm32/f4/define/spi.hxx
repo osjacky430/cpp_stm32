@@ -54,9 +54,9 @@ enum class InterruptFlag : std::uint8_t { ERRIE, RXNEIE, TXEIE };
  *  @class  SpiBaurdrate_t
  *  @brief  Utility class used to check whether baudrate prescaler is reasonable
  */
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(SpiBaurdrate_t, /**/
+SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(Baudrate_t, /**/
 																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{8, 0b10}, std::pair{16, 0b11},
 																		 std::pair{32, 0b100}, std::pair{64, 0b101}, std::pair{128, 0b110},
 																		 std::pair{256, 0b111});
 
-}	 // namespace cpp_stm32::spi
+}	// namespace cpp_stm32::spi

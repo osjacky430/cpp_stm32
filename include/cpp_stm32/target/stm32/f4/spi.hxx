@@ -224,7 +224,7 @@ constexpr void set_lsb_first() noexcept {
  * @tparam  SPI     @ref spi::Port
  */
 template <Port SPI>
-constexpr void set_baudrate_prescaler(SpiBaurdrate_t const t_spi_baud) noexcept {
+constexpr void set_baudrate_prescaler(Baudrate_t const t_spi_baud) noexcept {
 	reg::CR1<SPI>.template writeBit<reg::CR1Field::BR>(t_spi_baud);
 }
 
@@ -312,12 +312,12 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
  * @tparam    SPI   @ref spi::Port
  * @tparam    N     Number of data to receive
  */
-template <Port SPI, std::size_t N>
-constexpr std::array<std::uint16_t, N> read_blocking(ByteCount<N> const) noexcept {
+template <Port SPI, std::uint8_t N>
+constexpr auto read_blocking(ByteCount<N> const /*unused*/) noexcept {
 	std::array<std::uint16_t, N> ret_val{};
 	std::generate(ret_val.begin(), ret_val.end(), []() {
-		wait_status<SPI, Status::RXNE>();
-		return std::get<0>(reg::DR<SPI>.template readBit<reg::DRField::DR>());
+		wait_status<SPI, Status::RXNE>(true);
+		return reg::DR<SPI>.template readBit<reg::DRField::DR>(ValWithPos);
 	});
 
 	return ret_val;
@@ -329,8 +329,8 @@ constexpr std::array<std::uint16_t, N> read_blocking(ByteCount<N> const) noexcep
  * @param   t_begin Begin of the tx buffer
  * @param   t_end   End of the tx buffer
  */
-template <Port SPI, std::size_t N, typename IterT>
-constexpr std::array<std::uint16_t, N> xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
+template <Port SPI, std::uint8_t N, typename IterT>
+constexpr auto xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
 	return read_blocking<SPI>(t_bc);
 }
@@ -377,4 +377,4 @@ constexpr void disable_irq() noexcept {
 	reg::CR2<SPI>.template clearBit<to_cr2_field(Flags)...>();
 }
 
-}	 // namespace cpp_stm32::spi
+}	// namespace cpp_stm32::spi

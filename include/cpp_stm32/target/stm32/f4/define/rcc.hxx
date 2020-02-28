@@ -95,6 +95,8 @@ enum class PeriphClk : std::uint32_t {
 	Dma1,
 	Dma2,
 	/*APB1*/
+	Spi2,
+	Spi3,
 	Usart2,
 	Usart3,
 	Uart4,
@@ -131,4 +133,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
 
-}	 // namespace cpp_stm32::rcc
+}	// namespace cpp_stm32::rcc

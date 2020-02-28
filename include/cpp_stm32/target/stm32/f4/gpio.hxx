@@ -158,9 +158,25 @@ constexpr void set_output_speed(OutputSpeed const t_ospeed) noexcept {
 	reg::OSPEEDR<InputPort>.template writeBit<Pins...>(t_ospeed);
 }
 
+/**
+ * @brief			This function set the gpio to high
+ * @tparam 		InputPort  @ref gpio::Port
+ * @tparam 		Pins 			 @ref gpio::Pin
+ */
 template <Port InputPort, Pin... Pins>
 constexpr void set() noexcept {
 	reg::BSRR<InputPort>.template setBit<Pins...>();
+}
+
+/**
+ * @brief		This function clears the gpio pin to low
+ * @tparam 		InputPort  @ref gpio::Port
+ * @tparam 		Pins 			 @ref gpio::Pin
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void clear() noexcept {
+	constexpr auto HALF_WORD_OFFSET = 16U;
+	reg::BSRR<InputPort>.template setBit<Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>();
 }
 
 /**
@@ -199,4 +215,4 @@ class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
 	constexpr auto build() const noexcept {}
 };
 
-}	 // namespace cpp_stm32::gpio
+}	// namespace cpp_stm32::gpio

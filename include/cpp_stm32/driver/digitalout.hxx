@@ -56,6 +56,16 @@ class DigitalOut {
 	 * @todo    This can be extended to only toggle certain pins in input pin list
 	 */
 	constexpr void toggle() const noexcept { GpioUtil<PinNames...>::toggle(); }
+
+	/**
+	 * @brief 	This function sets pins to high
+	 */
+	constexpr void set() const noexcept { GpioUtil<PinNames...>::set(); }
+
+	/**
+	 * [clear description]
+	 */
+	constexpr void clear() const noexcept { GpioUtil<PinNames...>::clear(); }
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver
