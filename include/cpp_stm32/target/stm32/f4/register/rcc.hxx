@@ -123,8 +123,8 @@ static constexpr Register<RccAhb1RstInfo, Ahb1RstBit> AHB1RST{BASE_ADDR, 0x10U};
  */
 
 SETUP_REGISTER_INFO(RccApb1RstInfo,					 //
-										Binary<>{BitPos_t{15}},	// Spi2Rst
-										Binary<>{BitPos_t{16}},	// Spi3Rst
+										Binary<>{BitPos_t{14}},	 // Spi2Rst
+										Binary<>{BitPos_t{15}},	 // Spi3Rst
 										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{18}}, Binary<>{BitPos_t{19}}, Binary<>{BitPos_t{20}},
 										Binary<>{BitPos_t{21}}, Binary<>{BitPos_t{22}}, Binary<>{BitPos_t{23}}, Binary<>{BitPos_t{28}})
 
@@ -185,8 +185,8 @@ static constexpr Register<RccAhb1EnrInfo, Ahb1EnrBit> AHB1ENR{BASE_ADDR, 0x30U};
  */
 
 SETUP_REGISTER_INFO(RccApb1EnrInfo,					 /**/
-										Binary<>{BitPos_t{15}},	// Spi2En
-										Binary<>{BitPos_t{16}},	// Spi3En
+										Binary<>{BitPos_t{14}},	 // Spi2En
+										Binary<>{BitPos_t{15}},	 // Spi3En
 										Binary<>{BitPos_t{17}}, Binary<>{BitPos_t{18}}, Binary<>{BitPos_t{19}}, Binary<>{BitPos_t{20}},
 										Binary<>{BitPos_t{21}}, Binary<>{BitPos_t{22}}, Binary<>{BitPos_t{23}}, Binary<>{BitPos_t{28}})
 
@@ -233,4 +233,4 @@ static constexpr Register<RccBdcrInfo, BdcrBit> BDCR{BASE_ADDR, 0x70U};
 
 /**@}*/
 
-}	// namespace cpp_stm32::rcc::reg
+}	 // namespace cpp_stm32::rcc::reg

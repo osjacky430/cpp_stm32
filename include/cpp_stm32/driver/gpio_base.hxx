@@ -89,7 +89,7 @@ class PinGroupingHelper {
 	static constexpr auto PORT_NUM			= calcPortNum();								 /*!< Number of port used */
 	static constexpr auto PIN_NAME_LIST = genPinNameList();							 /*!< List of pin name */
 	static constexpr auto PORT_LIST = genPortList(IdxThruPinNameList{}); /*!< list of port according to pin name list */
-	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	/*!< list of pin according to pin name list*/
+	static constexpr auto PIN_LIST	= genPinList(IdxThruPinNameList{});	 /*!< list of pin according to pin name list*/
 
 	/**
 	 * @brief    This function collect pins with same port
@@ -351,7 +351,7 @@ class GpioUtil {
 	/**
 	 * @brief		This function is the public interface of gpio clear function
 	 */
-	static constexpr void clear() noexcept {};
+	static constexpr void clear() noexcept { clearThruPort(IdxThruPort{}); };
 };
 
-}	// namespace cpp_stm32::driver
+}	 // namespace cpp_stm32::driver

@@ -21,8 +21,7 @@
 #include <utility>
 
 #include "cpp_stm32/common/rcc.hxx"
-#include "cpp_stm32/target/stm32/f4/pin_map.hxx"
-
+#include "cpp_stm32/target/stm32/f4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/register/rcc.hxx"
 
 namespace cpp_stm32::rcc {
@@ -37,7 +36,32 @@ static constexpr void enable_periph_clk() noexcept {
 }
 
 template <PeriphClk PeriphClk>
-static constexpr void reset_periph_clk() noexcept {
+constexpr void disable_periph_clk() noexcept {
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<enable_bit>();
+}
+
+template <PeriphClk PeriphClk>
+static constexpr void pulse_reset_periph_clk() noexcept {
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
+	CTL_REG.template setBit<rst_bit>();
+	CTL_REG.template clearBit<rst_bit>();
+}
+
+template <PeriphClk PeriphClk>
+static constexpr void release_reset_periph_clk() noexcept {
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
+	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
+	CTL_REG.template clearBit<rst_bit>();
+}
+
+template <PeriphClk PeriphClk>
+static constexpr void hold_reset_periph_clk() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -96,7 +120,7 @@ static constexpr void set_sysclk() noexcept {
 }
 
 static constexpr SysClk sysclk_in_use() noexcept {
-	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	//
+	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	 //
 }
 
 template <SysClk Clk>

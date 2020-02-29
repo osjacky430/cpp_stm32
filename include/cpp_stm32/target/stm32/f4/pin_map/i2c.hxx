@@ -36,7 +36,7 @@ namespace cpp_stm32::i2c {
 
 class PinMap {
  private:
-	using I2CPinData = detail::Tuple<gpio::PinName, Port, gpio::AltFunc, rcc::PeriphClk, std::array<IrqNum, 2>>;
+	using PinData = detail::Tuple<gpio::PinName, Port, gpio::AltFunc, rcc::PeriphClk, std::array<IrqNum, 2>>;
 
 	static constexpr auto AF = gpio::AltFunc::AF4;
 	static constexpr std::array RCC{rcc::PeriphClk::I2c1, rcc::PeriphClk::I2c2, rcc::PeriphClk::I2c3};
@@ -46,7 +46,7 @@ class PinMap {
 
 	static constexpr auto SET_DATA = [](gpio::PinName const t_pin, Port const t_port) {
 		auto const idx = to_underlying(t_port);
-		return I2CPinData{t_pin, t_port, AF, RCC[idx], IRQ[idx]};
+		return PinData{t_pin, t_port, AF, RCC[idx], IRQ[idx]};
 	};
 
 	static constexpr std::array SDA_TABLE{

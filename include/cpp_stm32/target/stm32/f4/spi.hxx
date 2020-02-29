@@ -20,6 +20,8 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -28,8 +30,14 @@
 #include "cpp_stm32/target/stm32/f4/define/spi.hxx"
 #include "cpp_stm32/target/stm32/f4/register/spi.hxx"
 
+#include "sys_info.hpp"
+
 namespace cpp_stm32::spi {
 
+template <Port SPI>
+constexpr auto is_enabled() noexcept {
+	return reg::CR1<SPI>.template readBit<reg::CR1Field::SPE>(ValueOnly);
+}
 /**
  * @brief   This function disables SPI
  * @tparam  SPI @ref spi::Port
@@ -229,6 +237,28 @@ constexpr void set_baudrate_prescaler(Baudrate_t const t_spi_baud) noexcept {
 }
 
 /**
+ * @brief 	This function select closest SPI baudrate prescaler
+ * @tparam 	SPI 	@ref spi::Port
+ * @tparam 	HZ 		Desire frequency of SPI SCLK
+ */
+template <Port SPI, std::uint32_t HZ>
+constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
+	constexpr auto& KV_PAIR = Baudrate_t::AVAIL_DIVISION_FACTOR;
+	constexpr auto COMP			= [](auto const& t_val, auto const& t_pair) { return t_val < std::get<0>(t_pair); };
+	constexpr auto division = []() {
+		if constexpr (SPI == Port::SPI1 || SPI == Port::SPI4) {
+			return APB2_CLK_FREQ / HZ;
+		} else if constexpr (SPI == Port::SPI2 || SPI == Port::SPI3) {
+			return APB1_CLK_FREQ / HZ;
+		}
+	}();
+	constexpr auto up_bound = std::get<0>(*detail::upper_bound(KV_PAIR.begin(), KV_PAIR.end(), division, COMP));
+
+	// @todo: need to consider limit
+	set_baudrate_prescaler<SPI>(Baudrate_t{uint32_c<up_bound>{}});
+}
+
+/**
  * @brief   This function sets nss output to high
  * @tparam  SPI     @ref spi::Port
  */
@@ -313,7 +343,7 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
  * @tparam    N     Number of data to receive
  */
 template <Port SPI, std::uint8_t N>
-constexpr auto read_blocking(ByteCount<N> const /*unused*/) noexcept {
+constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
 	std::array<std::uint16_t, N> ret_val{};
 	std::generate(ret_val.begin(), ret_val.end(), []() {
 		wait_status<SPI, Status::RXNE>(true);
@@ -332,7 +362,7 @@ constexpr auto read_blocking(ByteCount<N> const /*unused*/) noexcept {
 template <Port SPI, std::uint8_t N, typename IterT>
 constexpr auto xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
-	return read_blocking<SPI>(t_bc);
+	return receive_blocking<SPI>(t_bc);
 }
 
 /**
@@ -377,4 +407,4 @@ constexpr void disable_irq() noexcept {
 	reg::CR2<SPI>.template clearBit<to_cr2_field(Flags)...>();
 }
 
-}	// namespace cpp_stm32::spi
+}	 // namespace cpp_stm32::spi

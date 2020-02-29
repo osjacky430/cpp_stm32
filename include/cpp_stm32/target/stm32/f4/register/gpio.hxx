@@ -41,6 +41,18 @@ template <typename BitList, bool Atomicity, Access IoOp = Access::Word>
 using GpioReg = Register<BitList, gpio::Pin, IoOp, Atomicity>;
 
 /**
+ * [TO_IDX description]
+ * @param  t_line [description]
+ * @return        [description]
+ */
+struct AFHRIdxPolicy {
+	static constexpr auto TO_IDX(gpio::Pin const t_line) noexcept {
+		constexpr auto HALF_WORD_OFFSET = 8U;
+		return to_underlying(t_line) - HALF_WORD_OFFSET;
+	}
+};
+
+/**
  * @defgroup MODER_GROUP		GPIO Mode Register declaration
  * @{
  */

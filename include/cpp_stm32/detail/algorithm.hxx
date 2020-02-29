@@ -36,6 +36,18 @@ constexpr void generate(ForwardIt first, ForwardIt last, Generator g) {
 	}
 }
 
+template <class T, std::size_t Size, typename UnaryPredicate>
+constexpr auto array_count_if(std::array<T, Size> const& t_arr, UnaryPredicate const p) {
+	int ret = 0;
+	for (int i = 0; i < Size; ++i) {
+		if (p(t_arr[i])) {
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
 template <class T, std::size_t Size>
 constexpr auto array_count(std::array<T, Size> const& t_arr, T const& t_val) {
 	int ret = 0;
@@ -185,6 +197,52 @@ constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, Bin
 		}
 	}
 	return result;
+}
+
+/**
+ * [lower_bound description]
+ * @param  first [description]
+ * @param  last  [description]
+ * @param  value [description]
+ * @param  comp  [description]
+ * @return       [description]
+ */
+template <class ForwardIt, class T, class Compare>
+constexpr ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& value, Compare comp) {
+	ForwardIt it;
+	typename std::iterator_traits<ForwardIt>::difference_type count, step;
+	count = std::distance(first, last);
+
+	while (count > 0) {
+		it	 = first;
+		step = count / 2;
+		std::advance(it, step);
+		if (comp(*it, value)) {
+			first = ++it;
+			count -= step + 1;
+		} else
+			count = step;
+	}
+	return first;
+}
+
+template <class ForwardIt, class T, class Compare>
+constexpr ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& value, Compare comp) {
+	ForwardIt it{};
+	typename std::iterator_traits<ForwardIt>::difference_type count = std::distance(first, last);
+	typename std::iterator_traits<ForwardIt>::difference_type step	= 0;
+
+	while (count > 0) {
+		it	 = first;
+		step = count / 2;
+		std::advance(it, step);
+		if (!comp(value, *it)) {
+			first = ++it;
+			count -= step + 1;
+		} else
+			count = step;
+	}
+	return first;
 }
 
 }	 // namespace cpp_stm32::detail

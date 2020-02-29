@@ -96,6 +96,8 @@ constexpr void toggle() noexcept {
  * @tparam    InputPort @ref gpio::Port
  * @tparam    Pins    	@ref gpio::Pin
  * @param     t_af    	@ref gpio::AltFunc
+ *
+ * @note 			This wont do what I expect it to do
  */
 template <Port InputPort, Pin... Pins>
 constexpr void set_alternate_function(AltFunc const t_af) noexcept {
@@ -215,4 +217,4 @@ class GpioBuilder : detail::Builder<GpioBuilder<InputPort, Pins...>> {
 	constexpr auto build() const noexcept {}
 };
 
-}	// namespace cpp_stm32::gpio
+}	 // namespace cpp_stm32::gpio
