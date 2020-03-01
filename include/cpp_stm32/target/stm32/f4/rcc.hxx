@@ -44,7 +44,7 @@ constexpr void disable_periph_clk() noexcept {
 }
 
 template <PeriphClk PeriphClk>
-static constexpr void pulse_reset_periph_clk() noexcept {
+static constexpr void pulse_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -53,7 +53,7 @@ static constexpr void pulse_reset_periph_clk() noexcept {
 }
 
 template <PeriphClk PeriphClk>
-static constexpr void release_reset_periph_clk() noexcept {
+static constexpr void release_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -61,7 +61,7 @@ static constexpr void release_reset_periph_clk() noexcept {
 }
 
 template <PeriphClk PeriphClk>
-static constexpr void hold_reset_periph_clk() noexcept {
+static constexpr void hold_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);

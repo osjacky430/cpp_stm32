@@ -102,7 +102,7 @@ static constexpr Register<PMCBitList, PMCField> PMC{BASE_ADDR, 0x04U};
 SETUP_REGISTER_INFO(EXTICRxBitList, CREATE_LIST_OF_BITS<Bit<4, gpio::Port>>(detail::Interval<0, 12, 4>{}))
 
 template <gpio::Pin CR>
-static constexpr Register<EXTICRxBitList, gpio::Pin, DefaultAccess, true, ExtiCRxIdxPolicy> EXTICRx{BASE_ADDR,
+static constexpr Register<EXTICRxBitList, gpio::Pin, DEFAULT_ACCESS, true, ExtiCRxIdxPolicy> EXTICRx{BASE_ADDR,
 																																																		OFFSET(CR)};
 /**@}*/
 

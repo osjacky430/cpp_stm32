@@ -37,8 +37,9 @@ constexpr auto BASE_ADDR(Port const& t_port) noexcept {
 	return memory_at(PeriphAddr::Ahb1Base, 0x0400U * to_underlying(t_port));
 }
 
-template <typename BitList, bool Atomicity, Access IoOp = Access::Word>
-using GpioReg = Register<BitList, gpio::Pin, IoOp, Atomicity>;
+template <typename BitList, bool Atomicity, Access IoOp = DEFAULT_ACCESS,
+					typename IdxPolicy = DefaultIdxPolicy<gpio::Pin>>
+using GpioReg = Register<BitList, gpio::Pin, IoOp, Atomicity, IdxPolicy>;
 
 /**
  * [TO_IDX description]
@@ -142,7 +143,8 @@ template <Port GPIO>
 static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x20U)> AFRL{BASE_ADDR(GPIO), 0x20U};
 
 template <Port GPIO>
-static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x24U)> AFRH{BASE_ADDR(GPIO), 0x24U};
+static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x24U), DEFAULT_ACCESS, AFHRIdxPolicy> AFRH{
+	BASE_ADDR(GPIO), 0x24U};
 
 /**@}*/
 

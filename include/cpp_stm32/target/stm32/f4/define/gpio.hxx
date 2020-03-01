@@ -23,6 +23,7 @@
 #pragma once
 
 #include <cstdint>
+#include <utility>
 
 namespace cpp_stm32::gpio {
 
@@ -94,5 +95,11 @@ enum class PinName {
 	NC
 	// clang-format on
 };
+
+template <Pin... Pins>
+using PinSequence_t = std::integer_sequence<Pin, Pins...>;
+
+template <PinName... PinNames>
+using PinNameSequence_t = std::integer_sequence<PinName, PinNames...>;
 
 }	 // namespace cpp_stm32::gpio

@@ -84,7 +84,7 @@ struct DefaultIdxPolicy {
 /**
  *
  */
-static constexpr auto DefaultAccess = Access::Word | Access::HalfWord | Access::Byte;
+static constexpr auto DEFAULT_ACCESS = Access::Word | Access::HalfWord | Access::Byte;
 
 /**
  * @class 	Register
@@ -96,7 +96,7 @@ static constexpr auto DefaultAccess = Access::Word | Access::HalfWord | Access::
  * @note		Need to add some sfinae or static_assert to ensure the user don't mess up with it
  * @todo 		Consider policy base implementation?
  */
-template <typename BitList, typename BitListIdx, Access IoOp = DefaultAccess, bool atomicity = false,
+template <typename BitList, typename BitListIdx, Access IoOp = DEFAULT_ACCESS, bool atomicity = false,
 					typename IdxPolicy = DefaultIdxPolicy<BitListIdx>>
 class Register {
  private:
