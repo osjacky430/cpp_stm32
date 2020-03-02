@@ -68,7 +68,7 @@ constexpr auto atomicity(std::uint32_t const& t_mem_addr) noexcept {
 template <typename BitList, typename BitListIdx, Access IoOp, bool atomicity, typename IdxPolicy>
 template <BitListIdx BitIdx, typename ValueType, bool b>
 constexpr void Register<BitList, BitListIdx, IoOp, atomicity, IdxPolicy>::writeBit(
-	ValueType const& t_param, Atomic_t<b> const& /*unused*/) const noexcept {
+	ValueType const t_param, Atomic_t<b> const& /*unused*/) const noexcept {
 	constexpr auto bit = GET_BIT<BitIdx>();
 	static_assert(atomicity && b);
 	static_assert((bit.template isTypeAvailable<ValueType>()));

@@ -1,7 +1,8 @@
 /**
- * @file  example/i2c/i2c_imu.cpp
- * @brief	I2C example with IMU, LSM9DS0
+ * @file  example/spi/spi_driver_imu.cpp
+ * @brief	SPI driver example with IMU, LSM9DS0
  *
+ * @note  Still Under Construction, there is a bug still can't resolve
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -21,10 +22,8 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
-
 #include "cpp_stm32/driver/digitalout.hxx"
-#include "cpp_stm32/driver/i2c.hxx"
+#include "cpp_stm32/driver/spi.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
@@ -32,9 +31,9 @@
 
 namespace Rcc		= cpp_stm32::rcc;
 namespace Gpio	= cpp_stm32::gpio;
-namespace I2c		= cpp_stm32::i2c;
 namespace Sys		= cpp_stm32::sys;
 namespace Usart = cpp_stm32::usart;
+namespace Spi		= cpp_stm32::spi;
 
 namespace Driver = cpp_stm32::driver;
 
@@ -42,17 +41,15 @@ using cpp_stm32::operator"" _kHz;
 using cpp_stm32::operator"" _byte;
 using Usart::operator"" _Baud;
 
-/* USART to send value returned from IMU to PC */
 Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v<Gpio::PinName::PA_3>, 115200_Baud};
 
-/* LED to indicate the CPU state (stalling or not) */
 Driver::DigitalOut<Gpio::PinName::PA_5> const led;
 
-/**/
+/* IMU defines */
 using Lsm9ds0::LSM9DS0, Lsm9ds0::GyroCs, Lsm9ds0::XMCs, Lsm9ds0::SDO, Lsm9ds0::SCL, Lsm9ds0::SDA;
 
-LSM9DS0 imu{GyroCs<Gpio::PinName::PC_8>{}, XMCs<Gpio::PinName::PC_9>{}, SDO<Gpio::PinName::NC>{},
-						SCL<Gpio::PinName::PB_8>{}, SDA<Gpio::PinName::PB_9>{}};
+LSM9DS0 const imu{GyroCs<Gpio::PinName::PB_3>{}, XMCs<Gpio::PinName::PB_10>{}, SDO<Gpio::PinName::PB_14>{},
+									SCL<Gpio::PinName::PB_13>{}, SDA<Gpio::PinName::PB_15>{}};
 
 int main() {
 	Sys::Clock::init<Rcc::ClkSrc::Hse>();
@@ -65,7 +62,7 @@ int main() {
 
 		led.toggle();
 
-		auto const [gyro_id] = imu.getID(Lsm9ds0::Sensor::Gyroscope);
+		auto const [gyro_id] = imu.getID(Lsm9ds0::Sensor::Accelerometer);
 
 		pc << gyro_id << "\n\r";
 	}

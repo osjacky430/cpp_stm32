@@ -309,7 +309,7 @@ class Register {
 	 * @param 	t_param		Value to be written.
 	 */
 	template <BitListIdx... BitIdx, typename ValueType>
-	constexpr void writeBit(ValueType const& t_param) const noexcept {
+	constexpr void writeBit(ValueType const t_param) const noexcept {
 		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueType>() && ...));
 		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
 
@@ -354,7 +354,7 @@ class Register {
 	 * @param 	t_param			Input value to be set.
 	 */
 	template <BitListIdx... BitIdx, typename... ValueTypes>
-	constexpr void writeBit(ValueTypes const&... t_param) const noexcept {
+	constexpr void writeBit(ValueTypes const... t_param) const noexcept {
 		static_assert(sizeof...(BitIdx) == sizeof...(ValueTypes));
 		static_assert((GET_BIT<BitIdx>().template isTypeAvailable<ValueTypes>() && ...));
 		static_assert((GET_BIT<BitIdx>().isWritable() && ...));
@@ -426,7 +426,7 @@ class Register {
 	 * 					not implemented yet
 	 */
 	template <BitListIdx BitIdx, typename ValueType, bool b>
-	constexpr void writeBit(ValueType const& t_param, Atomic_t<b> const& /*unused*/) const noexcept;
+	constexpr void writeBit(ValueType const t_param, Atomic_t<b> const& /*unused*/) const noexcept;
 
 	/**
 	 * @brief		This function literally reads bits in the register

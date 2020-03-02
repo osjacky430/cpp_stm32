@@ -2,7 +2,6 @@
  * @file  example/i2c/i2c_imu.cpp
  * @brief	I2C example with IMU, LSM9DS0
  *
- * @note  Still Under Construction
  */
 
 /** Copyright (c) 2020 by osjacky430.

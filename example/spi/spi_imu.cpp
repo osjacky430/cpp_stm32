@@ -2,7 +2,7 @@
  * @file  example/spi/spi_imu.cpp
  * @brief	SPI example with IMU, LSM9DS0
  *
- * @note  Still Under Construction
+ * @note  Still Under Construction, there is a bug still can't resolve
  */
 
 /** Copyright (c) 2020 by osjacky430.
