@@ -1,9 +1,6 @@
 # osx file
 .DS_Store
 
-# personal directory
-src/
-
 # build folder
 build/
 example_bin/

@@ -3,9 +3,9 @@
 ###################################################
 cmake_minimum_required(VERSION 3.15.2...3.16.1 FATAL_ERROR)
 
-option(BUILD_DOC  "Build documentation" OFF)
 set(TARGET_BOARD "stm32f446re" CACHE STRING "Target MCU")
-set(BUILD_EXAMPLE "" CACHE STRING "Build example")
+
+include(${CMAKE_SOURCE_DIR}/cmake/project_settings.cmake)
 include(${CMAKE_SOURCE_DIR}/board/${TARGET_BOARD}.in)
 
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
@@ -16,7 +16,6 @@ project(cpp_stm32 DESCRIPTION "Pure c++17 implementation of stm32 driver"
 ###################################################
 #             library compile options             #
 ###################################################
-set(WARNING_FLAGS -Wall -Wextra -Wredundant-decls -Wundef -Wshadow)
 set(OPTIMIZATION_FLAGS -ffunction-sections -fno-common -fdata-sections -Os)
 set(CXX_FEATURE_FLAGS -fno-exceptions -fno-rtti)
 set(UTILITY_FLAGS -g)  # verbose and debug
@@ -25,6 +24,13 @@ set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 ###################################################
 #          add library, target properties         #
 ###################################################
+add_library(project_options INTERFACE)
+target_compile_features(project_options INTERFACE cxx_std_17)
+
+include(${CMAKE_SOURCE_DIR}/cmake/compiler_warning.cmake)
+add_library(project_warnings INTERFACE)
+set_project_warnings(project_warnings)
+
 add_library(cpp_stm32 STATIC) # TODO this need to change once user is allowed to use different target board via command line
 target_sources(cpp_stm32
   PRIVATE
@@ -36,10 +42,10 @@ target_include_directories(cpp_stm32
     ${CMAKE_SOURCE_DIR}/include/
 )
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
-target_compile_features(cpp_stm32 PUBLIC cxx_std_17)
+target_link_libraries(cpp_stm32 PRIVATE project_warnings project_options)
+
 target_compile_options(cpp_stm32
   PRIVATE
-    ${WARNING_FLAGS}
     ${UTILITY_FLAGS}
   PUBLIC
     ${BOARD_FLAGS}
@@ -47,6 +53,7 @@ target_compile_options(cpp_stm32
     ${CXX_FEATURE_FLAGS}
     ${NEWLIB_FLAGS}
 )
+
 target_link_options(cpp_stm32
   INTERFACE
     ${BOARD_FLAGS}
@@ -57,25 +64,21 @@ target_link_options(cpp_stm32
 )
 
 ###################################################
-#        link library to application example      #
+#            link library to application          #
 ###################################################
-# add_executable(main.elf ${CMAKE_SOURCE_DIR}/src/main.cpp)
-# target_link_libraries(main.elf PRIVATE cpp_stm32)
-# add_custom_target(main.bin ALL ${CMAKE_OBJCOPY} -Obinary main.elf main.bin DEPENDS main.elf)
+add_subdirectory(src)
 
 ###################################################
 #               build documentation               #
 ###################################################
-if (${BUILD_DOC})
-  find_package(Doxygen)
-  if (DOXYGEN_FOUND)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/documentation/)
-  endif()
-endif()
+include(${CMAKE_SOURCE_DIR}/cmake/doxygen.cmake)
+enable_doxygen()
 
 ###################################################
 #                  build example                  #
 ###################################################
+set(BUILD_EXAMPLE "" CACHE STRING "Build example")
+
 if (NOT ${BUILD_EXAMPLE} STREQUAL "")
   add_subdirectory(${CMAKE_SOURCE_DIR}/example/)
 endif()
