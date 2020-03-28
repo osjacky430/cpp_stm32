@@ -1,19 +1,24 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  hal/register.hxx
+ * @brief	Abstraction of special function registers
+ */
 
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #pragma once
 
 #include <cstdint>
@@ -114,9 +119,9 @@ class Register {
 
 	static constexpr auto NoThreadSafe = ThreadSafe<false, Access::None>{};
 
-	std::uint32_t const m_base;		/*!< Peripheral base address */
-	std::uint32_t const m_offset; /*!< Offset relative to peripheral base */
-	std::uint32_t const m_resetVal;
+	std::uint32_t const m_base;			/*!< Peripheral base address */
+	std::uint32_t const m_offset;		/*!< Offset relative to peripheral base */
+	std::uint32_t const m_resetVal; /*!< Reset value of the register */
 
 	/**
 	 * [viewRegByAccessMode description]

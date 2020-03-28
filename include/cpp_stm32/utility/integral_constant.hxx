@@ -49,7 +49,7 @@ struct ByteCount {};
 template <std::uint32_t Q>
 struct Unit {
 	static constexpr auto value = Q;
-	constexpr auto operator()() noexcept { return value; }
+	constexpr auto operator()() const noexcept { return value; }
 };
 
 template <std::uint32_t Sec>

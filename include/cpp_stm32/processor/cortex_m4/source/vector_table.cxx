@@ -85,6 +85,7 @@ void reset_handler() {
 	volatile unsigned* src	= &load_data_start_addr_;
 	volatile unsigned* dest = &sdata_;
 
+	// @TODO these copies should be written in c++ style, but I need to find a way to verify it
 	for (; dest < &edata_; ++src, ++dest) {
 		*dest = *src;
 	}
@@ -93,6 +94,7 @@ void reset_handler() {
 		*dest++ = 0;
 	}
 
+	// UB?!
 	for (FuncPtr* p_fp = &__preinit_array_start; p_fp < &__preinit_array_end; ++p_fp) {
 		(*p_fp)();
 	}

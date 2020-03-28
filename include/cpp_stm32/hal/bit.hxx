@@ -1,18 +1,24 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  hal/bit.hxx
+ * @brief	Abstraction of bits in special function registers
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -56,10 +62,10 @@ struct Bit {
 	std::uint32_t const pos;
 	std::uint32_t const mask;
 
-	constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1ULL << LENGTH) - 1U) << pos) {}
+	explicit constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1ULL << LENGTH) - 1U) << pos) {}
 
 	// currently support only integral type and struct that implement get() method
-	// @todo change get() to operator() so that it support lambda(?)
+	// @todo change get() to operator() so that it supports lambda(?)
 	[[nodiscard]] constexpr auto operator()(DataType const& t_val) const noexcept {
 		if constexpr (std::is_enum_v<DataType>) {
 			return (to_underlying(t_val) << pos) & mask;
@@ -78,7 +84,7 @@ struct Bit {
 	[[nodiscard]] static constexpr auto isReadable() noexcept { return (Mod & BitMod::RdOnly) == BitMod::RdOnly; }
 
 	template <typename ValueType>
-	[[nodiscard]] constexpr auto toDataType(ValueType const& t_val) const noexcept {
+	[[nodiscard]] static constexpr auto toDataType(ValueType const& t_val) noexcept {
 		return static_cast<DataType>(t_val);
 	}
 };

@@ -1,18 +1,24 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  detail/algorithm.hxx
+ * @brief	Constexpr version of algorithm library for c++17
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -210,18 +216,18 @@ constexpr OutputIt unique_copy(InputIt first, InputIt last, OutputIt result, Bin
 template <class ForwardIt, class T, class Compare>
 constexpr ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& value, Compare comp) {
 	ForwardIt it;
-	typename std::iterator_traits<ForwardIt>::difference_type count, step;
-	count = std::distance(first, last);
+	typename std::iterator_traits<ForwardIt>::difference_type dist, step;
+	dist = std::distance(first, last);
 
-	while (count > 0) {
+	while (dist > 0) {
 		it	 = first;
-		step = count / 2;
+		step = dist / 2;
 		std::advance(it, step);
 		if (comp(*it, value)) {
 			first = ++it;
-			count -= step + 1;
+			dist -= step + 1;
 		} else
-			count = step;
+			dist = step;
 	}
 	return first;
 }
@@ -229,18 +235,18 @@ constexpr ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& value,
 template <class ForwardIt, class T, class Compare>
 constexpr ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& value, Compare comp) {
 	ForwardIt it{};
-	typename std::iterator_traits<ForwardIt>::difference_type count = std::distance(first, last);
-	typename std::iterator_traits<ForwardIt>::difference_type step	= 0;
+	typename std::iterator_traits<ForwardIt>::difference_type dist = std::distance(first, last);
+	typename std::iterator_traits<ForwardIt>::difference_type step = 0;
 
-	while (count > 0) {
+	while (dist > 0) {
 		it	 = first;
-		step = count / 2;
+		step = dist / 2;
 		std::advance(it, step);
 		if (!comp(value, *it)) {
 			first = ++it;
-			count -= step + 1;
+			dist -= step + 1;
 		} else
-			count = step;
+			dist = step;
 	}
 	return first;
 }

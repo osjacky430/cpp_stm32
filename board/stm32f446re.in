@@ -10,4 +10,8 @@ set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
 #               MCU compile options               #
 ###################################################
 # TODO: add soft float
-set(BOARD_FLAGS -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mcpu=cortex-m4)
+set(CPU -mcpu=cortex-m4)
+set(HARD_FLOAT -mfloat-abi=hard -mfpu=fpv4-sp-d16)
+set(SOFT_FLOAT -mfloat-abi=soft)
+
+set(BOARD_FLAGS ${HARD_FLOAT} -mthumb ${CPU})
