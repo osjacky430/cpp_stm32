@@ -75,7 +75,7 @@ SECTIONS
     * @ref https://stackoverflow.com/questions/13734745/why-do-i-have-an-undefined-reference-to-init-in-libc-init-array
     *
     * Since I am using the gcc flag -nostartfile, I need to do the initialization on my own,
-    * and since these naming conventions are according to libc, so I'll stick to these names.
+    * and since these naming conventions are according to libc, I'll stick to these names.
     */
   .preinit_array :
   {

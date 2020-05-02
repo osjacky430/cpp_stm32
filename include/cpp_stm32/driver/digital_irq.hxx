@@ -42,7 +42,7 @@ class DigitalIrq {
 		// exti::set_trigger_type<>(t_trigger);
 
 		{
-			auto const critical_section = create_critical_section();
+			auto const critical_section = core::create_critical_section();
 			// Interrupt<>::attach(t_cb);
 		}
 	}

@@ -21,7 +21,7 @@
 
 #include "cpp_stm32/processor/cortex_m4/core_util.hxx"
 #include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/nvic_reg.hxx"
+#include "cpp_stm32/processor/cortex_m4/memory/nvic.hxx"
 
 namespace cpp_stm32::nvic {
 
@@ -30,7 +30,7 @@ constexpr void enable_irq(Callback<F> const& t_cb) noexcept {
 	reg::NVIC_ISER<IRQn>.template setBit<reg::NVIC_IRQ_BIT_POS(IRQn)>();
 
 	{
-		auto const critical_sec = create_critical_section();
+		auto const critical_sec = core::create_critical_section();
 		Interrupt<IRQn>::attach(t_cb);
 	}	 // end critical section
 }
