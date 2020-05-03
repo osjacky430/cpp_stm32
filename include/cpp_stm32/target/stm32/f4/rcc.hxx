@@ -135,22 +135,66 @@ static constexpr void set_pllsrc() {
 	reg::PLLCFGR.template writeBit<reg::PllCfgBit::PLLSRC>(Clk);
 }
 
-static constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
-																								 PllQ const& t_pllq, PllR const& t_pllr) noexcept {
+static constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln, PllP const t_pllp,
+																								 PllQ const t_pllq, PllR const t_pllr) noexcept {
 	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
 												reg::PllCfgBit::PLLR>(t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
+/**
+ * @brief	This function sets the pll clock clock src and pll division factor
+ * @param t_pllm Division factor PLLM
+ * @param t_plln Division factor PLLN
+ * @param t_pllp Division factor PLLP
+ * @param t_pllq Division factor PLLQ
+ * @param t_pllr Division factor PLLR
+ */
 template <ClkSrc Clk>
-static constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln, PllP const& t_pllp,
-																								PllQ const& t_pllq, PllR const& t_pllr) noexcept {
+static constexpr void set_pllsrc_and_div_factor(PllM const t_pllm, PllN const t_plln, PllP const t_pllp,
+																								PllQ const t_pllq, PllR const t_pllr) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
 												reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
 
-static constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
+/**
+ * [config_adv_bus_division_factor description]
+ * @param t_hpre  [description]
+ * @param t_ppre1 [description]
+ * @param t_ppre2 [description]
+ */
+static constexpr void config_adv_bus_division_factor(HPRE const t_hpre, PPRE const t_ppre1, PPRE const t_ppre2) {
 	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
+
+/**
+ * @brief	This function enables the RTC clock
+ */
+constexpr void enable_rtc() noexcept { reg::BDCR.setBit<reg::BDCRField::RTCEN>(); }
+
+/**
+ * @brief 	This function sets the rtc clock source
+ * @tparam 	Clk 	Rtc clock source
+ */
+template <RtcClk Clk>
+constexpr void set_rtc_clk_src() noexcept {
+	reg::BDCR.template writeBit<reg::BDCRField::RTCSEL>(Clk);
+}
+
+/**
+ * @brief 	This function sets the RTC clock prescaler
+ * @note 		This function needs to be called only when HSE is selected as the RTC clock source
+ */
+constexpr void set_rtc_prescaler(RTCPRE const t_rtcpre) noexcept { reg::CFGR.writeBit<reg::CfgBit::RTCPRE>(t_rtcpre); }
+
+/**
+ * @brief
+ */
+constexpr void hold_reset_backup_domain() noexcept { reg::BDCR.setBit<reg::BDCRField::BDRST>(); }
+
+/**
+ * @brief
+ */
+constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::BDCRField::BDRST>(); }
 
 }	 // namespace cpp_stm32::rcc

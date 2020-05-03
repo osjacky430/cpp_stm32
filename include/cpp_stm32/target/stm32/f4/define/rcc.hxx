@@ -73,6 +73,10 @@ SETUP_LOOKUP_TABLE_WITH_BOUND(PllQ, 2, 15);
  */
 SETUP_LOOKUP_TABLE_WITH_BOUND(PllR, 2, 7);
 
+/**
+ * @class 	HPRE
+ * @brief
+ */
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(HPRE, /**/
 																		 std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
 																		 std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
@@ -81,6 +85,11 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(HPRE, /**/
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PPRE, /**/
 																		 std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101}, std::pair{8, 0b110},
 																		 std::pair{16, 0b111});
+
+/**
+ * [SETUP_LOOKUP_TABLE_WITH_BOUND description]
+ */
+SETUP_LOOKUP_TABLE_WITH_BOUND(RTCPRE, 2, 31);
 
 /**
  *	@enum 	PeriphClk
@@ -113,7 +122,7 @@ enum class PeriphClk : std::uint32_t {
 	SysCfg,
 };
 
-enum class ClkSrc : std::uint32_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
+enum class ClkSrc : std::uint8_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
 
 /**
  * @enum 		SysClk
@@ -122,7 +131,9 @@ enum class ClkSrc : std::uint32_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
  * 					- HSE (High Speed External) oscillator clock
  * 					- Two main PLL (Phase Lock Loop) clock
  */
-enum class SysClk : std::uint32_t { Hsi, Hse, Pllp, Pllr };
+enum class SysClk : std::uint8_t { Hsi, Hse, Pllp, Pllr };
+
+enum class RtcClk : std::uint8_t { NoClk, Lse, Lsi, Hse };
 
 /**
  *
@@ -133,4 +144,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc

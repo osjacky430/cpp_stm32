@@ -39,10 +39,14 @@ static constexpr auto BASE_ADDR = memory_at(PeriphAddr::Apb1Base, 0x7000U);
  * @{
  */
 
-SETUP_REGISTER_INFO(PwrCrInfo, /**/
-										Bit<2, VoltageScale>{BitPos_t{14}}, Binary<>{BitPos_t{16}}, Binary<>{BitPos_t{17}})
+SETUP_REGISTER_INFO(PwrCrInfo,													 /**/
+										Binary<>{BitPos_t{8}},							 // DBP
+										Bit<2, VoltageScale>{BitPos_t{14}},	 // Vos
+										Binary<>{BitPos_t{16}},							 // OdEn
+										Binary<>{BitPos_t{17}})							 // OdSwEn
 
 enum class CrBit {
+	DBP,
 	Vos,
 	OdEn,
 	OdSwEn,

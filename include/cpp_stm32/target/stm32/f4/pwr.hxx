@@ -32,7 +32,9 @@ constexpr void enable_overdrive_switch() noexcept { reg::CR.setBit<reg::CrBit::O
 
 constexpr auto is_overdrive_rdy() noexcept { return std::get<0>(reg::CSR.readBit<reg::CsrBit::OdrRdy>(ValueOnly)); }
 
-constexpr auto is_overdrive_switch_rdy() noexcept { return std::get<0>(reg::CSR.readBit<reg::CsrBit::OdrSwRdy>(ValueOnly)); }
+constexpr auto is_overdrive_switch_rdy() noexcept {
+	return std::get<0>(reg::CSR.readBit<reg::CsrBit::OdrSwRdy>(ValueOnly));
+}
 
 constexpr void wait_vos_rdy() noexcept {
 	while (is_vos_rdy() != 1) {
@@ -50,5 +52,15 @@ constexpr void wait_overdrive_switch_rdy() noexcept {
 }
 
 constexpr void set_voltage_scale(VoltageScale const& t_val) noexcept { reg::CR.writeBit<reg::CrBit::Vos>(t_val); }
+
+/**
+ * @brief	This function unlocks write protection so that write to RCC_BDCR register is valid
+ */
+constexpr void unlock_write_protection() noexcept { reg::CR.setBit<reg::CrBit::DBP>(); }
+
+/**
+ * @brief This function locks write protection so that write to RCC_BDCR register is not valid
+ */
+constexpr void lock_write_protection() noexcept { reg::CR.clearBit<reg::CrBit::DBP>(); }
 
 }	 // namespace cpp_stm32::pwr

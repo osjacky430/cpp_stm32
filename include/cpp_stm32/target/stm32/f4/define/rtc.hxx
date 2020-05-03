@@ -19,6 +19,7 @@
  * You should have received a copy of the Lesser GNU General Public License
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
 #include <cstdint>
 
@@ -29,6 +30,24 @@ namespace cpp_stm32::rtc {
 enum class AlarmOutput : std::uint8_t { OutputDisabled, AlarmA, AlarmB, Wakeup };
 enum class AlarmOutputType : std::uint8_t { OpenDrain, PushPull };
 enum class AlarmOutputPolarity : std::uint8_t { High, Low };
+enum class Status : std::uint8_t {
+	RECALPF, /*!< Recalibration pending Flag*/
+	TAMP2F,	 /*!< TAMPER2 detection flag*/
+	TAMP1F,	 /*!< Tamper detection flag*/
+	TSOVF,	 /*!< Time-stamp overflow flag*/
+	TSF,		 /*!< Time-stamp flag*/
+	WUTF,		 /*!< Wakeup timer flag*/
+	ALRBF,	 /*!< Alarm B flag*/
+	ALRAF,	 /*!< Alarm A flag*/
+	INIT,		 /*!< Initialization mode*/
+	INITF,	 /*!< Initialization flag*/
+	RSF,		 /*!< Registers synchronization flag*/
+	INITS,	 /*!< Initialization status flag*/
+	SHPF,		 /*!< Shift operation pending*/
+	WUTWF,	 /*!< Wakeup timer write flag*/
+	ALRBWF,	 /*!< Alarm B write flag*/
+	ALRAWF,	 /*!< Alarm A write flag*/
+};
 
 using AsyncPrescaler_t = StrongType<std::uint8_t, struct AsyncPrescaler>;
 using SyncPrescaler_t	 = StrongType<std::uint16_t, struct SyncPrescaler>;

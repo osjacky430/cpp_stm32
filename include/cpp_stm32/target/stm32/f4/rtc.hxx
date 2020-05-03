@@ -30,8 +30,8 @@
 namespace cpp_stm32::rtc {
 
 /**
- * [to_ten_and_unit description]
- * @return [description]
+ * @brief This function decompose input integer to its ten and unit
+ * @return Tuple that contains ten and unit of the input val
  */
 constexpr auto to_ten_and_unit(std::uint8_t const t_val) noexcept {
 	return std::tuple<std::uint8_t, std::uint8_t>{t_val / 10, t_val % 10};
@@ -88,12 +88,12 @@ constexpr void set_alarm_output_type(AlarmOutputType const t_output_type) noexce
  * @brief This function enables initialization mode, counters are stopped and start counting from the new value when
  *        INIT is reset.
  */
-constexpr void enable_init_mode() noexcept { reg::ISR.setBit<reg::ISRField::INIT>(); }
+constexpr void enable_init_mode() noexcept { reg::ISR.setBit<Status::INIT>(); }
 
 /**
  * @brief This function disables initialization mode (free running mode)
  */
-constexpr void disable_init_mode() noexcept { reg::ISR.clearBit<reg::ISRField::INIT>(); }
+constexpr void disable_init_mode() noexcept { reg::ISR.clearBit<Status::INIT>(); }
 
 /**
  * @brief This function sets output polarity of the pin
@@ -155,18 +155,46 @@ constexpr void set_time(std::chrono::hours const t_hour, std::chrono::minutes co
 }
 
 /**
+ * [get_time description]
+ * @return [description]
+ */
+[[nodiscard]] constexpr auto get_time() noexcept {
+	auto const [hour_ten, hour_unit, min_ten, min_unit, sec_ten, sec_unit] =
+		reg::TR.readBit<reg::TRField::HT, reg::TRField::HU, reg::TRField::MNT, reg::TRField::MNU, reg::TRField::ST,
+										reg::TRField::SU>(ValueOnly);
+
+	return std::tuple{hour_ten * 10 + hour_unit, min_ten * 10 + min_unit, sec_ten * 10 + sec_unit};
+}
+
+/**
  * @brief This function sets date
  * @param t_y  Year
  * @param t_m  Month
+ * @param t_w  Weekday
  * @param t_d  Date
  */
-constexpr void set_date(Year_t const t_y, Month_t const t_m, Date_t const t_d) noexcept {
+constexpr void set_date(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d) noexcept {
 	auto const [year_ten, year_unit]	 = to_ten_and_unit(t_y.get() - 2000);
-	auto const [month_ten, month_unit] = to_ten_and_unit(t_m.get());
+	auto const [month_ten, month_unit] = to_ten_and_unit(to_underlying(t_m));
+	auto const weekday_unit						 = to_underlying(t_w);
 	auto const [date_ten, date_unit]	 = to_ten_and_unit(t_d.get());
 
-	reg::DR.writeBit<reg::DRField::YT, reg::DRField::YU, reg::DRField::MT, reg::DRField::MU, reg::DRField::DT,
-									 reg::DRField::DU>(year_ten, year_unit, month_ten, month_unit, date_ten, date_unit);
+	reg::DR.writeBit<reg::DRField::YT, reg::DRField::YU, reg::DRField::WDU, reg::DRField::MT, reg::DRField::MU,
+									 reg::DRField::DT, reg::DRField::DU>(year_ten, year_unit, weekday_unit, month_ten, month_unit,
+																											 date_ten, date_unit);
+}
+
+/**
+ * @brief This function returns the date in Y-M-D sequence
+ * @return  tuple that contains date in Y-M-D sequence
+ */
+constexpr auto get_date() noexcept {
+	auto const [year_ten, year_unit, weekday, month_ten, month_unit, date_ten, date_unit] =
+		reg::DR.readBit<reg::DRField::YT, reg::DRField::YU, reg::DRField::WDU, reg::DRField::MT, reg::DRField::MU,
+										reg::DRField::DT, reg::DRField::DU>(ValueOnly);
+
+	return std::tuple{2000 + year_ten * 10 + year_unit, Weekday{weekday},
+										Month{static_cast<std::uint8_t>(month_ten * 10 + month_unit)}, date_ten * 10 + date_unit};
 }
 
 /**
@@ -191,5 +219,34 @@ constexpr void apply_winter_time_change() noexcept { reg::CR.setBit<reg::CRField
  * @brief This function applies summer time change, i.e, add 1 hour to the calendar time
  */
 constexpr void apply_summer_time_change() noexcept { reg::CR.setBit<reg::CRField::ADD1H>(); }
+
+/**
+ * [get_status description]
+ * @return [description]
+ */
+template <auto Flag>
+[[nodiscard]] constexpr auto get_status() noexcept {
+	return reg::ISR.readBit<Flag>(ValueOnly);
+}
+
+/**
+ * [clear_status description]
+ */
+template <auto Flag>
+constexpr void clear_status() noexcept {
+	return reg::ISR.clearBit<Flag>();
+}
+
+/**
+ * @brief  	This function wait until the status flag turns to desire value
+ * @tparam 	Flag
+ *
+ * @param		t_desire 	desire value of the status bit
+ */
+template <auto Flag>
+constexpr void wait_status(bool const t_desire) noexcept {
+	while (std::get<0>(get_status<Flag>()) != t_desire) {
+	}
+}
 
 }	 // namespace cpp_stm32::rtc

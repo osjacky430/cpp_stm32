@@ -31,8 +31,9 @@ namespace cpp_stm32::rtc {
 enum class HourFormat : std::uint8_t { Twelve, TwentyFour };
 enum class TimeFormat : std::uint8_t { Am, Pm };
 
-using Year_t	= StrongType<std::uint16_t, struct Year>;
-using Month_t = StrongType<std::uint8_t, struct Month>;
-using Date_t	= StrongType<std::uint8_t, struct Date>;
+enum class Month : std::uint8_t { Jan = 1, Feb, Mar, Apr, May, June, July, Aug, Sep, Oct, Nov, Dec };
+enum class Weekday : std::uint8_t { Mon = 1, Tue, Wed, Thu, Fri, Sat, Sun };
 
+using Year_t = StrongType<std::uint16_t, struct Year>;
+using Date_t = StrongType<std::uint8_t, struct Date>;
 }	 // namespace cpp_stm32::rtc

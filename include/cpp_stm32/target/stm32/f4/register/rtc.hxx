@@ -169,26 +169,7 @@ SETUP_REGISTER_INFO(ISRBitList,									 /**/
 										StatusBit<1>{BitPos_t{0}}		 // ALRAWF
 )
 
-enum class ISRField {
-	RECALPF, /*!< Recalibration pending Flag*/
-	TAMP2F,	 /*!< TAMPER2 detection flag*/
-	TAMP1F,	 /*!< Tamper detection flag*/
-	TSOVF,	 /*!< Time-stamp overflow flag*/
-	TSF,		 /*!< Time-stamp flag*/
-	WUTF,		 /*!< Wakeup timer flag*/
-	ALRBF,	 /*!< Alarm B flag*/
-	ALRAF,	 /*!< Alarm A flag*/
-	INIT,		 /*!< Initialization mode*/
-	INITF,	 /*!< Initialization flag*/
-	RSF,		 /*!< Registers synchronization flag*/
-	INITS,	 /*!< Initialization status flag*/
-	SHPF,		 /*!< Shift operation pending*/
-	WUTWF,	 /*!< Wakeup timer write flag*/
-	ALRBWF,	 /*!< Alarm B write flag*/
-	ALRAWF,	 /*!< Alarm A write flag*/
-};
-
-static constexpr Register<ISRBitList, ISRField> ISR{BASE_ADDR, 0x0cU};
+static constexpr Register<ISRBitList, Status> ISR{BASE_ADDR, 0x0cU};
 /**@}*/
 
 /**

@@ -79,10 +79,10 @@ static constexpr Register<RccPllcfgrBitInfo, PllCfgBit> PLLCFGR{BASE_ADDR, 0x04U
  */
 
 SETUP_REGISTER_INFO(RccCfgInfo, /**/
-										Bit<2, SysClk>{BitPos_t(0)}, Bit<2, SysClk>{BitPos_t(2)}, Bit<4, HPRE>{BitPos_t(4)},
-										Bit<3, PPRE>{BitPos_t(10)}, Bit<3, PPRE>{BitPos_t(13)})
+										Bit<2, SysClk>{BitPos_t{0}}, Bit<2, SysClk>{BitPos_t{2}}, Bit<4, HPRE>{BitPos_t{4}},
+										Bit<3, PPRE>{BitPos_t{10}}, Bit<3, PPRE>{BitPos_t{13}}, Bit<5, RTCPRE>{BitPos_t{16}})
 
-enum class CfgBit { SW, SWS, HPRE, PPRE1, PPRE2 };
+enum class CfgBit { SW, SWS, HPRE, PPRE1, PPRE2, RTCPRE };
 
 static constexpr Register<RccCfgInfo, CfgBit> CFGR{BASE_ADDR, 0x08U};
 /**@} */
@@ -219,17 +219,27 @@ static constexpr Register<RccApb2EnrInfo, Apb2EnrBit> APB2ENR{BASE_ADDR, 0x44U};
  * @{
  */
 
-SETUP_REGISTER_INFO(RccBdcrInfo, /**/
-										Bit<1>{BitPos_t(0)}, Bit<1>{BitPos_t(1)}, Bit<1>{BitPos_t(2)}, Bit<1>{BitPos_t(3)})
+SETUP_REGISTER_INFO(BDCRBitList,									/**/
+										Binary<>{BitPos_t{0}},				//	LSEON
+										Binary<>{BitPos_t{1}},				//	LSERDY
+										Binary<>{BitPos_t{2}},				//	LseByp	{@todo modify in the future}
+										Binary<>{BitPos_t{3}},				//	LSEMOD
+										Bit<2, RtcClk>{BitPos_t{8}},	//	RTCSEL
+										Binary<>{BitPos_t{15}},				//	RTCEN
+										Binary<>{BitPos_t{16}}				//	RTCEN
+)
 
-enum class BdcrBit {
+enum class BDCRField {
 	LSEON,
 	LSERDY,
 	LseByp,
 	LSEMOD,
+	RTCSEL,
+	RTCEN,
+	BDRST,
 };
 
-static constexpr Register<RccBdcrInfo, BdcrBit> BDCR{BASE_ADDR, 0x70U};
+static constexpr Register<BDCRBitList, BDCRField> BDCR{BASE_ADDR, 0x70U};
 
 /**@}*/
 
