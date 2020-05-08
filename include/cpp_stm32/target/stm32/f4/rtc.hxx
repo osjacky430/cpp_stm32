@@ -109,7 +109,7 @@ constexpr void set_output_polarity(AlarmOutputPolarity const t_output_pol) noexc
  * @note  If the frequency of the APB1 clock is less than seven times the frequency of RTCCLK,
  *        BYPSHAD must be set to ‘1’.
  */
-constexpr void enaable_bypass_shadow_reg() noexcept { reg::CR.setBit<reg::CRField::BYPSHAD>(); }
+constexpr void enable_bypass_shadow_reg() noexcept { reg::CR.setBit<reg::CRField::BYPSHAD>(); }
 
 /**
  * @brief This function disables bypassing of the shadow register when reading from RTC_SSR, RTC_TR, and RTC_DR
