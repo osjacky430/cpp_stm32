@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "cpp_stm32/detail/index_interval.hxx"
+#include "cpp_stm32/detail/index_range.hxx"
 #include "cpp_stm32/utility/enum_op.hxx"
 
 namespace cpp_stm32 {

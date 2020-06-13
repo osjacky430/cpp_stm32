@@ -31,7 +31,7 @@ namespace cpp_stm32::exti::reg {
 
 static constexpr auto BASE_ADDR = 0x40013c00U;
 
-SETUP_REGISTER_INFO(ExtiBitList, CREATE_LIST_OF_BITS<Binary<>>(detail::Interval<0, 22>{}))
+SETUP_REGISTER_INFO(ExtiBitList, CREATE_LIST_OF_BITS<Binary<>>(detail::IdxRange<0, 22>{}))
 
 /**
  * @defgroup	EXTI_IMR_GROUP		Interrupt mask register (EXTI_IMR) group
@@ -84,7 +84,7 @@ static constexpr Register<ExtiBitList, Line> SWIER{BASE_ADDR, 0x10U};
  * @{
  */
 
-SETUP_REGISTER_INFO(PRBitList, CREATE_LIST_OF_BITS<Binary<BitMod::RdClrWr1>>(detail::Interval<0, 22>{}))
+SETUP_REGISTER_INFO(PRBitList, CREATE_LIST_OF_BITS<Binary<BitMod::RdClrWr1>>(detail::IdxRange<0, 22>{}))
 
 static constexpr Register<PRBitList, Line> PR{BASE_ADDR, 0x14U};
 /**@}*/

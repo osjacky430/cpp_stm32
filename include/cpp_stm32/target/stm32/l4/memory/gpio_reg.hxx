@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cpp_stm32/detail/index_interval.hxx"
+#include "cpp_stm32/detail/index_range.hxx"
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
@@ -101,7 +101,7 @@ using GpioReg = Register<BitList, gpio::Pin, IoOp, Atomicity>;
  */
 
 SETUP_REGISTER_INFO(GpioModerInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, gpio::Mode>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, gpio::Mode>>(detail::IdxRange<0, 30, 2>{}));
 
 template <gpio::Port Port>
 static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(Port) + 0x00U)> MODER{BASE_ADDR(Port), 0x00U};
@@ -114,7 +114,7 @@ static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(Port) + 0x00U)> MODE
  */
 
 SETUP_REGISTER_INFO(GpioPupdInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, gpio::Pupd>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, gpio::Pupd>>(detail::IdxRange<0, 30, 2>{}));
 
 template <gpio::Port Port>
 static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(Port) + 0x0CU)> PUPDR{BASE_ADDR(Port), 0x0CU};
@@ -127,7 +127,7 @@ static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(Port) + 0x0CU)> PUPDR
  */
 
 SETUP_REGISTER_INFO(GpioOdrInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<1>>(detail::Interval<0, 15>{}));
+										CREATE_LIST_OF_BITS<Bit<1>>(detail::IdxRange<0, 15>{}));
 
 template <gpio::Port Port>
 static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(Port) + 0x14U)> ODR{BASE_ADDR(Port), 0x14U};
@@ -140,7 +140,7 @@ static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(Port) + 0x14U)> ODR{BA
  */
 
 SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
-										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(detail::Interval<0, 31>{}));
+										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(detail::IdxRange<0, 31>{}));
 
 template <gpio::Port Port>
 static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(Port) + 0x18U)> BSRR{BASE_ADDR(Port), 0x18U};
@@ -153,7 +153,7 @@ static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(Port) + 0x18U)> BSRR{
  */
 
 SETUP_REGISTER_INFO(GpioAfrInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<4, gpio::AltFunc>>(detail::Interval<0, 28, 4>{}));
+										CREATE_LIST_OF_BITS<Bit<4, gpio::AltFunc>>(detail::IdxRange<0, 28, 4>{}));
 
 template <gpio::Port Port>
 static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(Port) + 0x20U)> AFRL{BASE_ADDR(Port), 0x20U};

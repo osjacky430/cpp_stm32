@@ -29,7 +29,7 @@
 #include "cpp_stm32/target/stm32/f4/define/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
 
-#include "cpp_stm32/detail/index_interval.hxx"
+#include "cpp_stm32/detail/index_range.hxx"
 
 namespace cpp_stm32::gpio::reg {
 
@@ -59,7 +59,7 @@ struct AFHRIdxPolicy {
  */
 
 SETUP_REGISTER_INFO(GpioModerInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, Mode>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, Mode>>(detail::IdxRange<0, 30, 2>{}));
 
 template <Port GPIO>
 static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(GPIO) + 0x00U)> MODER{BASE_ADDR(GPIO), 0x00U};
@@ -73,7 +73,7 @@ static constexpr GpioReg<GpioModerInfo, atomicity(BASE_ADDR(GPIO) + 0x00U)> MODE
  */
 
 SETUP_REGISTER_INFO(OTYPERBitList, /**/
-										CREATE_LIST_OF_BITS<Bit<1, OutputType>>(detail::Interval<0, 15, 1>{}))
+										CREATE_LIST_OF_BITS<Bit<1, OutputType>>(detail::IdxRange<0, 15, 1>{}))
 
 template <Port GPIO>
 static constexpr GpioReg<OTYPERBitList, atomicity(BASE_ADDR(GPIO) + 0x04U)> OTYPER{BASE_ADDR(GPIO), 0x04U};
@@ -86,7 +86,7 @@ static constexpr GpioReg<OTYPERBitList, atomicity(BASE_ADDR(GPIO) + 0x04U)> OTYP
  */
 
 SETUP_REGISTER_INFO(OSPEEDRBitList, /**/
-										CREATE_LIST_OF_BITS<Bit<2, OutputSpeed>>(detail::Interval<0, 30, 2>{}))
+										CREATE_LIST_OF_BITS<Bit<2, OutputSpeed>>(detail::IdxRange<0, 30, 2>{}))
 
 template <Port GPIO>
 static constexpr GpioReg<OSPEEDRBitList, atomicity(BASE_ADDR(GPIO) + 0x08U)> OSPEEDR{BASE_ADDR(GPIO), 0x08U};
@@ -98,7 +98,7 @@ static constexpr GpioReg<OSPEEDRBitList, atomicity(BASE_ADDR(GPIO) + 0x08U)> OSP
  */
 
 SETUP_REGISTER_INFO(GpioPupdInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<2, Pupd>>(detail::Interval<0, 30, 2>{}));
+										CREATE_LIST_OF_BITS<Bit<2, Pupd>>(detail::IdxRange<0, 30, 2>{}));
 
 template <Port GPIO>
 static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(GPIO) + 0x0CU)> PUPDR{BASE_ADDR(GPIO), 0x0CU};
@@ -111,7 +111,7 @@ static constexpr GpioReg<GpioPupdInfo, atomicity(BASE_ADDR(GPIO) + 0x0CU)> PUPDR
  */
 
 SETUP_REGISTER_INFO(GpioOdrInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<1>>(detail::Interval<0, 15>{}));
+										CREATE_LIST_OF_BITS<Bit<1>>(detail::IdxRange<0, 15>{}));
 
 template <Port GPIO>
 static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(GPIO) + 0x14U)> ODR{BASE_ADDR(GPIO), 0x14U};
@@ -124,7 +124,7 @@ static constexpr GpioReg<GpioOdrInfo, atomicity(BASE_ADDR(GPIO) + 0x14U)> ODR{BA
  */
 
 SETUP_REGISTER_INFO(GpioBsrrInfo, /**/
-										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(detail::Interval<0, 31>{}));
+										CREATE_LIST_OF_BITS<Binary<BitMod::WrOnly>>(detail::IdxRange<0, 31>{}));
 
 template <Port GPIO>
 static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(GPIO) + 0x18U)> BSRR{BASE_ADDR(GPIO), 0x18U};
@@ -137,7 +137,7 @@ static constexpr GpioReg<GpioBsrrInfo, atomicity(BASE_ADDR(GPIO) + 0x18U)> BSRR{
  */
 
 SETUP_REGISTER_INFO(GpioAfrInfo, /**/
-										CREATE_LIST_OF_BITS<Bit<4, AltFunc>>(detail::Interval<0, 28, 4>{}));
+										CREATE_LIST_OF_BITS<Bit<4, AltFunc>>(detail::IdxRange<0, 28, 4>{}));
 
 template <Port GPIO>
 static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x20U)> AFRL{BASE_ADDR(GPIO), 0x20U};

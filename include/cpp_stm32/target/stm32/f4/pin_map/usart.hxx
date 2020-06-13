@@ -106,14 +106,14 @@ class PinMap {
 	[[nodiscard]] static constexpr auto getTxPinData() noexcept {
 		constexpr auto iter = *detail::find_if(TX_PIN_TABLE.begin(), TX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return RETURN_PIN_DATA(iter, detail::Interval<1, 4>{});
+		return RETURN_PIN_DATA(iter, detail::IdxRange<1, 4>{});
 	}
 
 	template <PinName Pin>
 	[[nodiscard]] static constexpr auto getRxPinData() noexcept {
 		constexpr auto iter = *detail::find_if(RX_PIN_TABLE.begin(), RX_PIN_TABLE.end(), PREDICATE<Pin>);
 
-		return RETURN_PIN_DATA(iter, detail::Interval<1, 4>{});
+		return RETURN_PIN_DATA(iter, detail::IdxRange<1, 4>{});
 	}
 
 	template <PinName Pin>

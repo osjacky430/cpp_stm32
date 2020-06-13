@@ -21,28 +21,28 @@
 namespace cpp_stm32::detail {
 
 template <std::size_t interval, std::size_t start, std::size_t seq, std::size_t... end>
-struct IdxIntervalImpl {
+struct RangeImpl {
 	static_assert(static_cast<int>(seq) - static_cast<int>(interval) >= 0);
-	using IdxIntervalType = typename IdxIntervalImpl<interval, start, seq - interval, seq, end...>::IdxIntervalType;
+	using RangeSeq = typename RangeImpl<interval, start, seq - interval, seq, end...>::RangeSeq;
 };
 
 template <std::size_t interval, std::size_t start, std::size_t... seq>
-struct IdxIntervalImpl<interval, start, start, seq...> {
-	using IdxIntervalType = std::index_sequence<start, seq...>;
+struct RangeImpl<interval, start, start, seq...> {
+	using RangeSeq = std::index_sequence<start, seq...>;
 };
 
 template <std::size_t start, std::size_t end, std::size_t interval>
-struct IdxInterval {
+struct Range_ {
 	// static_assert((end - start + 1) % interval == 0);
-	using IdxIntervalType = typename IdxIntervalImpl<interval, start, end - interval, end>::IdxIntervalType;
+	using RangeSeq = typename RangeImpl<interval, start, end - interval, end>::RangeSeq;
 };
 
 template <std::size_t start, std::size_t interval>
-struct IdxInterval<start, start, interval> {
-	using IdxIntervalType = std::index_sequence<start>;
+struct Range_<start, start, interval> {
+	using RangeSeq = std::index_sequence<start>;
 };
 
 template <std::size_t start, std::size_t end, std::size_t interval = 1>
-using Interval = typename IdxInterval<start, end, interval>::IdxIntervalType;
+using IdxRange = typename Range_<start, end, interval>::RangeSeq;
 
 }	 // namespace cpp_stm32::detail
