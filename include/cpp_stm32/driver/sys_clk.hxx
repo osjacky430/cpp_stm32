@@ -20,4 +20,23 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace cpp_stm32::driver {}
+#pragma once
+
+#include <chrono>
+
+#include "cpp_stm32/driver/gpio_base.hxx"
+#include "device.hxx"
+
+namespace cpp_stm32::driver {
+
+class Rtc {
+ public:
+	explicit constexpr Rtc(rtc::Year_t const t_y, rtc::Month const t_m, rtc::Weekday const t_week,
+												 rtc::Date_t const t_date, std::chrono::hours const t_hr, std::chrono::minutes const t_min,
+												 std::chrono::seconds const t_sec) noexcept {
+		//
+		rtc::set_calendar(t_y, t_m, t_week, t_date, t_hr, t_min, t_sec);
+	}
+};
+
+}	 // namespace cpp_stm32::driver

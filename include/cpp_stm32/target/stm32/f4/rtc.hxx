@@ -20,7 +20,11 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <array>
 #include <chrono>
+#include <numeric>
 #include <tuple>
 
 #include "cpp_stm32/common/rtc.hxx"
@@ -35,6 +39,31 @@ namespace cpp_stm32::rtc {
  */
 constexpr auto to_ten_and_unit(std::uint8_t const t_val) noexcept {
 	return std::tuple<std::uint8_t, std::uint8_t>{t_val / 10, t_val % 10};
+}
+
+/**
+ * [get_status description]
+ * @return [description]
+ *
+ * @todo 		this should be a general function since all the status register share same format (wait status)
+ */
+template <auto Flag>
+[[nodiscard]] constexpr auto get_status() noexcept {
+	return reg::ISR.readBit<Flag>(ValueOnly);
+}
+
+/**
+ * @brief  	This function wait until the status flag turns to desire value
+ * @tparam 	Flag
+ *
+ * @param		t_desire 	desire value of the status bit
+ *
+ * @todo 		this should be a general function since all the status register share same format (wait status)
+ */
+template <auto Flag>
+constexpr void wait_status(bool const t_desire) noexcept {
+	while (std::get<0>(get_status<Flag>()) != t_desire) {
+	}
 }
 
 /**
@@ -88,7 +117,10 @@ constexpr void set_alarm_output_type(AlarmOutputType const t_output_type) noexce
  * @brief This function enables initialization mode, counters are stopped and start counting from the new value when
  *        INIT is reset.
  */
-constexpr void enable_init_mode() noexcept { reg::ISR.setBit<Status::INIT>(); }
+constexpr void enable_init_mode() noexcept {
+	reg::ISR.setBit<Status::INIT>();
+	wait_status<Status::INITF>(true);
+}
 
 /**
  * @brief This function disables initialization mode (free running mode)
@@ -221,15 +253,6 @@ constexpr void apply_winter_time_change() noexcept { reg::CR.setBit<reg::CRField
 constexpr void apply_summer_time_change() noexcept { reg::CR.setBit<reg::CRField::ADD1H>(); }
 
 /**
- * [get_status description]
- * @return [description]
- */
-template <auto Flag>
-[[nodiscard]] constexpr auto get_status() noexcept {
-	return reg::ISR.readBit<Flag>(ValueOnly);
-}
-
-/**
  * [clear_status description]
  */
 template <auto Flag>
@@ -238,15 +261,32 @@ constexpr void clear_status() noexcept {
 }
 
 /**
- * @brief  	This function wait until the status flag turns to desire value
- * @tparam 	Flag
  *
- * @param		t_desire 	desire value of the status bit
  */
-template <auto Flag>
-constexpr void wait_status(bool const t_desire) noexcept {
-	while (std::get<0>(get_status<Flag>()) != t_desire) {
+template <typename HourType>
+constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d, HourType const t_hour,
+										Minute_t const t_min, Second_t const t_sec) noexcept {
+	static_assert(std::is_same_v<HourType, Hour_t> || std::is_same_v<HourType, std::chrono::hours>);
+
+	unlock_write_protection();
+	enable_init_mode();
+
+	// set prescaler
+
+	// set calander format
+	if constexpr (std::is_same_v<HourType, Hour_t>) {
+		set_time(t_hour.hour, t_min, t_sec);
+		set_date(t_y, t_m, t_w, t_d);
+		set_hour_format(HourFormat::Twelve);
+		set_time_format_am_pm(t_hour.timeFormat);
+	} else {
+		set_time(t_hour.hour, t_min, t_sec);
+		set_date(t_y, t_m, t_w, t_d);
+		set_hour_format(HourFormat::TwentyFour);
 	}
+
+	disable_init_mode();
+	lock_write_protection();
 }
 
 }	 // namespace cpp_stm32::rtc

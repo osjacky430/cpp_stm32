@@ -35,6 +35,38 @@
  */
 namespace cpp_stm32::detail {
 
+/**
+ *	@todo finish it
+ */
+template <int Start, int End, int Interval>
+constexpr auto gen_array_seq() noexcept {
+	// assert abs(Start) < abs(End)
+	// asser End - Start can be divided by Interval
+	if constexpr (End >= Start) {
+	} else {
+	}
+}
+
+/**
+ * [iota description]
+ * @param first [description]
+ * @param last  [description]
+ * @param value [description]
+ */
+template <class ForwardIt, class T>
+constexpr void iota(ForwardIt first, ForwardIt last, T value) {
+	while (first != last) {
+		*first++ = value;
+		++value;
+	}
+}
+
+/**
+ * [generate description]
+ * @param first [description]
+ * @param last  [description]
+ * @param g     [description]
+ */
 template <class ForwardIt, class Generator>
 constexpr void generate(ForwardIt first, ForwardIt last, Generator g) {
 	while (first != last) {

@@ -56,4 +56,5 @@ constexpr std::uint8_t LOCK_WRITE_PROTECTION_KEY		 = 0xFFU;
 constexpr std::uint8_t UNLOCK_WRITE_PROTECTION_KEY_1 = 0xCAU;
 constexpr std::uint8_t UNLOCK_WRITE_PROTECTION_KEY_2 = 0x53U;
 
+constexpr auto HSE_CLK_FREQ_TO_RTC = 1_MHz;
 }	 // namespace cpp_stm32::rtc

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 
 #include "cpp_stm32/utility/strongly_typed.hxx"
@@ -34,6 +35,28 @@ enum class TimeFormat : std::uint8_t { Am, Pm };
 enum class Month : std::uint8_t { Jan = 1, Feb, Mar, Apr, May, June, July, Aug, Sep, Oct, Nov, Dec };
 enum class Weekday : std::uint8_t { Mon = 1, Tue, Wed, Thu, Fri, Sat, Sun };
 
-using Year_t = StrongType<std::uint16_t, struct Year>;
-using Date_t = StrongType<std::uint8_t, struct Date>;
+struct Hour_t {
+	std::chrono::hours const hour;
+	TimeFormat const timeFormat;
+};
+
+using Year_t	 = StrongType<std::uint16_t, struct Year>;
+using Date_t	 = StrongType<std::uint8_t, struct Date>;
+using Minute_t = std::chrono::minutes;
+using Second_t = std::chrono::seconds;
+
+template <char... num>
+constexpr auto operator""_Am() noexcept {
+	constexpr auto hour = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	static_assert(hour < 12);
+	return Hour_t{std::chrono::hours{hour}, TimeFormat::Am};
+}
+
+template <char... num>
+constexpr auto operator""_Pm() noexcept {
+	constexpr auto hour = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	static_assert(hour < 12);
+	return Hour_t{std::chrono::hours{hour}, TimeFormat::Pm};
+}
+
 }	 // namespace cpp_stm32::rtc
