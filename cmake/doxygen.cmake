@@ -23,8 +23,10 @@ function(enable_doxygen)
       set(DOXYGEN_RECURSIVE YES)
       set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../documentation)
 
-      doxygen_add_docs(doxygen ALL WORKING_DIRECTORY ${DOXYGEN_WORKING_DIR}
-                       COMMENT "Generate man pages")
+      doxygen_add_docs(
+        doxygen ALL
+        WORKING_DIRECTORY ${DOXYGEN_WORKING_DIR}
+        COMMENT "Generate man pages")
     endif(DOXYGEN_FOUND)
     # doxygen_add_docs(doxygen-docs ${PROJECT_SOURCE_DIR})
 
