@@ -100,7 +100,7 @@ class ClkRegMap {
 
 	static constexpr std::tuple EXT_OSC_BYP_TABLE{
 		std::pair{reg::CR, reg::CrBit::HseByp},
-		std::pair{reg::BDCR, reg::BdcrBit::LseByp},
+		std::pair{reg::BDCR, reg::BDCRField::LseByp},
 	};
 
  public:

@@ -35,6 +35,37 @@
  */
 namespace cpp_stm32::detail {
 
+/**
+ *
+ */
+template <class InputIt, class UnaryFunction>
+constexpr UnaryFunction for_each(InputIt first, InputIt last, UnaryFunction f) {
+	for (; first != last; ++first) {
+		f(*first);
+	}
+	return f;
+}
+
+/**
+ * [iota description]
+ * @param first [description]
+ * @param last  [description]
+ * @param value [description]
+ */
+template <class ForwardIt, class T>
+constexpr void iota(ForwardIt first, ForwardIt last, T value) {
+	while (first != last) {
+		*first++ = value;
+		++value;
+	}
+}
+
+/**
+ * [generate description]
+ * @param first [description]
+ * @param last  [description]
+ * @param g     [description]
+ */
 template <class ForwardIt, class Generator>
 constexpr void generate(ForwardIt first, ForwardIt last, Generator g) {
 	while (first != last) {

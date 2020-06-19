@@ -11,4 +11,6 @@
 #define APB1_CLK_FREQ (45 MHz)
 #define APB2_CLK_FREQ (90 MHz)
 
+#define RTC_CLK_SRC_FREQ HSE_CLK_FREQ
+
 #define HSE_BYPASS_CLK_SRC true
