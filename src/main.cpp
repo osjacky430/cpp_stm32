@@ -24,29 +24,19 @@ Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v
 
 int main() {
 	using namespace std::literals::chrono_literals;
-	Sys::Clock::init<Rcc::ClkSrc::Hse, Rcc::RtcClk::Hse>();
+	Sys::Clock::init<Rcc::ClkSrc::Hse>();
 
-	Rtc::unlock_write_protection();
-	Rtc::enable_init_mode();
-	Rtc::set_async_prescaler(Rtc::AsyncPrescaler_t{124});
-	Rtc::set_sync_prescaler(Rtc::SyncPrescaler_t{7999});
-	Rtc::set_hour_format(Rtc::HourFormat::TwentyFour);
-	Rtc::set_time_format_24_hour();
-	Rtc::set_time(13h, 21min, 40s);
-	Rtc::set_date(Rtc::Year_t{2020}, Rtc::Month::Apr, Rtc::Weekday::Sun, Rtc::Date_t{3U});
-
-	Rtc::disable_init_mode();
-	Rtc::lock_write_protection();
-
-	Rtc::init(Rtc::Year_t{2020}, Rtc::Month::Apr, Rtc::Weekday::Sun, Rtc::Date_t{3U}, 11_Am, 21min, 40s);
+	Rtc::init<Rcc::RtcClk::Hse>(Rtc::Year_t{2020}, Rtc::Month::Apr, Rtc::Weekday::Sun, Rtc::Date_t{3U}, 11_Am, 21min,
+															40s);
 
 	while (true) {
 		Rtc::clear_status<Rtc::Status::RSF>();
 		Rtc::wait_status<Rtc::Status::RSF>(true);
 
-		auto const [y, w, m, d] = Rtc::get_date();
 		auto const [h, min, s]	= Rtc::get_time();
+		auto const [y, w, m, d] = Rtc::get_date();
 
-		pc << y << "_" << h << ':' << min << ':' << s << "\n\r";
+		// pc << d << "\n\r";
+		pc << y << "_" << d << "_" << h << ':' << min << ':' << s << "\n\r";
 	}
 }

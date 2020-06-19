@@ -233,23 +233,6 @@ class Clock {
 		rcc::set_sysclk<SYS_CLK_SRC>();
 		rcc::wait_sysclk_rdy<SYS_CLK_SRC>();
 	}
-
-	template <rcc::ClkSrc PllSrc, rcc::RtcClk RtcSrc>
-	static constexpr void init() noexcept {
-		init<PllSrc>();
-
-		pwr::unlock_write_protection();
-		rcc::hold_reset_backup_domain();
-		rcc::release_reset_backup_domain();
-
-		if constexpr (RtcSrc == rcc::RtcClk::Hse) {
-			constexpr std::uint32_t rtc_prescaler = HSE_CLK_FREQ / rtc::HSE_CLK_FREQ_TO_RTC;
-			rcc::set_rtc_prescaler(rcc::RTCPRE{rcc::DivisionFactor_v<rtc_prescaler>});
-		}
-
-		rcc::set_rtc_clk_src<RtcSrc>();
-		rcc::enable_rtc();
-	}
 };
 
 }	 // namespace cpp_stm32::sys

@@ -29,6 +29,8 @@
 
 #include "cpp_stm32/common/rtc.hxx"
 #include "cpp_stm32/target/stm32/f4/define/rtc.hxx"
+#include "cpp_stm32/target/stm32/f4/pwr.hxx"
+#include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/register/rtc.hxx"
 
 namespace cpp_stm32::rtc {
@@ -189,6 +191,10 @@ constexpr void set_time(std::chrono::hours const t_hour, std::chrono::minutes co
 /**
  * [get_time description]
  * @return [description]
+ *
+ * @note 	One must call get_date() after get_time() to unlock the values in the higher-order calendar shadow
+ * 				registers to ensure consistency between the time and date values. Reading RTC current time locks the values in
+ * 				calendar shadow registers until current date is read.
  */
 [[nodiscard]] constexpr auto get_time() noexcept {
 	auto const [hour_ten, hour_unit, min_ten, min_unit, sec_ten, sec_unit] =
@@ -219,6 +225,10 @@ constexpr void set_date(Year_t const t_y, Month const t_m, Weekday const t_w, Da
 /**
  * @brief This function returns the date in Y-M-D sequence
  * @return  tuple that contains date in Y-M-D sequence
+ *
+ * @note 	One must call get_date() after get_time() to unlock the values in the higher-order calendar shadow registers
+ * 				to ensure consistency between the time and date values. Reading RTC current time locks the values in calendar
+ * 				shadow registers until current date is read.
  */
 constexpr auto get_date() noexcept {
 	auto const [year_ten, year_unit, weekday, month_ten, month_unit, date_ten, date_unit] =
@@ -263,27 +273,48 @@ constexpr void clear_status() noexcept {
 /**
  *
  */
-template <typename HourType>
+template <rcc::RtcClk RtcSrc, typename HourType>
 constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d, HourType const t_hour,
 										Minute_t const t_min, Second_t const t_sec) noexcept {
 	static_assert(std::is_same_v<HourType, Hour_t> || std::is_same_v<HourType, std::chrono::hours>);
+
+	pwr::unlock_write_protection();
+	rcc::hold_reset_backup_domain();
+	rcc::release_reset_backup_domain();
+
+	if constexpr (RtcSrc == rcc::RtcClk::Hse) {
+		constexpr std::uint32_t rtc_prescaler = HSE_CLK_FREQ / HSE_CLK_FREQ_TO_RTC;
+		rcc::set_rtc_prescaler(rcc::RTCPRE{rcc::DivisionFactor_v<rtc_prescaler>});
+	}
+
+	rcc::set_rtc_clk_src<RtcSrc>();
+	rcc::enable_rtc();
 
 	unlock_write_protection();
 	enable_init_mode();
 
 	// set prescaler
+	if constexpr (RtcSrc == rcc::RtcClk::Hse) {
+		constexpr std::uint16_t SYNC_PRESCALER_VAL = HSE_CLK_FREQ_TO_RTC / (ASYNC_PRESCALER_MAX.get() + 1) - 1;
+		constexpr SyncPrescaler_t SYN_PRESCALER{SYNC_PRESCALER_VAL};
+		set_async_prescaler(ASYNC_PRESCALER_MAX);
+		set_sync_prescaler(SYN_PRESCALER);
+	} else if constexpr (RtcSrc == rcc::RtcClk::Lse) {
+		// @todo finish LSE and LSI case
+	} else {
+	}
 
 	// set calander format
 	if constexpr (std::is_same_v<HourType, Hour_t>) {
-		set_time(t_hour.hour, t_min, t_sec);
-		set_date(t_y, t_m, t_w, t_d);
 		set_hour_format(HourFormat::Twelve);
 		set_time_format_am_pm(t_hour.timeFormat);
 	} else {
-		set_time(t_hour.hour, t_min, t_sec);
-		set_date(t_y, t_m, t_w, t_d);
 		set_hour_format(HourFormat::TwentyFour);
+		set_time_format_24_hour();
 	}
+
+	set_time(t_hour.hour, t_min, t_sec);
+	set_date(t_y, t_m, t_w, t_d);
 
 	disable_init_mode();
 	lock_write_protection();

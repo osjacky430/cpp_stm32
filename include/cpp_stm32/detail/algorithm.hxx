@@ -36,15 +36,14 @@
 namespace cpp_stm32::detail {
 
 /**
- *	@todo finish it
+ *
  */
-template <int Start, int End, int Interval>
-constexpr auto gen_array_seq() noexcept {
-	// assert abs(Start) < abs(End)
-	// asser End - Start can be divided by Interval
-	if constexpr (End >= Start) {
-	} else {
+template <class InputIt, class UnaryFunction>
+constexpr UnaryFunction for_each(InputIt first, InputIt last, UnaryFunction f) {
+	for (; first != last; ++first) {
+		f(*first);
 	}
+	return f;
 }
 
 /**

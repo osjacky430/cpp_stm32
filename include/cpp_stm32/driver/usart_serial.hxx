@@ -97,9 +97,9 @@ class Usart {
 		std::array<char, BUFFER_SIZE> str{};
 
 		if (auto [p, ec] = std::to_chars(str.data(), str.data() + str.size(), t_val); ec == std::errc()) {
-			for (auto const& val : std::string_view(str.data(), p - str.data())) {
-				usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val));
-			}
+			auto const result = std::string_view(str.data(), p - str.data());
+			detail::for_each(result.begin(), result.end(),
+											 [](char const val) { usart::send_blocking<USART_PORT>(static_cast<std::uint8_t>(val)); });
 		}
 	}
 
