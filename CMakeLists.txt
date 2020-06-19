@@ -51,7 +51,7 @@ add_library(cpp_stm32 STATIC) # TODO this need to change once user is allowed to
                               # use different target board via command line
 option(ENABLE_HARD_FLOAT "Use VFP extension" TRUE)
 target_compile_options(
-  cpp_stm32 PUBLIC $<IF:ENABLE_HARD_FLOAT,${HARD_FLOAT},${SOFT_FLOAT}>)
+cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
 target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR}
                                             ${CMAKE_SOURCE_DIR}/include/)
