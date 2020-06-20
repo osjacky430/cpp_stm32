@@ -28,6 +28,7 @@ namespace cpp_stm32 {
 constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
+constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
 constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
 
 template <char... num>

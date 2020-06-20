@@ -1,17 +1,39 @@
-# ##############################################################################
+# ############################################################################################################
 # target MCU path
-# ##############################################################################
+# ############################################################################################################
 set(PROCESSOR_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/processor")
 set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
 set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
 set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
 
-# ##############################################################################
+# ############################################################################################################
 # MCU compile options
-# ##############################################################################
+# ############################################################################################################
 # TODO: add soft float
 set(CPU -mcpu=cortex-m4)
 set(HARD_FLOAT -mfloat-abi=hard -mfpu=fpv4-sp-d16)
 set(SOFT_FLOAT -mfloat-abi=soft)
 
 set(BOARD_FLAGS ${HARD_FLOAT} -mthumb ${CPU})
+
+# ############################################################################################################
+# Default system configuration
+# ############################################################################################################
+set(DEFAULT_SYS_CONFIG_FILE
+    [[
+  #pragma once
+
+  #define COMPILE_TIME_CLOCK_CONFIG true
+
+  #define HSE_CLK_FREQ (8000000U)
+  #define LSE_CLK_FREQ (32768U)
+  #define HSI_CLK_FREQ (16000000U)
+  #define LSI_CLK_FREQ (32000U)
+  #define SYS_CLK_FREQ (180000000U)
+  #define AHB_CLK_FREQ (180000000U)
+  #define APB1_CLK_FREQ (45000000U)
+  #define APB2_CLK_FREQ (90000000U)
+
+  #define HSE_BYPASS_CLK_SRC true
+  #define LSE_BYPASS_CLK_SRC false
+]])

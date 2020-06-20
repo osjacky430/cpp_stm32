@@ -124,7 +124,7 @@ SETUP_REGISTER_INFO(SxCRBitList,													 /**/
 										Binary<>{BitPos_t{3}},								 // HTIE
 										Binary<>{BitPos_t{4}},								 // TCIE
 										Bit<1, FlowControl>{BitPos_t{5}},			 // PFCTRL
-										Bit<2, TransferMode>{BitPos_t{6}},			 // DIR
+										Bit<2, TransferMode>{BitPos_t{6}},		 // DIR
 										Binary<>{BitPos_t{8}},								 // CIRC
 										Binary<>{BitPos_t{9}},								 // PINC
 										Binary<>{BitPos_t{10}},								 // MINC

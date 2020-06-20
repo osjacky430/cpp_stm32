@@ -103,7 +103,7 @@ SETUP_REGISTER_INFO(EXTICRxBitList, CREATE_LIST_OF_BITS<Bit<4, gpio::Port>>(deta
 
 template <gpio::Pin CR>
 static constexpr Register<EXTICRxBitList, gpio::Pin, DEFAULT_ACCESS, true, ExtiCRxIdxPolicy> EXTICRx{BASE_ADDR,
-																																																		OFFSET(CR)};
+																																																		 OFFSET(CR)};
 /**@}*/
 
 /**

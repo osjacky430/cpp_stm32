@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/dma.hxx
- * @brief	DMA class and enum define.
+ * @brief	Dma class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

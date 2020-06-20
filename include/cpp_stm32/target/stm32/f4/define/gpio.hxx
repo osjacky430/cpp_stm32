@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/gpio.hxx
- * @brief	GPIO class and enum define.
+ * @brief	Gpio class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

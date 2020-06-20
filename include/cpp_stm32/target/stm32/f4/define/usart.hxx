@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/usart.hxx
- * @brief	USART class and enum define.
+ * @brief	Usart class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

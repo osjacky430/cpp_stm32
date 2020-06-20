@@ -29,13 +29,30 @@
 
 namespace cpp_stm32::driver {
 
-class Rtc {
+class RealTimeClock {
  public:
-	explicit constexpr Rtc(rtc::Year_t const t_y, rtc::Month const t_m, rtc::Weekday const t_week,
-												 rtc::Date_t const t_date, std::chrono::hours const t_hr, std::chrono::minutes const t_min,
-												 std::chrono::seconds const t_sec) noexcept {
-		//
-		rtc::set_calendar(t_y, t_m, t_week, t_date, t_hr, t_min, t_sec);
+	RealTimeClock() = default;
+
+	template <rcc::RtcClk RtcSrc, typename HourType>
+	constexpr void init(rtc::Year_t const t_y, rtc::Month const t_m, rtc::Weekday const t_week, rtc::Date_t const t_date,
+											HourType const t_hr, rtc::Minute_t const t_min, rtc::Second_t const t_sec) const noexcept {
+		rtc::init<RtcSrc>(t_y, t_m, t_week, t_date, t_hr, t_min, t_sec);
+	}
+
+	constexpr auto read_calendar() const noexcept {
+		rtc::wait_synchronization();
+
+		auto const [h, min, s]	= rtc::get_time();
+		auto const [y, w, m, d] = rtc::get_date();
+
+		return std::tuple{y, w, m, d, h, min, s};
+	}
+
+	template <typename HourType>
+	constexpr void set_calendar(rtc::Year_t const t_y, rtc::Month const t_m, rtc::Weekday const t_week,
+															rtc::Date_t const t_date, HourType const t_hr, rtc::Minute_t const t_min,
+															rtc::Second_t const t_sec) const noexcept {
+		init_calendar(t_y, t_m, t_week, t_date, t_hr, t_min, t_sec);
 	}
 };
 

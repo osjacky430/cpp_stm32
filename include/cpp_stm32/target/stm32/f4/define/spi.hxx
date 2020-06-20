@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/spi.hxx
- * @brief	SPI class and enum define.
+ * @brief	Spi class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

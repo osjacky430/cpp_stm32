@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/rcc.hxx
- * @brief	RCC class and enum define.
+ * @brief	Rcc class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -133,6 +133,13 @@ enum class ClkSrc : std::uint8_t { Hsi, Hse, Pll, PllI2c, PllSai, Lse, Lsi };
  */
 enum class SysClk : std::uint8_t { Hsi, Hse, Pllp, Pllr };
 
+/**
+ * @enum 		RtcClk
+ * @brief		Three different clock sources can be used to drive the real time clock
+ * 					- Lse (Low Speed External) oscillator clock
+ * 					- Lsi (Low Speed Internal) oscillator clock
+ * 					- Hse (High speed External) oscillator clock
+ */
 enum class RtcClk : std::uint8_t { NoClk, Lse, Lsi, Hse };
 
 /**

@@ -1,18 +1,24 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  stm32/f4/sys_init.hxx
+ * @brief	System clock setup API for stm32f4
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -29,6 +35,30 @@
 #include "sys_info.hpp"
 
 namespace cpp_stm32::sys {
+
+/**
+ * @defgroup LSE_CLK_FREQ   LSE Clock
+ * @{
+ */
+
+#if !defined(LSI_CLK_FREQ)
+#define LSI_CLK_FREQ 32000
+#endif
+
+static_assert(LSI_CLK_FREQ == 32_KHz);
+
+/**@}*/
+
+/**
+ * @defgroup LSE_CLK_FREQ   LSE Clock
+ * @{
+ */
+
+#if !defined(LSE_CLK_FREQ)
+#define LSE_CLK_FREQ 32768
+#endif
+
+/**@}*/
 
 /**
  * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
@@ -51,7 +81,7 @@ static_assert(1.8f <= STM32_VDD && STM32_VDD <= 3.6f);
  */
 
 #if !defined(HSI_CLK_FREQ)
-#define HSI_CLK_FREQ (16 MHz)
+#define HSI_CLK_FREQ (16000000U)
 #endif
 
 static_assert(HSI_CLK_FREQ == 16_MHz);
@@ -64,7 +94,7 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
  */
 
 #if !defined(HSE_CLK_FREQ)
-#define HSE_CLK_FREQ (8 MHz)
+#define HSE_CLK_FREQ (8000000U)
 #endif
 
 #if !defined(HSE_BYPASS_CLK_SRC)

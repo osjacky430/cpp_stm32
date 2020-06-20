@@ -1,6 +1,6 @@
-# ##############################################################################
+# ############################################################################################################
 # cpp_stm32 library
-# ##############################################################################
+# ############################################################################################################
 cmake_minimum_required(VERSION 3.15.2...3.16.1 FATAL_ERROR)
 
 set(TARGET_BOARD
@@ -24,42 +24,38 @@ include(board_settings)
 include(sanitizer)
 include(doxygen)
 
-check_board_supported(${TARGET_BOARD})
-include(${CMAKE_SOURCE_DIR}/board/${TARGET_BOARD}.in)
+import_board_setting(${TARGET_BOARD})
+check_configuration_file()
 
-# In practice, it is usally easier and more robust to use the variables to set
-# language requirements project-wide rather than use per target properties.
+# In practice, it is usally easier and more robust to use the variables to set language requirements
+# project-wide rather than use per target properties.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# ##############################################################################
+# ############################################################################################################
 # library compile options
-# ##############################################################################
+# ############################################################################################################
 set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 
-# ##############################################################################
+# ############################################################################################################
 # add library, target properties
-# ##############################################################################
+# ############################################################################################################
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
 add_library(project_options INTERFACE)
 enable_sanitizers(project_options)
 
-add_library(cpp_stm32 STATIC) # TODO this need to change once user is allowed to
-                              # use different target board via command line
+add_library(cpp_stm32 STATIC)
 option(ENABLE_HARD_FLOAT "Use VFP extension" TRUE)
-target_compile_options(
-cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
+target_compile_options(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
-target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR}
-                                            ${CMAKE_SOURCE_DIR}/include/)
+target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/)
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_link_libraries(cpp_stm32 PRIVATE project_warnings project_options)
-target_compile_options(
-  cpp_stm32 PUBLIC ${BOARD_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions
-                   -fno-rtti> ${NEWLIB_FLAGS})
+target_compile_options(cpp_stm32 PUBLIC ${BOARD_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti>
+                                        ${NEWLIB_FLAGS})
 target_link_options(
   cpp_stm32
   INTERFACE
@@ -70,19 +66,19 @@ target_link_options(
   "SHELL: -Xlinker --gc-sections"
   "SHELL: -Xlinker --print-memory-usage")
 
-# ##############################################################################
+# ############################################################################################################
 # link library to application
-# ##############################################################################
+# ############################################################################################################
 add_subdirectory(src)
 
-# ##############################################################################
+# ############################################################################################################
 # build documentation
-# ##############################################################################
+# ############################################################################################################
 enable_doxygen()
 
-# ##############################################################################
+# ############################################################################################################
 # build example
-# ##############################################################################
+# ############################################################################################################
 set(BUILD_EXAMPLE
     ""
     CACHE STRING "Build example")

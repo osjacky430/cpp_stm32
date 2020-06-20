@@ -1,6 +1,6 @@
 /**
  * @file  stm32/pin_map/rcc.hxx
- * @brief	Header that include rcc pin map information
+ * @brief	Rcc Pin Mapping for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

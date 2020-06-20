@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/i2c.hxx
- * @brief	I2C setup API for stm32f4
+ * @brief	I2c setup API for stm32f4
  *
  * @ref   https://www.nxp.com/docs/en/user-guide/UM10204.pdf
  */

@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/rtc.hxx
- * @brief	RTC setup API for stm32f4
+ * @brief	Rtc setup API for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -32,6 +32,7 @@
 #include "cpp_stm32/target/stm32/f4/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/register/rtc.hxx"
+#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
 namespace cpp_stm32::rtc {
 
@@ -273,11 +274,35 @@ constexpr void clear_status() noexcept {
 /**
  *
  */
-template <rcc::RtcClk RtcSrc, typename HourType>
-constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d, HourType const t_hour,
-										Minute_t const t_min, Second_t const t_sec) noexcept {
-	static_assert(std::is_same_v<HourType, Hour_t> || std::is_same_v<HourType, std::chrono::hours>);
+constexpr void wait_synchronization() noexcept {
+	clear_status<Status::RSF>();
+	wait_status<Status::RSF>(true);
+}
 
+/**
+ *
+ */
+auto create_init_section() noexcept {
+	struct InitHandler {
+		InitHandler() noexcept {
+			unlock_write_protection();
+			enable_init_mode();
+		}
+
+		~InitHandler() noexcept {
+			disable_init_mode();
+			lock_write_protection();
+		}
+	};
+
+	return InitHandler{};
+}
+
+/**
+ *
+ */
+template <rcc::RtcClk RtcSrc>
+constexpr void init_clock_src() noexcept {
 	pwr::unlock_write_protection();
 	rcc::hold_reset_backup_domain();
 	rcc::release_reset_backup_domain();
@@ -289,20 +314,48 @@ constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t
 
 	rcc::set_rtc_clk_src<RtcSrc>();
 	rcc::enable_rtc();
+}
 
-	unlock_write_protection();
-	enable_init_mode();
+/**
+ *
+ */
+template <typename HourType>
+constexpr void init_calendar(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d,
+														 HourType const t_hour, Minute_t const t_min, Second_t const t_sec) noexcept {
+	auto const init_section = create_init_section();
+
+	if constexpr (std::is_same_v<HourType, Hour_t>) {
+		set_hour_format(HourFormat::Twelve);
+		set_time_format_am_pm(t_hour.timeFormat);
+	} else {
+		set_hour_format(HourFormat::TwentyFour);
+		set_time_format_24_hour();
+	}
+
+	set_time(t_hour.hour, t_min, t_sec);
+	set_date(t_y, t_m, t_w, t_d);
+}
+
+/**
+ * @brief
+ */
+template <rcc::RtcClk RtcSrc, typename HourType>
+constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t const t_d, HourType const t_hour,
+										Minute_t const t_min, Second_t const t_sec) noexcept {
+	static_assert(std::is_same_v<HourType, Hour_t> || std::is_same_v<HourType, std::chrono::hours>);
+
+	init_clock_src<RtcSrc>();
+
+	auto const init_section = create_init_section();
 
 	// set prescaler
-	if constexpr (RtcSrc == rcc::RtcClk::Hse) {
-		constexpr std::uint16_t SYNC_PRESCALER_VAL = HSE_CLK_FREQ_TO_RTC / (ASYNC_PRESCALER_MAX.get() + 1) - 1;
-		constexpr SyncPrescaler_t SYN_PRESCALER{SYNC_PRESCALER_VAL};
-		set_async_prescaler(ASYNC_PRESCALER_MAX);
-		set_sync_prescaler(SYN_PRESCALER);
-	} else if constexpr (RtcSrc == rcc::RtcClk::Lse) {
-		// @todo finish LSE and LSI case
-	} else {
-	}
+	constexpr std::array<std::uint64_t, 3> RTC_CLK_FREQ{LSE_CLK_FREQ, LSI_CLK_FREQ, HSE_CLK_FREQ_TO_RTC};
+	constexpr std::uint16_t SYNC_PRESCALER_VAL =
+		RTC_CLK_FREQ[to_underlying(RtcSrc) - 1] / (ASYNC_PRESCALER_MAX.get() + 1) - 1;
+	constexpr SyncPrescaler_t SYNC_PRESCALER{SYNC_PRESCALER_VAL};
+
+	set_async_prescaler(ASYNC_PRESCALER_MAX);
+	set_sync_prescaler(SYNC_PRESCALER);
 
 	// set calander format
 	if constexpr (std::is_same_v<HourType, Hour_t>) {
@@ -315,9 +368,6 @@ constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t
 
 	set_time(t_hour.hour, t_min, t_sec);
 	set_date(t_y, t_m, t_w, t_d);
-
-	disable_init_mode();
-	lock_write_protection();
 }
 
 }	 // namespace cpp_stm32::rtc

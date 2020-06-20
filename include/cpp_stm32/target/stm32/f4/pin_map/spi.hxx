@@ -1,6 +1,6 @@
 /**
  * @file  stm32/pin_map/spi.hxx
- * @brief	Header that include all pin map information
+ * @brief	Spi Pin Mapping for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

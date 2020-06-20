@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/syscfg.hxx
- * @brief	Gpio setup API for stm32f4
+ * @brief	SysCfg setup API for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

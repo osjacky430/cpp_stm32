@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/rtc.hxx
- * @brief	RTC class and enum define.
+ * @brief	Rtc class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

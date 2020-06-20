@@ -1,8 +1,8 @@
 #include "cpp_stm32/driver/digitalout.hxx"
+#include "cpp_stm32/driver/real_time_clock.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 
 #include "cpp_stm32/target/stm32/f4/gpio.hxx"
-#include "cpp_stm32/target/stm32/f4/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/rtc.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
@@ -26,15 +26,12 @@ int main() {
 	using namespace std::literals::chrono_literals;
 	Sys::Clock::init<Rcc::ClkSrc::Hse>();
 
-	Rtc::init<Rcc::RtcClk::Hse>(Rtc::Year_t{2020}, Rtc::Month::Apr, Rtc::Weekday::Sun, Rtc::Date_t{3U}, 11_Am, 21min,
-															40s);
+	Driver::RealTimeClock const rtc_clk;
+	rtc_clk.init<Rcc::RtcClk::Hse>(Rtc::Year_t{2020}, Rtc::Month::June, Rtc::Weekday::Sat, Rtc::Date_t{20U}, 10_Am, 23min,
+																 40s);
 
 	while (true) {
-		Rtc::clear_status<Rtc::Status::RSF>();
-		Rtc::wait_status<Rtc::Status::RSF>(true);
-
-		auto const [h, min, s]	= Rtc::get_time();
-		auto const [y, w, m, d] = Rtc::get_date();
+		auto const [y, w, m, d, h, min, s] = rtc_clk.read_calendar();
 
 		// pc << d << "\n\r";
 		pc << y << "_" << d << "_" << h << ':' << min << ':' << s << "\n\r";

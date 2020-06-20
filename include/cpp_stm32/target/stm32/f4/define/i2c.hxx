@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/define/i2c.hxx
- * @brief	I2C class and enum define.
+ * @brief	I2c class and enum define.
  */
 
 /** Copyright (c) 2020 by osjacky430.

@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/pin_map/i2c.hxx
- * @brief I2C pin mapping for stm32f4
+ * @brief I2c pin mapping for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

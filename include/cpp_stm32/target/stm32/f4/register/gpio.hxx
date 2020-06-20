@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/register/gpio.hxx
- * @brief	GPIO registers of stm32f4
+ * @brief	Gpio registers of stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

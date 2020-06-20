@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/pin_map/usart.hxx
- * @brief	USART Pin Mapping for stm32f4
+ * @brief	Usart Pin Mapping for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -24,8 +24,6 @@
 
 #include <tuple>
 
-#include "cpp_stm32/common/pin_data.hxx"
-
 #include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/target/stm32/f4/define/dma.hxx"
@@ -37,7 +35,7 @@
 
 namespace cpp_stm32::dma {
 
-using UsartDma = PinData<Port, Stream, cpp_stm32::IrqNum, Channel, PeriphAddress_t, DataSize>;
+using UsartDma = detail::Tuple<Port, Stream, cpp_stm32::IrqNum, Channel, PeriphAddress_t, DataSize>;
 
 }	 // namespace cpp_stm32::dma
 

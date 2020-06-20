@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "cpp_stm32/target/stm32/f4/pin_map/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map/i2c.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map/spi.hxx"

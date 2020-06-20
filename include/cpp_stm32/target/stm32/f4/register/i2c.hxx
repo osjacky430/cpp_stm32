@@ -1,6 +1,6 @@
 /**
  * @file  stm32/f4/register/i2c.hxx
- * @brief	I2C registers of stm32f4
+ * @brief	I2c registers of stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.

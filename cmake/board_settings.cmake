@@ -1,10 +1,17 @@
-function(check_board_supported target_board)
+macro(import_board_setting target_board)
   set(SUPPORTED_BOARD_LIST stm32f446re stm32f303k8 stm32l432kc stm32f746ng)
 
   list(FIND SUPPORTED_BOARD_LIST ${target_board} out)
   if(${out} EQUAL -1)
-    message(
-      FATAL_ERROR
-        "Target board ${target_board} is not supported yet by the driver!")
+    message(FATAL_ERROR "Target board ${target_board} is not supported yet by the driver!")
+  else()
+    include(${CMAKE_SOURCE_DIR}/board/${target_board}.in)
   endif()
-endfunction()
+endmacro()
+
+macro(check_configuration_file)
+  if(NOT EXISTS ${CMAKE_SOURCE_DIR}/src/sys_info.hpp)
+    message(STATUS "Missing sys_info.hpp in src directory, creating one with default configuration")
+    file(WRITE ${CMAKE_SOURCE_DIR}/src/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
+  endif()
+endmacro()
