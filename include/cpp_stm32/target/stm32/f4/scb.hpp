@@ -38,6 +38,7 @@ class [[gnu::packed]] ExceptionStackFrame {
 	std::uint32_t xpsr;
 };
 
+// @todo finish this
 constexpr void set_priority_grouping() noexcept {}
 
 }	 // namespace cpp_stm32::scb

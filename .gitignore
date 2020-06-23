@@ -4,6 +4,7 @@
 # build folder
 build/
 example_bin/
+compile_commands.json
 
 # documentation folder
 documentation/

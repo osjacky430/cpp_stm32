@@ -7,6 +7,8 @@
 #include "cpp_stm32/target/stm32/f4/rtc.hxx"
 #include "cpp_stm32/target/stm32/f4/sys_init.hxx"
 
+#include "cpp_stm32/target/stm32/f4/wwdg.hxx"
+
 namespace Pwr		= cpp_stm32::pwr;
 namespace Rcc		= cpp_stm32::rcc;
 namespace Gpio	= cpp_stm32::gpio;
