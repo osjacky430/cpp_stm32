@@ -42,7 +42,7 @@ constexpr auto to_underlying(Enum t_e) noexcept {
  */
 template <typename Enum, typename = std::enable_if_t<is_scoped_enum<Enum>>>
 constexpr auto operator&(Enum const& lhs, Enum const& rhs) noexcept {
-	return Enum{to_underlying(lhs) & to_underlying(rhs)};
+	return Enum{static_cast<std::underlying_type_t<Enum>>(to_underlying(lhs) & to_underlying(rhs))};
 }
 
 /**

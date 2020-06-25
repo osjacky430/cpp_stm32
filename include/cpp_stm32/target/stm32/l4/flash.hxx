@@ -18,14 +18,8 @@
 
 #include <cstdint>
 
-#include "cpp_stm32/target/stm32/l4/memory/flash_reg.hxx"
+#include "cpp_stm32/target/stm32/l4/register/flash.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
-
-namespace cpp_stm32::pwr {
-
-enum class VoltageScale;
-
-}
 
 namespace cpp_stm32::flash {
 

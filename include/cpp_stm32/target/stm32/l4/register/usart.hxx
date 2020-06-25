@@ -1,54 +1,15 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #pragma once
 
 #include "cpp_stm32/common/usart.hxx"
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/target/stm32/l4/memory/memory_map.hxx"
-
-namespace cpp_stm32::usart {
-
-enum class Port { Usart1, Usart2, Total };
-
-/**
- * @enum OverSampling
- */
-enum class OverSampling : std::uint8_t {
-	OverSampling16,
-	OverSampling8,
-};
-
-/**
- * @enum 	DataBit
- */
-enum class DataBit : std::uint8_t { DataBit8, DataBit9, DataBit7 };
-
-enum class HardwareFlowControl : std::uint8_t { None, CTS, RTS, Both };
-enum class Mode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
-enum class Parity : std::uint8_t { Even, Odd, None };
-enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
-
-}	 // namespace cpp_stm32::usart
+#include "cpp_stm32/target/stm32/l4/define/usart.hxx"
+#include "cpp_stm32/target/stm32/l4/register/memory_map.hxx"
 
 namespace cpp_stm32::usart::reg {
 
-static constexpr auto BASE_ADDR(usart::Port const& t_usart_num) {
+[[nodiscard]] constexpr auto BASE_ADDR(Port const t_usart_num) {
 	switch (t_usart_num) {
 		case Port::Usart1:
 			return memory_at(PeriphAddr::Apb2Base, 0x3800U);
@@ -64,7 +25,7 @@ static constexpr auto BASE_ADDR(usart::Port const& t_usart_num) {
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartCr1Info,																/************ Description ************/
+SETUP_REGISTER_INFO(CR1BitList,																	/************ Description ************/
 										Binary<>{BitPos_t{0}},											// USART Enable
 										Binary<>{BitPos_t{1}},											// USART Enable in stop mode
 										Binary<>{BitPos_t{2}},											// Receiver Enable
@@ -88,7 +49,7 @@ SETUP_REGISTER_INFO(UsartCr1Info,																/************ Description *****
 										Binary<>{BitPos_t{28}}											// Word Length (bit 1)
 )
 
-enum class Cr1Bit {
+enum class CR1Field {
 	UE,
 	UESM,
 	RE,
@@ -113,7 +74,7 @@ enum class Cr1Bit {
 };
 
 template <Port InputPort>
-static constexpr Register<UsartCr1Info, Cr1Bit> CR1{BASE_ADDR(InputPort), 0x00U};
+static constexpr Register<CR1BitList, CR1Field> CR1{BASE_ADDR(InputPort), 0x00U};
 
 /**@}*/
 
@@ -122,28 +83,28 @@ static constexpr Register<UsartCr1Info, Cr1Bit> CR1{BASE_ADDR(InputPort), 0x00U}
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartCr2Info,													 /************ Description ************/
-										Binary<>{BitPos_t{4}},								 // Address Detectio/4-bit Address Detection
-										Binary<>{BitPos_t{5}},								 // Line Break Detection Length
-										Binary<>{BitPos_t{6}},								 // Line Break Detection Interrupt Enable
-										Binary<>{BitPos_t{8}},								 // Last Bit Clock Pause
-										Binary<>{BitPos_t{9}},								 // Clock Phase
-										Binary<>{BitPos_t{10}},								 // Clock Polarity
-										Binary<>{BitPos_t{11}},								 // Clock Enable
-										Bit<2, usart::Stopbit>{BitPos_t{12}},	 // Stop Bit
-										Binary<>{BitPos_t{14}},								 // LIN Mode Enable
-										Binary<>{BitPos_t{15}},								 // Swap TX/RX Pin
-										Binary<>{BitPos_t{16}},								 // RX pin active level Inversion
-										Binary<>{BitPos_t{17}},								 // TX pin active level Inversion
-										Binary<>{BitPos_t{18}},								 // Binary Data Inversion
-										Binary<>{BitPos_t{19}},								 // Most Significant Bit first
-										Binary<>{BitPos_t{20}},								 // Auto Baudrate Enable
-										Bit<2>{BitPos_t{21}},									 // Auto Baudrate Mode
-										Binary<>{BitPos_t{23}},								 // Receiver Timeout Enable
-										Bit<8>{BitPos_t{24}}									 // Address of USART node
+SETUP_REGISTER_INFO(CR2BitList,											/************ Description ************/
+										Binary<>{BitPos_t{4}},					// Address Detectio/4-bit Address Detection
+										Binary<>{BitPos_t{5}},					// Line Break Detection Length
+										Binary<>{BitPos_t{6}},					// Line Break Detection Interrupt Enable
+										Binary<>{BitPos_t{8}},					// Last Bit Clock Pause
+										Binary<>{BitPos_t{9}},					// Clock Phase
+										Binary<>{BitPos_t{10}},					// Clock Polarity
+										Binary<>{BitPos_t{11}},					// Clock Enable
+										Bit<2, Stopbit>{BitPos_t{12}},	// Stop Bit
+										Binary<>{BitPos_t{14}},					// LIN Mode Enable
+										Binary<>{BitPos_t{15}},					// Swap TX/RX Pin
+										Binary<>{BitPos_t{16}},					// RX pin active level Inversion
+										Binary<>{BitPos_t{17}},					// TX pin active level Inversion
+										Binary<>{BitPos_t{18}},					// Binary Data Inversion
+										Binary<>{BitPos_t{19}},					// Most Significant Bit first
+										Binary<>{BitPos_t{20}},					// Auto Baudrate Enable
+										Bit<2>{BitPos_t{21}},						// Auto Baudrate Mode
+										Binary<>{BitPos_t{23}},					// Receiver Timeout Enable
+										Bit<8>{BitPos_t{24}}						// Address of USART node
 )
 
-enum class Cr2Bit {
+enum class CR2Field {
 	ADDM7,
 	LBDL,
 	LBDIE,
@@ -164,7 +125,7 @@ enum class Cr2Bit {
 };
 
 template <Port InputPort>
-static constexpr Register<UsartCr2Info, Cr2Bit> CR2{BASE_ADDR(InputPort), 0x04U};
+static constexpr Register<CR2BitList, CR2Field> CR2{BASE_ADDR(InputPort), 0x04U};
 
 /**@}*/
 
@@ -173,7 +134,7 @@ static constexpr Register<UsartCr2Info, Cr2Bit> CR2{BASE_ADDR(InputPort), 0x04U}
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartCr3Info,						 /************ Description ************/
+SETUP_REGISTER_INFO(CR3BitList,							 /************ Description ************/
 										Binary<>{BitPos_t{0}},	 // Error Interrupt Enable
 										Binary<>{BitPos_t{1}},	 // IrDA mode Enable
 										Binary<>{BitPos_t{2}},	 // IrDA Low Power
@@ -197,7 +158,7 @@ SETUP_REGISTER_INFO(UsartCr3Info,						 /************ Description ************/
 										Binary<>{BitPos_t{24}}	 // Transmission Complete Before Guard Time Interrupt Enable
 )
 
-enum class Cr3Bit {
+enum class CR3Field {
 	EIE,
 	IrEn,
 	IrLP,
@@ -222,23 +183,23 @@ enum class Cr3Bit {
 };
 
 template <Port InputPort>
-static constexpr Register<UsartCr3Info, Cr3Bit> CR3{BASE_ADDR(InputPort), 0x08U};
+static constexpr Register<CR3BitList, CR3Field> CR3{BASE_ADDR(InputPort), 0x08U};
 
 /**@}*/
 
 /**
- * @degroup BRR_GROUP		Usart Baud Rate Register Group
+ * @defgroup BRR_GROUP		Usart Baud Rate Register Group
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartBrrInfo,												 /************ Description ************/
+SETUP_REGISTER_INFO(BRRBitList,													 /************ Description ************/
 										Bit<16, std::uint16_t>{BitPos_t{0}}	 // Baud Rate Register
 )
 
-enum class BrrBit { Brr };
+enum class BRRField { BRR };
 
 template <Port InputPort>
-static constexpr Register<UsartBrrInfo, BrrBit> BRR{BASE_ADDR(InputPort), 0x0CU};
+static constexpr Register<BRRBitList, BRRField> BRR{BASE_ADDR(InputPort), 0x0CU};
 /**@}*/
 
 /**
@@ -246,7 +207,7 @@ static constexpr Register<UsartBrrInfo, BrrBit> BRR{BASE_ADDR(InputPort), 0x0CU}
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartISrInfo,								/************ Description ************/
+SETUP_REGISTER_INFO(ISRBitList,									/************ Description ************/
 										StatusBit<1>{BitPos_t{0}},	// Parity Error
 										StatusBit<1>{BitPos_t{1}},	// Framing Error
 										StatusBit<1>{BitPos_t{2}},	// start bit Noise detection Flag
@@ -272,7 +233,7 @@ SETUP_REGISTER_INFO(UsartISrInfo,								/************ Description ************/
 										Binary<>{BitPos_t{25}}			// Transmission Complete Before Guard Time completion
 )
 
-enum class ISrBit {
+enum class ISRField {
 	PE,
 	FE,
 	NF,
@@ -299,7 +260,7 @@ enum class ISrBit {
 };
 
 template <Port InputPort>
-static constexpr Register<UsartISrInfo, ISrBit> ISR{BASE_ADDR(InputPort), 0x1CU};
+static constexpr Register<ISRBitList, ISRField> ISR{BASE_ADDR(InputPort), 0x1CU};
 /**@}*/
 
 /**
@@ -307,7 +268,7 @@ static constexpr Register<UsartISrInfo, ISrBit> ISR{BASE_ADDR(InputPort), 0x1CU}
  * @{
  */
 
-SETUP_REGISTER_INFO(UsartIcrInfo,														 /************ Description ************/
+SETUP_REGISTER_INFO(ICRBitList,															 /************ Description ************/
 										Binary<BitMod::RdClrWr1>{BitPos_t{0}},	 // Parity Error Clear Flag
 										Binary<BitMod::RdClrWr1>{BitPos_t{1}},	 // Framing Error Clear Flag
 										Binary<BitMod::RdClrWr1>{BitPos_t{2}},	 // Noise detected Clear Flag
@@ -323,24 +284,24 @@ SETUP_REGISTER_INFO(UsartIcrInfo,														 /************ Description ******
 										Binary<BitMod::RdClrWr1>{BitPos_t{20}}	 // WakeUp from stop mode Clear Flag
 )
 
-enum class IcrBit { PECF, FECF, NCF, ORECF, IdleCF, TCCF, TCBGTCF, LBDCF, CTSCF, RTOCF, EOBCF, CMCF, WUCF };
+enum class ICRField { PECF, FECF, NCF, ORECF, IdleCF, TCCF, TCBGTCF, LBDCF, CTSCF, RTOCF, EOBCF, CMCF, WUCF };
 
 template <Port InputPort>
-static constexpr Register<UsartIcrInfo, IcrBit> ICR{BASE_ADDR(InputPort), 0x20U};
+static constexpr Register<ICRBitList, ICRField> ICR{BASE_ADDR(InputPort), 0x20U};
 /**@}*/
 
 /**
  * @defgroup RDR_GROUP		USART Data Register Group
  * @{
  */
-SETUP_REGISTER_INFO(UsartRDrInfo,																			 /************ Description ************/
+SETUP_REGISTER_INFO(RDRBitList,																				 /************ Description ************/
 										Bit<8, std::uint8_t, BitMod::RdOnly>{BitPos_t{0}}	 // Receive data value
 )
 
-enum class RDrBit { RDr };
+enum class RDRField { RDr };
 
 template <Port InputPort>
-static constexpr Register<UsartRDrInfo, RDrBit> RDR{BASE_ADDR(InputPort), 0x24U};
+static constexpr Register<RDRBitList, RDRField> RDR{BASE_ADDR(InputPort), 0x24U};
 
 /**@}*/
 
@@ -348,14 +309,14 @@ static constexpr Register<UsartRDrInfo, RDrBit> RDR{BASE_ADDR(InputPort), 0x24U}
  * @defgroup TDR_GROUP		USART Data Register Group
  * @{
  */
-SETUP_REGISTER_INFO(UsartTDrInfo,				 /************ Description ************/
+SETUP_REGISTER_INFO(TDRBitList,					 /************ Description ************/
 										Bit<8>{BitPos_t{0}}	 // Transmit data value
 )
 
-enum class TDrBit { TDr };
+enum class TDRField { TDr };
 
 template <Port InputPort>
-static constexpr Register<UsartTDrInfo, TDrBit> TDR{BASE_ADDR(InputPort), 0x28U};
+static constexpr Register<TDRBitList, TDRField> TDR{BASE_ADDR(InputPort), 0x28U};
 
 /**@}*/
 

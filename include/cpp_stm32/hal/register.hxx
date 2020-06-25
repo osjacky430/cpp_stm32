@@ -30,6 +30,7 @@
 #include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/mmio.hxx"
+#include "cpp_stm32/utility/enum_op.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
 #include "cpp_stm32/utility/utility.hxx"
 

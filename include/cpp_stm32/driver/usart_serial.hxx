@@ -104,7 +104,7 @@ class Usart {
 	}
 
  public:
-	explicit constexpr Usart(usart::Baudrate_t const& t_baud) noexcept {}
+	explicit constexpr Usart(usart::Baudrate_t const t_baud) noexcept {}
 
 	explicit constexpr Usart(UsartTx<TX> const /*unused*/, UsartRx<RX> const /*unused*/,
 													 usart::Baudrate_t const t_baud) noexcept {

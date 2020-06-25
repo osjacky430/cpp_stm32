@@ -18,10 +18,8 @@
 
 #include <tuple>
 
-#include "cpp_stm32/common/gpio.hxx"
 #include "cpp_stm32/detail/tuple.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
-#include "cpp_stm32/target/stm32/l4/memory/gpio_reg.hxx"
+#include "cpp_stm32/target/stm32/l4/register/gpio.hxx"
 
 namespace cpp_stm32::gpio {
 
@@ -69,6 +67,7 @@ constexpr void mode_setup(Mode const& t_mode, Pupd const& t_pupd) noexcept {
  */
 template <Port Port, Pin... Pins>
 constexpr void toggle() noexcept {
+	using namespace detail;
 	constexpr auto HALF_WORD_OFFSET = 16U;
 
 	auto const m_odr	 = reg::ODR<Port>.template readBit<Pins...>(ValueOnly);
@@ -81,36 +80,91 @@ constexpr void toggle() noexcept {
 	reg::BSRR<Port>.template writeBit<Pins..., Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>(mod_val);
 }
 
+// helper struct
+template <Port InputPort, Pin... Pins>
+struct SortAfrPins {
+	static constexpr auto PIN_LIST		 = std::tuple{Pins...};
+	static constexpr auto HIGH_PIN_NUM = ((Pins > Pin::Pin7) + ...);
+	static constexpr auto LOW_PIN_NUM	 = sizeof...(Pins) - HIGH_PIN_NUM;
+
+	template <std::size_t... Idx>
+	static constexpr auto GEN_LOW_PIN(std::index_sequence<Idx...> const /**/) noexcept {
+		constexpr auto IterateThruPins = [](auto const t_pin) {
+			if constexpr (constexpr auto pin_name = std::get<t_pin()>(PIN_LIST); pin_name <= Pin::Pin7) {
+				return std::tuple{pin_name};
+			} else {
+				return std::tuple{};
+			}
+		};
+
+		return std::tuple_cat(IterateThruPins(size_c<Idx>{})...);
+	}
+
+	template <std::size_t... Idx>
+	static constexpr auto GEN_HIGH_PIN(std::index_sequence<Idx...> const /**/) noexcept {
+		constexpr auto IterateThruPins = [](auto const t_pin) {
+			if constexpr (constexpr auto pin_name = std::get<t_pin()>(PIN_LIST); pin_name > Pin::Pin7) {
+				return std::tuple{pin_name};
+			} else {
+				return std::tuple{};
+			}
+		};
+
+		return std::tuple_cat(IterateThruPins(size_c<Idx>{})...);
+	}
+
+	static constexpr auto HIGH_PIN_LIST = GEN_HIGH_PIN(std::make_index_sequence<sizeof...(Pins)>{});
+	static constexpr auto LOW_PIN_LIST	= GEN_LOW_PIN(std::make_index_sequence<sizeof...(Pins)>{});
+
+	template <std::size_t... Idx>
+	static constexpr void set_afhr([[maybe_unused]] AltFunc const t_af, std::index_sequence<Idx...> const /**/) noexcept {
+		if constexpr (HIGH_PIN_NUM > 0) {
+			reg::AFRH<InputPort>.template writeBit<std::get<Idx>(HIGH_PIN_LIST)...>(t_af);
+		}
+	}
+
+	template <std::size_t... Idx>
+	static constexpr void set_aflr([[maybe_unused]] AltFunc const t_af, std::index_sequence<Idx...> const /**/) noexcept {
+		if constexpr (LOW_PIN_NUM > 0) {
+			reg::AFRL<InputPort>.template writeBit<std::get<Idx>(LOW_PIN_LIST)...>(t_af);
+		}
+	}
+};
+
 /**
- * @brief    This function handles the setup of alternate function
- * @tparam    Port    ::Port
- * @tparam    Pins    ::Pin
- * @param     t_af    ::AltFunc
+ * @brief     This function handles the setup of alternate function
+ * @tparam    InputPort @ref gpio::Port
+ * @tparam    Pins    	@ref gpio::Pin
+ * @param     t_af    	@ref gpio::AltFunc
+ *
  */
-template <Port Port, Pin... Pins>
-constexpr void set_alternate_function(AltFunc const& t_af) noexcept {
-	constexpr auto Pin7 = Pin::Pin7;
+template <Port InputPort, Pin... Pins>
+constexpr void set_alternate_function(AltFunc const t_af) noexcept {
+	constexpr SortAfrPins<InputPort, Pins...> afr_pins;
 
-	if constexpr (((Pins <= Pin7) || ...)) {
-		constexpr auto low_pin_group = [](Pin t_pin) {
-			if (t_pin <= Pin7) {
-				return t_pin;
-			}
-		};
+	afr_pins.set_aflr(t_af, std::make_index_sequence<afr_pins.LOW_PIN_NUM>{});
+	afr_pins.set_afhr(t_af, std::make_index_sequence<afr_pins.HIGH_PIN_NUM>{});
+}
 
-		reg::AFRL<Port>.template writeBit<low_pin_group(Pins)...>(t_af);
-	}
+/**
+ * @brief			This function set the gpio to high
+ * @tparam 		InputPort  @ref gpio::Port
+ * @tparam 		Pins 			 @ref gpio::Pin
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void set() noexcept {
+	reg::BSRR<InputPort>.template setBit<Pins...>();
+}
 
-	if constexpr (((Pins > Pin7) || ...)) {
-		constexpr auto high_pin_group = [](Pin t_pin) {
-			if (t_pin > Pin7) {
-				std::uint8_t const a = static_cast<std::underlying_type_t<Pin>>(t_pin) - 8U;
-				return Pin{a};
-			}
-		};
-
-		reg::AFRH<Port>.template writeBit<high_pin_group(Pins)...>(t_af);
-	}
+/**
+ * @brief		This function clears the gpio pin to low
+ * @tparam 		InputPort  @ref gpio::Port
+ * @tparam 		Pins 			 @ref gpio::Pin
+ */
+template <Port InputPort, Pin... Pins>
+constexpr void clear() noexcept {
+	constexpr auto HALF_WORD_OFFSET = 16U;
+	reg::BSRR<InputPort>.template setBit<Pin{to_underlying(Pins) + HALF_WORD_OFFSET}...>();
 }
 
 }	 // namespace cpp_stm32::gpio

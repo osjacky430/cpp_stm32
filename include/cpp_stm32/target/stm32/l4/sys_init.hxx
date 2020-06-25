@@ -201,7 +201,7 @@ class Clock {
 
 	/**
 	 * @var 		SYS_CLK_SRC
-	 * @brief		This is chosen according to the following rules:
+	 * @brief		This is chosen according to the   following rules:
 	 * 					-	The sys clock source must be Pll if the desired clock frequency doesn't
 	 * 					  match any oscillator clock (i.e. HSI, HSE, and MSI)
 	 * 					- If SYS Freq does match any oscillator clock frequency, then the following order is checked

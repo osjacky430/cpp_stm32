@@ -6,6 +6,8 @@ build/
 example_bin/
 compile_commands.json
 
+.ycm_extra_conf.py
+
 # documentation folder
 documentation/
 

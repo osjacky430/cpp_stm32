@@ -26,7 +26,7 @@
 
 namespace cpp_stm32::usart {
 
-enum class Port { Usart1, Usart2, Usart3, Uart4, Uart5, Usart6 };
+enum class Port : std::uint8_t { Usart1, Usart2, Usart3, Uart4, Uart5, Usart6 };
 
 /**
  * @enum OverSampling

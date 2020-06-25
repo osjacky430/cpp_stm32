@@ -30,7 +30,7 @@
 
 namespace cpp_stm32::usart::reg {
 
-static constexpr auto BASE_ADDR(Port const& t_usart_num) {
+static constexpr auto BASE_ADDR(Port const t_usart_num) {
 	switch (t_usart_num) {
 		case Port::Usart1:
 			return memory_at(PeriphAddr::Apb2Base, 0x1000U);
