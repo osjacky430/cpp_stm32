@@ -72,47 +72,51 @@ static constexpr Register<DRBitList, DRField> DR{BASE_ADDR, 0x04U};
  */
 
 SETUP_REGISTER_INFO(CRBitList, /**/
-					Bit<3>{BitPos_t{0}},	// WCKSEL
-					Binary<>{BitPos_t{3}},	// TSEDGE
-					Binary<>{BitPos_t{4}},	// REFCKON
-					Binary<>{BitPos_t{6}},	// FMT
-					Binary<>{BitPos_t{7}},	// DCE
-					Binary<>{BitPos_t{8}},	// ALRAE
-					Binary<>{BitPos_t{9}},	// ALRBE
-					Binary<>{BitPos_t{10}},	// WUTE
-					Binary<>{BitPos_t{11}},	// TSE
-					Binary<>{BitPos_t{12}},	// ALRAIE
-					Binary<>{BitPos_t{13}},	// ALRBIE
-					Binary<>{BitPos_t{14}},	// WUTIE
-					Binary<>{BitPos_t{15}},	// TSIE
-					Binary<>{BitPos_t{16}},	// ADD1H
-					Binary<>{BitPos_t{17}},	// SUB1H
-					Binary<>{BitPos_t{18}},	// BKP
-					Binary<>{BitPos_t{20}},	// POL
+					Binary<>{BitPos_t{24}},	// ITSE
+					Binary<>{BitPos_t{23}},	// COE
 					Bit<2>{BitPos_t{21}},	// OSEL
-					Binary<>{BitPos_t{23}}	// COE
+					Binary<>{BitPos_t{20}},	// POL
+					Binary<>{BitPos_t{19}},	// COSEL
+					Binary<>{BitPos_t{18}},	// BKP
+					Binary<>{BitPos_t{17}},	// SUB1H
+					Binary<>{BitPos_t{16}},	// ADD1H
+					Binary<>{BitPos_t{15}},	// TSIE
+					Binary<>{BitPos_t{14}},	// WUTIE
+					Binary<>{BitPos_t{13}},	// ALRBIE
+					Binary<>{BitPos_t{12}},	// ALRAIE
+					Binary<>{BitPos_t{11}},	// TSE
+					Binary<>{BitPos_t{10}},	// WUTE
+					Binary<>{BitPos_t{9}},	// ALRBE
+					Binary<>{BitPos_t{8}},	// ALRAE
+					Binary<>{BitPos_t{6}},	// FMT
+					Binary<>{BitPos_t{5}},	// BYPSHAD
+					Binary<>{BitPos_t{4}},	// REFCKON
+					Binary<>{BitPos_t{3}},	// TSEDGE
+					Bit<3>{BitPos_t{0}}	// WCKSEL
 					)
 
 enum class CRField {
-	WCKSEL,		/*!< Wakeup clock selection*/
-	TSEDGE,		/*!< Time-stamp event active edge*/
-	REFCKON,		/*!< Reference clock detection enable (50 or 60 Hz)*/
-	FMT,		/*!< Hour format*/
-	DCE,		/*!< Coarse digital calibration enable*/
-	ALRAE,		/*!< Alarm A enable*/
-	ALRBE,		/*!< Alarm B enable*/
-	WUTE,		/*!< Wakeup timer enable*/
-	TSE,		/*!< Time stamp enable*/
-	ALRAIE,		/*!< Alarm A interrupt enable*/
-	ALRBIE,		/*!< Alarm B interrupt enable*/
-	WUTIE,		/*!< Wakeup timer interrupt enable*/
-	TSIE,		/*!< Time-stamp interrupt enable*/
-	ADD1H,		/*!< Add 1 hour (summer time change)*/
-	SUB1H,		/*!< Subtract 1 hour (winter time change)*/
-	BKP,		/*!< Backup*/
-	POL,		/*!< Output polarity*/
-	OSEL,		/*!< Output selection*/
+	ITSE,		/*!< timestamp on internal event enable*/
 	COE,		/*!< Calibration output enable*/
+	OSEL,		/*!< Output selection*/
+	POL,		/*!< Output polarity*/
+	COSEL,		/*!< Calibration output selection*/
+	BKP,		/*!< Backup*/
+	SUB1H,		/*!< Subtract 1 hour (winter time change)*/
+	ADD1H,		/*!< Add 1 hour (summer time change)*/
+	TSIE,		/*!< Time-stamp interrupt enable*/
+	WUTIE,		/*!< Wakeup timer interrupt enable*/
+	ALRBIE,		/*!< Alarm B interrupt enable*/
+	ALRAIE,		/*!< Alarm A interrupt enable*/
+	TSE,		/*!< Time stamp enable*/
+	WUTE,		/*!< Wakeup timer enable*/
+	ALRBE,		/*!< Alarm B enable*/
+	ALRAE,		/*!< Alarm A enable*/
+	FMT,		/*!< Hour format*/
+	BYPSHAD,		/*!< Bypass the shadow registers*/
+	REFCKON,		/*!< Reference clock detection enable (50 or 60 Hz)*/
+	TSEDGE,		/*!< Time-stamp event active edge*/
+	WCKSEL,		/*!< Wakeup clock selection*/
 };
 
 static constexpr Register<CRBitList, CRField> CR{BASE_ADDR, 0x08U};
@@ -126,6 +130,7 @@ static constexpr Register<CRBitList, CRField> CR{BASE_ADDR, 0x08U};
 
 SETUP_REGISTER_INFO(ISRBitList, /**/
 					StatusBit<1>{BitPos_t{16}},	// RECALPF
+					Binary<>{BitPos_t{15}},	// TAMP3F
 					Binary<>{BitPos_t{14}},	// TAMP2F
 					Binary<>{BitPos_t{13}},	// TAMP1F
 					Binary<>{BitPos_t{12}},	// TSOVF
@@ -145,7 +150,8 @@ SETUP_REGISTER_INFO(ISRBitList, /**/
 
 enum class ISRField {
 	RECALPF,		/*!< Recalibration pending Flag*/
-	TAMP2F,		/*!< TAMPER2 detection flag*/
+	TAMP3F,		/*!< RTC_TAMP3 detection flag*/
+	TAMP2F,		/*!< RTC_TAMP2 detection flag*/
 	TAMP1F,		/*!< Tamper detection flag*/
 	TSOVF,		/*!< Time-stamp overflow flag*/
 	TSF,		/*!< Time-stamp flag*/
@@ -199,25 +205,6 @@ enum class WUTRField {
 };
 
 static constexpr Register<WUTRBitList, WUTRField> WUTR{BASE_ADDR, 0x14U};
-/**@}*/
-
-/**
- * @defgroup	RTC_CALIBR_GROUP		calibration register group
- *
- * @{
- */
-
-SETUP_REGISTER_INFO(CALIBRBitList, /**/
-					Bit<5>{BitPos_t{0}},	// DC
-					Binary<>{BitPos_t{7}}	// DCS
-					)
-
-enum class CALIBRField {
-	DC,		/*!< Digital calibration*/
-	DCS,		/*!< Digital calibration sign*/
-};
-
-static constexpr Register<CALIBRBitList, CALIBRField> CALIBR{BASE_ADDR, 0x18U};
 /**@}*/
 
 /**
@@ -366,21 +353,23 @@ static constexpr Register<SHIFTRBitList, SHIFTRField> SHIFTR{BASE_ADDR, 0x2cU};
  */
 
 SETUP_REGISTER_INFO(TSTRBitList, /**/
-					Binary<>{BitPos_t{0}},	// TAMP1E
-					Binary<>{BitPos_t{1}},	// TAMP1TRG
-					Binary<>{BitPos_t{2}},	// TAMPIE
-					Binary<>{BitPos_t{16}},	// TAMP1INSEL
-					Binary<>{BitPos_t{17}},	// TSINSEL
-					Binary<>{BitPos_t{18}}	// ALARMOUTTYPE
+					Binary<>{BitPos_t{22}},	// PM
+					Bit<2>{BitPos_t{20}},	// HT
+					Bit<4>{BitPos_t{16}},	// HU
+					Bit<3>{BitPos_t{12}},	// MNT
+					Bit<4>{BitPos_t{8}},	// MNU
+					Bit<3>{BitPos_t{4}},	// ST
+					Bit<4>{BitPos_t{0}}	// SU
 					)
 
 enum class TSTRField {
-	TAMP1E,		/*!< Tamper 1 detection enable*/
-	TAMP1TRG,		/*!< Active level for tamper 1*/
-	TAMPIE,		/*!< Tamper interrupt enable*/
-	TAMP1INSEL,		/*!< TAMPER1 mapping*/
-	TSINSEL,		/*!< TIMESTAMP mapping*/
-	ALARMOUTTYPE,		/*!< AFO_ALARM output type*/
+	PM,		/*!< AM/PM notation*/
+	HT,		/*!< Hour tens in BCD format*/
+	HU,		/*!< Hour units in BCD format*/
+	MNT,		/*!< Minute tens in BCD format*/
+	MNU,		/*!< Minute units in BCD format*/
+	ST,		/*!< Second tens in BCD format*/
+	SU,		/*!< Second units in BCD format*/
 };
 
 static constexpr Register<TSTRBitList, TSTRField> TSTR{BASE_ADDR, 0x30U};
@@ -452,44 +441,60 @@ static constexpr Register<CALRBitList, CALRField> CALR{BASE_ADDR, 0x3cU};
 /**@}*/
 
 /**
- * @defgroup	RTC_TAFCR_GROUP		tamper and alternate function configuration register group
+ * @defgroup	RTC_TAMPCR_GROUP		tamper configuration register group
  *
  * @{
  */
 
-SETUP_REGISTER_INFO(TAFCRBitList, /**/
-					Binary<>{BitPos_t{0}},	// TAMP1E
-					Binary<>{BitPos_t{1}},	// TAMP1TRG
-					Binary<>{BitPos_t{2}},	// TAMPIE
-					Binary<>{BitPos_t{3}},	// TAMP2E
-					Binary<>{BitPos_t{4}},	// TAMP2TRG
-					Binary<>{BitPos_t{7}},	// TAMPTS
-					Bit<3>{BitPos_t{8}},	// TAMPFREQ
-					Bit<2>{BitPos_t{11}},	// TAMPFLT
-					Bit<2>{BitPos_t{13}},	// TAMPPRCH
+SETUP_REGISTER_INFO(TAMPCRBitList, /**/
+					Binary<>{BitPos_t{24}},	// TAMP3MF
+					Binary<>{BitPos_t{23}},	// TAMP3NOERASE
+					Binary<>{BitPos_t{22}},	// TAMP3IE
+					Binary<>{BitPos_t{21}},	// TAMP2MF
+					Binary<>{BitPos_t{20}},	// TAMP2NOERASE
+					Binary<>{BitPos_t{19}},	// TAMP2IE
+					Binary<>{BitPos_t{18}},	// TAMP1MF
+					Binary<>{BitPos_t{17}},	// TAMP1NOERASE
+					Binary<>{BitPos_t{16}},	// TAMP1IE
 					Binary<>{BitPos_t{15}},	// TAMPPUDIS
-					Binary<>{BitPos_t{16}},	// TAMP1INSEL
-					Binary<>{BitPos_t{17}},	// TSINSEL
-					Binary<>{BitPos_t{18}}	// ALARMOUTTYPE
+					Bit<2>{BitPos_t{13}},	// TAMPPRCH
+					Bit<2>{BitPos_t{11}},	// TAMPFLT
+					Bit<3>{BitPos_t{8}},	// TAMPFREQ
+					Binary<>{BitPos_t{7}},	// TAMPTS
+					Binary<>{BitPos_t{6}},	// TAMP3TRG
+					Binary<>{BitPos_t{5}},	// TAMP3E
+					Binary<>{BitPos_t{4}},	// TAMP2TRG
+					Binary<>{BitPos_t{3}},	// TAMP2E
+					Binary<>{BitPos_t{2}},	// TAMPIE
+					Binary<>{BitPos_t{1}},	// TAMP1TRG
+					Binary<>{BitPos_t{0}}	// TAMP1E
 					)
 
-enum class TAFCRField {
-	TAMP1E,		/*!< Tamper 1 detection enable*/
-	TAMP1TRG,		/*!< Active level for tamper 1*/
-	TAMPIE,		/*!< Tamper interrupt enable*/
-	TAMP2E,		/*!< Tamper 2 detection enable*/
-	TAMP2TRG,		/*!< Active level for tamper 2*/
-	TAMPTS,		/*!< Activate timestamp on tamper detection event*/
-	TAMPFREQ,		/*!< Tamper sampling frequency*/
-	TAMPFLT,		/*!< Tamper filter count*/
-	TAMPPRCH,		/*!< Tamper precharge duration*/
+enum class TAMPCRField {
+	TAMP3MF,		/*!< Tamper 3 mask flag*/
+	TAMP3NOERASE,		/*!< Tamper 3 no erase*/
+	TAMP3IE,		/*!< Tamper 3 interrupt enable*/
+	TAMP2MF,		/*!< Tamper 2 mask flag*/
+	TAMP2NOERASE,		/*!< Tamper 2 no erase*/
+	TAMP2IE,		/*!< Tamper 2 interrupt enable*/
+	TAMP1MF,		/*!< Tamper 1 mask flag*/
+	TAMP1NOERASE,		/*!< Tamper 1 no erase*/
+	TAMP1IE,		/*!< Tamper 1 interrupt enable*/
 	TAMPPUDIS,		/*!< TAMPER pull-up disable*/
-	TAMP1INSEL,		/*!< TAMPER1 mapping*/
-	TSINSEL,		/*!< TIMESTAMP mapping*/
-	ALARMOUTTYPE,		/*!< AFO_ALARM output type*/
+	TAMPPRCH,		/*!< Tamper precharge duration*/
+	TAMPFLT,		/*!< Tamper filter count*/
+	TAMPFREQ,		/*!< Tamper sampling frequency*/
+	TAMPTS,		/*!< Activate timestamp on tamper detection event*/
+	TAMP3TRG,		/*!< Active level for tamper 3*/
+	TAMP3E,		/*!< Tamper 3 detection enable*/
+	TAMP2TRG,		/*!< Active level for tamper 2*/
+	TAMP2E,		/*!< Tamper 2 detection enable*/
+	TAMPIE,		/*!< Tamper interrupt enable*/
+	TAMP1TRG,		/*!< Active level for tamper 1*/
+	TAMP1E,		/*!< Tamper 1 detection enable*/
 };
 
-static constexpr Register<TAFCRBitList, TAFCRField> TAFCR{BASE_ADDR, 0x40U};
+static constexpr Register<TAMPCRBitList, TAMPCRField> TAMPCR{BASE_ADDR, 0x40U};
 /**@}*/
 
 /**
@@ -528,6 +533,25 @@ enum class ALRMBSSRField {
 };
 
 static constexpr Register<ALRMBSSRBitList, ALRMBSSRField> ALRMBSSR{BASE_ADDR, 0x48U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_OR_GROUP		option register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(ORBitList, /**/
+					Binary<>{BitPos_t{1}},	// RTC_OUT_RMP
+					Binary<>{BitPos_t{0}}	// RTC_ALARM_TYPE
+					)
+
+enum class ORField {
+	RTC_OUT_RMP,		/*!< RTC_OUT remap*/
+	RTC_ALARM_TYPE,		/*!< RTC_ALARM on PC13 output type*/
+};
+
+static constexpr Register<ORBitList, ORField> OR{BASE_ADDR, 0x4cU};
 /**@}*/
 
 /**
@@ -868,6 +892,210 @@ enum class BKP19RField {
 };
 
 static constexpr Register<BKP19RBitList, BKP19RField> BKP19R{BASE_ADDR, 0x9cU};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP20R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP20RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP20RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP20RBitList, BKP20RField> BKP20R{BASE_ADDR, 0xa0U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP21R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP21RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP21RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP21RBitList, BKP21RField> BKP21R{BASE_ADDR, 0xa4U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP22R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP22RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP22RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP22RBitList, BKP22RField> BKP22R{BASE_ADDR, 0xa8U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP23R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP23RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP23RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP23RBitList, BKP23RField> BKP23R{BASE_ADDR, 0xacU};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP24R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP24RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP24RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP24RBitList, BKP24RField> BKP24R{BASE_ADDR, 0xb0U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP25R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP25RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP25RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP25RBitList, BKP25RField> BKP25R{BASE_ADDR, 0xb4U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP26R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP26RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP26RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP26RBitList, BKP26RField> BKP26R{BASE_ADDR, 0xb8U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP27R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP27RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP27RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP27RBitList, BKP27RField> BKP27R{BASE_ADDR, 0xbcU};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP28R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP28RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP28RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP28RBitList, BKP28RField> BKP28R{BASE_ADDR, 0xc0U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP29R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP29RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP29RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP29RBitList, BKP29RField> BKP29R{BASE_ADDR, 0xc4U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP30R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP30RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP30RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP30RBitList, BKP30RField> BKP30R{BASE_ADDR, 0xc8U};
+/**@}*/
+
+/**
+ * @defgroup	RTC_BKP31R_GROUP		backup register group
+ *
+ * @{
+ */
+
+SETUP_REGISTER_INFO(BKP31RBitList, /**/
+					Bit<32, std::uint32_t>{BitPos_t{0}}	// BKP
+					)
+
+enum class BKP31RField {
+	BKP,		/*!< BKP*/
+};
+
+static constexpr Register<BKP31RBitList, BKP31RField> BKP31R{BASE_ADDR, 0xccU};
 /**@}*/
 
 

@@ -25,10 +25,10 @@
 
 #include "cpp_stm32/driver/usart_serial.hxx"
 
-#include "cpp_stm32/target/stm32/f4/gpio.hxx"
-#include "cpp_stm32/target/stm32/f4/i2c.hxx"
-#include "cpp_stm32/target/stm32/f4/rcc.hxx"
-#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
+#include "gpio.hxx"
+#include "i2c.hxx"
+#include "rcc.hxx"
+#include "sys_init.hxx"
 
 namespace Rcc		= cpp_stm32::rcc;
 namespace Gpio	= cpp_stm32::gpio;

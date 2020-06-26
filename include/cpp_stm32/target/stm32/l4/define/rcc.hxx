@@ -2,7 +2,9 @@
 
 #include <array>
 #include <cstdint>
+#include <utility>
 
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 #include "cpp_stm32/utility/macro.hxx"
 

@@ -20,8 +20,8 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cpp_stm32/target/stm32/f4/gpio.hxx"
-#include "cpp_stm32/target/stm32/f4/rcc.hxx"
+#include "gpio.hxx"
+#include "rcc.hxx"
 
 constexpr void setup_led_gpio() noexcept {
 	using namespace cpp_stm32::gpio;

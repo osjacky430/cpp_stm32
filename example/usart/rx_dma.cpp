@@ -25,7 +25,7 @@
 #include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 
-#include "cpp_stm32/target/stm32/f4/dma.hxx"
+#include "dma.hxx"
 
 namespace Driver = cpp_stm32::driver;
 namespace Gpio	 = cpp_stm32::gpio;

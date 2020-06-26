@@ -124,6 +124,9 @@ static constexpr auto AHB_VOS_RANGE1_MAX_FREQ = 80_MHz;
 static constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
 
 static_assert(AHB_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(SYS_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(APB1_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(APB2_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
 
 class Clock {
  private:

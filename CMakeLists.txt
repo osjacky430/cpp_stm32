@@ -25,7 +25,7 @@ include(sanitizer)
 include(doxygen)
 
 import_board_setting(${TARGET_BOARD})
-check_configuration_file()
+check_config_file(BOARD ${TARGET_BOARD} FILE_DIR "${CMAKE_SOURCE_DIR}/src")
 
 # In practice, it is usally easier and more robust to use the variables to set language requirements
 # project-wide rather than use per target properties.
@@ -79,10 +79,8 @@ enable_doxygen()
 # ############################################################################################################
 # build example
 # ############################################################################################################
-set(BUILD_EXAMPLE
-    ""
-    CACHE STRING "Build example")
+option(BUILD_EXAMPLE "Build example" OFF)
 
-if(NOT ${BUILD_EXAMPLE} STREQUAL "")
+if(BUILD_EXAMPLE)
   add_subdirectory(${CMAKE_SOURCE_DIR}/example/)
 endif()

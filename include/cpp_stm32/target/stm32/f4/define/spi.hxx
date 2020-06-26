@@ -51,7 +51,7 @@ enum class Status : std::uint8_t {
 enum class InterruptFlag : std::uint8_t { ERRIE, RXNEIE, TXEIE };
 
 /**
- *  @class  SpiBaurdrate_t
+ *  @class  Baurdrate_t
  *  @brief  Utility class used to check whether baudrate prescaler is reasonable
  */
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(Baudrate_t, /**/

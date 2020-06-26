@@ -5,17 +5,10 @@
 
 namespace cpp_stm32::sai::reg {
 
-static constexpr auto BASE_ADDR(Port const& t_sai) {
-	switch(t_sai) {
-	case Port::SAI1:
-		return 0x40015800U;
-	case Port::SAI2:
-		return 0x40015c00U;
-}
-	}
+static constexpr auto BASE_ADDR = 0x40015400U;
 
 /**
- * @defgroup	SAI2_BCR1_GROUP		BConfiguration register 1 group
+ * @defgroup	SAI1_BCR1_GROUP		BConfiguration register 1 group
  *
  * @{
  */
@@ -50,12 +43,11 @@ enum class BCR1Field {
 	MCJDIV,		/*!< Master clock divider*/
 };
 
-template <Port SAI>
-static constexpr Register<BCR1BitList, BCR1Field> BCR1{BASE_ADDR(SAI), 0x24U};
+static constexpr Register<BCR1BitList, BCR1Field> BCR1{BASE_ADDR, 0x24U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BCR2_GROUP		BConfiguration register 2 group
+ * @defgroup	SAI1_BCR2_GROUP		BConfiguration register 2 group
  *
  * @{
  */
@@ -82,12 +74,11 @@ enum class BCR2Field {
 	COMP,		/*!< Companding mode*/
 };
 
-template <Port SAI>
-static constexpr Register<BCR2BitList, BCR2Field> BCR2{BASE_ADDR(SAI), 0x28U};
+static constexpr Register<BCR2BitList, BCR2Field> BCR2{BASE_ADDR, 0x28U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BFRCR_GROUP		BFRCR group
+ * @defgroup	SAI1_BFRCR_GROUP		BFRCR group
  *
  * @{
  */
@@ -108,12 +99,11 @@ enum class BFRCRField {
 	FSOFF,		/*!< Frame synchronization offset*/
 };
 
-template <Port SAI>
-static constexpr Register<BFRCRBitList, BFRCRField> BFRCR{BASE_ADDR(SAI), 0x2cU};
+static constexpr Register<BFRCRBitList, BFRCRField> BFRCR{BASE_ADDR, 0x2cU};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BSLOTR_GROUP		BSlot register group
+ * @defgroup	SAI1_BSLOTR_GROUP		BSlot register group
  *
  * @{
  */
@@ -132,12 +122,11 @@ enum class BSLOTRField {
 	SLOTEN,		/*!< Slot enable*/
 };
 
-template <Port SAI>
-static constexpr Register<BSLOTRBitList, BSLOTRField> BSLOTR{BASE_ADDR(SAI), 0x30U};
+static constexpr Register<BSLOTRBitList, BSLOTRField> BSLOTR{BASE_ADDR, 0x30U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BIM_GROUP		BInterrupt mask register2 group
+ * @defgroup	SAI1_BIM_GROUP		BInterrupt mask register2 group
  *
  * @{
  */
@@ -162,12 +151,11 @@ enum class BIMField {
 	LFSDETIE,		/*!< Late frame synchronization detection interrupt enable*/
 };
 
-template <Port SAI>
-static constexpr Register<BIMBitList, BIMField> BIM{BASE_ADDR(SAI), 0x34U};
+static constexpr Register<BIMBitList, BIMField> BIM{BASE_ADDR, 0x34U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BSR_GROUP		BStatus register group
+ * @defgroup	SAI1_BSR_GROUP		BStatus register group
  *
  * @{
  */
@@ -194,12 +182,11 @@ enum class BSRField {
 	FLVL,		/*!< FIFO level threshold*/
 };
 
-template <Port SAI>
-static constexpr Register<BSRBitList, BSRField> BSR{BASE_ADDR(SAI), 0x38U};
+static constexpr Register<BSRBitList, BSRField> BSR{BASE_ADDR, 0x38U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BCLRFR_GROUP		BClear flag register group
+ * @defgroup	SAI1_BCLRFR_GROUP		BClear flag register group
  *
  * @{
  */
@@ -222,12 +209,11 @@ enum class BCLRFRField {
 	LFSDET,		/*!< Clear late frame synchronization detection flag*/
 };
 
-template <Port SAI>
-static constexpr Register<BCLRFRBitList, BCLRFRField> BCLRFR{BASE_ADDR(SAI), 0x3cU};
+static constexpr Register<BCLRFRBitList, BCLRFRField> BCLRFR{BASE_ADDR, 0x3cU};
 /**@}*/
 
 /**
- * @defgroup	SAI2_BDR_GROUP		BData register group
+ * @defgroup	SAI1_BDR_GROUP		BData register group
  *
  * @{
  */
@@ -240,12 +226,11 @@ enum class BDRField {
 	DATA,		/*!< Data*/
 };
 
-template <Port SAI>
-static constexpr Register<BDRBitList, BDRField> BDR{BASE_ADDR(SAI), 0x40U};
+static constexpr Register<BDRBitList, BDRField> BDR{BASE_ADDR, 0x40U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ACR1_GROUP		AConfiguration register 1 group
+ * @defgroup	SAI1_ACR1_GROUP		AConfiguration register 1 group
  *
  * @{
  */
@@ -280,12 +265,11 @@ enum class ACR1Field {
 	MCJDIV,		/*!< Master clock divider*/
 };
 
-template <Port SAI>
-static constexpr Register<ACR1BitList, ACR1Field> ACR1{BASE_ADDR(SAI), 0x04U};
+static constexpr Register<ACR1BitList, ACR1Field> ACR1{BASE_ADDR, 0x04U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ACR2_GROUP		AConfiguration register 2 group
+ * @defgroup	SAI1_ACR2_GROUP		AConfiguration register 2 group
  *
  * @{
  */
@@ -312,12 +296,11 @@ enum class ACR2Field {
 	COMP,		/*!< Companding mode*/
 };
 
-template <Port SAI>
-static constexpr Register<ACR2BitList, ACR2Field> ACR2{BASE_ADDR(SAI), 0x08U};
+static constexpr Register<ACR2BitList, ACR2Field> ACR2{BASE_ADDR, 0x08U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_AFRCR_GROUP		AFRCR group
+ * @defgroup	SAI1_AFRCR_GROUP		AFRCR group
  *
  * @{
  */
@@ -338,12 +321,11 @@ enum class AFRCRField {
 	FSOFF,		/*!< Frame synchronization offset*/
 };
 
-template <Port SAI>
-static constexpr Register<AFRCRBitList, AFRCRField> AFRCR{BASE_ADDR(SAI), 0x0cU};
+static constexpr Register<AFRCRBitList, AFRCRField> AFRCR{BASE_ADDR, 0x0cU};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ASLOTR_GROUP		ASlot register group
+ * @defgroup	SAI1_ASLOTR_GROUP		ASlot register group
  *
  * @{
  */
@@ -362,12 +344,11 @@ enum class ASLOTRField {
 	SLOTEN,		/*!< Slot enable*/
 };
 
-template <Port SAI>
-static constexpr Register<ASLOTRBitList, ASLOTRField> ASLOTR{BASE_ADDR(SAI), 0x10U};
+static constexpr Register<ASLOTRBitList, ASLOTRField> ASLOTR{BASE_ADDR, 0x10U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_AIM_GROUP		AInterrupt mask register2 group
+ * @defgroup	SAI1_AIM_GROUP		AInterrupt mask register2 group
  *
  * @{
  */
@@ -392,12 +373,11 @@ enum class AIMField {
 	LFSDET,		/*!< Late frame synchronization detection interrupt enable*/
 };
 
-template <Port SAI>
-static constexpr Register<AIMBitList, AIMField> AIM{BASE_ADDR(SAI), 0x14U};
+static constexpr Register<AIMBitList, AIMField> AIM{BASE_ADDR, 0x14U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ASR_GROUP		AStatus register group
+ * @defgroup	SAI1_ASR_GROUP		AStatus register group
  *
  * @{
  */
@@ -416,7 +396,7 @@ SETUP_REGISTER_INFO(ASRBitList, /**/
 enum class ASRField {
 	OVRUDR,		/*!< Overrun / underrun*/
 	MUTEDET,		/*!< Mute detection*/
-	WCKCFG,		/*!< Wrong clock configuration flag. This bit is read only.*/
+	WCKCFG,		/*!< Wrong clock configuration flag. This bit is read only*/
 	FREQ,		/*!< FIFO request*/
 	CNRDY,		/*!< Codec not ready*/
 	AFSDET,		/*!< Anticipated frame synchronization detection*/
@@ -424,12 +404,11 @@ enum class ASRField {
 	FLVL,		/*!< FIFO level threshold*/
 };
 
-template <Port SAI>
-static constexpr Register<ASRBitList, ASRField> ASR{BASE_ADDR(SAI), 0x18U};
+static constexpr Register<ASRBitList, ASRField> ASR{BASE_ADDR, 0x18U};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ACLRFR_GROUP		AClear flag register group
+ * @defgroup	SAI1_ACLRFR_GROUP		AClear flag register group
  *
  * @{
  */
@@ -448,16 +427,15 @@ enum class ACLRFRField {
 	MUTEDET,		/*!< Mute detection flag*/
 	WCKCFG,		/*!< Clear wrong clock configuration flag*/
 	CNRDY,		/*!< Clear codec not ready flag*/
-	CAFSDET,		/*!< Clear anticipated frame synchronization detection flag.*/
+	CAFSDET,		/*!< Clear anticipated frame synchronization detection flag*/
 	LFSDET,		/*!< Clear late frame synchronization detection flag*/
 };
 
-template <Port SAI>
-static constexpr Register<ACLRFRBitList, ACLRFRField> ACLRFR{BASE_ADDR(SAI), 0x1cU};
+static constexpr Register<ACLRFRBitList, ACLRFRField> ACLRFR{BASE_ADDR, 0x1cU};
 /**@}*/
 
 /**
- * @defgroup	SAI2_ADR_GROUP		AData register group
+ * @defgroup	SAI1_ADR_GROUP		AData register group
  *
  * @{
  */
@@ -470,28 +448,7 @@ enum class ADRField {
 	DATA,		/*!< Data*/
 };
 
-template <Port SAI>
-static constexpr Register<ADRBitList, ADRField> ADR{BASE_ADDR(SAI), 0x20U};
-/**@}*/
-
-/**
- * @defgroup	SAI2_GCR_GROUP		Global configuration register group
- *
- * @{
- */
-
-SETUP_REGISTER_INFO(GCRBitList, /**/
-					Bit<2>{BitPos_t{4}},	// SYNCOUT
-					Bit<2>{BitPos_t{0}}	// SYNCIN
-					)
-
-enum class GCRField {
-	SYNCOUT,		/*!< Synchronization outputs*/
-	SYNCIN,		/*!< Synchronization inputs*/
-};
-
-template <Port SAI>
-static constexpr Register<GCRBitList, GCRField> GCR{BASE_ADDR(SAI), 0x00U};
+static constexpr Register<ADRBitList, ADRField> ADR{BASE_ADDR, 0x20U};
 /**@}*/
 
 

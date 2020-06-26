@@ -5,10 +5,10 @@
 
 namespace cpp_stm32::sdio::reg {
 
-static constexpr auto BASE_ADDR = 0x40012c00U;
+static constexpr auto BASE_ADDR = 0x40012800U;
 
 /**
- * @defgroup	SDIO_POWER_GROUP		power control register group
+ * @defgroup	SDMMC_POWER_GROUP		power control register group
  *
  * @{
  */
@@ -25,7 +25,7 @@ static constexpr Register<POWERBitList, POWERField> POWER{BASE_ADDR, 0x00U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_CLKCR_GROUP		SDI clock control register group
+ * @defgroup	SDMMC_CLKCR_GROUP		SDI clock control register group
  *
  * @{
  */
@@ -54,7 +54,7 @@ static constexpr Register<CLKCRBitList, CLKCRField> CLKCR{BASE_ADDR, 0x04U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_ARG_GROUP		argument register group
+ * @defgroup	SDMMC_ARG_GROUP		argument register group
  *
  * @{
  */
@@ -71,7 +71,7 @@ static constexpr Register<ARGBitList, ARGField> ARG{BASE_ADDR, 0x08U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_CMD_GROUP		command register group
+ * @defgroup	SDMMC_CMD_GROUP		command register group
  *
  * @{
  */
@@ -92,7 +92,7 @@ enum class CMDField {
 	CMDINDEX,		/*!< Command index*/
 	WAITRESP,		/*!< Wait for response bits*/
 	WAITINT,		/*!< CPSM waits for interrupt request*/
-	WAITPEND,		/*!< CPSM Waits for ends of data transfer (CmdPend internal signal).*/
+	WAITPEND,		/*!< CPSM Waits for ends of data transfer (CmdPend internal signal)*/
 	CPSMEN,		/*!< Command path state machine (CPSM) Enable bit*/
 	SDIOSuspend,		/*!< SD I/O suspend command*/
 	ENCMDcompl,		/*!< Enable CMD completion*/
@@ -104,7 +104,7 @@ static constexpr Register<CMDBitList, CMDField> CMD{BASE_ADDR, 0x0cU};
 /**@}*/
 
 /**
- * @defgroup	SDIO_RESPCMD_GROUP		command response register group
+ * @defgroup	SDMMC_RESPCMD_GROUP		command response register group
  *
  * @{
  */
@@ -121,7 +121,7 @@ static constexpr Register<RESPCMDBitList, RESPCMDField> RESPCMD{BASE_ADDR, 0x10U
 /**@}*/
 
 /**
- * @defgroup	SDIO_RESP1_GROUP		response 1..4 register group
+ * @defgroup	SDMMC_RESP1_GROUP		response 1..4 register group
  *
  * @{
  */
@@ -131,14 +131,14 @@ SETUP_REGISTER_INFO(RESP1BitList, /**/
 					)
 
 enum class RESP1Field {
-	CARDSTATUS1,		/*!< see Table 132.*/
+	CARDSTATUS1,		/*!< see Table 132*/
 };
 
 static constexpr Register<RESP1BitList, RESP1Field> RESP1{BASE_ADDR, 0x14U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_RESP2_GROUP		response 1..4 register group
+ * @defgroup	SDMMC_RESP2_GROUP		response 1..4 register group
  *
  * @{
  */
@@ -148,14 +148,14 @@ SETUP_REGISTER_INFO(RESP2BitList, /**/
 					)
 
 enum class RESP2Field {
-	CARDSTATUS2,		/*!< see Table 132.*/
+	CARDSTATUS2,		/*!< see Table 132*/
 };
 
 static constexpr Register<RESP2BitList, RESP2Field> RESP2{BASE_ADDR, 0x18U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_RESP3_GROUP		response 1..4 register group
+ * @defgroup	SDMMC_RESP3_GROUP		response 1..4 register group
  *
  * @{
  */
@@ -165,14 +165,14 @@ SETUP_REGISTER_INFO(RESP3BitList, /**/
 					)
 
 enum class RESP3Field {
-	CARDSTATUS3,		/*!< see Table 132.*/
+	CARDSTATUS3,		/*!< see Table 132*/
 };
 
 static constexpr Register<RESP3BitList, RESP3Field> RESP3{BASE_ADDR, 0x1cU};
 /**@}*/
 
 /**
- * @defgroup	SDIO_RESP4_GROUP		response 1..4 register group
+ * @defgroup	SDMMC_RESP4_GROUP		response 1..4 register group
  *
  * @{
  */
@@ -182,14 +182,14 @@ SETUP_REGISTER_INFO(RESP4BitList, /**/
 					)
 
 enum class RESP4Field {
-	CARDSTATUS4,		/*!< see Table 132.*/
+	CARDSTATUS4,		/*!< see Table 132*/
 };
 
 static constexpr Register<RESP4BitList, RESP4Field> RESP4{BASE_ADDR, 0x20U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_DTIMER_GROUP		data timer register group
+ * @defgroup	SDMMC_DTIMER_GROUP		data timer register group
  *
  * @{
  */
@@ -206,7 +206,7 @@ static constexpr Register<DTIMERBitList, DTIMERField> DTIMER{BASE_ADDR, 0x24U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_DLEN_GROUP		data length register group
+ * @defgroup	SDMMC_DLEN_GROUP		data length register group
  *
  * @{
  */
@@ -223,7 +223,7 @@ static constexpr Register<DLENBitList, DLENField> DLEN{BASE_ADDR, 0x28U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_DCTRL_GROUP		data control register group
+ * @defgroup	SDMMC_DCTRL_GROUP		data control register group
  *
  * @{
  */
@@ -243,7 +243,7 @@ SETUP_REGISTER_INFO(DCTRLBitList, /**/
 enum class DCTRLField {
 	DTEN,		/*!< DTEN*/
 	DTDIR,		/*!< Data transfer direction selection*/
-	DTMODE,		/*!< Data transfer mode selection 1: Stream or SDIO multibyte data transfer.*/
+	DTMODE,		/*!< Data transfer mode selection 1: Stream or SDIO multibyte data transfer*/
 	DMAEN,		/*!< DMA enable bit*/
 	DBLOCKSIZE,		/*!< Data block size*/
 	RWSTART,		/*!< Read wait start*/
@@ -256,7 +256,7 @@ static constexpr Register<DCTRLBitList, DCTRLField> DCTRL{BASE_ADDR, 0x2cU};
 /**@}*/
 
 /**
- * @defgroup	SDIO_DCOUNT_GROUP		data counter register group
+ * @defgroup	SDMMC_DCOUNT_GROUP		data counter register group
  *
  * @{
  */
@@ -273,7 +273,7 @@ static constexpr Register<DCOUNTBitList, DCOUNTField> DCOUNT{BASE_ADDR, 0x30U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_STA_GROUP		status register group
+ * @defgroup	SDMMC_STA_GROUP		status register group
  *
  * @{
  */
@@ -336,7 +336,7 @@ static constexpr Register<STABitList, STAField> STA{BASE_ADDR, 0x34U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_ICR_GROUP		interrupt clear register group
+ * @defgroup	SDMMC_ICR_GROUP		interrupt clear register group
  *
  * @{
  */
@@ -377,7 +377,7 @@ static constexpr Register<ICRBitList, ICRField> ICR{BASE_ADDR, 0x38U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_MASK_GROUP		mask register group
+ * @defgroup	SDMMC_MASK_GROUP		mask register group
  *
  * @{
  */
@@ -440,7 +440,7 @@ static constexpr Register<MASKBitList, MASKField> MASK{BASE_ADDR, 0x3cU};
 /**@}*/
 
 /**
- * @defgroup	SDIO_FIFOCNT_GROUP		FIFO counter register group
+ * @defgroup	SDMMC_FIFOCNT_GROUP		FIFO counter register group
  *
  * @{
  */
@@ -450,14 +450,14 @@ SETUP_REGISTER_INFO(FIFOCNTBitList, /**/
 					)
 
 enum class FIFOCNTField {
-	FIFOCOUNT,		/*!< Remaining number of words to be written to or read from the FIFO.*/
+	FIFOCOUNT,		/*!< Remaining number of words to be written to or read from the FIFO*/
 };
 
 static constexpr Register<FIFOCNTBitList, FIFOCNTField> FIFOCNT{BASE_ADDR, 0x48U};
 /**@}*/
 
 /**
- * @defgroup	SDIO_FIFO_GROUP		data FIFO register group
+ * @defgroup	SDMMC_FIFO_GROUP		data FIFO register group
  *
  * @{
  */

@@ -310,7 +310,7 @@ constexpr auto get_interrupt_flag() noexcept {
 /**
  * @brief 	This function clears USART interrupt flag status
  * @tparam	InputPort  	@ref usart::Port
- * @tparam 	Flags 			@ref usart::InterruptFlag
+ * @tparam 	Flags       @ref usart::InterruptFlag
  */
 template <Port InputPort, InterruptFlag Flag>
 constexpr auto clear_interrupt_flag() noexcept {

@@ -25,7 +25,7 @@
 #include "cpp_stm32/driver/digitalout.hxx"
 #include "cpp_stm32/driver/spi.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
-#include "cpp_stm32/target/stm32/f4/sys_init.hxx"
+#include "sys_init.hxx"
 
 #include "lsm9ds0.hpp"
 

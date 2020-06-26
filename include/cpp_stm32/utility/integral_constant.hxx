@@ -25,6 +25,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 #include <tuple>
 #include <utility>
 

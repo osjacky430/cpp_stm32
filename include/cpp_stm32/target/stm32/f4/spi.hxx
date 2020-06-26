@@ -34,10 +34,17 @@
 
 namespace cpp_stm32::spi {
 
+/**
+ * @brief   This function check is SPI enabled
+ * @tparam  SPI @reef spi::Port
+ *
+ * @return  true if enabled, false otherwise
+ */
 template <Port SPI>
 constexpr auto is_enabled() noexcept {
 	return reg::CR1<SPI>.template readBit<reg::CR1Field::SPE>(ValueOnly);
 }
+
 /**
  * @brief   This function disables SPI
  * @tparam  SPI @ref spi::Port
@@ -101,15 +108,6 @@ constexpr void disable_crc() noexcept {
 template <Port SPI>
 constexpr void set_crc_transfer_next() noexcept {
 	reg::CR1<SPI>.template setBit<reg::CR1Field::CRCNEXT>();
-}
-
-/**
- * @brief   This function sets sdata as next transfer target
- * @tparam  SPI @ref spi::Port
- */
-template <Port SPI>
-constexpr void set_data_transfer_next() noexcept {
-	reg::CR1<SPI>.template clearBit<reg::CR1Field::CRCNEXT>();
 }
 
 /**

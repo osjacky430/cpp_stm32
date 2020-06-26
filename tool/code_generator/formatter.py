@@ -1,5 +1,6 @@
 from collections import defaultdict
 import os
+import subprocess
 
 CPP_STM32_BIT_HXX = 'cpp_stm32/hal/bit.hxx'
 CPP_STM32_REG_HXX = 'cpp_stm32/hal/register.hxx'
@@ -212,9 +213,11 @@ class RegFileMaker:
 
         self.__end_namespace(peripheral)
 
-    def create_file(self):
+    def create_file(self, format=False):
         for peripheral in self.device.peripherals:
             filename = peripheral.group_name.lower() + '.hxx'
 
-            with open(filename, 'w+') as self.file:
+            with open(filename, 'w+') as self.file:   
                 self.__gen_reg_file(peripheral)
+                if format:
+                    subprocess.run(['clang-format', '-i', '--style=file', filename])

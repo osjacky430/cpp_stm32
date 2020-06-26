@@ -22,12 +22,12 @@
 
 #include <tuple>
 
-#include "cpp_stm32/target/stm32/f4/exti.hxx"
-#include "cpp_stm32/target/stm32/f4/gpio.hxx"
-#include "cpp_stm32/target/stm32/f4/interrupt.hxx"
-#include "cpp_stm32/target/stm32/f4/nvic.hxx"
-#include "cpp_stm32/target/stm32/f4/rcc.hxx"
-#include "cpp_stm32/target/stm32/f4/syscfg.hxx"
+#include "exti.hxx"
+#include "gpio.hxx"
+#include "interrupt.hxx"
+#include "nvic.hxx"
+#include "rcc.hxx"
+#include "syscfg.hxx"
 
 namespace Rcc		 = cpp_stm32::rcc;
 namespace Gpio	 = cpp_stm32::gpio;

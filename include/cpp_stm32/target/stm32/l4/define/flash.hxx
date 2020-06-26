@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
+
 #include "cpp_stm32/common/flash.hxx"
 #include "cpp_stm32/utility/macro.hxx"
 

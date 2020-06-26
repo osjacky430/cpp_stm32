@@ -1,9 +1,6 @@
-include(../build_binary.cmake)
+is_periph_supported(${TARGET_BOARD} exti is_supported)
 
-if (${BUILD_EXAMPLE} STREQUAL "ALL")
-  add_binary(blue_button)
-else()
-  foreach(src ${exti_files})
-    add_binary(${src})
-  endforeach()
+if(is_supported)
+  check_config_file(BOARD ${TARGET_BOARD} FILE_DIR ${CMAKE_CURRENT_SOURCE_DIR} OVERWRITE)
+  add_binary(IS_EXAMPLE TARGET_NAME blue_button)
 endif()

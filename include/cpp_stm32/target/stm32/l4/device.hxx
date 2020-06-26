@@ -24,7 +24,7 @@
 #include "cpp_stm32/target/stm32/l4/pin_map/pin_map.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 // #include "cpp_stm32/target/stm32/l4/rtc.hxx"
-// #include "cpp_stm32/target/stm32/l4/spi.hxx"
+#include "cpp_stm32/target/stm32/l4/spi.hxx"
 #include "cpp_stm32/target/stm32/l4/usart.hxx"
 
 #include "cpp_stm32/processor/cortex_m4/core_util.hxx"
