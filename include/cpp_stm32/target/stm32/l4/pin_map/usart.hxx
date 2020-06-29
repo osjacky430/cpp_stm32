@@ -16,13 +16,11 @@ class PinMap {
 	using UsartPinData = detail::Tuple<PinName, Port, gpio::AltFunc, rcc::PeriphClk, IrqNum>;
 
 	static constexpr std::array TX_PIN_TABLE{
-
 		UsartPinData{PinName::PA_2, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
 
 	};
 
 	static constexpr std::array RX_PIN_TABLE{
-
 		UsartPinData{PinName::PA_3, Port::Usart2, gpio::AltFunc::AF7, rcc::PeriphClk::Usart2, IrqNum::Usart2Global},
 
 	};

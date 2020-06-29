@@ -145,7 +145,7 @@ class Clock {
 		constexpr auto pll_input_clk_freq = []() {
 			switch (PllSrc) {
 				case ClkSrc::Msi:
-					return MSI_CLK_FREQ;
+					return std::uint64_t{MSI_CLK_FREQ};
 				case ClkSrc::Hse:
 					return std::uint64_t(HSE_CLK_FREQ);
 				case ClkSrc::Hsi160:

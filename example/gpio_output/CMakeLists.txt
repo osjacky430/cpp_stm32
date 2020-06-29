@@ -1,4 +1,4 @@
-is_periph_supported(${TARGET_BOARD} "gpio" is_supported)
+is_periph_supported(is_supported BOARD ${TARGET_BOARD} PERIPH gpio)
 
 if(is_supported)
   check_config_file(BOARD ${TARGET_BOARD} FILE_DIR ${CMAKE_CURRENT_SOURCE_DIR} OVERWRITE)

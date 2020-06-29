@@ -27,7 +27,7 @@ class FieldMaker:
             template_param += self.bit_width_str
 
             if self.data_type != 'std::uint8_t':
-                template_param += self.data_type
+                template_param += ', ' + self.data_type
         else:
             template_param += self.bit_width_str
 

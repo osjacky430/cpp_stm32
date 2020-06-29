@@ -9,41 +9,42 @@ namespace cpp_stm32::rcc {
 class ClkRegMap {
  private:
 	static constexpr std::tuple PERIPH_CLK_RST_TABLE{
-		std::pair{reg::AHB2RST, reg::Ahb2RstBit::GpioARst},
-		std::pair{reg::AHB2RST, reg::Ahb2RstBit::GpioBRst},
+		std::pair{reg::AHB2RSTR, reg::AHB2RSTRField::GPIOARST},
+		std::pair{reg::AHB2RSTR, reg::AHB2RSTRField::GPIOBRST},
 		/*APB1*/
-		std::pair{reg::APB1RST_1, reg::Apb1Rst1Bit::Usart2Rst},
-		std::pair{reg::APB1RST_1, reg::Apb1Rst1Bit::PwrRst},
+		std::pair{reg::APB1RSTR1, reg::APB1RSTR1Field::USART2RST},
+		std::pair{reg::APB1RSTR1, reg::APB1RSTR1Field::PWRRST},
 		/*APB2*/
-		std::pair{reg::APB2RST, reg::Apb2RstBit::Usart1Rst},
-
+		std::pair{reg::APB2RSTR, reg::APB2RSTRField::SPI1RST},
+		std::pair{reg::APB2RSTR, reg::APB2RSTRField::USART1RST},
 	};
 
 	static constexpr std::tuple PERIPH_CLK_EN_TABLE{
-		std::pair{reg::AHB2ENR, reg::Ahb2EnrBit::GpioAEn},
-		std::pair{reg::AHB2ENR, reg::Ahb2EnrBit::GpioBEn},
+		std::pair{reg::AHB2ENR, reg::AHB2ENRField::GPIOAEN},
+		std::pair{reg::AHB2ENR, reg::AHB2ENRField::GPIOBEN},
 		/*APB1*/
-		std::pair{reg::APB1ENR_1, reg::Apb1Enr1Bit::Usart2En},
-		std::pair{reg::APB1ENR_1, reg::Apb1Enr1Bit::PwrEn},
+		std::pair{reg::APB1ENR1, reg::APB1ENR1Field::USART2EN},
+		std::pair{reg::APB1ENR1, reg::APB1ENR1Field::PWREN},
 		/*APB2*/
-		std::pair{reg::APB2ENR, reg::Apb2EnrBit::Usart1En},
+		std::pair{reg::APB2ENR, reg::APB2ENRField::SPI1EN},
+		std::pair{reg::APB2ENR, reg::APB2ENRField::USART1EN},
 	};
 
 	static constexpr std::tuple OSC_ON_TABLE{
-		std::pair{reg::CRRCR, reg::CrrCrBit::Hsi48On}, std::pair{reg::CR, reg::CrBit::MsiOn},
-		std::pair{reg::CR, reg::CrBit::HsiOn},				 std::pair{reg::CR, reg::CrBit::HseOn},
-		std::pair{reg::CR, reg::CrBit::PllOn},				 std::pair{reg::CR, reg::CrBit::PllSaiOn},
+		std::pair{reg::CRRCR, reg::CRRCRField::HSI48ON}, std::pair{reg::CR, reg::CRField::MSION},
+		std::pair{reg::CR, reg::CRField::HSION},				 std::pair{reg::CR, reg::CRField::HSEON},
+		std::pair{reg::CR, reg::CRField::PLLON},				 std::pair{reg::CR, reg::CRField::PLLSAI1ON},
 	};
 
 	static constexpr std::tuple OSC_RDY_TABLE{
-		std::pair{reg::CRRCR, reg::CrrCrBit::Hsi48Rdy}, std::pair{reg::CR, reg::CrBit::MsiRdy},
-		std::pair{reg::CR, reg::CrBit::HsiRdy},					std::pair{reg::CR, reg::CrBit::HseRdy},
-		std::pair{reg::CR, reg::CrBit::PllRdy},					std::pair{reg::CR, reg::CrBit::PllSaiRdy},
+		std::pair{reg::CRRCR, reg::CRRCRField::HSI48RDY}, std::pair{reg::CR, reg::CRField::MSIRDY},
+		std::pair{reg::CR, reg::CRField::HSIRDY},					std::pair{reg::CR, reg::CRField::HSERDY},
+		std::pair{reg::CR, reg::CRField::PLLRDY},					std::pair{reg::CR, reg::CRField::PLLSAI1RDY},
 	};
 
 	static constexpr std::tuple EXT_OSC_BYP_TABLE{
-		std::pair{reg::CR, reg::CrBit::HseByp},
-		std::pair{reg::BDCR, reg::BdcrBit::LseByp},
+		std::pair{reg::CR, reg::CRField::HSEBYP},
+		std::pair{reg::BDCR, reg::BDCRField::LSEBYP},
 	};
 
  public:

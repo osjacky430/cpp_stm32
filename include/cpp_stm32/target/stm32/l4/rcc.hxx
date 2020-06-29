@@ -92,11 +92,11 @@ constexpr void no_bypass() noexcept {
 
 template <SysClk Clk>
 constexpr void set_sysclk() noexcept {
-	reg::CFGR.template writeBit<reg::CfgBit::SW>(Clk);
+	reg::CFGR.template writeBit<reg::CFGRField::SW>(Clk);
 }
 
 constexpr SysClk sysclk_in_use() noexcept {
-	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	 //
+	return std::get<0>(reg::CFGR.readBit<reg::CFGRField::SWS>(ValueOnly));	//
 }
 
 template <SysClk Clk>
@@ -108,7 +108,7 @@ constexpr void wait_sysclk_rdy() noexcept {
 template <ClkSrc Clk>
 constexpr void set_pllsrc() {
 	static_assert(is_pll_clk_src<Clk>);
-	reg::PLLCFGR.template writeBit<reg::PllCfgBit::PllSrc>(Clk);
+	reg::PLLCFGR.template writeBit<reg::PLLCFGRField::PLLSRC>(Clk);
 }
 
 constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln,
@@ -124,9 +124,10 @@ constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln
 	auto const pllr_val = t_pllr.value_or(PllR{DivisionFactor_v<2>});
 	std::tuple const mod_val{t_pllm, t_plln, pllp_val, enable_pllp, pllq_val, enable_pllq, pllr_val, enable_pllr};
 
-	reg::PLLCFGR.writeBit<reg::PllCfgBit::PllM, reg::PllCfgBit::PllN, reg::PllCfgBit::PllP, reg::PllCfgBit::PllPEn,
-												reg::PllCfgBit::PllQ, reg::PllCfgBit::PllQEn, reg::PllCfgBit::PllR, reg::PllCfgBit::PllREn>(
-		mod_val);
+	reg::PLLCFGR
+		.writeBit<reg::PLLCFGRField::PLLM, reg::PLLCFGRField::PLLN, reg::PLLCFGRField::PLLP, reg::PLLCFGRField::PLLPEN,
+							reg::PLLCFGRField::PLLQ, reg::PLLCFGRField::PLLQEN, reg::PLLCFGRField::PLLR, reg::PLLCFGRField::PLLREN>(
+			mod_val);
 }
 
 template <ClkSrc Clk>
@@ -145,19 +146,19 @@ constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln,
 	auto const pllr_val = t_pllr.value_or(PllR{DivisionFactor_v<2>});
 	std::tuple const mod_val{Clk, t_pllm, t_plln, pllp_val, enable_pllp, pllq_val, enable_pllq, pllr_val, enable_pllr};
 
-	reg::PLLCFGR.writeBit<reg::PllCfgBit::PllSrc, reg::PllCfgBit::PllM, reg::PllCfgBit::PllN, reg::PllCfgBit::PllP,
-												reg::PllCfgBit::PllPEn, reg::PllCfgBit::PllQ, reg::PllCfgBit::PllQEn, reg::PllCfgBit::PllR,
-												reg::PllCfgBit::PllREn>(mod_val);
+	reg::PLLCFGR.writeBit<reg::PLLCFGRField::PLLSRC, reg::PLLCFGRField::PLLM, reg::PLLCFGRField::PLLN,
+												reg::PLLCFGRField::PLLP, reg::PLLCFGRField::PLLPEN, reg::PLLCFGRField::PLLQ,
+												reg::PLLCFGRField::PLLQEN, reg::PLLCFGRField::PLLR, reg::PLLCFGRField::PLLREN>(mod_val);
 }
 
 constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
-	reg::CFGR.writeBit<reg::CfgBit::HPre, reg::CfgBit::PPre1, reg::CfgBit::PPre2>(t_hpre, t_ppre1, t_ppre2);
+	reg::CFGR.writeBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
 
 constexpr void set_msi_range(MsiRange const& t_msi_range) noexcept {
-	reg::CR.writeBit<reg::CrBit::MsiRange>(t_msi_range);
+	reg::CR.writeBit<reg::CRField::MSIRANGE>(t_msi_range);
 }
 
-constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CrBit::MsiRgSel>(); }
+constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CRField::MSIRGSEL>(); }
 
 }	 // namespace cpp_stm32::rcc

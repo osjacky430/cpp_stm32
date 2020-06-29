@@ -53,8 +53,8 @@ enum class PeriphClk : std::uint32_t {
 	Usart2,
 	Pwr,
 
+	Spi1,
 	Usart1,
-
 };
 
 /**

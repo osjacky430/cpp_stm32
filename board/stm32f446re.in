@@ -9,7 +9,6 @@ set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
 # ############################################################################################################
 # MCU compile options
 # ############################################################################################################
-# TODO: add soft float
 set(CPU -mcpu=cortex-m4)
 set(HARD_FLOAT -mfloat-abi=hard -mfpu=fpv4-sp-d16)
 set(SOFT_FLOAT -mfloat-abi=soft)
@@ -37,3 +36,7 @@ set(DEFAULT_SYS_CONFIG_FILE
   #define HSE_BYPASS_CLK_SRC true
   #define LSE_BYPASS_CLK_SRC false
 ]])
+
+# ############################################################################################################
+# Often used periph (@todo add)
+# ############################################################################################################

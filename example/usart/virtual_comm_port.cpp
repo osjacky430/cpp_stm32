@@ -1,6 +1,6 @@
 /**
- * @file  example/gpio_output/ll_driver.cpp
- * @brief	Gpio output example using low level gpio api
+ * @file  example/gpio_output/digitalout.cpp
+ * @brief	Gpio output example using cpp_stm32::driver
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -20,27 +20,29 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gpio.hxx"
-#include "rcc.hxx"
-
-constexpr void setup_led_gpio() noexcept {
-	using namespace cpp_stm32::gpio;
-	using namespace cpp_stm32::rcc;
-
-	enable_periph_clk<PeriphClk::GpioA>();
-	mode_setup<Port::PortA, Pin::Pin5>(Mode::Output, Pupd::None);
-}
+#include "cpp_stm32/driver/digitalout.hxx"
+#include "cpp_stm32/driver/usart_serial.hxx"
+#include "sys_init.hxx"
 
 int main() {
-	using namespace cpp_stm32::gpio;
+	using cpp_stm32::usart::operator""_Baud;
+	using namespace cpp_stm32::driver;
+	using namespace cpp_stm32::sys;
+	using namespace cpp_stm32::rcc;
+	using cpp_stm32::gpio::PinName;
 
-	setup_led_gpio();
+	Clock::init<ClkSrc::Msi>();
+
+	Usart pc{UsartTx_v<PinName::PA_2>, UsartRx_v<PinName::PA_3>, 115200_Baud};
+	DigitalOut<PinName::PB_3> led;
+
 	while (1) {
-		constexpr auto SOME_INTERVAL = 100000;
+		constexpr auto SOME_INTERVAL = 10000000;
 		for (int i = 0; i < SOME_INTERVAL; ++i) {
 			__asm("nop");
 		}
 
-		toggle<Port::PortA, Pin::Pin5>();
+		pc << "1\n\r";
+		led.toggle();
 	}
 }

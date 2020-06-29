@@ -1,0 +1,1 @@
+set(LIST_OF_SUPPORTED_BOARD stm32f446re stm32f303k8 stm32l432kc stm32f746ng)

@@ -21,12 +21,14 @@ class PinMap {
 	static constexpr auto PIN_TABLE = []() {
 		std::array<PortPinPair, to_underlying(PinName::Total)> temp{};
 
-		temp[to_underlying(PinName::PA_0)] = PortPinPair{Port::PortA, Pin::Pin0};
-		temp[to_underlying(PinName::PA_1)] = PortPinPair{Port::PortA, Pin::Pin1};
-		temp[to_underlying(PinName::PA_2)] = PortPinPair{Port::PortA, Pin::Pin2};
-		temp[to_underlying(PinName::PA_3)] = PortPinPair{Port::PortA, Pin::Pin3};
-		temp[to_underlying(PinName::PA_5)] = PortPinPair{Port::PortA, Pin::Pin5};
+		temp[to_underlying(PinName::PA_0)]	= PortPinPair{Port::PortA, Pin::Pin0};
+		temp[to_underlying(PinName::PA_1)]	= PortPinPair{Port::PortA, Pin::Pin1};
+		temp[to_underlying(PinName::PA_2)]	= PortPinPair{Port::PortA, Pin::Pin2};
+		temp[to_underlying(PinName::PA_3)]	= PortPinPair{Port::PortA, Pin::Pin3};
+		temp[to_underlying(PinName::PA_5)]	= PortPinPair{Port::PortA, Pin::Pin5};
+		temp[to_underlying(PinName::PA_15)] = PortPinPair{Port::PortA, Pin::Pin15};
 
+		temp[to_underlying(PinName::PB_0)] = PortPinPair{Port::PortB, Pin::Pin0};
 		temp[to_underlying(PinName::PB_1)] = PortPinPair{Port::PortB, Pin::Pin1};
 		temp[to_underlying(PinName::PB_2)] = PortPinPair{Port::PortB, Pin::Pin2};
 		temp[to_underlying(PinName::PB_3)] = PortPinPair{Port::PortB, Pin::Pin3};

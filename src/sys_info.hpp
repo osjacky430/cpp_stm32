@@ -10,6 +10,7 @@
 #define AHB_CLK_FREQ (80000000U)
 #define APB1_CLK_FREQ (80000000U)
 #define APB2_CLK_FREQ (80000000U)
+#define MSI_CLK_FREQ (4000000U)
 
-#define HSE_BYPASS_CLK_SRC true
+#define HSE_BYPASS_CLK_SRC false
 #define LSE_BYPASS_CLK_SRC false

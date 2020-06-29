@@ -245,19 +245,30 @@ class Register {
 	 * @return		If reading register is necessary, then return the value of the register, otherwise return 0.
 	 */
 	template <BitListIdx... BitIdx, bool NeedTS = false, Access TSIo = Access::None>
-	constexpr decltype(auto) readCurrentVal(ThreadSafe<NeedTS, TSIo> const& t_ts = NoThreadSafe) const noexcept {
+	constexpr decltype(auto) readCurrentVal(ThreadSafe<NeedTS, TSIo> const t_ts = NoThreadSafe) const noexcept {
 		constexpr auto num_of_bit_to_mod = []() {
 			auto arr = std::array{BitIdx...};
 			detail::sort(arr, [](auto rhs, auto lhs) { return (to_underlying(rhs) < to_underlying(lhs)); });
 			return detail::unique(arr.begin(), arr.end()) - arr.begin();
 		}();
 
-		constexpr auto need_to_read_current_val = [=](auto const& bit) {
-			return (!(bit.MOD == BitMod::WrOnly) && !(bit.MOD == BitMod::RdSet) &&
-							!(num_of_bit_to_mod == BitList::WRITABLE_BIT_NUM));
+		// you need to read current value if this bit is not:
+		//
+		//  1. write only, which means reading the bit is meaningless
+		//  2. read/set, since writing 0 has no effect on bit value
+		//
+		// Also, if the number of bits to modified are the same as total writable bits in the bit list, then we don't need
+		// to read register value cause the rest of them are read-only, writing to read-only register doesn't change
+		// anything.
+		//
+		// Last but not least, if the register contains only 1 field, e.g. data register, baudrate register, etc.
+		// reading the current value is pointless, as we will write new value to it anyway.
+		constexpr auto need_to_read_current_val = [=](auto const bit) {
+			return (!(bit.MOD == BitMod::WrOnly) && !(bit.MOD == BitMod::RdSet));
 		};
 
-		if constexpr ((need_to_read_current_val(GET_BIT<BitIdx>()) && ...)) {
+		if constexpr ((need_to_read_current_val(GET_BIT<BitIdx>()) && ...) &&
+									!(num_of_bit_to_mod == BitList::WRITABLE_BIT_NUM) && !(BitList::LIST_SIZE == 1)) {
 			return readReg<BitIdx...>(t_ts);
 		} else {
 			return 0;
@@ -269,7 +280,7 @@ class Register {
 	 * @return [description]
 	 */
 	template <BitListIdx... BitIdx, BitListIdx... Avoid>
-	static constexpr auto getThreadSafeAccess(IsolateFrom_t<Avoid...> const& t_isolate) noexcept {
+	static constexpr auto getThreadSafeAccess(IsolateFrom_t<Avoid...> const t_isolate) noexcept {
 		if constexpr (IS_SEPARABLE<Access::Byte, BitIdx...>(t_isolate)) {
 			return Access::Byte;
 		} else if constexpr (IS_SEPARABLE<Access::HalfWord, BitIdx...>(t_isolate)) {

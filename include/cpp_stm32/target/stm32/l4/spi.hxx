@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 
 #include "cpp_stm32/target/stm32/l4/define/spi.hxx"
 #include "cpp_stm32/target/stm32/l4/register/spi.hxx"
@@ -227,7 +228,7 @@ constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
 	constexpr auto& KV_PAIR = Baudrate_t::AVAIL_DIVISION_FACTOR;
 	constexpr auto COMP			= [](auto const& t_val, auto const& t_pair) { return t_val < std::get<0>(t_pair); };
 	constexpr auto division = []() {
-		if constexpr (SPI == Port::SPI1 || SPI == Port::SPI4) {
+		if constexpr (SPI == Port::SPI1) {
 			return APB2_CLK_FREQ / HZ;
 		} else if constexpr (SPI == Port::SPI2 || SPI == Port::SPI3) {
 			return APB1_CLK_FREQ / HZ;
@@ -308,13 +309,18 @@ constexpr auto wait_status(bool const t_desire) noexcept {
 
 /**
  * @brief   This function transmits 8 bit data to slave
+ * @tparam  SPI   @ref spi::Port
  * @tparam  IterT iterator type
  */
 template <Port SPI, typename IterT>
 constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
+	constexpr auto WRITE_SIZE = []() {
+		return FifoThreshold{sizeof(typename std::iterator_traits<IterT>::value_type) <= sizeof(std::uint8_t)};
+	}();
+
 	std::for_each(t_begin, t_end, [](auto const& t_v) {
 		wait_status<SPI, Status::TXE>(true);
-		reg::DR<SPI>.template writeBit<reg::DRField::DR>(static_cast<std::uint16_t>(t_v));
+		reg::DR<SPI, WRITE_SIZE>.template writeBit<reg::DRField::DR>(static_cast<std::uint16_t>(t_v));
 	});
 }
 
@@ -322,13 +328,17 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
  * @brief     This function read N bytes of data from slave
  * @tparam    SPI   @ref spi::Port
  * @tparam    N     Number of data to receive
+ *
+ * @todo    Byte count is not a good name, as we can receive half word with SPI
  */
-template <Port SPI, std::uint8_t N>
+template <Port SPI, typename DataType, std::uint8_t N>
 constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
+	constexpr auto WRITE_SIZE = []() { return FifoThreshold{sizeof(DataType) <= sizeof(std::uint8_t)}; }();
+
 	std::array<std::uint16_t, N> ret_val{};
 	std::generate(ret_val.begin(), ret_val.end(), []() {
 		wait_status<SPI, Status::RXNE>(true);
-		return reg::DR<SPI>.template readBit<reg::DRField::DR>(ValWithPos);
+		return reg::DR<SPI, WRITE_SIZE>.template readBit<reg::DRField::DR>(ValWithPos);
 	});
 
 	return ret_val;
@@ -343,7 +353,7 @@ constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
 template <Port SPI, std::uint8_t N, typename IterT>
 constexpr auto xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
-	return receive_blocking<SPI>(t_bc);
+	return receive_blocking<SPI, typename std::iterator_traits<IterT>::value_type>(t_bc);
 }
 
 /**
@@ -384,8 +394,39 @@ constexpr void disable_irq() noexcept {
 				return reg::CR2Field::ERRIE;
 		}
 	};
-
 	reg::CR2<SPI>.template clearBit<to_cr2_field(Flags)...>();
+}
+
+/**
+ * @brief   This function sets the RX FIFO threshold
+ * @tparam  SPI   @ref spi::Port
+ * @param   t_thresh  @ref spi::FifoThreshold
+ */
+template <Port SPI>
+constexpr void set_rx_fifo_threshold(FifoThreshold const t_thresh) noexcept {
+	reg::CR2<SPI>.template writeBit<reg::CR2Field::FRXTH>(t_thresh);
+}
+
+/**
+ * @brief   This function returns the RX FIFO level
+ * @tparam  SPI   @ref spi::Port
+ *
+ * @return  @ref spi::FifoLevel
+ */
+template <Port SPI>
+[[nodiscard]] constexpr auto get_rx_fifo_level() noexcept {
+	return reg::SR<SPI>.template readBit<Status::FRLVL>(ValueOnly);
+}
+
+/**
+ * @brief   This function returns the TX FIFO level
+ * @tparam  SPI   @ref spi::Port
+ *
+ * @return  @ref spi::FifoLevel
+ */
+template <Port SPI>
+[[nodiscard]] constexpr auto get_tx_fifo_level() noexcept {
+	return reg::SR<SPI>.template readBit<Status::FTLVL>(ValueOnly);
 }
 
 }	 // namespace cpp_stm32::spi
