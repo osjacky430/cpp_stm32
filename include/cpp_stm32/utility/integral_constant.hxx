@@ -43,8 +43,14 @@ using uint32_c = std::integral_constant<std::uint32_t, Val>;
 template <std::uint8_t Val>
 using uint8_c = std::integral_constant<std::uint8_t, Val>;
 
+template <std::uint8_t Count, typename DataType>
+struct DataCount {};
+
 template <std::uint8_t BC>
-struct ByteCount {};
+using ByteCount = DataCount<BC, std::uint8_t>;
+
+template <std::uint8_t BC>
+using HalfWordCount = DataCount<BC, std::uint16_t>;
 
 // not sure
 template <std::uint32_t Q>

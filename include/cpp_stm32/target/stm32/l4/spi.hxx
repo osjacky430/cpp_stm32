@@ -57,6 +57,7 @@ constexpr void set_transfer_mode() noexcept {
 		reg::CR1<SPI>.template writeBit<reg::CR1Field::BIDIMODE, reg::CR1Field::RXONLY>(std::uint8_t{0}, std::uint8_t{1});
 	}
 }
+
 /**
  * @brief   This function enables SPI CRC calculation
  * @tparam  SPI @ref spi::Port
@@ -328,11 +329,9 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
  * @brief     This function read N bytes of data from slave
  * @tparam    SPI   @ref spi::Port
  * @tparam    N     Number of data to receive
- *
- * @todo    Byte count is not a good name, as we can receive half word with SPI
  */
 template <Port SPI, typename DataType, std::uint8_t N>
-constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
+constexpr auto receive_blocking(DataCount<N, DataType> const /*unused*/) noexcept {
 	constexpr auto WRITE_SIZE = []() { return FifoThreshold{sizeof(DataType) <= sizeof(std::uint8_t)}; }();
 
 	std::array<std::uint16_t, N> ret_val{};
@@ -345,13 +344,14 @@ constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
 }
 
 /**
- * @brief   This function send and receive data from slave
+ * @brief   This function sends and receives data from slave
  * @param   t_bc    Byte to receive
  * @param   t_begin Begin of the tx buffer
  * @param   t_end   End of the tx buffer
  */
 template <Port SPI, std::uint8_t N, typename IterT>
-constexpr auto xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
+constexpr auto xfer_blocking(DataCount<N, typename std::iterator_traits<IterT>::value_type> const t_bc,
+														 IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
 	return receive_blocking<SPI, typename std::iterator_traits<IterT>::value_type>(t_bc);
 }
