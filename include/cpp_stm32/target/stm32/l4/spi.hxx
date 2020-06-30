@@ -331,7 +331,8 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
  * @tparam    N     Number of data to receive
  */
 template <Port SPI, typename DataType, std::uint8_t N>
-constexpr auto receive_blocking(DataCount<N, DataType> const /*unused*/) noexcept {
+constexpr auto receive_blocking(DataCount<DataType, N> const /*unused*/) noexcept {
+	static_assert(std::is_same_v<DataType, std::uint8_t> || std::is_same_v<DataType, std::uint16_t>);
 	constexpr auto WRITE_SIZE = []() { return FifoThreshold{sizeof(DataType) <= sizeof(std::uint8_t)}; }();
 
 	std::array<std::uint16_t, N> ret_val{};
@@ -350,7 +351,7 @@ constexpr auto receive_blocking(DataCount<N, DataType> const /*unused*/) noexcep
  * @param   t_end   End of the tx buffer
  */
 template <Port SPI, std::uint8_t N, typename IterT>
-constexpr auto xfer_blocking(DataCount<N, typename std::iterator_traits<IterT>::value_type> const t_bc,
+constexpr auto xfer_blocking(DataCount<typename std::iterator_traits<IterT>::value_type, N> const t_bc,
 														 IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
 	return receive_blocking<SPI, typename std::iterator_traits<IterT>::value_type>(t_bc);
@@ -429,4 +430,27 @@ template <Port SPI>
 	return reg::SR<SPI>.template readBit<Status::FTLVL>(ValueOnly);
 }
 
-}	 // namespace cpp_stm32::spi
+/**
+ *	@todo 	Not done yet
+ */
+template <Port SPI, TransferMode TM, SlaveSelectMode SSM, typename DataType, std::uint32_t Hz>
+constexpr void init_master(Mode const t_mode, Frequency<Hz> t_baud) noexcept {
+	using reg::CR1Field;
+
+	constexpr std::uint8_t bidimode_val = (TM != TransferMode::RxSimplex && TM != TransferMode::TxSimplex);
+	constexpr std::uint8_t bidioe_val		= (TM == TransferMode::TxHalfDuplex);
+	constexpr std::uint8_t rxonly_val		= (TM == TransferMode::RxSimplex);
+
+	constexpr std::uint8_t ssm_val	= SSM == SlaveSelectMode::Software;
+	constexpr std::uint8_t ssoe_val = SSM == SlaveSelectMode::OutputHardware;
+
+	std::uint8_t const idle_high					 = (t_mode == Mode::Mode2 || t_mode == Mode::Mode3);
+	std::uint8_t const second_edge_capture = (t_mode == Mode::Mode1 || t_mode == Mode::Mode3);
+
+	reg::CR1<SPI>.template writeBit<CR1Field::BIDIMODE, CR1Field::BIDIOE, CR1Field::RXONLY, CR1Field::SSM, CR1Field::CPHA, CR1Field::CPOL>(
+		bidimode_val, bidioe_val, rxonly_val, ssm_val, second_edge_capture, idle_high);
+
+	set_baudrate(t_baud);
+}
+
+}	// namespace cpp_stm32::spi

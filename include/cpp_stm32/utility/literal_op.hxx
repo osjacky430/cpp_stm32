@@ -61,4 +61,10 @@ constexpr auto operator"" _byte() noexcept {
 	return ByteCount<idx>{};
 }
 
-}	 // namespace cpp_stm32
+template <char... num>
+constexpr auto operator"" _halfword() noexcept {
+	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	return HalfWordCount<idx>{};
+}
+
+}	// namespace cpp_stm32

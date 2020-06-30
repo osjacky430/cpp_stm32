@@ -43,14 +43,14 @@ using uint32_c = std::integral_constant<std::uint32_t, Val>;
 template <std::uint8_t Val>
 using uint8_c = std::integral_constant<std::uint8_t, Val>;
 
-template <std::uint8_t Count, typename DataType>
+template <typename DataType, std::uint8_t Count>
 struct DataCount {};
 
 template <std::uint8_t BC>
-using ByteCount = DataCount<BC, std::uint8_t>;
+using ByteCount = DataCount<std::uint8_t, BC>;
 
 template <std::uint8_t BC>
-using HalfWordCount = DataCount<BC, std::uint16_t>;
+using HalfWordCount = DataCount<std::uint16_t, BC>;
 
 // not sure
 template <std::uint32_t Q>
@@ -65,4 +65,4 @@ struct Second : Unit<Sec> {};
 template <std::uint32_t Hz>
 struct Frequency : Unit<Hz> {};
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

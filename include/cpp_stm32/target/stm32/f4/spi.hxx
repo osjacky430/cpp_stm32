@@ -337,11 +337,13 @@ constexpr void send_blocking(IterT const t_begin, IterT const t_end) noexcept {
 
 /**
  * @brief     This function read N bytes of data from slave
- * @tparam    SPI   @ref spi::Port
- * @tparam    N     Number of data to receive
+ * @tparam    SPI   		@ref spi::Port
+ * @tparam    N     		Number of data to receive
+ * @tparam 		DataType	Format of data, std::uint8_t, std::uint16_t
  */
-template <Port SPI, std::uint8_t N>
-constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
+template <Port SPI, typename DataType, std::uint8_t N>
+constexpr auto receive_blocking(DataCount<DataType, N> const /*unused*/) noexcept {
+	static_assert(std::is_same_v<DataType, std::uint8_t> || std::is_same_v<DataType, std::uint16_t>);
 	std::array<std::uint16_t, N> ret_val{};
 	std::generate(ret_val.begin(), ret_val.end(), []() {
 		wait_status<SPI, Status::RXNE>(true);
@@ -358,7 +360,8 @@ constexpr auto receive_blocking(ByteCount<N> const /*unused*/) noexcept {
  * @param   t_end   End of the tx buffer
  */
 template <Port SPI, std::uint8_t N, typename IterT>
-constexpr auto xfer_blocking(ByteCount<N> const t_bc, IterT const t_begin, IterT const t_end) {
+constexpr auto xfer_blocking(DataCount<typename std::iterator_traits<IterT>::value_type, N> const t_bc,
+														 IterT const t_begin, IterT const t_end) {
 	send_blocking<SPI>(t_begin, t_end);
 	return receive_blocking<SPI>(t_bc);
 }
@@ -405,4 +408,4 @@ constexpr void disable_irq() noexcept {
 	reg::CR2<SPI>.template clearBit<to_cr2_field(Flags)...>();
 }
 
-}	 // namespace cpp_stm32::spi
+}	// namespace cpp_stm32::spi
