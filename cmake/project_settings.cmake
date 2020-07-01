@@ -1,10 +1,14 @@
 if(NOT CMAKE_BUILD_TYPE AND NOT GENERATOR_IS_MULTI_CONFIG)
   # For single configuration generators, consider setting CMAKE_BUILD_TYPE to a better default value if it is
   # empty. message(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
-  set(CMAKE_BUILD_TYPE
-      RelWithDebInfo
-      CACHE STRING "Choose the type of build." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+  set(allowableBuildTypes "Debug" "Release" "MinSizeRel" "RelWithDebInfo" "Profile")
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowableBuildTypes}")
+
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
+  elseif(NOT CMAKE_BUILD_TYPE IN_LIST allowableBuildTypes)
+    message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}")
+  endif()
 endif()
 
 # ############################################################################################################
