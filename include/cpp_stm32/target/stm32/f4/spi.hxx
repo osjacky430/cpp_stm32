@@ -408,4 +408,37 @@ constexpr void disable_irq() noexcept {
 	reg::CR2<SPI>.template clearBit<to_cr2_field(Flags)...>();
 }
 
+/**
+ * @brief 	This function initializes SPI master mode with default value
+ */
+template <Port SPI, TransferMode TM, SlaveSelectMode SSM, std::size_t Ds, std::uint32_t Hz>
+constexpr void init_master(Mode const t_mode, size_c<Ds> const, Frequency<Hz> const t_baud) noexcept {
+	using reg::CR1Field, reg::CR1, reg::CR2Field, reg::CR2;
+
+	constexpr std::uint8_t master				= 1;
+	constexpr std::uint8_t bidimode_val = TM != TransferMode::FullDuplex;
+	constexpr std::uint8_t bidioe_val		= (TM == TransferMode::TxHalfDuplex);
+	constexpr std::uint8_t rxonly_val		= (TM == TransferMode::RxSimplex);
+
+	constexpr std::uint8_t ssm_val	= SSM == SlaveSelectMode::Software;
+	constexpr std::uint8_t ssoe_val = SSM == SlaveSelectMode::OutputHardware;
+
+	std::uint8_t const idle_high					 = (t_mode == Mode::Mode2 || t_mode == Mode::Mode3);
+	std::uint8_t const second_edge_capture = (t_mode == Mode::Mode1 || t_mode == Mode::Mode3);
+
+	constexpr auto data_frame = DataFrameFormat{Ds > sizeof(std::uint8_t) * 8};
+
+	constexpr std::uint8_t lsb_first		= 0;	// msb first
+	constexpr std::uint8_t frame_format = 0;	// motorola
+
+	CR1<SPI>.template writeBit<CR1Field::MSTR, CR1Field::BIDIMODE, CR1Field::BIDIOE, CR1Field::RXONLY, //
+	 													 CR1Field::SSM, CR1Field::CPHA, CR1Field::CPOL, CR1Field::LSBFIRST, CR1Field::DFF>(
+		master, bidimode_val, bidioe_val, rxonly_val, ssm_val, second_edge_capture, idle_high, lsb_first, data_frame);
+
+	CR2<SPI>.template writeBit<CR2Field::SSOE, CR2Field::FRF>(ssoe_val, frame_format);
+
+	set_baudrate<SPI>(t_baud);
+	enable<SPI>();
+}
+
 }	// namespace cpp_stm32::spi

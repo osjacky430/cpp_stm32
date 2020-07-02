@@ -65,17 +65,8 @@ constexpr void setup_spi() noexcept {
 	Gpio::set_alternate_function<Gpio::Port::PortA, Gpio::Pin::Pin5, Gpio::Pin::Pin6, Gpio::Pin::Pin7>(
 		Gpio::AltFunc::AF5);
 
-	Spi::set_master_mode<Spi::Port::SPI1>();
-	Spi::set_baudrate_prescaler<Spi::Port::SPI1>(Spi::Baudrate_t{cpp_stm32::uint32_c<16>{}});
-	Spi::set_transfer_mode<Spi::Port::SPI1, Spi::TransferMode::FullDuplex>();
-	Spi::set_mode<Spi::Port::SPI1>(Spi::Mode::Mode2);
-	Spi::set_data_size<Spi::Port::SPI1>(Spi::DataSize{cpp_stm32::uint32_c<8>{}});
-	// Spi::set_data_frame_format<Spi::Port::SPI1>(Spi::DataFrameFormat::Byte);
-	Spi::set_msb_first<Spi::Port::SPI1>();
-	Spi::set_slave_select_mode<Spi::Port::SPI1, Spi::SlaveSelectMode::OutputHardware>();
-	Spi::set_rx_fifo_threshold<Spi::Port::SPI1>(Spi::FifoThreshold::Byte);
-
-	Spi::enable<Spi::Port::SPI1>();
+	Spi::init_master<Spi::Port::SPI1, Spi::TransferMode::FullDuplex, Spi::SlaveSelectMode::OutputHardware>(
+		Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
 }
 
 int main() {
