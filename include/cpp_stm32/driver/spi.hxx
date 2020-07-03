@@ -113,8 +113,8 @@ class SPI {
 		return spi::xfer_blocking<PORT>(t_bc, val.begin(), val.end());
 	}
 
-	template <std::uint8_t BC, std::size_t N>
-	constexpr auto xfer(ByteCount<BC> const t_bc, std::array<std::uint16_t, N> const& t_val) const noexcept {
+	template <typename DataType, std::uint8_t BC, std::size_t N>
+	constexpr auto xfer(DataCount<DataType, BC> const t_bc, std::array<std::uint16_t, N> const& t_val) const noexcept {
 		return spi::xfer_blocking<PORT>(t_bc, t_val.begin(), t_val.end());
 	}
 
@@ -129,10 +129,10 @@ class SPI {
 		spi::send_blocking<PORT>(std::begin(val), std::end(val));
 	}
 
-	template <std::uint8_t BC>
-	constexpr auto receive(ByteCount<BC> const t_bc) const noexcept {
+	template <typename DataType, std::uint8_t BC>
+	constexpr auto receive(DataCount<DataType, BC> const t_bc) const noexcept {
 		return spi::receive_blocking<PORT>(t_bc);
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

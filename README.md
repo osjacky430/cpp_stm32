@@ -14,8 +14,8 @@ These instructions will get you a copy of the project up and running on your tar
 ### Prerequisites
 cpp_stm32 requires the following things to be installed:
 - C++17 compiler: the driver is tested with arm-none-eabi-gcc 9.2.1 and arm-none-eabi-gcc 8.3.1, you can download the compiler from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
-- [CMake](https://cmake.org/download/)
-- [make](https://www.gnu.org/software/make/)
+- [CMake](https://cmake.org/download/) (minimum required: 3.15.2)
+- [make](https://www.gnu.org/software/make/) or [ninja](https://ninja-build.org/)
 
 ### Building
 Clone the repository, and then build it, make sure the toolchain path is in ```PATH```
@@ -26,44 +26,29 @@ mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 cmake --build ./
 ```
-To build with your MCU, you need to modify the following file: (todo: config via command line input)
-- CMakeLists.txt: change ```TARGET_DIR```, ```LINKER_SCRIPT``` and ```TARGET_PROCESSOR```
-
-```
-set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
-                      Change to your target device directory ^^^^^^^^
-
-set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
-              Change to your target linker script ^^^^^^^^^^^^^^
-
-set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
-      Change to your target processor ^^^^^^^^^^
-```
-**UPDATE: input file is added for command line configuration, still experimenting.** The basic usage will be:
+#### To build with your MCU:
+Set ```TARGET_BOARD``` variable to the name of your MCU. CMake will check if the MCU is supported or not. If not supported, it will issue a fatal error.
 ```
 export PATH="$PATH:/path/to/arm-none-eabi-gcc/bin"
 mkdir build && cd build
 cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
-cmake --build ./
+cmake --build .
 ```
-### Build Example
-To build the example, you must use the following syntax (at least currently):
+#### Build Example
+Set ```BUILD_EXAMPLE``` option to ```ON```, then build the desire example by specifying the name of the example source file
 ```
-cmake -DBUILD_EXAMPLE="<example_category>:<example_file_name>" (here goes the rest of the options ...)
-```
-The ```example_category``` are folders under ```example``` directory (e.g. ```gpio_output```, ```i2c``` etc.), and the ```example_file_name``` are the source files under ```example_category```, (e.g. ```digitalout```, ```ll_driver``` in ```gpio_output``` folder). Multiple example file names are separated by comma (**no whitespace**). An example to build ```digitalout``` and ```ll_driver``` in ```gpio_output``` will be like:
-```
-cmake -DBUILD_EXAMPLE="gpio_output:digitalout,ll_driver" -G "Unix Makefiles" ..
-```
-Since we want to build all example in gpio_output, we can also use the following syntax:
-```
-cmake -DBUILD_EXAMPLE="gpio_output:" -G "Unix Makefiles" ..
+cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" -DBUILD_EXAMPLE=ON ..
+cmale --build . --target example_name_1.elf example_name_2.elf
 ```
 ### Tunable Options
-Currently Under construction...
+- ```ENABLE_HARD_FLOAT```: this option is enabled by default, which links the hard float flags to the library.
 
 ### Link library to your application
 Currently Under construction...
+
+### Current Work in progress
+- Code coverage
+- Unit test
 
 ### System Clock Configuration File
 Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)

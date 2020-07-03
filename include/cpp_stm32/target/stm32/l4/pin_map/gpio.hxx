@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/target/stm32/l4/define/gpio.hxx"
 #include "cpp_stm32/utility/enum_op.hxx"
@@ -21,12 +22,9 @@ class PinMap {
 	static constexpr auto PIN_TABLE = []() {
 		std::array<PortPinPair, to_underlying(PinName::Total)> temp{};
 
-		temp[to_underlying(PinName::PA_0)]	= PortPinPair{Port::PortA, Pin::Pin0};
-		temp[to_underlying(PinName::PA_1)]	= PortPinPair{Port::PortA, Pin::Pin1};
-		temp[to_underlying(PinName::PA_2)]	= PortPinPair{Port::PortA, Pin::Pin2};
-		temp[to_underlying(PinName::PA_3)]	= PortPinPair{Port::PortA, Pin::Pin3};
-		temp[to_underlying(PinName::PA_5)]	= PortPinPair{Port::PortA, Pin::Pin5};
-		temp[to_underlying(PinName::PA_15)] = PortPinPair{Port::PortA, Pin::Pin15};
+		detail::generate_n(temp.begin(), to_underlying(PinName::PA_15), [n = std::uint8_t{0}]() mutable {
+			return PortPinPair{Port::PortA, Pin{n++}};
+		});
 
 		temp[to_underlying(PinName::PB_0)] = PortPinPair{Port::PortB, Pin::Pin0};
 		temp[to_underlying(PinName::PB_1)] = PortPinPair{Port::PortB, Pin::Pin1};
@@ -46,5 +44,4 @@ class PinMap {
 	}
 };
 
-}	 // namespace cpp_stm32::gpio
-
+}	// namespace cpp_stm32::gpio

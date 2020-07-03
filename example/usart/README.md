@@ -2,9 +2,11 @@
 - Tested on STM32-NUCLEO-F446RE
 - Test script is written with [Processing](https://processing.org/download/)
 
-# Example 1: usart rx dma
+# Example 1: usart comm port
 
-# Example 2: usart rx dma receive variable length data
+# Example 2: usart rx dma
+
+# Example 3: usart rx dma receive variable length data
 This example utilizes idle line interrupt and dma transfer interrupt to receive unknown length of data, for more detail, refer to [this website](https://stm32f4-discovery.net/2017/07/stm32-tutorial-efficiently-receive-uart-data-using-dma/).
 
 ## STM32-NUCLEO-F446 Configuration
