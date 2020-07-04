@@ -10,33 +10,58 @@
 
 namespace cpp_stm32::rcc {
 
+// @todo change this to KeyValTable
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(MsiRange, /**/
 																		 std::pair{100_KHz, 0b000}, std::pair{200_KHz, 0b0001}, std::pair{400_KHz, 0b0010},
 																		 std::pair{800_KHz, 0b0011}, std::pair{1_MHz, 0b0100}, std::pair{2_MHz, 0b0101},
 																		 std::pair{4_MHz, 0b0110}, std::pair{8_MHz, 0b0111}, std::pair{16_MHz, 0b1000},
 																		 std::pair{24_MHz, 0b1001}, std::pair{32_MHz, 0b1010}, std::pair{48_MHz, 0b1011});
+/**
+ *
+ *
+ */
+using HPRE =
+	cpp_stm32::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
+												 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
+												 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
 
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(HPRE, /**/
-																		 std::pair{1, 0b0000}, std::pair{2, 0b1000}, std::pair{4, 0b1001},
-																		 std::pair{8, 0b1010}, std::pair{16, 0b1011}, std::pair{64, 0b1100},
-																		 std::pair{128, 0b1101}, std::pair{256, 0b1110}, std::pair{512, 0b1111});
+/**
+ *
+ *
+ */
+using PPRE = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
+																		PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
 
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PPRE, /**/
-																		 std::pair{1, 0b000}, std::pair{2, 0b100}, std::pair{4, 0b101}, std::pair{8, 0b110},
-																		 std::pair{16, 0b111});
+/**
+ *
+ *
+ */
+using PllM = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLM, /**/
+																		PAIR(1, 0b000), PAIR(2, 0b001), PAIR(3, 0b010), PAIR(4, 0b011), PAIR(5, 0b100),
+																		PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111)>;
 
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllM, /**/
-																		 std::pair{1, 0b000}, std::pair{2, 0b001}, std::pair{3, 0b010}, std::pair{4, 0b011},
-																		 std::pair{5, 0b100}, std::pair{6, 0b101}, std::pair{7, 0b110},
-																		 std::pair{8, 0b111});
+/**
+ *
+ *
+ */
+using PllN = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLN, 8, 86>;
 
-SETUP_LOOKUP_TABLE_WITH_BOUND(PllN, 8, 86);
+/**
+ *
+ *
+ */
+using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, PAIR(7, 0), PAIR(17, 1)>;
 
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllP, std::pair{7, 0}, std::pair{17, 1});
+/**
+ *
+ */
+using PllQ = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
+																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllQ, /**/
-																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
+// using PllR = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
+//																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
+// @todo Chane this to KeyValTable
 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllR, /**/
 																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
 

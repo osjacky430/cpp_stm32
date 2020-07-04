@@ -8,6 +8,6 @@
 
 namespace cpp_stm32::flash {
 
-SETUP_LOOKUP_TABLE_WITH_BOUND(Latency, 0, 4);
+using Latency = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_LATENCY, 0, 4>;
 
-}
+}	 // namespace cpp_stm32::flash

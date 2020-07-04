@@ -13,29 +13,106 @@
 //
 // You should have received a copy of the Lesser GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#pragma once
 
-/**
- * @def 	 SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)
- * @brief	 A helper macro to declare division factor helper class
- * @param  ClassName   	Class name
- * @param  LowerBound		Lower bound of division factor
- * @param  UpperBound		Upper bound of division factor
- */
-#define SETUP_LOOKUP_TABLE_WITH_BOUND(ClassName, LowerBound, UpperBound)                                      \
-	struct ClassName {                                                                                          \
-		std::uint32_t const m_value;                                                                              \
-                                                                                                              \
-		static constexpr auto MAX = UpperBound;                                                                   \
-		static constexpr auto MIN = LowerBound;                                                                   \
-                                                                                                              \
-		template <std::uint32_t Val>                                                                              \
-		explicit constexpr ClassName(std::integral_constant<std::uint32_t, Val> const&) noexcept : m_value(Val) { \
-			static_assert(LowerBound <= Val && Val <= UpperBound);                                                  \
-		}                                                                                                         \
-                                                                                                              \
-		[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }                              \
-		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                     \
+#include <cstdint>
+#include <utility>
+
+#include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/utility/integral_constant.hxx"
+
+// @todo this is the best solution I can think of so far...
+#define PAIR(x, y) (x), (y)
+
+namespace cpp_stm32 {
+
+// @todo replace macro above with this LookUpTable class
+template <typename Tag, std::uint32_t Lower, std::uint32_t Upper>
+struct LookUpTable {
+	std::uint32_t const m_value;
+
+	static constexpr auto MAX = Upper;
+	static constexpr auto MIN = Lower;
+
+	template <std::uint32_t Val>
+	explicit constexpr LookUpTable(cpp_stm32::uint32_c<Val> const /*unused*/) noexcept : m_value(Val) {
+		static_assert(MIN <= Val && Val <= MAX);
 	}
+
+	[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }
+	[[nodiscard]] constexpr auto get() const noexcept { return m_value; }
+};
+
+template <typename Key, typename Val>
+struct Pair {
+	Key const key;
+	Val const val;
+
+	explicit constexpr Pair(Key&& t_key, Val&& t_val) noexcept : key(t_key), val(t_val) {}
+};
+
+template <typename Tag, auto... All>
+class KeyValTable {
+ private:
+	template <auto Key, auto Val, auto... Rest>
+	struct KeyValGetter {
+		static constexpr std::tuple KVP{std::tuple_cat(std::tuple{Pair{Key, Val}}, KeyValGetter<Rest...>::KVP)};
+	};
+
+	template <auto Key, auto Val>
+	struct KeyValGetter<Key, Val> {
+		static constexpr std::tuple KVP{Pair{Key, Val}};
+	};
+
+	std::uint32_t const m_val;
+
+ public:
+	static constexpr auto KEY_VAL_MAP = KeyValGetter<All...>::KVP;
+	static constexpr auto KV_NUM			= sizeof...(All) / 2;
+
+ private:
+	template <auto Key, std::size_t... idx>
+	static constexpr auto HAVE_KEY(std::index_sequence<idx...> const) noexcept {
+		return ((std::get<idx>(KEY_VAL_MAP).key == Key) || ...);
+	}
+
+	template <auto Key, std::size_t... idx>
+	static constexpr auto GET_VALUE(std::integral_constant<decltype(Key), Key> const,
+																	std::index_sequence<idx...> const) noexcept {
+		constexpr std::array is_key_arr{std::get<idx>(KEY_VAL_MAP).key == Key...};
+		constexpr std::size_t val_idx = *detail::find(is_key_arr.begin(), is_key_arr.end(), true);
+		return std::get<val_idx>(KEY_VAL_MAP).val;
+	}
+
+	template <auto Key, std::size_t... idx>
+	static constexpr auto UPPER_BOUND(std::index_sequence<idx...> const) noexcept {
+		constexpr std::array is_greater_arr{std::get<idx>(KEY_VAL_MAP).key < Key...};
+		constexpr std::size_t val_idx = *detail::find(is_greater_arr.begin(), is_greater_arr.end(), true);
+		return std::get<val_idx>(KEY_VAL_MAP);
+	}
+
+ public:
+	template <auto Val>
+	static constexpr auto have_key() noexcept {
+		return HAVE_KEY<Val>(std::make_index_sequence<KV_NUM>{});
+	}
+
+	template <auto Val>
+	static constexpr auto upper_bound() noexcept {
+		return UPPER_BOUND<Val>(std::make_index_sequence<KV_NUM>{});
+	}
+
+	template <auto Val>
+	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const t_v) noexcept
+		: m_val(GET_VALUE(t_v, std::make_index_sequence<KV_NUM>{})) {
+		static_assert(HAVE_KEY<Val>(std::make_index_sequence<KV_NUM>{}));
+	}
+
+	[[nodiscard]] constexpr auto get() const noexcept { return m_val; }
+	[[nodiscard]] constexpr auto operator()() const noexcept { return m_val; }
+};
+
+}	 // namespace cpp_stm32
 
 /**
  * @def 	 SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(ClassName, ...)
@@ -63,10 +140,3 @@
 		[[nodiscard]] constexpr auto get() const noexcept { return m_value; }                                   \
 	}
 
-/**
- *
- */
-#define CREATE_PIN_TABLE(ClassName, ...)                \
-	struct ClassName {                                    \
-		static constexpr std::array PIN_TABLE{__VA_ARGS__}; \
-	}

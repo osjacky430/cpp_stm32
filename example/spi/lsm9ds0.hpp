@@ -5,6 +5,7 @@
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/driver/i2c.hxx"
 #include "cpp_stm32/driver/spi.hxx"
+#include "cpp_stm32/utility/integral_constant.hxx"
 
 namespace Lsm9ds0 {
 
@@ -59,7 +60,8 @@ class LSM9DS0 {
 		if constexpr (std::is_same_v<COMM_t, I2C_t>) {
 			return COMM_t{Driver::I2cSDA<SDAPin>{}, Driver::I2cSCL<SCLPin>{}, 400_kHz};
 		} else {
-			return COMM_t{Driver::Miso<SDOPin>{}, Driver::Mosi<SDAPin>{}, Driver::Sclk<SCLPin>{}, 5000_kHz, Spi::Mode::Mode2};
+			return COMM_t{Driver::Miso<SDOPin>{}, Driver::Mosi<SDAPin>{}, Driver::Sclk<SCLPin>{},
+										Spi::Mode::Mode2,				cpp_stm32::size_c<8>,		5000_kHz};
 		}
 	}();
 

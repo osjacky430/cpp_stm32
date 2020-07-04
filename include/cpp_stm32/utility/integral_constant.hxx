@@ -53,16 +53,21 @@ template <std::uint8_t BC>
 using HalfWordCount = DataCount<std::uint16_t, BC>;
 
 // not sure
-template <std::uint32_t Q>
+template <std::uint32_t Q, typename Tag>
 struct Unit {
 	static constexpr auto value = Q;
 	constexpr auto operator()() const noexcept { return value; }
+
+	template <std::uint32_t P>
+	constexpr auto operator>(Unit<P, Tag> const) const noexcept {
+		return Q > P;
+	}
 };
 
 template <std::uint32_t Sec>
-struct Second : Unit<Sec> {};
+struct Second : Unit<Sec, struct s> {};
 
-template <std::uint32_t Hz>
-struct Frequency : Unit<Hz> {};
+template <std::uint32_t Freq>
+struct Frequency : Unit<Freq, struct Hz> {};
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

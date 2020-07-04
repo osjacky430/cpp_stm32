@@ -36,19 +36,18 @@ enum class InterruptFlag : std::uint8_t { ERRIE, RXNEIE, TXEIE };
  *  @class  Baurdrate_t
  *  @brief  Utility class used to check whether baudrate prescaler is reasonable
  */
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(Baudrate_t, /**/
-																		 std::pair{2U, 0b00}, std::pair{4U, 0b01}, std::pair{8U, 0b10},
-																		 std::pair{16U, 0b11}, std::pair{32U, 0b100}, std::pair{64U, 0b101},
-																		 std::pair{128U, 0b110}, std::pair{256U, 0b111});
+
+using Baudrate_t = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_SPI_BAUD, /**/
+																					PAIR(2, 0b00), PAIR(4, 0b01), PAIR(8, 0b10), PAIR(16, 0b11), PAIR(32, 0b100),
+																					PAIR(64, 0b101), PAIR(128, 0b110), PAIR(256, 0b111)>;
 /**
  *  @class  DataSize
  *  @brief  Utility class used to check whether data size is reasonable
  */
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(DataSize, /**/
-																		 std::pair{4U, 0b11}, std::pair{5U, 0b100}, std::pair{6U, 0b101},
-																		 std::pair{7U, 0b110}, std::pair{8U, 0b111}, std::pair{9U, 0b1000},
-																		 std::pair{10U, 0b1001}, std::pair{11U, 0b1010}, std::pair{12U, 0b1011},
-																		 std::pair{13U, 0b1100}, std::pair{14U, 0b1101}, std::pair{15U, 0b1110},
-																		 std::pair{16U, 0b1111});
+
+using DataSize = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_SPI_DS, /**/
+																				PAIR(4, 0b11), PAIR(5, 0b100), PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111),
+																				PAIR(9, 0b1000), PAIR(10, 0b1001), PAIR(11, 0b1010), PAIR(12, 0b1011),
+																				PAIR(13, 0b1100), PAIR(14, 0b1101), PAIR(15, 0b1110), PAIR(16, 0b1111)>;
 
 }	 // namespace cpp_stm32::spi

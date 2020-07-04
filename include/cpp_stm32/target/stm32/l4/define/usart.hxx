@@ -24,6 +24,7 @@ enum class TransferMode : std::uint8_t { RxOnly = 1, TxOnly, TxRx };
 enum class Parity : std::uint8_t { Even, Odd, None };
 enum class Stopbit : std::uint8_t { Bit1, Bit0f5, Bit2, Bit1f5 };
 
+// @todo this needs documentation, or just dont do this
 enum class InterruptFlag : std::uint8_t {
 	TXE		= 7,
 	CTSIF = 10,

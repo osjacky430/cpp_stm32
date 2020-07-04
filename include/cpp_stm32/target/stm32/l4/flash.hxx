@@ -18,12 +18,11 @@
 
 #include <cstdint>
 
+#include "cpp_stm32/target/stm32/l4/define/flash.hxx"
 #include "cpp_stm32/target/stm32/l4/register/flash.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 namespace cpp_stm32::flash {
-
-struct Latency;
 
 /**
  * [if  description]

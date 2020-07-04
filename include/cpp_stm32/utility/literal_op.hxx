@@ -31,6 +31,14 @@ constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 10
 constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
 constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
 
+// template <char... num>
+// constexpr auto operator"" _MHz() noexcept {
+//	static_assert(detail::str_literal_is_int<num...>);
+
+//	constexpr auto freq = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{}) * 1000000;
+//	return Frequency<freq>{};
+//}
+
 template <char... num>
 constexpr auto operator"" _kHz() noexcept {
 	static_assert(detail::str_literal_is_int<num...>);
@@ -67,4 +75,4 @@ constexpr auto operator"" _halfword() noexcept {
 	return HalfWordCount<idx>{};
 }
 
-}	// namespace cpp_stm32
+}	 // namespace cpp_stm32

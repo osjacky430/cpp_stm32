@@ -227,8 +227,6 @@ constexpr void set_baudrate_prescaler(Baudrate_t const t_spi_baud) noexcept {
  */
 template <Port SPI, std::uint32_t HZ>
 constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
-	constexpr auto& KV_PAIR = Baudrate_t::AVAIL_DIVISION_FACTOR;
-	constexpr auto COMP			= [](auto const& t_val, auto const& t_pair) { return t_val < std::get<0>(t_pair); };
 	constexpr auto division = []() {
 		if constexpr (SPI == Port::SPI1) {
 			return APB2_CLK_FREQ / HZ;
@@ -236,8 +234,8 @@ constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
 			return APB1_CLK_FREQ / HZ;
 		}
 	}();
-	constexpr auto up_bound = std::get<0>(*detail::upper_bound(KV_PAIR.begin(), KV_PAIR.end(), division, COMP));
 
+	constexpr auto up_bound = Baudrate_t::upper_bound<division>().key;
 	// @todo: need to consider limit
 	set_baudrate_prescaler<SPI>(Baudrate_t{uint32_c<up_bound>{}});
 }
@@ -466,4 +464,4 @@ constexpr void init_master(Mode const t_mode, size_c<Ds> const, Frequency<Hz> co
 	enable<SPI>();
 }
 
-}	// namespace cpp_stm32::spi
+}	 // namespace cpp_stm32::spi

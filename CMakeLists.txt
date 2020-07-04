@@ -4,8 +4,8 @@
 cmake_minimum_required(VERSION 3.15.2...3.16.1 FATAL_ERROR)
 
 set(TARGET_BOARD
-    "stm32l432kc"
-    CACHE STRING "Target MCU" FORCE)
+    ""
+    CACHE STRING "Target MCU")
 
 set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
 

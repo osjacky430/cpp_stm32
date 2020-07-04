@@ -23,6 +23,7 @@
  */
 
 #include "cpp_stm32/driver/digitalout.hxx"
+#include "cpp_stm32/driver/spi.hxx"
 #include "cpp_stm32/driver/usart_serial.hxx"
 
 #include "gpio.hxx"
@@ -57,20 +58,15 @@ enum class RegisterMap : std::uint8_t {
 };
 
 constexpr void setup_spi() noexcept {
-	Rcc::enable_periph_clk<Rcc::PeriphClk::GpioB>();
-	Rcc::enable_periph_clk<Rcc::PeriphClk::Spi1>();
-	Gpio::mode_setup<Gpio::Port::PortA, Gpio::Pin::Pin5, Gpio::Pin::Pin6, Gpio::Pin::Pin7>(Gpio::Mode::AltFunc,
-																																												 Gpio::Pupd::None);
+	Driver::SPI imu(Driver::Miso<Gpio::PinName::PA_6>{}, Driver::Mosi<Gpio::PinName::PA_7>{},
+									Driver::Sclk<Gpio::PinName::PA_5>{}, Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
 
-	Gpio::set_alternate_function<Gpio::Port::PortA, Gpio::Pin::Pin5, Gpio::Pin::Pin6, Gpio::Pin::Pin7>(
-		Gpio::AltFunc::AF5);
-
-	Spi::init_master<Spi::Port::SPI1, Spi::TransferMode::FullDuplex, Spi::SlaveSelectMode::OutputHardware>(
-		Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
+	//	Spi::init_master<Spi::Port::SPI1, Spi::TransferMode::FullDuplex, Spi::SlaveSelectMode::OutputHardware>(
+	//		Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
 }
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Msi>();
+	Sys::Clock::init<Rcc::ClkSrc::Hse>();
 
 	Driver::DigitalOut<Gpio::PinName::PB_1> const xm_ss;
 	Driver::DigitalOut<Gpio::PinName::PB_0> const gyro_ss;
@@ -93,8 +89,8 @@ int main() {
 		Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin(), tx.begin() + 1);
 		auto const [gyro_id] = Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin() + 1, tx.end());
 
-		auto const [level] = Spi::get_rx_fifo_level<Spi::Port::SPI1>();
+		//	auto const [level] = Spi::get_rx_fifo_level<Spi::Port::SPI1>();
 		pc << (gyro_id) << "\n\r";
-		pc << cpp_stm32::to_underlying(level) << "\n\r";
+		//		pc << cpp_stm32::to_underlying(level) << "\n\r";
 	}
 }

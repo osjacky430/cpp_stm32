@@ -27,7 +27,7 @@
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/utility/serial.hxx"
 
-#include "device.hxx"
+#include "pin_map/spi.hxx"
 
 namespace cpp_stm32::driver {
 
@@ -64,26 +64,32 @@ class SPI {
 	/**
 	 * @brief    Construct SPI with
 	 */
-	template <std::uint32_t HZ, typename = std::enable_if_t<MISO != gpio::PinName::NC>,
+	template <std::uint32_t HZ, std::size_t Ds, typename = std::enable_if_t<MISO != gpio::PinName::NC>,
 						typename = std::enable_if_t<NSS == gpio::PinName::NC>>
-	explicit constexpr SPI(Miso<MISO> const /**/, Mosi<MOSI> const /**/, Sclk<SCLK> const /**/,
-												 Frequency<HZ> const t_freq, spi::Mode const t_mode) noexcept {
+	explicit constexpr SPI(Miso<MISO> const /**/, Mosi<MOSI> const /**/, Sclk<SCLK> const /**/, spi::Mode const t_mode,
+												 size_c<Ds> t_ds, Frequency<HZ> const t_freq) noexcept {
 		GpioUtil<MISO, MOSI, SCLK>::enableAllGpioClk();
 		GpioUtil<MISO, MOSI, SCLK>::modeSetup(gpio::Mode::AltFunc, gpio::Pupd::None);
 
-		GpioUtil<MISO>::alternateFuncSetup(MISO_AF);
-		GpioUtil<MOSI>::alternateFuncSetup(MOSI_AF);
-		GpioUtil<SCLK>::alternateFuncSetup(SCLK_AF);
+		if constexpr (MISO_AF == MOSI_AF && MOSI_AF == MISO_AF) {
+			GpioUtil<MISO, MOSI, SCLK>::alternateFuncSetup(MISO_AF);
+		} else if constexpr (MISO_AF == MOSI_AF) {
+			GpioUtil<MISO, MOSI>::alternateFuncSetup(MISO_AF);
+			GpioUtil<SCLK>::alternateFuncSetup(SCLK_AF);
+		} else if constexpr (MISO_AF == SCLK_AF) {
+			GpioUtil<MISO, SCLK>::alternateFuncSetup(MISO_AF);
+			GpioUtil<MOSI>::alternateFuncSetup(MOSI_AF);
+		} else if constexpr (MOSI_AF == SCLK_AF) {
+			GpioUtil<MOSI, SCLK>::alternateFuncSetup(MOSI_AF);
+			GpioUtil<MISO>::alternateFuncSetup(MISO_AF);
+		} else {
+			GpioUtil<MISO>::alternateFuncSetup(MISO_AF);
+			GpioUtil<MOSI>::alternateFuncSetup(MOSI_AF);
+			GpioUtil<SCLK>::alternateFuncSetup(SCLK_AF);
+		}
 
 		rcc::enable_periph_clk<RCC>();
-
-		spi::set_master_mode<PORT>();
-		spi::set_msb_first<PORT>();
-		spi::set_transfer_mode<PORT, spi::TransferMode::FullDuplex>();
-		spi::set_slave_select_mode<PORT, spi::SlaveSelectMode::OutputHardware>();
-		spi::set_baudrate<PORT>(t_freq);
-		spi::set_mode<PORT>(t_mode);
-		spi::enable<PORT>();
+		spi::init_master<PORT, spi::TransferMode::FullDuplex, spi::SlaveSelectMode::OutputHardware>(t_mode, t_ds, t_freq);
 	}
 
 	/**
@@ -135,4 +141,4 @@ class SPI {
 	}
 };
 
-}	// namespace cpp_stm32::driver
+}	 // namespace cpp_stm32::driver
