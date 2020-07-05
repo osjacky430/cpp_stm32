@@ -29,6 +29,7 @@
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 
 #include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 // user specific include
@@ -164,15 +165,14 @@ class Clock {
 		constexpr auto max_plln				= std::floor(VCO_OUTPUT_FREQ_MAX / vco_input_freq);
 		constexpr auto min_plln				= std::ceil(VCO_OUTPUT_FREQ_MIN / vco_input_freq);
 
-		constexpr auto pllp_satisfy_constraint = [](auto const& t_pllp_candidate) {
-			auto const plln = t_pllp_candidate.first * plln_over_pllp;
+		constexpr auto pllp_satisfy_constraint = [](auto&& t_pllp_candidate) {
+			auto const plln = t_pllp_candidate.key * plln_over_pllp;
 			return (min_plln <= plln && plln <= max_plln);
 		};
 
-		constexpr auto pllp_iter =
-			detail::find_if(PllP::AVAIL_DIVISION_FACTOR.begin(), PllP::AVAIL_DIVISION_FACTOR.end(), pllp_satisfy_constraint);
-		constexpr auto pllp = pllp_iter->first;
-		constexpr auto plln = static_cast<std::uint32_t>(plln_over_pllp * pllp);
+		constexpr auto pllp_idx = detail::find_if(PllP::KEY_VAL_MAP, pllp_satisfy_constraint);
+		constexpr auto pllp			= std::get<pllp_idx>(PllP::KEY_VAL_MAP).key;
+		constexpr auto plln			= static_cast<std::uint32_t>(plln_over_pllp * pllp);
 
 		// if constexpr (need to calculate pllq and pllr) {
 		//    ...

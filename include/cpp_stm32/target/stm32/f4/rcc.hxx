@@ -27,6 +27,7 @@
 #include <utility>
 
 #include "cpp_stm32/common/rcc.hxx"
+#include "cpp_stm32/target/stm32/f4/define/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/register/rcc.hxx"
 

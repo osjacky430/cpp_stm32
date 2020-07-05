@@ -24,6 +24,7 @@
  */
 namespace cpp_stm32::rcc {
 
+// @todo remove the Frequency stuff!!
 template <std::uint32_t Val>
 using Frequency_t = uint32_c<Val>;
 

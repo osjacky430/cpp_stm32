@@ -28,5 +28,12 @@ install:
 script:
     - cd $TRAVIS_BUILD_DIR
     - mkdir build && cd build
-    - cmake -DBUILD_EXAMPLE="ALL" -G "Unix Makefiles" ..
+    - cmake -DBUILD_EXAMPLE=ON -DTARGET_BOARD="stm32f446re" -G "Unix Makefiles" ..
+    - cmake --build ./
+    ###################################
+    # build target board stm32l432kc  #
+    ###################################
+    - rm -rf build/
+    - mkdir build && cd build
+    - cmake -DBUILD_EXAMPLE=ON -DTARGET_BOARD="stm32l432kc" -G "Unix Makefiles" ..
     - cmake --build ./

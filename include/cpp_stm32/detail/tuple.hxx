@@ -389,3 +389,24 @@ struct tuple_element<Idx, cpp_stm32::detail::Tuple<Elems...>> {
 };
 
 }	 // namespace std
+
+// tuple algorithm
+namespace cpp_stm32::detail {
+
+template <typename Tup, typename F>
+constexpr auto find_if(Tup&& t_tup, F&& pred) noexcept {
+	auto const find_for_each = [&](auto&& t_elem, std::size_t t_idx) {
+		return pred(t_elem) ? t_idx : std::tuple_size_v<std::remove_reference_t<Tup>>;
+	};
+
+	auto const apply_func = [&](auto&&... t_elems) {
+		std::size_t i = 0;
+		(void)((find_for_each(t_elems, i++) != std::tuple_size_v<std::remove_reference_t<Tup>>) || ...);
+		return i - 1;
+	};
+
+	return std::apply(apply_func, t_tup);
+}
+
+}	 // namespace cpp_stm32::detail
+

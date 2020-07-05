@@ -20,7 +20,8 @@
 #include <tuple>
 
 #include "cpp_stm32/common/rcc.hxx"
-#include "cpp_stm32/target/stm32/l4/pin_map/pin_map.hxx"
+#include "cpp_stm32/target/stm32//l4/define/rcc.hxx"
+#include "cpp_stm32/target/stm32/l4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/l4/register/rcc.hxx"
 
 namespace cpp_stm32::rcc {
@@ -111,10 +112,10 @@ constexpr void set_pllsrc() {
 	reg::PLLCFGR.template writeBit<reg::PLLCFGRField::PLLSRC>(Clk);
 }
 
-constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln,
-																					std::optional<PllP> const& t_pllp = std::nullopt,
-																					std::optional<PllQ> const& t_pllq = std::nullopt,
-																					std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
+constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln,
+																					std::optional<PllP> const t_pllp = std::nullopt,
+																					std::optional<PllQ> const t_pllq = std::nullopt,
+																					std::optional<PllR> const t_pllr = std::nullopt) noexcept {
 	std::uint8_t const enable_pllp = static_cast<bool>(t_pllp);
 	std::uint8_t const enable_pllq = static_cast<bool>(t_pllq);
 	std::uint8_t const enable_pllr = static_cast<bool>(t_pllr);
@@ -131,10 +132,10 @@ constexpr void config_pll_division_factor(PllM const& t_pllm, PllN const& t_plln
 }
 
 template <ClkSrc Clk>
-constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln,
-																				 std::optional<PllP> const& t_pllp = std::nullopt,
-																				 std::optional<PllQ> const& t_pllq = std::nullopt,
-																				 std::optional<PllR> const& t_pllr = std::nullopt) noexcept {
+constexpr void set_pllsrc_and_div_factor(PllM const t_pllm, PllN const t_plln,
+																				 std::optional<PllP> const t_pllp = std::nullopt,
+																				 std::optional<PllQ> const t_pllq = std::nullopt,
+																				 std::optional<PllR> const t_pllr = std::nullopt) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 
 	std::uint8_t const enable_pllp = static_cast<bool>(t_pllp);
@@ -151,11 +152,11 @@ constexpr void set_pllsrc_and_div_factor(PllM const& t_pllm, PllN const& t_plln,
 												reg::PLLCFGRField::PLLQEN, reg::PLLCFGRField::PLLR, reg::PLLCFGRField::PLLREN>(mod_val);
 }
 
-constexpr void config_adv_bus_division_factor(HPRE const& t_hpre, PPRE const& t_ppre1, PPRE const& t_ppre2) {
+constexpr void config_adv_bus_division_factor(HPRE const t_hpre, PPRE const t_ppre1, PPRE const t_ppre2) {
 	reg::CFGR.writeBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(t_hpre, t_ppre1, t_ppre2);
 }
 
-constexpr void set_msi_range(MsiRange const& t_msi_range) noexcept {
+constexpr void set_msi_range(MsiRange const t_msi_range) noexcept {
 	reg::CR.writeBit<reg::CRField::MSIRANGE>(t_msi_range);
 }
 

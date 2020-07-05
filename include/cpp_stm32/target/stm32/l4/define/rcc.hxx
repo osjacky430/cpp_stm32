@@ -58,12 +58,12 @@ using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, PAIR(7, 0), PAIR(
 using PllQ = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
 																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
-// using PllR = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
-//																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
-
-// @todo Chane this to KeyValTable
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllR, /**/
-																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
+/**
+ *
+ *
+ */
+using PllR = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
+																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
 /**
  * @enum 		PeriphClk

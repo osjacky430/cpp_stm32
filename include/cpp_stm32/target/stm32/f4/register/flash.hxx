@@ -29,14 +29,10 @@
 #include "cpp_stm32/utility/macro.hxx"
 
 #include "cpp_stm32/common/flash.hxx"
+#include "cpp_stm32/target/stm32/f4/define/flash.hxx"
 #include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
 
 // @todo move this to define/flash.hxx
-namespace cpp_stm32::flash {
-
-using Latency = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_LATENCY, 0, 15>;
-
-}	 // namespace cpp_stm32::flash
 
 namespace cpp_stm32::flash::reg {
 

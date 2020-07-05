@@ -28,13 +28,8 @@
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 
+#include "cpp_stm32/target/stm32/f4/define/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
-
-namespace cpp_stm32::pwr {
-
-enum class VoltageScale;
-
-}
 
 namespace cpp_stm32::pwr::reg {
 

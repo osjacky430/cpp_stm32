@@ -26,6 +26,7 @@
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
 
 #include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
 #include "sys_info.hpp"
@@ -138,6 +139,38 @@ class Clock {
 		};
 	};
 
+	template <std::size_t Idx>
+	static constexpr auto CHECK_PLL_MNR_IMPL(std::uint64_t const t_pll_input) noexcept {
+		constexpr auto pllr						= std::get<Idx>(rcc::PllR::KEY_VAL_MAP).key;
+		constexpr auto vco_freq				= pllr * SYS_CLK_FREQ;
+		constexpr auto vco_in_inrange = [](auto const t_vco_in) {
+			return VCO_INPUT_FREQ_MIN <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX;
+		};
+		constexpr auto vco_out_inrange = [](auto const t_vco_out) {
+			return VCO_OUTPUT_FREQ_MIN <= t_vco_out && t_vco_out <= VCO_OUTPUT_FREQ_MAX;
+		};
+
+		if constexpr (vco_out_inrange(vco_freq)) {
+			for (auto plln = rcc::PllN::MIN; plln <= rcc::PllN::MAX; ++plln) {
+				if (auto const vco_in_freq = vco_freq / plln; vco_in_inrange(vco_in_freq)) {
+					if (auto const pllm = t_pll_input / vco_in_freq; 1 <= pllm && pllm <= 7) {
+						return std::tuple{pllm, plln, pllr};
+					}
+				}
+			}
+		}
+
+		if constexpr (Idx + 1 < rcc::PllR::KV_NUM) {
+			return CHECK_PLL_MNR_IMPL<Idx + 1>(t_pll_input);
+		} else {
+			return std::tuple{0ULL, 0UL, 0};
+		}
+	}
+
+	static constexpr auto CHECK_PLL_MNR(std::uint64_t const t_pll_input) noexcept {
+		return CHECK_PLL_MNR_IMPL<0>(t_pll_input);
+	}
+
 	template <rcc::ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() noexcept {
 		using rcc::ClkSrc, rcc::PllM, rcc::PllN, rcc::PllP, rcc::PllQ, rcc::PllR;
@@ -155,23 +188,10 @@ class Clock {
 			}
 		}();
 
-		constexpr auto pllm_n_r = []() {
-			for (auto const& pllr_candidate : PllR::AVAIL_DIVISION_FACTOR) {
-				if (auto const vco_freq = pllr_candidate.first * SYS_CLK_FREQ;
-						VCO_OUTPUT_FREQ_MIN <= vco_freq && vco_freq <= VCO_OUTPUT_FREQ_MAX) {
-					for (auto plln = PllN::MIN; plln < PllN::MAX; ++plln) {
-						if (auto const vco_input_freq = vco_freq / plln;
-								VCO_INPUT_FREQ_MIN <= vco_input_freq && vco_input_freq <= VCO_INPUT_FREQ_MAX) {
-							if (auto const pllm = pll_input_clk_freq / vco_input_freq; 1 <= pllm && pllm <= 7)
-								return std::tuple{pllm, plln, pllr_candidate.first};
-						}
-					}
-				}
-			}
-		}();
-		constexpr auto pllm = std::get<0>(pllm_n_r);
-		constexpr auto plln = std::get<1>(pllm_n_r);
-		constexpr auto pllr = std::get<2>(pllm_n_r);
+		constexpr auto pllm_n_r = CHECK_PLL_MNR(pll_input_clk_freq);
+		constexpr auto pllm			= std::get<0>(pllm_n_r);
+		constexpr auto plln			= std::get<1>(pllm_n_r);
+		constexpr auto pllr			= std::get<2>(pllm_n_r);
 
 		// if constexpr (need to calculate pllp, pllq)
 		// {
@@ -180,7 +200,8 @@ class Clock {
 		return std::tuple{PllM{rcc::DivisionFactor_v<pllm>}, PllN{rcc::DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
 											PllR{rcc::DivisionFactor_v<pllr>}};
 		// }
-	}
+	}	 // namespace cpp_stm32::sys
+
 	/**
 	 * @var 	CPU_WAIT_STATE
 	 * @brief	This is chosen base on AHB clock frequency

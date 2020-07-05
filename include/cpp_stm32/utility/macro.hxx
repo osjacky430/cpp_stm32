@@ -1,18 +1,27 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  utility/macro.hxx
+ * @brief	Some macro and utiltiy class definition
+ *
+ * @todo  Move to detail namespace
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <cstdint>
@@ -26,7 +35,17 @@
 
 namespace cpp_stm32 {
 
-// @todo replace macro above with this LookUpTable class
+struct Table {
+ protected:
+	std::uint32_t const m_value;
+
+ public:
+	explicit constexpr Table(std::uint32_t const t_val) noexcept : m_value(t_val) {}
+
+	[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }
+	[[nodiscard]] constexpr auto get() const noexcept { return m_value; }
+};
+
 template <typename Tag, std::uint32_t Lower, std::uint32_t Upper>
 struct LookUpTable {
 	std::uint32_t const m_value;
@@ -51,6 +70,9 @@ struct Pair {
 	explicit constexpr Pair(Key&& t_key, Val&& t_val) noexcept : key(t_key), val(t_val) {}
 };
 
+/**
+ *
+ */
 template <typename Tag, auto... All>
 class KeyValTable {
  private:
@@ -111,6 +133,21 @@ class KeyValTable {
 	[[nodiscard]] constexpr auto get() const noexcept { return m_val; }
 	[[nodiscard]] constexpr auto operator()() const noexcept { return m_val; }
 };
+
+/**
+ * @todo finish this?
+ */
+template <std::size_t I, typename T>
+struct TypePair {
+	static constexpr auto Index = I;
+	using Type									= T;
+};
+
+/**
+ * @todo finish this?
+ */
+template <typename... T>
+struct TypeTable {};
 
 }	 // namespace cpp_stm32
 

@@ -56,11 +56,8 @@ using PllN = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLN, 50, 432>;
  * 							 6		 |   0b10
  * 							 8		 |	 0b11
  */
-// @todo replace this with KeyValTable
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(PllP, /**/
-																		 std::pair{2, 0b00}, std::pair{4, 0b01}, std::pair{6, 0b10}, std::pair{8, 0b11}, );
-// using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, /**/
-//																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, /**/
+																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 /**
  * @class 	PllQ
  * @brief		Utility class used to check whether division factor is reasonable.

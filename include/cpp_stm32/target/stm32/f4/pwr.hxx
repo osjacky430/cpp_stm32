@@ -22,11 +22,10 @@
 
 #pragma once
 
+#include "cpp_stm32/target/stm32/f4/define/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/register/pwr.hxx"
 
 namespace cpp_stm32::pwr {
-
-enum class VoltageScale { Scale1Mode = 0b11, Scale2Mode = 0b10, Scale3Mode = 0b01 };
 
 // only set when pll is enabled
 // @ref https://community.st.com/s/question/0D50X0000A4qUmwSQE/more-documentation-about-vosrdy
