@@ -160,10 +160,10 @@ class Clock {
 			}
 		}
 
-		if constexpr (Idx + 1 < rcc::PllR::KV_NUM) {
+		if constexpr (Idx + 1 < rcc::PllR::KEY_VAL_NUM) {
 			return CHECK_PLL_MNR_IMPL<Idx + 1>(t_pll_input);
 		} else {
-			return std::tuple{0ULL, 0UL, 0};
+			return std::tuple{0ULL, 0, 0};
 		}
 	}
 
@@ -200,7 +200,7 @@ class Clock {
 		return std::tuple{PllM{rcc::DivisionFactor_v<pllm>}, PllN{rcc::DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
 											PllR{rcc::DivisionFactor_v<pllr>}};
 		// }
-	}	 // namespace cpp_stm32::sys
+	}	// namespace cpp_stm32::sys
 
 	/**
 	 * @var 	CPU_WAIT_STATE
@@ -295,4 +295,4 @@ class Clock {
 	}
 };	// namespace cpp_stm32::stm32::l4
 
-}	 // namespace cpp_stm32::sys
+}	// namespace cpp_stm32::sys

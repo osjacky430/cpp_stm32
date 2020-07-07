@@ -26,7 +26,7 @@
 #include <cstdint>
 
 #include "cpp_stm32/detail/algorithm.hxx"
-#include "cpp_stm32/utility/macro.hxx"
+#include "cpp_stm32/detail/lookup_table.hxx"
 
 namespace cpp_stm32::spi {
 
@@ -54,7 +54,7 @@ enum class InterruptFlag : std::uint8_t { ERRIE, RXNEIE, TXEIE };
  *  @class  Baurdrate_t
  *  @brief  Utility class used to check whether baudrate prescaler is reasonable
  */
-using Baudrate_t = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_SPI_BAUD, /**/
-																					PAIR(2, 0b00), PAIR(4, 0b01), PAIR(8, 0b10), PAIR(16, 0b11), PAIR(32, 0b100),
-																					PAIR(64, 0b101), PAIR(128, 0b110), PAIR(256, 0b111)>;
-}	 // namespace cpp_stm32::spi
+using Baudrate_t = detail::KeyValTable<struct CPP_STM32_LUT_SPI_BAUD, /**/
+																			 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(8, 0b10), PAIR(16, 0b11), PAIR(32, 0b100),
+																			 PAIR(64, 0b101), PAIR(128, 0b110), PAIR(256, 0b111)>;
+}	// namespace cpp_stm32::spi

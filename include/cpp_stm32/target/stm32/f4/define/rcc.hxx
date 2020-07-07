@@ -26,7 +26,7 @@
 #include <cstdint>
 
 #include "cpp_stm32/detail/algorithm.hxx"
-#include "cpp_stm32/utility/macro.hxx"
+#include "cpp_stm32/detail/lookup_table.hxx"
 
 namespace cpp_stm32::rcc {
 
@@ -35,14 +35,14 @@ namespace cpp_stm32::rcc {
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllM valid number lies between 2 and 63
  */
-using PllM = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLM, 2, 63>;
+using PllM = detail::KeyValTable<struct CPP_STM32_LUT_PLLM, 2, 63>;
 
 /**
  * @class		PllN
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllN valid number lies between 50 and 432
  */
-using PllN = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLN, 50, 432>;
+using PllN = detail::KeyValTable<struct CPP_STM32_LUT_PLLN, 50, 432>;
 
 /**
  * @class 	PllP
@@ -56,41 +56,40 @@ using PllN = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLN, 50, 432>;
  * 							 6		 |   0b10
  * 							 8		 |	 0b11
  */
-using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, /**/
-																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllP = detail::KeyValTable<struct CPP_STM32_LUT_PLLP, /**/
+																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 /**
  * @class 	PllQ
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllQ valid number lies between 2 and 15
  */
-using PllQ = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLQ, 2, 15>;
+using PllQ = detail::KeyValTable<struct CPP_STM32_LUT_PLLQ, 2, 15>;
 
 /**
  * @class 	PllR
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note 		PllR valid number lies between 2 and 7
  */
-using PllR = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLR, 2, 7>;
+using PllR = detail::KeyValTable<struct CPP_STM32_LUT_PLLR, 2, 7>;
 
 /**
  * @class 	HPRE
  * @brief
  */
-using HPRE =
-	cpp_stm32::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
-												 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
-												 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
+using HPRE = detail::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
+																 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
+																 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
 
 /**
  * @class PPRE
  * @brief
  */
-using PPRE = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
-																		PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
+using PPRE = detail::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
+																 PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
 /**
  * [SETUP_LOOKUP_TABLE_WITH_BOUND description]
  */
-using RTCPRE = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_RTCPRE, 2, 31>;
+using RTCPRE = detail::KeyValTable<struct CPP_STM32_LUT_RTCPRE, 2, 31>;
 
 /**
  *	@enum 	PeriphClk
@@ -152,4 +151,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
 
-}	 // namespace cpp_stm32::rcc
+}	// namespace cpp_stm32::rcc

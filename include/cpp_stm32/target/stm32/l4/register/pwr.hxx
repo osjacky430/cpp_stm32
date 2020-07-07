@@ -4,7 +4,6 @@
 #include "cpp_stm32/hal/register.hxx"
 
 #include "cpp_stm32/target/stm32/l4/define/pwr.hxx"
-#include "cpp_stm32/utility/macro.hxx"
 
 namespace cpp_stm32::pwr::reg {
 
@@ -27,4 +26,4 @@ static constexpr Register<PwrCrInfo, CrBit> CR{PWR_BASE, 0x00U};
 
 /**@}*/
 
-}	 // namespace cpp_stm32::pwr::reg
+}	// namespace cpp_stm32::pwr::reg

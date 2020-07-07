@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "cpp_stm32/detail/algorithm.hxx"
-#include "cpp_stm32/utility/macro.hxx"
+#include "cpp_stm32/detail/lookup_table.hxx"
 
 namespace cpp_stm32::spi {
 
@@ -37,17 +37,17 @@ enum class InterruptFlag : std::uint8_t { ERRIE, RXNEIE, TXEIE };
  *  @brief  Utility class used to check whether baudrate prescaler is reasonable
  */
 
-using Baudrate_t = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_SPI_BAUD, /**/
-																					PAIR(2, 0b00), PAIR(4, 0b01), PAIR(8, 0b10), PAIR(16, 0b11), PAIR(32, 0b100),
-																					PAIR(64, 0b101), PAIR(128, 0b110), PAIR(256, 0b111)>;
+using Baudrate_t = detail::KeyValTable<struct CPP_STM32_LUT_SPI_BAUD, /**/
+																			 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(8, 0b10), PAIR(16, 0b11), PAIR(32, 0b100),
+																			 PAIR(64, 0b101), PAIR(128, 0b110), PAIR(256, 0b111)>;
 /**
  *  @class  DataSize
  *  @brief  Utility class used to check whether data size is reasonable
  */
 
-using DataSize = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_SPI_DS, /**/
-																				PAIR(4, 0b11), PAIR(5, 0b100), PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111),
-																				PAIR(9, 0b1000), PAIR(10, 0b1001), PAIR(11, 0b1010), PAIR(12, 0b1011),
-																				PAIR(13, 0b1100), PAIR(14, 0b1101), PAIR(15, 0b1110), PAIR(16, 0b1111)>;
+using DataSize = detail::KeyValTable<struct CPP_STM32_LUT_SPI_DS, /**/
+																		 PAIR(4, 0b11), PAIR(5, 0b100), PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111),
+																		 PAIR(9, 0b1000), PAIR(10, 0b1001), PAIR(11, 0b1010), PAIR(12, 0b1011),
+																		 PAIR(13, 0b1100), PAIR(14, 0b1101), PAIR(15, 0b1110), PAIR(16, 0b1111)>;
 
-}	 // namespace cpp_stm32::spi
+}	// namespace cpp_stm32::spi

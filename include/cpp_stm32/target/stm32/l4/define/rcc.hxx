@@ -4,9 +4,10 @@
 #include <cstdint>
 #include <utility>
 
-#include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/lookup_table.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 #include "cpp_stm32/utility/macro.hxx"
+#include "cpp_stm32/utility/strongly_typed.hxx"
 
 namespace cpp_stm32::rcc {
 
@@ -16,54 +17,54 @@ SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(MsiRange, /**/
 																		 std::pair{800_KHz, 0b0011}, std::pair{1_MHz, 0b0100}, std::pair{2_MHz, 0b0101},
 																		 std::pair{4_MHz, 0b0110}, std::pair{8_MHz, 0b0111}, std::pair{16_MHz, 0b1000},
 																		 std::pair{24_MHz, 0b1001}, std::pair{32_MHz, 0b1010}, std::pair{48_MHz, 0b1011});
-/**
- *
- *
- */
-using HPRE =
-	cpp_stm32::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
-												 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
-												 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
 
 /**
  *
  *
  */
-using PPRE = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
-																		PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
+using HPRE = detail::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
+																 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
+																 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
 
 /**
  *
  *
  */
-using PllM = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLM, /**/
-																		PAIR(1, 0b000), PAIR(2, 0b001), PAIR(3, 0b010), PAIR(4, 0b011), PAIR(5, 0b100),
-																		PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111)>;
+using PPRE = detail::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
+																 PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
 
 /**
  *
  *
  */
-using PllN = cpp_stm32::LookUpTable<struct CPP_STM32_LUT_PLLN, 8, 86>;
+using PllM = detail::KeyValTable<struct CPP_STM32_LUT_PLLM, /**/
+																 PAIR(1, 0b000), PAIR(2, 0b001), PAIR(3, 0b010), PAIR(4, 0b011), PAIR(5, 0b100),
+																 PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111)>;
 
 /**
  *
  *
  */
-using PllP = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLP, PAIR(7, 0), PAIR(17, 1)>;
-
-/**
- *
- */
-using PllQ = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
-																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllN = detail::KeyValTable<struct CPP_STM32_LUT_PLLN, 8, 86>;
 
 /**
  *
  *
  */
-using PllR = cpp_stm32::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
-																		PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllP = detail::KeyValTable<struct CPP_STM32_LUT_PLLP, PAIR(7, 0), PAIR(17, 1)>;
+
+/**
+ *
+ */
+using PllQ = detail::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
+																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+
+/**
+ *
+ *
+ */
+using PllR = detail::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
+																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
 /**
  * @enum 		PeriphClk
@@ -125,5 +126,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi160 || Clk == ClkSrc::Msi);
 
-}	 // namespace cpp_stm32::rcc
-
+}	// namespace cpp_stm32::rcc

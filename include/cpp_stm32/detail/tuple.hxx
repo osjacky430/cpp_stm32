@@ -297,8 +297,8 @@ class Tuple : public TupleImpl<0, Elems...> {
 	 * @return  const reference to element at index
 	 */
 	template <std::size_t Idx>
-	[[nodiscard]] constexpr auto const& operator[](
-		std::integral_constant<std::size_t, Idx> const /*unused*/) const noexcept {
+	[[nodiscard]] constexpr auto const& operator[](std::integral_constant<std::size_t, Idx> const /*unused*/) const
+		noexcept {
 		return get<Idx>(*static_cast<TupleImpl<0, Elems...> const*>(this));
 	}
 
@@ -377,7 +377,12 @@ template <typename... Elems>
 	return to_std_tup_impl(t_tup, std::make_index_sequence<sizeof...(Elems)>{});
 }
 
-}	 // namespace cpp_stm32::detail
+template <typename T, std::size_t... Idx>
+[[nodiscard]] constexpr auto partial_tuple(T&& t_tup, std::index_sequence<Idx...> const) noexcept {
+	return std::tuple{std::get<Idx>(t_tup)...};
+}
+
+}	// namespace cpp_stm32::detail
 
 namespace std {
 template <typename... Elems>
@@ -388,11 +393,17 @@ struct tuple_element<Idx, cpp_stm32::detail::Tuple<Elems...>> {
 	using type = decltype(get<Idx>(std::declval<cpp_stm32::detail::Tuple<Elems...>>()));
 };
 
-}	 // namespace std
+}	// namespace std
 
 // tuple algorithm
 namespace cpp_stm32::detail {
 
+/**
+ * [find_if description]
+ * @param  t_tup [description]
+ * @param  pred  [description]
+ * @return       [description]
+ */
 template <typename Tup, typename F>
 constexpr auto find_if(Tup&& t_tup, F&& pred) noexcept {
 	auto const find_for_each = [&](auto&& t_elem, std::size_t t_idx) {
@@ -400,13 +411,51 @@ constexpr auto find_if(Tup&& t_tup, F&& pred) noexcept {
 	};
 
 	auto const apply_func = [&](auto&&... t_elems) {
-		std::size_t i = 0;
-		(void)((find_for_each(t_elems, i++) != std::tuple_size_v<std::remove_reference_t<Tup>>) || ...);
-		return i - 1;
+		std::size_t i		 = 0;
+		bool const found = ((find_for_each(t_elems, i++) != std::tuple_size_v<std::remove_reference_t<Tup>>) || ...);
+		return found ? i - 1 : i;
 	};
 
 	return std::apply(apply_func, t_tup);
 }
 
-}	 // namespace cpp_stm32::detail
+/**
+ * [upper_bound_impl description]
+ * @param  t_tup  [description]
+ * @param  t_val  [description]
+ * @param  t_comp [description]
+ * @return        [description]
+ *
+ * @todo unit test?
+ */
+template <int Len, int First, typename Tup, typename T, typename F>
+constexpr auto upper_bound_impl(Tup&& t_tup, T const& t_val, F t_comp) noexcept {
+	if constexpr (Len > 0) {
+		constexpr auto step	= Len / 2;
+		constexpr int middle = First + step;
 
+		if (!t_comp(t_val, std::get<middle>(t_tup))) {
+			return upper_bound_impl<Len - middle - 1, middle + 1>(t_tup, t_val, t_comp);
+		} else {
+			return upper_bound_impl<step, First>(t_tup, t_val, t_comp);
+		}
+	}
+
+	return First;
+}
+
+/**
+ * [upper_bound description]
+ * @param  t_tup  [description]
+ * @param  t_val  [description]
+ * @param  t_comp [description]
+ * @return        [description]
+ *
+ * @todo unit test
+ */
+template <typename Tup, typename T, typename F>
+constexpr auto upper_bound(Tup&& t_tup, T const& t_val, F t_comp) noexcept {
+	return upper_bound_impl<std::tuple_size_v<std::decay_t<Tup>>, 0>(t_tup, t_val, t_comp);
+}
+
+}	// namespace cpp_stm32::detail

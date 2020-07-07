@@ -248,7 +248,7 @@ constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
 			return APB1_CLK_FREQ / HZ;
 		}
 	}();
-	constexpr auto up_bound = Baudrate_t::upper_bound<division>().key;
+	constexpr auto up_bound = Baudrate_t::UPPER_BOUND<division>().key;
 
 	// @todo: need to consider limit
 	set_baudrate_prescaler<SPI>(Baudrate_t{uint32_c<up_bound>{}});
@@ -439,4 +439,4 @@ constexpr void init_master(Mode const t_mode, size_c<Ds> const, Frequency<Hz> co
 	enable<SPI>();
 }
 
-}	 // namespace cpp_stm32::spi
+}	// namespace cpp_stm32::spi

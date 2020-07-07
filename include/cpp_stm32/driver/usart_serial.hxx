@@ -26,7 +26,6 @@
 #include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/driver/gpio_base.hxx"
 #include "cpp_stm32/hal/callback.hxx"
-#include "cpp_stm32/utility/macro.hxx"
 #include "cpp_stm32/utility/serial.hxx"
 
 // target specific include
@@ -131,7 +130,7 @@ class Usart {
 	constexpr auto receivable() const noexcept { return usart::is_rx_empty<USART_PORT>(); }
 
 	template <std::uint8_t BC = 1, bool Wait = false>
-	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	 = 1_byte,
+	[[nodiscard]] constexpr auto receive([[maybe_unused]] ByteCount<BC> const& t_bc	= 1_byte,
 																			 [[maybe_unused]] Waiting_t<Wait> const& t_w = Waiting<false>) const noexcept {
 		std::array<std::uint8_t, BC> ret_val{};
 		detail::generate(ret_val.begin(), ret_val.end(),
@@ -197,4 +196,4 @@ class Usart {
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

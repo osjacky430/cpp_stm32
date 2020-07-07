@@ -26,7 +26,6 @@
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/utility/macro.hxx"
 
 #include "cpp_stm32/common/flash.hxx"
 #include "cpp_stm32/target/stm32/f4/define/flash.hxx"
@@ -60,4 +59,4 @@ static constexpr Register<FlashAcrInfo, AcrBit> ACR{BASE_ADDR, 0x00U};
 
 /**@}*/
 
-}	 // namespace cpp_stm32::flash::reg
+}	// namespace cpp_stm32::flash::reg
