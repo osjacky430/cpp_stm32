@@ -6,17 +6,21 @@
 
 #include "cpp_stm32/detail/lookup_table.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
-#include "cpp_stm32/utility/macro.hxx"
 #include "cpp_stm32/utility/strongly_typed.hxx"
 
 namespace cpp_stm32::rcc {
 
-// @todo change this to KeyValTable
-SETUP_LOOKUP_TABLE_WITH_KEY_VAL_PAIR(MsiRange, /**/
-																		 std::pair{100_KHz, 0b000}, std::pair{200_KHz, 0b0001}, std::pair{400_KHz, 0b0010},
-																		 std::pair{800_KHz, 0b0011}, std::pair{1_MHz, 0b0100}, std::pair{2_MHz, 0b0101},
-																		 std::pair{4_MHz, 0b0110}, std::pair{8_MHz, 0b0111}, std::pair{16_MHz, 0b1000},
-																		 std::pair{24_MHz, 0b1001}, std::pair{32_MHz, 0b1010}, std::pair{48_MHz, 0b1011});
+/**
+ *
+ */
+using MsiRange =
+	detail::TypeTable<struct CPP_STM32_LUT_MSIRANGE, /**/
+										detail::TypePair<Frequency<100_k>, 0b0000>, detail::TypePair<Frequency<200_k>, 0b0001>,
+										detail::TypePair<Frequency<400_k>, 0b0010>, detail::TypePair<Frequency<800_k>, 0b0011>,
+										detail::TypePair<Frequency<1_M>, 0b0011>, detail::TypePair<Frequency<2_M>, 0b0101>,
+										detail::TypePair<Frequency<4_M>, 0b0110>, detail::TypePair<Frequency<8_M>, 0b0111>,
+										detail::TypePair<Frequency<16_M>, 0b1000>, detail::TypePair<Frequency<24_M>, 0b1001>,
+										detail::TypePair<Frequency<32_M>, 0b1010>, detail::TypePair<Frequency<48_M>, 0b1011> >;
 
 /**
  *

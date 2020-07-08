@@ -33,7 +33,6 @@ script:
     ###################################
     # build target board stm32l432kc  #
     ###################################
-    - rm -rf build/
     - mkdir build && cd build
     - cmake -DBUILD_EXAMPLE=ON -DTARGET_BOARD="stm32l432kc" -G "Unix Makefiles" ..
     - cmake --build ./

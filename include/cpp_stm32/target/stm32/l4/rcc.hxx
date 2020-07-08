@@ -162,4 +162,4 @@ constexpr void set_msi_range(MsiRange const t_msi_range) noexcept {
 
 constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CRField::MSIRGSEL>(); }
 
-}	 // namespace cpp_stm32::rcc
+}	// namespace cpp_stm32::rcc
