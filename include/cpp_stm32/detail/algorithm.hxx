@@ -180,7 +180,7 @@ constexpr InputIt find_if(InputIt first, InputIt last, UnaryPredicate p) {
  */
 template <class InputIt, class UnaryPredicate>
 constexpr bool all_of(InputIt first, InputIt last, UnaryPredicate p) {
-	return std::find_if_not(first, last, p) == last;
+	return find_if_not(first, last, p) == last;
 }
 
 /**

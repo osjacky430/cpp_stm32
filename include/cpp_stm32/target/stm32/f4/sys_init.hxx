@@ -46,7 +46,7 @@ namespace cpp_stm32::sys {
 #define LSI_CLK_FREQ 32000
 #endif
 
-static_assert(LSI_CLK_FREQ == 32_KHz);
+static_assert(Frequency<LSI_CLK_FREQ>{} == 32_kHz);
 
 /**@}*/
 
@@ -85,7 +85,7 @@ static_assert(1.8f <= STM32_VDD && STM32_VDD <= 3.6f);
 #define HSI_CLK_FREQ (16000000U)
 #endif
 
-static_assert(HSI_CLK_FREQ == 16_MHz);
+static_assert(Frequency<HSI_CLK_FREQ>{} == 16_MHz);
 
 /**@}*/
 
@@ -105,7 +105,7 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
 static constexpr auto HSE_CLK_FREQ_MIN = 4_MHz;
 static constexpr auto HSE_CLK_FREQ_MAX = 25_MHz;
 
-static_assert(HSE_CLK_FREQ_MIN <= HSE_CLK_FREQ && HSE_CLK_FREQ <= HSE_CLK_FREQ_MAX);
+static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
 
 /**@}*/
 
@@ -136,7 +136,7 @@ static constexpr auto APB1_FREQ_MAX_OVERDRIVE		 = 45_MHz;
 static constexpr auto APB2_FREQ_MAX_NO_OVERDRIVE = 84_MHz;
 static constexpr auto APB2_FREQ_MAX_OVERDRIVE		 = 90_MHz;
 
-static_assert(APB1_CLK_FREQ <= APB1_FREQ_MAX_OVERDRIVE);
+static_assert(Frequency<APB1_CLK_FREQ>{} <= APB1_FREQ_MAX_OVERDRIVE);
 
 /**
  * @class   Clock
@@ -144,7 +144,10 @@ static_assert(APB1_CLK_FREQ <= APB1_FREQ_MAX_OVERDRIVE);
  */
 class Clock {
  private:
-	static constexpr std::uint64_t AHB_CLK_FREQ_ = AHB_CLK_FREQ;
+	static constexpr auto AHB_CLK	= Frequency<AHB_CLK_FREQ>{};
+	static constexpr auto APB1_CLK = Frequency<APB1_CLK_FREQ>{};
+	static constexpr auto APB2_CLK = Frequency<APB2_CLK_FREQ>{};
+	static constexpr auto SYS_CLK	= Frequency<SYS_CLK_FREQ>{};
 
 	static constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR = []() {
 		using rcc::HPRE, rcc::PPRE, rcc::DivisionFactor_v;
@@ -158,10 +161,10 @@ class Clock {
 	template <rcc::ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() {
 		using rcc::ClkSrc, rcc::PllM, rcc::PllN, rcc::PllP, rcc::PllQ, rcc::PllR, rcc::DivisionFactor_v;
-		constexpr auto pll_input_clk_freq = (PllSrc == ClkSrc::Hse ? HSE_CLK_FREQ : HSI_CLK_FREQ);
-		constexpr auto pllm = static_cast<std::uint32_t>(std::ceil(pll_input_clk_freq / RECOMMEND_VCO_INPUT_FREQ));
-		constexpr auto vco_input_freq = pll_input_clk_freq / pllm;
-		constexpr auto plln_over_pllp = SYS_CLK_FREQ / vco_input_freq;
+		constexpr auto pll_input_clk = (PllSrc == ClkSrc::Hse ? HSE_CLK_FREQ : HSI_CLK_FREQ);
+		constexpr auto pllm = static_cast<std::uint32_t>(std::ceil(Frequency<pll_input_clk>{} / RECOMMEND_VCO_INPUT_FREQ));
+		constexpr auto vco_input_freq = Frequency<pll_input_clk / pllm>{};
+		constexpr auto plln_over_pllp = SYS_CLK / vco_input_freq;
 		constexpr auto max_plln				= std::floor(VCO_OUTPUT_FREQ_MAX / vco_input_freq);
 		constexpr auto min_plln				= std::ceil(VCO_OUTPUT_FREQ_MIN / vco_input_freq);
 
@@ -182,16 +185,16 @@ class Clock {
 	}
 
  public:
-	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ_);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK);
 
 	static constexpr auto NEED_OVERDRIVE =
-		(APB1_CLK_FREQ >= APB1_FREQ_MAX_NO_OVERDRIVE || APB2_CLK_FREQ >= APB2_FREQ_MAX_NO_OVERDRIVE ||
-		 AHB_CLK_FREQ >= AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE);
+		(APB1_CLK >= APB1_FREQ_MAX_NO_OVERDRIVE || APB2_CLK >= APB2_FREQ_MAX_NO_OVERDRIVE ||
+		 AHB_CLK >= AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE);
 
 	static constexpr auto VOLTAGE_SCALE = []() {
-		if constexpr (NEED_OVERDRIVE || AHB_CLK_FREQ >= AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
+		if constexpr (NEED_OVERDRIVE || AHB_CLK >= AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
 			return pwr::VoltageScale::Scale1Mode;
-		} else if constexpr (AHB_CLK_FREQ >= AHB_VOS_SCALE1_MAX_FREQ) {
+		} else if constexpr (AHB_CLK >= AHB_VOS_SCALE1_MAX_FREQ) {
 			return pwr::VoltageScale::Scale2Mode;
 		} else {
 			return pwr::VoltageScale::Scale3Mode;
@@ -232,7 +235,7 @@ class Clock {
 		rcc::wait_osc_rdy<PllSrc>();
 		rcc::set_sysclk<rcc::SysClk{to_underlying(PllSrc)}>();
 
-		{	 // operations that requires PLL off
+		{	// operations that requires PLL off
 			auto const& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
 
 			rcc::disable_clk<ClkSrc::Pll>();
@@ -257,7 +260,7 @@ class Clock {
 		auto const& [ahb, apb1, apb2] = CALC_ADVANCE_BUS_DIV_FACTOR();
 		rcc::config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc::wait_osc_rdy<ClkSrc::Pll>();	 // wait for PLL lock
+		rcc::wait_osc_rdy<ClkSrc::Pll>();	// wait for PLL lock
 
 		// switch sysclk and wait ready
 		rcc::set_sysclk<SYS_CLK_SRC>();
@@ -265,4 +268,4 @@ class Clock {
 	}
 };
 
-}	 // namespace cpp_stm32::sys
+}	// namespace cpp_stm32::sys

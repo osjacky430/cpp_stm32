@@ -31,7 +31,7 @@ namespace cpp_stm32::flash {
 struct WaitTable {
  private:
 	static constexpr std::tuple WAIT_STATE_TABLE{
-		[](std::uint64_t const& t_hclk) {
+		[](auto const& t_hclk) {
 			if (64_MHz <= t_hclk && t_hclk <= 80_MHz) {
 				return 4;
 			} else if (48_MHz <= t_hclk && t_hclk <= 64_MHz) {
@@ -44,7 +44,7 @@ struct WaitTable {
 				return 0;
 			}
 		},
-		[](std::uint64_t const& t_hclk) {
+		[](auto const& t_hclk) {
 			if (18_MHz <= t_hclk && t_hclk <= 26_MHz) {
 				return 3;
 			} else if (12_MHz <= t_hclk && t_hclk <= 18_MHz) {
@@ -68,8 +68,8 @@ struct WaitTable {
 	 * 				  range, we can decide the wait state by clock frequency.
 	 * @return  The wait state
 	 */
-	template <float const& DeviceVolt>
-	static constexpr auto getWaitState(std::uint64_t const& t_hclk) noexcept {
+	template <float const& DeviceVolt, auto Freq>
+	static constexpr auto getWaitState(Frequency<Freq> const t_hclk) noexcept {
 		if (t_hclk >= 26_MHz) {
 			return std::get<0>(WAIT_STATE_TABLE)(t_hclk);
 		} else {
@@ -99,8 +99,8 @@ constexpr void config_access_ctl(Latency const& t_cpu) noexcept {
 		}
 	};
 
-	std::tuple const val_to_set{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	 // fill the rest with 1 or 0
+	std::tuple const val_to_set{t_cpu, std::uint8_t(to_underlying(Setting) != 0)...};	// fill the rest with 1 or 0
 	reg::ACR.template writeBit<reg::AcrBit::Latency, register_to_set(Setting)...>(val_to_set);
 }
 
-}	 // namespace cpp_stm32::flash
+}	// namespace cpp_stm32::flash

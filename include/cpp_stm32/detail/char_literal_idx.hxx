@@ -21,8 +21,17 @@
 
 namespace cpp_stm32::detail {
 
+/**
+ * [to_number description]
+ * @param  c [description]
+ * @return   [description]
+ */
 constexpr int to_number(char c) noexcept { return static_cast<int>(c) - static_cast<int>('0'); }
 
+/**
+ * [decimal_pow description]
+ * @return [description]
+ */
 template <int Pow>
 constexpr int decimal_pow() noexcept {
 	if constexpr (Pow == 0) {
@@ -32,21 +41,68 @@ constexpr int decimal_pow() noexcept {
 	}
 }
 
-template <typename... num, std::size_t... Idx>
-constexpr auto str_to_int(std::tuple<num...> const& str, std::index_sequence<Idx...> const&) noexcept {
+/**
+ * [str_to_int description]
+ * @param  Idx [description]
+ * @return     [description]
+ */
+template <std::size_t... Idx>
+constexpr auto str_to_int(std::array<char, sizeof...(Idx)> const& str, std::index_sequence<Idx...> const&) noexcept {
 	return ((to_number(std::get<Idx>(str)) * decimal_pow<sizeof...(Idx) - Idx - 1>()) + ...);
 }
 
-template <char... num>
-constexpr bool str_literal_is_int = []() {
-	return ((static_cast<int>('0') <= static_cast<int>(num) && static_cast<int>(num) <= static_cast<int>('9')) && ...);
-}();
+/**
+ * [str_to_float description]
+ * @param  str [description]
+ * @return     [description]
+ */
+template <std::size_t N>
+constexpr auto str_to_float(std::array<char, N> const& str) noexcept {
+	auto const decimal_point_pos = detail::find(str.begin(), str.end(), '.') - str.begin();
+	auto const exponent_pos =
+		detail::find_if(str.begin(), str.end(), [](auto const& t_chr) { return t_chr == 'e' || t_chr == 'E'; }) -
+		str.begin();
 
-template <char... num>
-constexpr bool str_literal_is_float = []() {
-	return (((static_cast<int>('0') <= static_cast<int>(num) && static_cast<int>(num) <= static_cast<int>('9')) ||
-					 num == '.') &&
-					...);
-}();
+	float ret_val = 0.0;
+	auto exp			= 0.0;
+	auto base			= 1.0;
 
-}	 // namespace cpp_stm32::detail
+	for (int i = 0; i < decimal_point_pos; ++i) {
+		ret_val += to_number(str[decimal_point_pos - i - 1]) * base;
+		base *= 10;
+	}
+
+	base = 0.1;
+	for (int i = decimal_point_pos + 1; i < exponent_pos; ++i) {
+		ret_val += to_number(str[i]) * base;
+		base *= 0.1;
+	}
+
+	base = 1;
+	for (int i = N - 1; i > exponent_pos; --i) {
+		exp += to_number(str[i]) * base;
+		base *= 10;
+	}
+
+	return ret_val * std::pow(10, exp);
+}
+
+/**
+ * [str_is_float description]
+ * @param  t_str [description]
+ * @return       [description]
+ */
+template <std::size_t N>
+constexpr bool str_is_float(std::array<char, N> const& t_str) {
+	auto const is_valid_input = detail::all_of(t_str.begin(), t_str.end(), [](auto const& t_val) {
+		return '0' <= t_val && t_val <= '9' || t_val == '.' || t_val == 'e' || t_val == 'E';
+	});
+
+	auto const has_dec_pt = detail::find(t_str.begin(), t_str.end(), '.') != t_str.end();
+	auto const has_exp		= detail::find_if(t_str.begin(), t_str.end(),
+																				[](auto const& t_in) { return t_in == 'e' || t_in == 'E'; }) != t_str.end();
+
+	return is_valid_input && (has_dec_pt || has_exp);
+}
+
+}	// namespace cpp_stm32::detail

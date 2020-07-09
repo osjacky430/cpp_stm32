@@ -399,6 +399,27 @@ struct tuple_element<Idx, cpp_stm32::detail::Tuple<Elems...>> {
 namespace cpp_stm32::detail {
 
 /**
+ * [find description]
+ * @param  t_tup [description]
+ * @param  t_val [description]
+ * @return       [description]
+ */
+template <typename Tup, typename T>
+constexpr auto find(Tup&& t_tup, T const& t_val) noexcept {
+	auto const find_for_each = [&](T const& t_elem, std::size_t t_idx) {
+		return t_elem == t_val ? t_idx : std::tuple_size_v<std::decay_t<Tup>>;
+	};
+
+	auto const apply_func = [&](auto const&... t_elems) {
+		std::size_t i		 = 0;
+		bool const found = ((find_for_each(t_elems, i++) != std::tuple_size_v<std::decay_t<Tup>>) || ...);
+		return found ? i - 1 : i;
+	};
+
+	return std::apply(apply_func, t_tup);
+}
+
+/**
  * [find_if description]
  * @param  t_tup [description]
  * @param  pred  [description]
@@ -456,6 +477,15 @@ constexpr auto upper_bound_impl(Tup&& t_tup, T const& t_val, F t_comp) noexcept 
 template <typename Tup, typename T, typename F>
 constexpr auto upper_bound(Tup&& t_tup, T const& t_val, F t_comp) noexcept {
 	return upper_bound_impl<std::tuple_size_v<std::decay_t<Tup>>, 0>(t_tup, t_val, t_comp);
+}
+
+template <typename Tup, typename T>
+constexpr auto count(Tup&& t_tup, T const& t_val) {
+	auto const is_elem_eq = [&](T const& t_elem) { return t_elem == t_val ? 1 : 0; };
+
+	auto const apply_func = [&](auto const&... t_elems) { return (is_elem_eq(t_elems) + ...); };
+
+	std::apply(apply_func, t_tup);
 }
 
 }	// namespace cpp_stm32::detail

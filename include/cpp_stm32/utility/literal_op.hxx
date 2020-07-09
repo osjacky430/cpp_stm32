@@ -21,59 +21,67 @@
 
 #include "cpp_stm32/detail/char_literal_idx.hxx"
 #include "cpp_stm32/utility/integral_constant.hxx"
+#include "cpp_stm32/utility/unit.hxx"
 
 namespace cpp_stm32 {
 
 // @todo change to return Frequency<freq>
-constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _MHz(std::uint64_t t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
-constexpr auto operator"" _KHz(std::uint64_t t_freq) noexcept { return t_freq * 1000ULL; }
+// constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
+// constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
 
+constexpr auto operator"" _k(long double t_freq) noexcept { return t_freq * 1000ULL; }
 constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
+constexpr auto operator"" _M(long double t_freq) noexcept { return t_freq * 1000000ULL; }
 constexpr auto operator"" _M(std::uint64_t t_quan) noexcept { return t_quan * 1000000ULL; }
-// template <char... num>
-// constexpr auto operator"" _MHz() noexcept {
-//	static_assert(detail::str_literal_is_int<num...>);
 
-//	constexpr auto freq = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{}) * 1000000;
-//	return Frequency<freq>{};
-//}
+template <char... num>
+constexpr auto operator"" _MHz() noexcept {
+	constexpr auto freq = []() {
+		if constexpr (constexpr auto str = std::array{num...}; detail::str_is_float(str)) {
+			return detail::str_to_float(str) * 1000000;
+		} else {
+			return detail::str_to_int(str, std::make_index_sequence<sizeof...(num)>{}) * 1000000;
+		}
+	}();
+
+	return Frequency<freq>{};
+}
 
 template <char... num>
 constexpr auto operator"" _kHz() noexcept {
-	static_assert(detail::str_literal_is_int<num...>);
+	constexpr auto freq = []() {
+		if constexpr (constexpr auto str = std::array{num...}; detail::str_is_float(str)) {
+			return detail::str_to_float(str) * 1000;
+		} else {
+			return detail::str_to_int(str, std::make_index_sequence<sizeof...(num)>{}) * 1000;
+		}
+	}();
 
-	constexpr auto freq = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{}) * 1000;
 	return Frequency<freq>{};
 }
 
 template <char... num>
 constexpr auto operator"" _ns() noexcept {
-	static_assert(detail::str_literal_is_int<num...>);
-
-	constexpr auto Sec = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	constexpr auto Sec = detail::str_to_int(std::array{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return Second<Sec>{};
 }
 
 template <char... num>
 constexpr auto operator"" _ic() noexcept {
-	static_assert(detail::str_literal_is_int<num...>);
-
-	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	constexpr auto idx = detail::str_to_int(std::array{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return size_c<idx>{};
 }
 
 template <char... num>
 constexpr auto operator"" _byte() noexcept {
-	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	constexpr auto idx = detail::str_to_int(std::array{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return ByteCount<idx>{};
 }
 
 template <char... num>
 constexpr auto operator"" _halfword() noexcept {
-	constexpr auto idx = detail::str_to_int(std::tuple{num...}, std::make_index_sequence<sizeof...(num)>{});
+	constexpr auto idx = detail::str_to_int(std::array{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return HalfWordCount<idx>{};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

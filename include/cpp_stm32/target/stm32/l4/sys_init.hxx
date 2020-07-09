@@ -55,7 +55,7 @@ static_assert(1.71f <= STM32_VDD && STM32_VDD <= 3.6f);
 static constexpr auto HSI_CLK_FREQ = 16_MHz;
 #endif
 
-static_assert(HSI_CLK_FREQ == 16_MHz);
+static_assert(Frequency<HSI_CLK_FREQ>{} == 16_MHz);
 
 /**@}*/
 
@@ -69,11 +69,13 @@ static_assert(HSI_CLK_FREQ == 16_MHz);
 static constexpr auto MSI_CLK_FREQ = 4_MHz;
 #endif
 
-static constexpr std::array MSI_FREQ_TABLE{
-	100_KHz, 200_KHz, 400_KHz, 800_KHz, 1_MHz, 2_MHz, 4_MHz, 8_MHz, 16_MHz, 24_MHz, 32_MHz, 48_MHz,
+static constexpr std::tuple MSI_FREQ_TABLE{
+	100_kHz, 200_kHz, 400_kHz, 800_kHz, 1_MHz, 2_MHz, 4_MHz, 8_MHz, 16_MHz, 24_MHz, 32_MHz, 48_MHz,
 };
 
-static_assert(detail::find(MSI_FREQ_TABLE.begin(), MSI_FREQ_TABLE.end(), MSI_CLK_FREQ) != MSI_FREQ_TABLE.end());
+// @todo fix this
+// static_assert(detail::find(MSI_FREQ_TABLE, Frequency<MSI_CLK_FREQ>{}) !=
+// std::tuple_size_v<decltype(MSI_FREQ_TABLE)>);
 
 /**@}*/
 
@@ -94,7 +96,7 @@ static constexpr auto HSE_CLK_VALID = false;
 
 static constexpr auto HSE_CLK_VALID = true;
 
-static_assert(HSE_CLK_FREQ_MIN <= HSE_CLK_FREQ && HSE_CLK_FREQ <= HSE_CLK_FREQ_MAX);
+static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
 
 #endif
 
@@ -124,10 +126,10 @@ static constexpr auto APB2_FREQ_MAX_VOS_RANGE1 = 80_MHz;
 static constexpr auto AHB_VOS_RANGE1_MAX_FREQ = 80_MHz;
 static constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
 
-static_assert(AHB_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(SYS_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(APB1_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(APB2_CLK_FREQ <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(Frequency<AHB_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(Frequency<SYS_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(Frequency<APB1_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+static_assert(Frequency<APB2_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
 
 class Clock {
  private:
@@ -144,10 +146,10 @@ class Clock {
 		constexpr auto pllr						= std::get<Idx>(rcc::PllR::KEY_VAL_MAP).key;
 		constexpr auto vco_freq				= pllr * SYS_CLK_FREQ;
 		constexpr auto vco_in_inrange = [](auto const t_vco_in) {
-			return VCO_INPUT_FREQ_MIN <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX;
+			return VCO_INPUT_FREQ_MIN() <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX();
 		};
 		constexpr auto vco_out_inrange = [](auto const t_vco_out) {
-			return VCO_OUTPUT_FREQ_MIN <= t_vco_out && t_vco_out <= VCO_OUTPUT_FREQ_MAX;
+			return VCO_OUTPUT_FREQ_MIN() <= t_vco_out && t_vco_out <= VCO_OUTPUT_FREQ_MAX();
 		};
 
 		if constexpr (vco_out_inrange(vco_freq)) {
@@ -206,7 +208,7 @@ class Clock {
 	 * @var 	CPU_WAIT_STATE
 	 * @brief	This is chosen base on AHB clock frequency
 	 */
-	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK_FREQ);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(Frequency<AHB_CLK_FREQ>{});
 
 	/**
 	 * @var		VOLTAGE_SCALE
@@ -216,7 +218,7 @@ class Clock {
 	 * 				consumption.
 	 */
 	static constexpr auto VOLTAGE_SCALE = []() {
-		if constexpr (AHB_CLK_FREQ > AHB_VOS_RANGE2_MAX_FREQ) {
+		if constexpr (Frequency<AHB_CLK_FREQ>{} > AHB_VOS_RANGE2_MAX_FREQ) {
 			return pwr::VoltageScale::Range1;
 		} else {
 			return pwr::VoltageScale::Range2;
