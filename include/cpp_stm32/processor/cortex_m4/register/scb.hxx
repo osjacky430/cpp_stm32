@@ -25,6 +25,8 @@
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
 
+#include "cpp_stm32/processor/cortex_m4/define/scb.hxx"
+
 namespace cpp_stm32::scb::reg {
 
 static constexpr auto SCB_BASE = 0xE000ED00;
@@ -55,4 +57,40 @@ enum class MMFSRField {
 static constexpr Register<MMFSRBitList, MMFSRField> MMFSR{SCB_BASE, 0x28};
 
 /**@}*/
+
+/**
+ * @defgroup	SCB_CPACR_GROUP		Coprocessor Access Control Register
+ *
+ * @{
+ */
+SETUP_REGISTER_INFO(CPACRBitList,									 /**/
+										Bit<2, Access>{BitPos_t{0}},	 // CP0
+										Bit<2, Access>{BitPos_t{2}},	 // CP1
+										Bit<2, Access>{BitPos_t{4}},	 // CP2
+										Bit<2, Access>{BitPos_t{6}},	 // CP3
+										Bit<2, Access>{BitPos_t{8}},	 // CP4
+										Bit<2, Access>{BitPos_t{10}},	// CP5
+										Bit<2, Access>{BitPos_t{12}},	// CP6
+										Bit<2, Access>{BitPos_t{14}},	// CP7
+										Bit<2, Access>{BitPos_t{18}},	// CP10
+										Bit<2, Access>{BitPos_t{20}}	 // CP11
+)
+
+enum class CPACRField {
+	CP0,
+	CP1,
+	CP2,
+	CP3,
+	CP4,
+	CP5,
+	CP6,
+	CP7,
+	CP10,
+	CP11,
+};
+
+static constexpr Register<CPACRBitList, CPACRField> CPACR{SCB_BASE, 0x88U};
+
+/**@}*/
+
 }	// namespace cpp_stm32::scb::reg

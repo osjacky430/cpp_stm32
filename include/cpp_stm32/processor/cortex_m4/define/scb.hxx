@@ -1,6 +1,6 @@
 /**
- * @file  cortex_m4/scb.hxx
- * @brief	Scb API for cortex m4
+ * @file  cortex_m4/define/scb.hxx
+ * @brief	Scb definition for cortex m4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -22,15 +22,8 @@
 
 #pragma once
 
-#include "cpp_stm32/processor/cortex_m4/define/scb.hxx"
-#include "cpp_stm32/processor/cortex_m4/register/scb.hxx"
-
 namespace cpp_stm32::scb {
 
-constexpr void enable_mem_fault_handler() noexcept { reg::MMFSR.setBit<reg::MMFSRField::MMARVALID>(); }
+enum class Access : std::uint8_t { Denied = 0b00, PrivilegeOnly = 0b01, Full = 0b11 };
 
-constexpr void enable_vfp_coprocessor() noexcept {
-	reg::CPACR.writeBit<reg::CPACRField::CP10, reg::CPACRField::CP11>(Access::Full);
 }
-
-}	// namespace cpp_stm32::scb

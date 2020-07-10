@@ -95,6 +95,10 @@ void reset_handler() {
 		*dest++ = 0;
 	}
 
+	if constexpr (HARD_FLOAT_ENABLED) {
+		cpp_stm32::scb::enable_vfp_coprocessor();
+	}
+
 	// UB?!
 	for (FuncPtr* p_fp = &__preinit_array_start; p_fp < &__preinit_array_end; ++p_fp) {
 		(*p_fp)();

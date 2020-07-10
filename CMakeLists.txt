@@ -49,6 +49,7 @@ enable_sanitizers(project_options)
 
 add_library(cpp_stm32 STATIC)
 option(ENABLE_HARD_FLOAT "Use VFP extension" TRUE)
+target_compile_definitions(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,HARD_FLOAT_ENABLED=1,HARD_FLOAT_ENABLED=0>)
 target_compile_options(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
 target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/)

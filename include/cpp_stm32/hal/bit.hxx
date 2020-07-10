@@ -57,17 +57,20 @@ enum class BitMod {
  */
 template <std::uint32_t L, typename DataType = std::uint8_t, BitMod Mod = BitMod::RdWr>
 struct Bit {
+	static_assert(L <= 32);	//	bit length should never be greater than 32
 	static constexpr auto MOD		 = Mod;
 	static constexpr auto LENGTH = L;
 	std::uint32_t const pos;
 	std::uint32_t const mask;
 
-	explicit constexpr Bit(BitPos_t const& t_pos) : pos(t_pos.get()), mask(((1ULL << LENGTH) - 1U) << pos) {}
+	explicit constexpr Bit(BitPos_t const& t_pos)
+		: pos(t_pos.get()), mask(static_cast<std::uint32_t>(((1ULL << LENGTH) - 1U) << pos)) {}
 
 	// currently support only integral type and struct that implement get() method
 	// @todo change get() to operator() so that it supports lambda(?)
 	[[nodiscard]] constexpr auto operator()(DataType const& t_val) const noexcept {
 		if constexpr (std::is_enum_v<DataType>) {
+			// this will issue sign conversion warning, investigate it later
 			return (to_underlying(t_val) << pos) & mask;
 		} else if constexpr (std::is_integral_v<DataType>) {
 			return (t_val << pos) & mask;
@@ -112,4 +115,4 @@ template <typename T, std::size_t... Pos>
 	return std::tuple{T{BitPos_t{Pos}}...};
 }
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32
