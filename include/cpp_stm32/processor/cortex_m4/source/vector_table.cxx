@@ -16,6 +16,7 @@
 
 #include <algorithm>
 
+#include "cpp_stm32/processor/cortex_m4/scb.hxx"
 #include "cpp_stm32/processor/cortex_m4/vector_table.hxx"
 
 /**

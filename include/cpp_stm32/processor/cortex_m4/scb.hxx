@@ -1,6 +1,6 @@
 /**
- * @file  stm32/f4/scb.hxx
- * @brief	Scb setup API for stm32f4
+ * @file  cortex_m4/scb.hxx
+ * @brief	Scb API for cortex m4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -22,20 +22,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include "cpp_stm32/processor/cortex_m4/register/scb.hxx"
 
 namespace cpp_stm32::scb {
 
-class [[gnu::packed]] ExceptionStackFrame {
-	std::uint32_t r0;
-	std::uint32_t r1;
-	std::uint32_t r2;
-	std::uint32_t r3;
-	std::uint32_t r4;
-	std::uint32_t r12;
-	std::uint32_t lr;
-	std::uint32_t pc;
-	std::uint32_t xpsr;
-};
+constexpr void enable_mem_fault_handler() noexcept { reg::MMFSR.setBit<reg::MMFSRField::MMARVALID>(); }
 
 }	// namespace cpp_stm32::scb

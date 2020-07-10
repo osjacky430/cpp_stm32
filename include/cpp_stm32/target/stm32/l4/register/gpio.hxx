@@ -3,7 +3,7 @@
 #include "cpp_stm32/detail/index_range.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
+#include "cpp_stm32/processor/cortex_m4/bit_banding.hxx"
 #include "cpp_stm32/target/stm32/l4/define/gpio.hxx"
 #include "cpp_stm32/target/stm32/l4/register/memory_map.hxx"
 
@@ -96,4 +96,4 @@ class GpioBrrInfo;
 template <gpio::Port Port>
 static constexpr GpioReg<GpioBrrInfo, atomicity(BASE_ADDR(Port) + 0x28U)> BRR{BASE_ADDR(Port), 0x28U};
 
-}	 // namespace cpp_stm32::gpio::reg
+}	// namespace cpp_stm32::gpio::reg

@@ -337,7 +337,7 @@ class Tuple : public TupleImpl<0, Elems...> {
 template <typename Tup, std::size_t... Idx>
 [[nodiscard]] constexpr auto nand_impl(Tup const& t_tup, std::index_sequence<Idx...> const /* unused */) {
 	return Tup{~get<Idx>(t_tup)...};
-};
+}
 
 /**
  * @brief		Helper type to identify if all elements can apply NAND operator, this is verified by checking if it is
