@@ -45,7 +45,7 @@ using Usart::operator"" _Baud;
 
 Driver::Usart const pc{Driver::UsartTx_v<Gpio::PinName::PA_2>, Driver::UsartRx_v<Gpio::PinName::PA_3>, 115200_Baud};
 
-Driver::DigitalOut<Gpio::PinName::PB_3> const led;
+Driver::DigitalOut<Gpio::PinName::PA_5> const led;
 /* IMU defines */
 constexpr auto XM_SAD = 0b0011110, GYRO_SAD = 0b1101010;
 
@@ -58,8 +58,8 @@ enum class RegisterMap : std::uint8_t {
 };
 
 constexpr void setup_spi() noexcept {
-	Driver::SPI imu(Driver::Miso<Gpio::PinName::PA_6>{}, Driver::Mosi<Gpio::PinName::PA_7>{},
-									Driver::Sclk<Gpio::PinName::PA_5>{}, Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
+	// Driver::SPI imu(Driver::Miso<Gpio::PinName::PA_6>{}, Driver::Mosi<Gpio::PinName::PA_7>{},
+	// 								Driver::Sclk<Gpio::PinName::PA_5>{}, Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
 
 	//	Spi::init_master<Spi::Port::SPI1, Spi::TransferMode::FullDuplex, Spi::SlaveSelectMode::OutputHardware>(
 	//		Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
@@ -68,13 +68,13 @@ constexpr void setup_spi() noexcept {
 int main() {
 	Sys::Clock::init<Rcc::ClkSrc::Hse>();
 
-	Driver::DigitalOut<Gpio::PinName::PB_1> const xm_ss;
-	Driver::DigitalOut<Gpio::PinName::PB_0> const gyro_ss;
+	// Driver::DigitalOut<Gpio::PinName::PB_1> const xm_ss;
+	// Driver::DigitalOut<Gpio::PinName::PB_0> const gyro_ss;
+	//
+	// setup_spi();
 
-	setup_spi();
-
-	xm_ss.set();	// disable xm spi
-	gyro_ss.clear();
+	// xm_ss.set();	// disable xm spi
+	// gyro_ss.clear();
 
 	while (true) {
 		constexpr auto SOME_INTERVAL = 10000000;
@@ -84,13 +84,14 @@ int main() {
 
 		led.toggle();
 
-		std::array<std::uint8_t, 2> tx{(1 << 7) | cpp_stm32::to_underlying(RegisterMap::WHO_AM_I), std::uint8_t{0x00}};
+		// std::array<std::uint8_t, 2> tx{(1 << 7) | cpp_stm32::to_underlying(RegisterMap::WHO_AM_I), std::uint8_t{0x00}};
 
-		Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin(), tx.begin() + 1);
-		auto const [gyro_id] = Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin() + 1, tx.end());
+		// Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin(), tx.begin() + 1);
+		// auto const [gyro_id] = Spi::xfer_blocking<Spi::Port::SPI1>(1_byte, tx.begin() + 1, tx.end());
 
 		//	auto const [level] = Spi::get_rx_fifo_level<Spi::Port::SPI1>();
-		pc << (gyro_id) << "\n\r";
+		pc << "(gyro_id)"
+			 << "\n\r";
 		//		pc << cpp_stm32::to_underlying(level) << "\n\r";
 	}
 }

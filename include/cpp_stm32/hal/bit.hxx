@@ -40,6 +40,8 @@ namespace cpp_stm32 {
  * @note 		Settable  (Writing 1 is meaningful): WrOnly, RdWr, RdSet, RdClrWr1
  * 					Clearable (Writing 0 is meaningful): WrOnly, RdWr
  * 					Writable (Writing 0/1 is meaningful): WrOnly, RdWr, RdSet, RdClrWr1
+ *
+ * @todo 		is this right?
  */
 enum class BitMod {
 	RdOnly	 = 0x100, /*!< Software can only read this bit. */

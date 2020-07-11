@@ -24,18 +24,20 @@
 
 #include <cstdint>
 
-namespace cpp_stm32::scb {
+#include "cpp_stm32/processor/cortex_m4/scb.hxx"
 
-class [[gnu::packed]] ExceptionStackFrame {
-	std::uint32_t r0;
-	std::uint32_t r1;
-	std::uint32_t r2;
-	std::uint32_t r3;
-	std::uint32_t r4;
-	std::uint32_t r12;
-	std::uint32_t lr;
-	std::uint32_t pc;
-	std::uint32_t xpsr;
-};
+// namespace cpp_stm32::scb {
 
-}	// namespace cpp_stm32::scb
+// class [[gnu::packed]] ExceptionStackFrame {
+// 	std::uint32_t r0;
+// 	std::uint32_t r1;
+// 	std::uint32_t r2;
+// 	std::uint32_t r3;
+// 	std::uint32_t r4;
+// 	std::uint32_t r12;
+// 	std::uint32_t lr;
+// 	std::uint32_t pc;
+// 	std::uint32_t xpsr;
+// };
+
+// }	// namespace cpp_stm32::scb
