@@ -126,7 +126,8 @@ SECTIONS
   } >ram
 
   . = ALIGN(4);
-  end = .;
+  heap_start_ = .;
+  end = heap_start_;
 }
 
 PROVIDE(STACK = ORIGIN(ram) + LENGTH(ram));

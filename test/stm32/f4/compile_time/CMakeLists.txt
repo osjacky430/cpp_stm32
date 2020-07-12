@@ -1,0 +1,1 @@
+build_test_binary(TEST_MAIN test_entry TARGET_NAME division_factor)

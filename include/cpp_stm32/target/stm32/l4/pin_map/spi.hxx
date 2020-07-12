@@ -33,6 +33,7 @@ class PinMap {
  public:
 	template <gpio::PinName MISO, gpio::PinName MOSI, gpio::PinName SCLK>
 	[[nodiscard]] static constexpr auto getSpiPinData() noexcept {
+		// this will fail if one pin maps to two different port
 		constexpr auto miso = *detail::find_if(MISO_TABLE.begin(), MISO_TABLE.end(),
 																					 [](auto const t_val) { return detail::get<0>(t_val) == MISO; });
 

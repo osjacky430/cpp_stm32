@@ -24,7 +24,7 @@
 
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/bit_banding.hxx"
+#include "cpp_stm32/processor/cortex_m4/bit_banding.hxx"
 
 #include "cpp_stm32/target/stm32/f4/define/gpio.hxx"
 #include "cpp_stm32/target/stm32/f4/register/memory_map.hxx"
@@ -148,4 +148,4 @@ static constexpr GpioReg<GpioAfrInfo, atomicity(BASE_ADDR(GPIO) + 0x24U), DEFAUL
 
 /**@}*/
 
-}	 // namespace cpp_stm32::gpio::reg
+}	// namespace cpp_stm32::gpio::reg

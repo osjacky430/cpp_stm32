@@ -20,8 +20,7 @@
 #include "cpp_stm32/hal/interrupt.hxx"
 
 #include "cpp_stm32/processor/cortex_m4/core_util.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/nvic.hxx"
+#include "cpp_stm32/processor/cortex_m4/register/nvic.hxx"
 
 namespace cpp_stm32::nvic {
 
@@ -32,7 +31,7 @@ constexpr void enable_irq(Callback<F> const& t_cb) noexcept {
 	{
 		auto const critical_sec = core::create_critical_section();
 		Interrupt<IRQn>::attach(t_cb);
-	}	 // end critical section
+	}	// end critical section
 }
 
 template <IrqNum IRQn>
@@ -78,4 +77,4 @@ constexpr void set_irq_priority(std::uint8_t const& t_priority) noexcept {
 	}
 }
 
-}	 // namespace cpp_stm32::nvic
+}	// namespace cpp_stm32::nvic

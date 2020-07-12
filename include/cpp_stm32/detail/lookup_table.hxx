@@ -120,9 +120,22 @@ struct KeyValTable : public Table {
 		return ((std::get<Idx>(KEY_VAL_MAP).key == Key) || ...);
 	}
 
+	template <auto Key, std::size_t... idx>
+	static constexpr auto GET_VAL_IMPL(std::integral_constant<decltype(Key), Key> const,
+																		 std::index_sequence<idx...> const) noexcept {
+		constexpr std::array is_key_arr{std::get<idx>(KEY_VAL_MAP).key == Key...};
+		constexpr std::size_t val_idx = detail::find(is_key_arr.begin(), is_key_arr.end(), true) - is_key_arr.begin();
+		return std::get<val_idx>(KEY_VAL_MAP).val;
+	}
+
  public:
 	static constexpr auto KEY_VAL_MAP = NTTPPackDecomp<KVPs...>::KVP;
 	static constexpr auto KEY_VAL_NUM = sizeof...(KVPs) / 2;
+
+	template <auto Key>
+	static constexpr auto GET_VAL() noexcept {
+		return GET_VAL_IMPL(std::integral_constant<decltype(Key), Key>{}, std::make_index_sequence<KEY_VAL_NUM>{});
+	}
 
 	template <auto Val>
 	static constexpr auto HAVE_KEY() noexcept {
@@ -137,7 +150,8 @@ struct KeyValTable : public Table {
 	}
 
 	template <auto Val>
-	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const /*unused*/) noexcept : Table{Val} {
+	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const /*unused*/) noexcept
+		: Table{GET_VAL<Val>()} {
 		static_assert(HAVE_KEY<Val>());
 	}
 };

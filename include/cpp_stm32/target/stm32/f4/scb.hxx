@@ -1,7 +1,6 @@
 /**
- * @file  stm32/f4/register/memory_map.hxx
- * @brief	Perihperal base address of stm32f4
- * @todo 	Is this needed?
+ * @file  stm32/f4/scb.hxx
+ * @brief	Scb setup API for stm32f4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -25,23 +24,20 @@
 
 #include <cstdint>
 
-#include "cpp_stm32/processor/cortex_m4/register/internal_periph.hxx"
+#include "cpp_stm32/processor/cortex_m4/scb.hxx"
 
-namespace cpp_stm32 {
+// namespace cpp_stm32::scb {
 
-/**
- * @enum  	PeriphAddr
- * @brief		Device specific peripheral address
- *
- * @todo 		remove this in the future, this is not applicable if we use code generator
- */
-enum class PeriphAddr : std::uint32_t {
-	PeriphBase = 0x4000'0000U,
-	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
-	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
-	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
-};
+// class [[gnu::packed]] ExceptionStackFrame {
+// 	std::uint32_t r0;
+// 	std::uint32_t r1;
+// 	std::uint32_t r2;
+// 	std::uint32_t r3;
+// 	std::uint32_t r4;
+// 	std::uint32_t r12;
+// 	std::uint32_t lr;
+// 	std::uint32_t pc;
+// 	std::uint32_t xpsr;
+// };
 
-}	// namespace cpp_stm32
+// }	// namespace cpp_stm32::scb

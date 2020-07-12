@@ -49,6 +49,7 @@ enable_sanitizers(project_options)
 
 add_library(cpp_stm32 STATIC)
 option(ENABLE_HARD_FLOAT "Use VFP extension" TRUE)
+target_compile_definitions(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,HARD_FLOAT_ENABLED=1,HARD_FLOAT_ENABLED=0>)
 target_compile_options(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
 target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/)
@@ -65,6 +66,21 @@ target_link_options(
   "SHELL: ${LINKER_SCRIPT}"
   "SHELL: -Xlinker --gc-sections"
   "SHELL: -Xlinker --print-memory-usage")
+
+# ############################################################################################################
+# build example
+# ############################################################################################################
+option(ENABLE_TESTING "Build unit test" ON)
+
+if(ENABLE_TESTING)
+  if (TEST_DIR)
+    include(unit_test)
+    add_unit_test_lib()
+    add_subdirectory(${CMAKE_SOURCE_DIR}/test/)
+  else()
+    message(SEND_ERROR "No test for current chip ${TARGET_BOARD}")
+  endif()
+endif()
 
 # ############################################################################################################
 # link library to application

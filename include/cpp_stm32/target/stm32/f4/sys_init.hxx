@@ -139,6 +139,36 @@ static constexpr auto APB2_FREQ_MAX_OVERDRIVE		 = 90_MHz;
 static_assert(Frequency<APB1_CLK_FREQ>{} <= APB1_FREQ_MAX_OVERDRIVE);
 
 /**
+ * [CALC_PLL_DIV_FACTOR description]
+ * @return [description]
+ */
+template <auto ClkSrcFreq, auto SysClkFreq>
+static constexpr auto CALC_PLL_DIV_FACTOR(Frequency<ClkSrcFreq> const t_pll_freq,
+																					Frequency<SysClkFreq> const t_sys_freq) {
+	using rcc::PllP;
+
+	constexpr auto pllm						= static_cast<std::uint32_t>(std::ceil(t_pll_freq / RECOMMEND_VCO_INPUT_FREQ));
+	constexpr auto vco_input_freq = Frequency<ClkSrcFreq / pllm>{};
+	constexpr auto plln_over_pllp = t_sys_freq / vco_input_freq;
+	constexpr auto max_plln				= std::floor(VCO_OUTPUT_FREQ_MAX / vco_input_freq);
+	constexpr auto min_plln				= std::ceil(VCO_OUTPUT_FREQ_MIN / vco_input_freq);
+
+	constexpr auto pllp_satisfy_constraint = [](auto&& t_pllp_candidate) {
+		auto const plln = t_pllp_candidate.key * plln_over_pllp;
+		return (min_plln <= plln && plln <= max_plln);
+	};
+
+	constexpr auto pllp_idx = detail::find_if(PllP::KEY_VAL_MAP, pllp_satisfy_constraint);
+	constexpr auto pllp			= std::get<pllp_idx>(PllP::KEY_VAL_MAP).key;
+	constexpr auto plln			= static_cast<std::uint32_t>(plln_over_pllp * pllp);
+
+	// if constexpr (need to calculate pllq and pllr) {
+	//    ...
+	// } else
+	return std::tuple{pllm, plln, pllp, 2, 2};
+}
+
+/**
  * @class   Clock
  * @brief
  */
@@ -159,29 +189,20 @@ class Clock {
 	};
 
 	template <rcc::ClkSrc PllSrc>
-	static constexpr auto CALC_PLL_DIV_FACTOR() {
+	static constexpr auto GET_DIV_FACTOR() {
 		using rcc::ClkSrc, rcc::PllM, rcc::PllN, rcc::PllP, rcc::PllQ, rcc::PllR, rcc::DivisionFactor_v;
-		constexpr auto pll_input_clk = (PllSrc == ClkSrc::Hse ? HSE_CLK_FREQ : HSI_CLK_FREQ);
-		constexpr auto pllm = static_cast<std::uint32_t>(std::ceil(Frequency<pll_input_clk>{} / RECOMMEND_VCO_INPUT_FREQ));
-		constexpr auto vco_input_freq = Frequency<pll_input_clk / pllm>{};
-		constexpr auto plln_over_pllp = SYS_CLK / vco_input_freq;
-		constexpr auto max_plln				= std::floor(VCO_OUTPUT_FREQ_MAX / vco_input_freq);
-		constexpr auto min_plln				= std::ceil(VCO_OUTPUT_FREQ_MIN / vco_input_freq);
 
-		constexpr auto pllp_satisfy_constraint = [](auto&& t_pllp_candidate) {
-			auto const plln = t_pllp_candidate.key * plln_over_pllp;
-			return (min_plln <= plln && plln <= max_plln);
-		};
+		constexpr auto pll_input_clk = Frequency<(PllSrc == ClkSrc::Hse ? HSE_CLK_FREQ : HSI_CLK_FREQ)>{};
+		constexpr auto result				 = CALC_PLL_DIV_FACTOR(pll_input_clk, SYS_CLK);
 
-		constexpr auto pllp_idx = detail::find_if(PllP::KEY_VAL_MAP, pllp_satisfy_constraint);
-		constexpr auto pllp			= std::get<pllp_idx>(PllP::KEY_VAL_MAP).key;
-		constexpr auto plln			= static_cast<std::uint32_t>(plln_over_pllp * pllp);
+		constexpr auto pllm = std::get<0>(result);
+		constexpr auto plln = std::get<1>(result);
+		constexpr auto pllp = std::get<2>(result);
+		constexpr auto pllq = std::get<3>(result);
+		constexpr auto pllr = std::get<4>(result);
 
-		// if constexpr (need to calculate pllq and pllr) {
-		//    ...
-		// } else
 		return std::tuple{PllM{DivisionFactor_v<pllm>}, PllN{DivisionFactor_v<plln>}, PllP{DivisionFactor_v<pllp>},
-											PllQ{DivisionFactor_v<2U>}, PllR{DivisionFactor_v<2U>}};
+											PllQ{DivisionFactor_v<pllq>}, PllR{DivisionFactor_v<pllr>}};
 	}
 
  public:
@@ -236,7 +257,7 @@ class Clock {
 		rcc::set_sysclk<rcc::SysClk{to_underlying(PllSrc)}>();
 
 		{	// operations that requires PLL off
-			auto const& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
+			auto const& [m, n, p, q, r] = GET_DIV_FACTOR<PllSrc>();
 
 			rcc::disable_clk<ClkSrc::Pll>();
 			rcc::set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);

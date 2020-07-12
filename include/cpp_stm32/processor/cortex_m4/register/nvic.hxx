@@ -19,13 +19,13 @@
 #include "cpp_stm32/detail/index_range.hxx"
 #include "cpp_stm32/hal/bit.hxx"
 #include "cpp_stm32/hal/register.hxx"
-#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
+#include "cpp_stm32/processor/cortex_m4/register/internal_periph.hxx"
 
 namespace cpp_stm32 {
 
 enum class IrqNum : std::uint8_t;
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32
 
 namespace cpp_stm32::nvic::reg {
 
@@ -119,4 +119,4 @@ enum class NvicStirBit { IntId };
 static constexpr Register<NvicStirInfo, NvicStirBit> NVIC_STIR{NVIC_BASE, 0xD00};
 /**@}*/
 
-}	 // namespace cpp_stm32::nvic::reg
+}	// namespace cpp_stm32::nvic::reg

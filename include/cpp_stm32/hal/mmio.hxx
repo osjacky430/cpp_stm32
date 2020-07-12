@@ -30,12 +30,12 @@ namespace cpp_stm32 {
 
 // use enum class and self defined operator can deal with the problem easily
 template <typename T>
-constexpr decltype(auto) MMIO(std::uint32_t addr, const std::uint16_t offset) noexcept {
+constexpr decltype(auto) MMIO(std::uint32_t addr, std::uint32_t const offset) noexcept {
 	return *reinterpret_cast<volatile T*>(addr + offset);
 }
 
 static constexpr auto const MMIO32 = MMIO<std::uint32_t>;
 static constexpr auto const MMIO16 = MMIO<std::uint16_t>;
-static constexpr auto const MMIO8	 = MMIO<std::uint8_t>;
+static constexpr auto const MMIO8	= MMIO<std::uint8_t>;
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

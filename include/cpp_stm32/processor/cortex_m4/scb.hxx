@@ -1,7 +1,6 @@
 /**
- * @file  stm32/f4/register/memory_map.hxx
- * @brief	Perihperal base address of stm32f4
- * @todo 	Is this needed?
+ * @file  cortex_m4/scb.hxx
+ * @brief	Scb API for cortex m4
  */
 
 /** Copyright (c) 2020 by osjacky430.
@@ -23,25 +22,15 @@
 
 #pragma once
 
-#include <cstdint>
+#include "cpp_stm32/processor/cortex_m4/define/scb.hxx"
+#include "cpp_stm32/processor/cortex_m4/register/scb.hxx"
 
-#include "cpp_stm32/processor/cortex_m4/register/internal_periph.hxx"
+namespace cpp_stm32::scb {
 
-namespace cpp_stm32 {
+constexpr void enable_mem_fault_handler() noexcept { reg::MMFSR.setBit<reg::MMFSRField::MMARVALID>(); }
 
-/**
- * @enum  	PeriphAddr
- * @brief		Device specific peripheral address
- *
- * @todo 		remove this in the future, this is not applicable if we use code generator
- */
-enum class PeriphAddr : std::uint32_t {
-	PeriphBase = 0x4000'0000U,
-	Apb1Base	 = memory_at(PeriphBase, 0x00000U),
-	Apb2Base	 = memory_at(PeriphBase, 0x10000U),
-	Ahb1Base	 = memory_at(PeriphBase, 0x20000U),
-	Ahb2Base	 = memory_at(PeriphBase, 0x10000000U),
-	Ahb3Base	 = memory_at(PeriphBase, 0x20000000U),
-};
+constexpr void enable_vfp_coprocessor() noexcept {
+	reg::CPACR.writeBit<reg::CPACRField::CP10, reg::CPACRField::CP11>(Access::Full);
+}
 
-}	// namespace cpp_stm32
+}	// namespace cpp_stm32::scb

@@ -25,10 +25,6 @@
 
 namespace cpp_stm32 {
 
-// @todo change to return Frequency<freq>
-// constexpr auto operator"" _MHz(long double t_freq) noexcept { return t_freq * 1000000ULL; }
-// constexpr auto operator"" _KHz(long double t_freq) noexcept { return t_freq * 1000ULL; }
-
 constexpr auto operator"" _k(long double t_freq) noexcept { return t_freq * 1000ULL; }
 constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
 constexpr auto operator"" _M(long double t_freq) noexcept { return t_freq * 1000000ULL; }
@@ -62,6 +58,7 @@ constexpr auto operator"" _kHz() noexcept {
 
 template <char... num>
 constexpr auto operator"" _ns() noexcept {
+	// this needs additional care, not complete yet
 	constexpr auto Sec = detail::str_to_int(std::array{num...}, std::make_index_sequence<sizeof...(num)>{});
 	return Second<Sec>{};
 }
