@@ -73,8 +73,13 @@ target_link_options(
 option(ENABLE_TESTING "Build unit test" ON)
 
 if(ENABLE_TESTING)
-  include(unit_test)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/test/)
+  if (TEST_DIR)
+    include(unit_test)
+    add_unit_test_lib()
+    add_subdirectory(${CMAKE_SOURCE_DIR}/test/)
+  else()
+    message(SEND_ERROR "No test for current chip ${TARGET_BOARD}")
+  endif()
 endif()
 
 # ############################################################################################################

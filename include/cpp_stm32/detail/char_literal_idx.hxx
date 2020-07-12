@@ -16,8 +16,12 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstddef>
 #include <tuple>
+
+#include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
 
 namespace cpp_stm32::detail {
 

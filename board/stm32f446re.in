@@ -5,6 +5,7 @@ set(PROCESSOR_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/processor")
 set(TARGET_DIR "${CMAKE_SOURCE_DIR}/include/cpp_stm32/target/stm32/f4")
 set(LINKER_SCRIPT "-T ${TARGET_DIR}/linker_script/stm32f446xe.ld")
 set(TARGET_PROCESSOR "${PROCESSOR_DIR}/cortex_m4")
+set(TEST_DIR "${CMAKE_SOURCE_DIR}/test/stm32/f4")
 
 # ############################################################################################################
 # MCU compile options
