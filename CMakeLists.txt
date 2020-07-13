@@ -41,6 +41,14 @@ set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 # ############################################################################################################
 # add library, target properties
 # ############################################################################################################
+option(ENABLE_RUNTIME_FREQ_CONFIG "Set to ON if the project doesn't change the clock frequency after initialization" OFF)
+option(ENABLE_HARD_FLOAT "Use VFP extension" OFF)
+
+# Generate project configuration variables
+file(READ ${CMAKE_SOURCE_DIR}/cmake/project_config.hxx.in CONFIG_H_IN)
+string(CONFIGURE "${CONFIG_H_IN}" CONFIG_H_TMP)
+file(GENERATE OUTPUT ${CMAKE_SOURCE_DIR}/include/cpp_stm32/project_config.hxx CONTENT "${CONFIG_H_TMP}")
+
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
@@ -48,20 +56,25 @@ add_library(project_options INTERFACE)
 enable_sanitizers(project_options)
 
 add_library(cpp_stm32 STATIC)
-option(ENABLE_HARD_FLOAT "Use VFP extension" TRUE)
-target_compile_definitions(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,HARD_FLOAT_ENABLED=1,HARD_FLOAT_ENABLED=0>)
-target_compile_options(cpp_stm32 PUBLIC $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
 target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/)
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_link_libraries(cpp_stm32 PRIVATE project_warnings project_options)
-target_compile_options(cpp_stm32 PUBLIC ${BOARD_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti>
-                                        ${NEWLIB_FLAGS})
+
+target_compile_options(
+  cpp_stm32
+  PUBLIC
+  ${BOARD_FLAGS}
+  ${NEWLIB_FLAGS}
+  $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>
+  $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti>)
+
 target_link_options(
   cpp_stm32
   INTERFACE
   ${BOARD_FLAGS}
   ${NEWLIB_FLAGS}
+  $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>
   -nostartfiles
   "SHELL: ${LINKER_SCRIPT}"
   "SHELL: -Xlinker --gc-sections"
@@ -70,7 +83,7 @@ target_link_options(
 # ############################################################################################################
 # build example
 # ############################################################################################################
-option(ENABLE_TESTING "Build unit test" ON)
+option(ENABLE_TESTING "Build unit test" OFF)
 
 if(ENABLE_TESTING)
   if (TEST_DIR)

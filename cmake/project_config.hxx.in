@@ -1,0 +1,4 @@
+#pragma once
+
+static constexpr bool CPP_STM32_ENABLE_VFP = $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,true,false>;
+static constexpr bool CPP_STM32_FIX_CLK_FREQ = $<IF:$<BOOL:${ENABLE_RUNTIME_FREQ_CONFIG}>,false,true>;

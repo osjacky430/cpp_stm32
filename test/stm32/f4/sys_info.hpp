@@ -1,7 +1,5 @@
 #pragma once
 
-#define COMPILE_TIME_CLOCK_CONFIG true
-
 #define HSE_CLK_FREQ (8000000U)
 #define LSE_CLK_FREQ (32768U)
 #define HSI_CLK_FREQ (16000000U)

@@ -38,17 +38,24 @@ cmake --build .
 Set ```BUILD_EXAMPLE``` option to ```ON```, then build the desire example by specifying the name of the example source file
 ```
 cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" -DBUILD_EXAMPLE=ON ..
-cmale --build . --target example_name_1.elf example_name_2.elf
+cmale --build . --target example_name_1.elf example_name_2.bin
 ```
+
 ### Tunable Options
 - ```ENABLE_HARD_FLOAT```: this option is enabled by default, which links the hard float flags to the library.
+- ```ENABLE_IPO```: this option is disabled by default, turn this on to enable interprocedural optimization (LTO).
+- ```ENABLE_RUNTIME_FREQ_CONFIG```: this option is disabled by default, turn this on if the clock frequency will change after clock initialization.
 
 ### Link library to your application
 Currently Under construction...
 
 ### Current Work in progress
 - Code coverage
-- Unit test
+- More unit test
+- Let user include their own header that contains clk frequency information
+
+### Future work
+- Support for Clang/LLVM??
 
 ### System Clock Configuration File
 Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)

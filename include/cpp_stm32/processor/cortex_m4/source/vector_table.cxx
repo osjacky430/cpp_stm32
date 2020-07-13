@@ -16,6 +16,8 @@
 
 #include <algorithm>
 
+#include "cpp_stm32/project_config.hxx"
+
 #include "cpp_stm32/processor/cortex_m4/scb.hxx"
 #include "cpp_stm32/processor/cortex_m4/vector_table.hxx"
 
@@ -95,7 +97,7 @@ void reset_handler() {
 		*dest++ = 0;
 	}
 
-	if constexpr (HARD_FLOAT_ENABLED) {
+	if constexpr (CPP_STM32_ENABLE_VFP) {
 		cpp_stm32::scb::enable_vfp_coprocessor();
 	}
 
