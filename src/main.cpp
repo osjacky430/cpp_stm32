@@ -65,8 +65,21 @@ constexpr void setup_spi() noexcept {
 	//		Spi::Mode::Mode2, cpp_stm32::size_c<8>{}, 500_kHz);
 }
 
+static constexpr auto M_CLOCK_DATA = []() {
+	Sys::ClockBuilder builder;
+	builder.setHSE(HSE_BYPASS_CLK_SRC, HSE_CLK_FREQ)
+		.setLSE(LSE_BYPASS_CLK_SRC, LSE_CLK_FREQ)
+		.setSYS(SYS_CLK_FREQ)
+		.setAHB(AHB_CLK_FREQ)
+		.setAPB1(APB1_CLK_FREQ)
+		.setAPB2(APB2_CLK_FREQ)
+		.setPLL(Rcc::ClkSrc::Hse);
+
+	return builder.buildClock();
+}();
+
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<&M_CLOCK_DATA>::init();
 
 	// Driver::DigitalOut<Gpio::PinName::PB_1> const xm_ss;
 	// Driver::DigitalOut<Gpio::PinName::PB_0> const gyro_ss;

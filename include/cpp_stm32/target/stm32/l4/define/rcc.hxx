@@ -99,6 +99,8 @@ enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
 
 /**
  *  @enum 	ClkSrc
+ *
+ * @todo 		why 480 instead of 48?
  */
 enum class ClkSrc : std::uint32_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, Lsi };
 

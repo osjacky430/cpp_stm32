@@ -25,33 +25,28 @@
 
 namespace cpp_stm32 {
 
-constexpr auto operator"" _k(long double t_freq) noexcept { return t_freq * 1000ULL; }
-constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000ULL; }
-constexpr auto operator"" _M(long double t_freq) noexcept { return t_freq * 1000000ULL; }
-constexpr auto operator"" _M(std::uint64_t t_quan) noexcept { return t_quan * 1000000ULL; }
+constexpr auto operator"" _k(long double t_freq) noexcept { return t_freq * 1000; }
+constexpr auto operator"" _k(std::uint64_t t_quan) noexcept { return t_quan * 1000; }
+constexpr auto operator"" _M(long double t_freq) noexcept { return t_freq * 1000000; }
+constexpr auto operator"" _M(std::uint64_t t_quan) noexcept { return t_quan * 1000000; }
+
+template <char... num>
+constexpr auto operator"" _Hz() noexcept {
+	constexpr auto freq = detail::str_to_num<num...>();
+
+	return Frequency<freq>{};
+}
 
 template <char... num>
 constexpr auto operator"" _MHz() noexcept {
-	constexpr auto freq = []() {
-		if constexpr (constexpr auto str = std::array{num...}; detail::str_is_float(str)) {
-			return detail::str_to_float(str) * 1000000;
-		} else {
-			return detail::str_to_int(str, std::make_index_sequence<sizeof...(num)>{}) * 1000000;
-		}
-	}();
+	constexpr auto freq = detail::str_to_num<num...>() * 1000000;
 
 	return Frequency<freq>{};
 }
 
 template <char... num>
 constexpr auto operator"" _kHz() noexcept {
-	constexpr auto freq = []() {
-		if constexpr (constexpr auto str = std::array{num...}; detail::str_is_float(str)) {
-			return detail::str_to_float(str) * 1000;
-		} else {
-			return detail::str_to_int(str, std::make_index_sequence<sizeof...(num)>{}) * 1000;
-		}
-	}();
+	constexpr auto freq = detail::str_to_num<num...>() * 1000;
 
 	return Frequency<freq>{};
 }

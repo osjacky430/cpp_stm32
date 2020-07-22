@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <array>
 
-#include "cpp_stm32/project_config.hxx"
+#include "project_config.hxx"
 
 #include "cpp_stm32/target/stm32/f4/register/i2c.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"

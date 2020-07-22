@@ -49,6 +49,7 @@ constexpr int decimal_pow() noexcept {
  * [str_to_int description]
  * @param  Idx [description]
  * @return     [description]
+ * @todo modify this, this should have same implementation detail with str_to_float
  */
 template <std::size_t... Idx>
 constexpr auto str_to_int(std::array<char, sizeof...(Idx)> const& str, std::index_sequence<Idx...> const&) noexcept {
@@ -97,7 +98,7 @@ constexpr auto str_to_float(std::array<char, N> const& str) noexcept {
  * @return       [description]
  */
 template <std::size_t N>
-constexpr bool str_is_float(std::array<char, N> const& t_str) {
+constexpr bool str_is_float(std::array<char, N> const& t_str) noexcept {
 	auto const is_valid_input = detail::all_of(t_str.begin(), t_str.end(), [](auto const& t_val) {
 		return '0' <= t_val && t_val <= '9' || t_val == '.' || t_val == 'e' || t_val == 'E';
 	});
@@ -107,6 +108,20 @@ constexpr bool str_is_float(std::array<char, N> const& t_str) {
 																				[](auto const& t_in) { return t_in == 'e' || t_in == 'E'; }) != t_str.end();
 
 	return is_valid_input && (has_dec_pt || has_exp);
+}
+
+/**
+ * [str_to_num description]
+ * @param  digit [description]
+ * @return       [description]
+ */
+template <char... digit>
+constexpr auto str_to_num() noexcept {
+	if constexpr (constexpr auto str = std::array{digit...}; str_is_float(str)) {
+		return str_to_float(str);
+	} else {
+		return str_to_int(str, std::make_index_sequence<sizeof...(digit)>{});
+	}
 }
 
 }	// namespace cpp_stm32::detail

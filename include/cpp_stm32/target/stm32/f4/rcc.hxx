@@ -31,6 +31,8 @@
 #include "cpp_stm32/target/stm32/f4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/f4/register/rcc.hxx"
 
+#include "project_config.hxx"
+
 namespace cpp_stm32::rcc {
 
 // extend en and rst so that it takes template param pack
@@ -105,6 +107,10 @@ static constexpr void wait_osc_rdy() noexcept {
 	}
 }
 
+/**
+ * @brief 	This function enables the bypass bit for the clock
+ * @note 		The clock can only be HSE or LSE
+ */
 template <ClkSrc Clk>
 static constexpr void bypass_clksrc() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
@@ -113,6 +119,10 @@ static constexpr void bypass_clksrc() noexcept {
 	CTL_REG.template setBit<bypass_bit>();
 }
 
+/**
+ * @brief 	This function disables the bypass bit for the clock
+ * @note 		The clock can only be HSE or LSE
+ */
 template <ClkSrc Clk>
 static constexpr void no_bypass() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
@@ -127,7 +137,7 @@ static constexpr void set_sysclk() noexcept {
 }
 
 static constexpr SysClk sysclk_in_use() noexcept {
-	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	 //
+	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	//
 }
 
 template <SysClk Clk>
@@ -157,21 +167,24 @@ static constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t
  * @param t_pllr Division factor PLLR
  */
 template <ClkSrc Clk>
-static constexpr void set_pllsrc_and_div_factor(PllM const t_pllm, PllN const t_plln, PllP const t_pllp,
-																								PllQ const t_pllq, PllR const t_pllr) noexcept {
+static constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln,
+																								PllPChecker const t_pllp, PllQChecker const t_pllq,
+																								PllRChecker const t_pllr) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
-												reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
+												reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm(), t_plln(), t_pllp(), t_pllq(),
+																																		t_pllr());
 }
 
 /**
- * [config_adv_bus_division_factor description]
- * @param t_hpre  [description]
- * @param t_ppre1 [description]
- * @param t_ppre2 [description]
+ * @brief This function sets the division factor of the advance bus
+ * @param t_hpre  Division factor HPRE
+ * @param t_ppre1 Division factor PPRE1
+ * @param t_ppre2 Division factor PPRE2
  */
-static constexpr void config_adv_bus_division_factor(HPRE const t_hpre, PPRE const t_ppre1, PPRE const t_ppre2) {
-	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre, t_ppre1, t_ppre2);
+static constexpr void config_adv_bus_division_factor(HPREChecker const t_hpre, PPREChecker const t_ppre1,
+																										 PPREChecker const t_ppre2) {
+	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre(), t_ppre1(), t_ppre2());
 }
 
 /**
@@ -195,13 +208,66 @@ constexpr void set_rtc_clk_src() noexcept {
 constexpr void set_rtc_prescaler(RTCPRE const t_rtcpre) noexcept { reg::CFGR.writeBit<reg::CfgBit::RTCPRE>(t_rtcpre); }
 
 /**
- * @brief
+ * @brief	This function sets the reset bit of the backup domain, which will be in reset state unless explicitly call
+ * 				release_reset_backup_domain()
  */
 constexpr void hold_reset_backup_domain() noexcept { reg::BDCR.setBit<reg::BDCRField::BDRST>(); }
 
 /**
- * @brief
+ * @brief This function clears the reset bit of the backup domain, which release the reset state of the backup domain
  */
 constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::BDCRField::BDRST>(); }
 
-}	 // namespace cpp_stm32::rcc
+/**
+ * @brief	This function returns divsion factors of the advanced buses
+ * @return division factors HPRE, PPRE1, and PPRE2
+ */
+[[nodiscard]] constexpr auto get_adv_bus_division_factor() noexcept {
+	return reg::CFGR.readBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(ValueOnly);
+}
+
+/**
+ * @brief	This function returns division factos of the PLL
+ * @return division factors M, N, P, Q, R
+ */
+[[nodiscard]] constexpr auto get_pll_division_factor() noexcept {
+	// return reg::PLLCFGR.readBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
+	// 														reg::PllCfgBit::PLLR>(ValueOnly);
+}
+
+/**
+ *
+ */
+[[nodiscard]] constexpr auto get_ahb_clock_freq() noexcept {
+	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	} else {
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+	}
+}
+
+/**
+ * @brief	This function returns the apb1 clock frequency
+ * @return APB1 clock frequency
+ */
+[[nodiscard]] constexpr auto get_apb1_clock_freq() noexcept {
+	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	} else {
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+	}
+}
+
+/**
+ * @brief	This function returns the apb2 clock frequency
+ * @return APB2 clock frequency
+ */
+[[nodiscard]] constexpr auto get_apb2_clock_freq() noexcept {
+	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	} else {
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+	}
+}
+
+}	// namespace cpp_stm32::rcc

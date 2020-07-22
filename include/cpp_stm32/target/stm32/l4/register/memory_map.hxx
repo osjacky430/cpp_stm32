@@ -18,7 +18,7 @@
 
 #include <cstdint>
 
-#include "cpp_stm32/processor/cortex_m4/memory/internal_periph.hxx"
+#include "cpp_stm32/processor/cortex_m4/register/internal_periph.hxx"
 
 namespace cpp_stm32 {
 
@@ -34,4 +34,4 @@ enum class PeriphAddr : std::uint32_t {
 	Ahb2Base	 = memory_at(PeriphBase, 0x0800'0000U),
 };
 
-}	 // namespace cpp_stm32
+}	// namespace cpp_stm32

@@ -85,6 +85,7 @@ struct TypeTable {
  *
  * @todo remove this in the future, this is just bad...
  */
+template <typename RetVal>
 struct Table {
  protected:
 	std::uint32_t const m_value;
@@ -92,7 +93,8 @@ struct Table {
  public:
 	explicit constexpr Table(std::uint32_t const t_val) noexcept : m_value(t_val) {}
 
-	[[nodiscard]] constexpr auto operator()() const noexcept { return m_value; }
+	// temporary, let Table hold member with type RetVal
+	[[nodiscard]] constexpr auto operator()() const noexcept { return RetVal{m_value}; }
 	[[nodiscard]] constexpr auto get() const noexcept { return m_value; }
 };
 
@@ -102,8 +104,8 @@ struct Table {
  * @param [name] [description]
  * @param KVP    [description]
  */
-template <typename Tag, auto... KVPs>
-struct KeyValTable : public Table {
+template <typename RetVal, auto... KVPs>
+struct KeyValTable : public Table<RetVal> {
  private:
 	template <auto Key, auto Val, auto... Rest>
 	struct NTTPPackDecomp {
@@ -151,7 +153,7 @@ struct KeyValTable : public Table {
 
 	template <auto Val>
 	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const /*unused*/) noexcept
-		: Table{GET_VAL<Val>()} {
+		: Table<RetVal>{GET_VAL<Val>()} {
 		static_assert(HAVE_KEY<Val>());
 	}
 };
@@ -161,8 +163,8 @@ struct KeyValTable : public Table {
  * @param  const [description]
  * @return       [description]
  */
-template <typename Tag, auto Lower, auto Upper>
-struct KeyValTable<Tag, Lower, Upper> : public Table {
+template <typename RetVal, auto Lower, auto Upper>
+struct KeyValTable<RetVal, Lower, Upper> : public Table<RetVal> {
 	static constexpr auto MAX = Upper;
 	static constexpr auto MIN = Lower;
 
@@ -172,7 +174,8 @@ struct KeyValTable<Tag, Lower, Upper> : public Table {
 	}
 
 	template <auto Val>
-	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const /*unused*/) noexcept : Table{Val} {
+	explicit constexpr KeyValTable(std::integral_constant<decltype(Val), Val> const /*unused*/) noexcept
+		: Table<RetVal>{Val} {
 		static_assert(HAVE_KEY<Val>());
 	}
 };

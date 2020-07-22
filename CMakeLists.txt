@@ -39,15 +39,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 
 # ############################################################################################################
-# add library, target properties
+# some tunable options
 # ############################################################################################################
 option(ENABLE_RUNTIME_FREQ_CONFIG "Set to ON if the project doesn't change the clock frequency after initialization" OFF)
 option(ENABLE_HARD_FLOAT "Use VFP extension" OFF)
 
+# ############################################################################################################
+# add library, target properties
+# ############################################################################################################
 # Generate project configuration variables
 file(READ ${CMAKE_SOURCE_DIR}/cmake/project_config.hxx.in CONFIG_H_IN)
 string(CONFIGURE "${CONFIG_H_IN}" CONFIG_H_TMP)
-file(GENERATE OUTPUT ${CMAKE_SOURCE_DIR}/include/cpp_stm32/project_config.hxx CONTENT "${CONFIG_H_TMP}")
+file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx CONTENT "${CONFIG_H_TMP}")
 
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
@@ -57,7 +60,7 @@ enable_sanitizers(project_options)
 
 add_library(cpp_stm32 STATIC)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
-target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/)
+target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/ ${CMAKE_CURRENT_BINARY_DIR})
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_link_libraries(cpp_stm32 PRIVATE project_warnings project_options)
 

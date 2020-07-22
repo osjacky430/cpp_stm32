@@ -7,6 +7,7 @@ Since there are alot of things going on here, I need to make a list of recent id
 - In addition to providing C style API, also consider making some C++ style API, such as builder.
 - Try some internal config file (those booleans in device.hxx) (update: this requires some non trivial wrapper so that call to non existence function will not generate compile time error)
 - Check ```__has_include``` ([cppreference](https://en.cppreference.com/w/cpp/preprocessor/include))
+- Support some c++2a feature while not breaking c++17 code
 # References
 - [Odin Holmes “Concurrency Challenges of Interrupt Service Routines”](https://www.youtube.com/watch?v=gcRdG7dGMOw)
 - [A Possible Future of Embedded Software Development - Odin Holmes](https://www.youtube.com/watch?v=fsMmh8F8uV0)

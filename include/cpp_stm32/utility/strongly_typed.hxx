@@ -54,13 +54,13 @@ class StrongType {
 	UnderlyingType m_val;
 };
 
-using DeviceVolt_t = StrongType<float, struct Vdd_t>;
-using BitPos_t		 = StrongType<std::uint32_t, struct BitPosition>;
-using BitLength_t	 = StrongType<std::uint32_t, struct BitLength>;
+using DeviceVolt_t = StrongType<float, struct CPP_STM32_VDD>;
+using BitPos_t		 = StrongType<std::uint32_t, struct CPP_STM32_BITPOSITION>;
+using BitLength_t	= StrongType<std::uint32_t, struct CPP_STM32_BITLENGTH>;
 
-using BaseAddr_t = StrongType<std::uint32_t, struct BaseAddress>;
-using Offset_t	 = StrongType<std::uint16_t, struct Offset>;
+using BaseAddr_t = StrongType<std::uint32_t, struct CPP_STM32_BASEADDRESS>;
+using Offset_t	 = StrongType<std::uint16_t, struct CPP_STM32_OFFSET>;
 
-using Priority_t = StrongType<std::size_t, struct Priority>;
-using ResetVal_t = StrongType<std::uint32_t, struct ResetVal>;
-}	 // namespace cpp_stm32
+using Priority_t = StrongType<std::size_t, struct CPP_STM32_PRIORITY>;
+using ResetVal_t = StrongType<std::uint32_t, struct CPP_STM32_RESETVAL>;
+}	// namespace cpp_stm32
