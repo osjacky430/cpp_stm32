@@ -1,12 +1,12 @@
-# - Import board settings checks target board validity and import related variables
+# * Import board settings checks target board validity and import related variables
 #
-# This macro checks if the target board is supported by cpp_stm32 and import all
-# variables needed to successfully compile the library for target board.
-#   
-#    import_board_setting(<target_board>)
+# This macro checks if the target board is supported by cpp_stm32 and import all variables needed to
+# successfully compile the library for target board.
 #
-# If target_board is not supported, fatal error will occur. List of all supported 
-# boards are listed in board/supported_board.in
+# import_board_setting(<target_board>)
+#
+# If target_board is not supported, fatal error will occur. List of all supported boards are listed in
+# board/supported_board.in
 macro(import_board_setting target_board)
   include(${CMAKE_SOURCE_DIR}/board/supported_board.in)
 
@@ -18,49 +18,43 @@ macro(import_board_setting target_board)
   endif()
 endmacro()
 
-# - Check the existence of the configuration file
+# * Check the existence of the configuration file
 #
-# This function checks the configuration file (sys_info.hpp) cpp_stm32 needed to  
-# generate correct prescalers for the clock system
+# This function checks the configuration file (sys_info.hpp) cpp_stm32 needed to generate correct prescalers
+# for the clock system
 #
-#     check_config_file([OVERWRITE]
-#                       [BOARD <var>]
-#                       [FILE_DIR <var>])
+# check_config_file([OVERWRITE] [BOARD <var>] [FILE_DIR <var>])
 #
-# If sys_info.hpp doesn't exist at FILE_DIR, it will create new one according to
-# BOARD. If OVERWRITE is present, cmake will overwrite the existing sys_info.hpp
-# to the default values.
+# If sys_info.hpp doesn't exist at FILE_DIR, it will create new one according to BOARD. If OVERWRITE is
+# present, cmake will overwrite the existing sys_info.hpp to the default values.
 function(check_config_file)
   set(option_value OVERWRITE)
   set(single_value_arg BOARD FILE_DIR)
   set(multi_value_arg)
   cmake_parse_arguments(CONFIG "${option_value}" "${single_value_arg}" "${multi_value_arg}" ${ARGN})
 
-  if(NOT ${CONFIG_BOARD} STREQUAL "" AND NOT ${CONFIG_FILE_DIR} STREQUAL "") 
+  if(NOT ${CONFIG_BOARD} STREQUAL "" AND NOT ${CONFIG_FILE_DIR} STREQUAL "")
     import_board_setting(${CONFIG_BOARD})
     if(NOT EXISTS ${CONFIG_FILE_DIR}/sys_info.hpp)
-       message(STATUS "Missing sys_info.hpp in ${CONFIG_FILE_DIR}, creating one with default configuration")
-       file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
-     elseif(${CONFIG_OVERWRITE})
-       message(STATUS "Overwriting sys_info.hpp in ${CONFIG_FILE_DIR}")
-       file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
-    endif() 
+      message(STATUS "Missing sys_info.hpp in ${CONFIG_FILE_DIR}, creating one with default configuration")
+      file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
+    elseif(${CONFIG_OVERWRITE})
+      message(STATUS "Overwriting sys_info.hpp in ${CONFIG_FILE_DIR}")
+      file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
+    endif()
   endif()
 endfunction()
 
-# - Check whether the peripheral is implemented/supported or not.
+# * Check whether the peripheral is implemented/supported or not.
 #
-# This function checks whether the peripheral functionalities are supported by 
-# target board by checking register header and api header.
+# This function checks whether the peripheral functionalities are supported by target board by checking
+# register header and api header.
 #
-#     is_periph_supported(<result>
-#                         [BOARD <var>]
-#                         [PERIPH <var ...>])
+# is_periph_supported(<result> [BOARD <var>] [PERIPH <var ...>])
 #
-# If not supported/implemented, the result will be FALSE, otherwise TRUE. PERIPH
-# is case insensitive, i.e. GPIO and gpio will have the same result. This is useful
-# for cpp_stm32 to skip some example, or even test case (in the future) if the 
-# target board doesn't support such example/test case.
+# If not supported/implemented, the result will be FALSE, otherwise TRUE. PERIPH is case insensitive, i.e.
+# GPIO and gpio will have the same result. This is useful for cpp_stm32 to skip some example, or even test
+# case (in the future) if the target board doesn't support such example/test case.
 function(is_periph_supported result)
   set(option_arg)
   set(single_value_arg BOARD)
@@ -75,12 +69,52 @@ function(is_periph_supported result)
     set(REGISTER_HEADER ${TARGET_DIR}/register/${target_periph}.hxx)
     set(API_HEADER ${TARGET_DIR}/register/${target_periph}.hxx)
 
-    if (NOT EXISTS ${REGISTER_HEADER} OR NOT EXISTS ${API_HEADER})
+    if(NOT EXISTS ${REGISTER_HEADER} OR NOT EXISTS ${API_HEADER})
       list(APPEND ret_val FALSE)
     else()
       list(APPEND ret_val TRUE)
     endif()
   endforeach()
-  set(${result} ${ret_val} PARENT_SCOPE)
+  set(${result}
+      ${ret_val}
+      PARENT_SCOPE)
 
- endfunction()
+endfunction()
+
+# * Generate project configuration file
+#
+# This function generates the configuration file (project_config.hxx) cpp_stm32 needed to generate correct prescalers
+# for the clock system, the configuration file is in the form of yaml
+#
+# gen_project_config_file([BOARD <var>] [CLOCK_FILE <var>])
+#
+# If the yaml file doesn't exist, it will issue a FATAL_ERROR.
+function(gen_project_config_file)
+  set(option_arg)
+  set(single_value_arg BOARD CLOCK_FILE)
+  set(multi_value_arg)
+  cmake_parse_arguments("_" "${option_arg}" "${single_value_arg}" "${multi_value_arg}" ${ARGN})
+
+  if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tool/clock_generator/${__CLOCK_FILE})
+    message(FATAL_ERROR "clock file doesn't exist, aborted")
+  endif()
+
+  file(READ ${CMAKE_SOURCE_DIR}/cmake/project_config.hxx.in CONFIG_H_IN)
+  string(CONFIGURE "${CONFIG_H_IN}" CONFIG_H_TMP)
+  file(
+    GENERATE
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
+    CONTENT "${CONFIG_H_TMP}")
+
+  find_package(Python3 COMPONENTS Interpreter)
+  if(${Python3_FOUND})
+    add_custom_target(
+      gen_clk_info ALL
+      COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tool/clock_generator/clock_generator.py ${__CLOCK_FILE}
+              ${__BOARD} ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tool/clock_generator)
+  else()
+    message(FATAL_ERROR "can't find python3 to generate clock info, aborted")
+  endif()
+endfunction()

@@ -1,0 +1,19 @@
+HSE:
+  - BYPASS: False
+    FREQ: 8e6
+LSE:
+  - BYPASS: False
+    FREQ: 32.768e3
+SYS:
+  - SRC: PLLP
+    FREQ: 180e6
+AHB:
+  - FREQ: 180e6
+APB1:
+  - FREQ: 45e6
+APB2:
+  - FREQ: 90e6
+PLL:
+  - SRC: HSE
+VDD:
+  - VOLT: 3.3

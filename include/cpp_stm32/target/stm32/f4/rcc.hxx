@@ -231,18 +231,28 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  * @return division factors M, N, P, Q, R
  */
 [[nodiscard]] constexpr auto get_pll_division_factor() noexcept {
-	// return reg::PLLCFGR.readBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
-	// 														reg::PllCfgBit::PLLR>(ValueOnly);
+	return reg::PLLCFGR.readBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
+															reg::PllCfgBit::PLLR>(ValueOnly);
 }
 
 /**
  *
  */
 [[nodiscard]] constexpr auto get_ahb_clock_freq() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	if constexpr (FIX_CLK_FREQ) {
 	} else {
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+		auto const sys_src							= sysclk_in_use();
+
+		switch (sys_src) {
+			case rcc::SysClk::Pllp:
+			case rcc::SysClk::Pllr:
+			case rcc::SysClk::Hsi:
+			case rcc::SysClk::Hse:
+				break;
+		}
+
+		auto const [m, n, p, q, r] = get_pll_division_factor();
 	}
 }
 
@@ -251,10 +261,11 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  * @return APB1 clock frequency
  */
 [[nodiscard]] constexpr auto get_apb1_clock_freq() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	if constexpr (FIX_CLK_FREQ) {
 	} else {
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+		auto const [m, n, p, q, r]			= get_pll_division_factor();
+		auto const sys_src							= sysclk_in_use();
 	}
 }
 
@@ -263,10 +274,11 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  * @return APB2 clock frequency
  */
 [[nodiscard]] constexpr auto get_apb2_clock_freq() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	if constexpr (FIX_CLK_FREQ) {
 	} else {
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		// auto const [m, n, p, q, r]			= get_pll_division_factor();
+		auto const [m, n, p, q, r]			= get_pll_division_factor();
+		auto const sys_src							= sysclk_in_use();
 	}
 }
 

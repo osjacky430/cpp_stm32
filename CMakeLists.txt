@@ -1,13 +1,19 @@
 # ############################################################################################################
 # cpp_stm32 library
 # ############################################################################################################
-cmake_minimum_required(VERSION 3.15.2...3.16.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15.2 FATAL_ERROR)
 
+set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
+
+# ############################################################################################################
+# command line options (not skippable)
+# ############################################################################################################
 set(TARGET_BOARD
     ""
     CACHE STRING "Target MCU")
-
-set(CMAKE_TOOLCHAIN_FILE "ARMToolchain.cmake")
+set(CLOCK_FILE
+    ""
+    CACHE STRING "System Clock information")
 
 project(
   cpp_stm32
@@ -25,7 +31,18 @@ include(sanitizer)
 include(doxygen)
 
 import_board_setting(${TARGET_BOARD})
-check_config_file(BOARD ${TARGET_BOARD} FILE_DIR "${CMAKE_SOURCE_DIR}/src")
+
+# ############################################################################################################
+# some tunable options
+# ############################################################################################################
+option(ENABLE_RUNTIME_FREQ_CONFIG
+       "Set to ON if the project doesn't change the clock frequency after initialization" OFF)
+option(ENABLE_HARD_FLOAT "Use VFP extension" OFF)
+
+# ############################################################################################################
+# Generate project configuration variables
+# ############################################################################################################
+gen_project_config_file(CLOCK_FILE ${CLOCK_FILE} BOARD ${TARGET_BOARD})
 
 # In practice, it is usally easier and more robust to use the variables to set language requirements
 # project-wide rather than use per target properties.
@@ -39,19 +56,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(NEWLIB_FLAGS --specs=nano.specs --specs=nosys.specs)
 
 # ############################################################################################################
-# some tunable options
-# ############################################################################################################
-option(ENABLE_RUNTIME_FREQ_CONFIG "Set to ON if the project doesn't change the clock frequency after initialization" OFF)
-option(ENABLE_HARD_FLOAT "Use VFP extension" OFF)
-
-# ############################################################################################################
 # add library, target properties
 # ############################################################################################################
-# Generate project configuration variables
-file(READ ${CMAKE_SOURCE_DIR}/cmake/project_config.hxx.in CONFIG_H_IN)
-string(CONFIGURE "${CONFIG_H_IN}" CONFIG_H_TMP)
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx CONTENT "${CONFIG_H_TMP}")
-
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
@@ -60,17 +66,15 @@ enable_sanitizers(project_options)
 
 add_library(cpp_stm32 STATIC)
 target_sources(cpp_stm32 PRIVATE ${TARGET_PROCESSOR}/source/vector_table.cxx)
-target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/ ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(cpp_stm32 PUBLIC ${TARGET_DIR} ${CMAKE_SOURCE_DIR}/include/
+                                            ${CMAKE_CURRENT_BINARY_DIR})
 target_link_directories(cpp_stm32 INTERFACE ${PROCESSOR_DIR})
 target_link_libraries(cpp_stm32 PRIVATE project_warnings project_options)
 
 target_compile_options(
   cpp_stm32
-  PUBLIC
-  ${BOARD_FLAGS}
-  ${NEWLIB_FLAGS}
-  $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>
-  $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti>)
+  PUBLIC ${BOARD_FLAGS} ${NEWLIB_FLAGS} $<IF:$<BOOL:${ENABLE_HARD_FLOAT}>,${HARD_FLOAT},${SOFT_FLOAT}>
+         $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti>)
 
 target_link_options(
   cpp_stm32
@@ -89,7 +93,7 @@ target_link_options(
 option(ENABLE_TESTING "Build unit test" OFF)
 
 if(ENABLE_TESTING)
-  if (TEST_DIR)
+  if(TEST_DIR)
     include(unit_test)
     add_unit_test_lib()
     add_subdirectory(${CMAKE_SOURCE_DIR}/test/)

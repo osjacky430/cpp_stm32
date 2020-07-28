@@ -54,7 +54,7 @@ class StrongType {
 	UnderlyingType m_val;
 };
 
-using DeviceVolt_t = StrongType<float, struct CPP_STM32_VDD>;
+using SupplyVoltage = StrongType<float, struct CPP_STM32_VDD>;
 using BitPos_t		 = StrongType<std::uint32_t, struct CPP_STM32_BITPOSITION>;
 using BitLength_t	= StrongType<std::uint32_t, struct CPP_STM32_BITLENGTH>;
 

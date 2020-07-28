@@ -30,6 +30,6 @@ Debug
 .vscode
 
 # pycharm project
-tool/code_generator/.idea
-tool/code_generator/venv/
-tool/code_generator/__pycache__/
+tool/*/.idea
+tool/*/venv/
+tool/*/__pycache__/

@@ -97,7 +97,7 @@ void reset_handler() {
 		*dest++ = 0;
 	}
 
-	if constexpr (CPP_STM32_ENABLE_VFP) {
+	if constexpr (cpp_stm32::ENABLE_VFP) {
 		cpp_stm32::scb::enable_vfp_coprocessor();
 	}
 

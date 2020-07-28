@@ -25,7 +25,7 @@
 #include "cpp_stm32/common/usart.hxx"
 #include "cpp_stm32/target/stm32/f4/register/usart.hxx"
 
-#include "sys_info.hpp"
+#include "project_config.hxx"
 
 namespace cpp_stm32::usart {
 
@@ -36,12 +36,12 @@ namespace cpp_stm32::usart {
  */
 template <Port InputPort>
 constexpr void set_baudrate(Baudrate_t const t_baud) noexcept {
-	constexpr auto clk_freq = (InputPort == Port::Usart1 || InputPort == Port::Usart6 ? APB2_CLK_FREQ : APB1_CLK_FREQ);
+	constexpr auto clk_freq = (InputPort == Port::Usart1 || InputPort == Port::Usart6 ? APB2_FREQ : APB1_FREQ);
 
 	auto const usart_div = (clk_freq + t_baud.get() / 2) / t_baud.get();	// round (avoiding floating point arithmetic)
 
 	std::uint16_t const mantissa = usart_div >> 4;
-	std::uint8_t const fraction	 = usart_div & 0xF;
+	std::uint8_t const fraction	= usart_div & 0xF;
 
 	reg::BRR<InputPort>.template writeBit<reg::BrrBit::DivFraction, reg::BrrBit::DivMantissa>(fraction, mantissa);
 }
@@ -334,4 +334,4 @@ constexpr auto clear_interrupt_flag() noexcept {
 template <Port InputPort>
 class UsartBuilder {};
 
-}	 // namespace cpp_stm32::usart
+}	// namespace cpp_stm32::usart

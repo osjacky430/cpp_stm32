@@ -68,8 +68,8 @@ constexpr auto str_to_float(std::array<char, N> const& str) noexcept {
 		detail::find_if(str.begin(), str.end(), [](auto const& t_chr) { return t_chr == 'e' || t_chr == 'E'; }) -
 		str.begin();
 
-	float ret_val = 0.0;
-	auto exp			= 0.0;
+	float ret_val = 0.0f;
+	float exp			= 0.0f;
 	auto base			= 1.0;
 
 	for (int i = 0; i < decimal_point_pos; ++i) {
@@ -89,7 +89,7 @@ constexpr auto str_to_float(std::array<char, N> const& str) noexcept {
 		base *= 10;
 	}
 
-	return ret_val * std::pow(10, exp);
+	return ret_val * std::pow(10.0f, exp);
 }
 
 /**

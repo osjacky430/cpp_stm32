@@ -27,6 +27,7 @@
 
 #include "cpp_stm32/detail/algorithm.hxx"
 #include "cpp_stm32/detail/lookup_table.hxx"
+#include "cpp_stm32/utility/strongly_typed.hxx"
 
 namespace cpp_stm32::rcc {
 
@@ -98,6 +99,7 @@ using PPREChecker =
 /**
  * [SETUP_LOOKUP_TABLE_WITH_BOUND description]
  */
+// using RTCPRE = StrongType<std::uint32_t, struct CPP_STM32_RTCPRE>;
 using RTCPRE = detail::KeyValTable<struct CPP_STM32_LUT_RTCPRE, 2, 31>;
 
 /**

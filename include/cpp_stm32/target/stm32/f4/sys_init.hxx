@@ -25,65 +25,37 @@
 #include <cmath>
 #include <optional>
 
+#include "cpp_stm32/detail/algorithm.hxx"
+#include "cpp_stm32/detail/tuple.hxx"
+#include "cpp_stm32/target/stm32/f4/clock.hxx"
 #include "cpp_stm32/target/stm32/f4/flash.hxx"
 #include "cpp_stm32/target/stm32/f4/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
-
-#include "cpp_stm32/detail/algorithm.hxx"
-#include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
-
-// user specific include
-#include "sys_info.hpp"
 
 namespace cpp_stm32::sys {
 
-/**
- * @defgroup LSE_CLK_FREQ   LSE Clock
- * @{
- */
+// reference
+static constexpr auto STM32_VDD_MIN = 1.8f;
+static constexpr auto STM32_VDD_MAX = 3.6f;
 
-#if !defined(LSE_CLK_FREQ)
-#define LSE_CLK_FREQ 32768
-#endif
+// reference
+static constexpr auto HSE_CLK_FREQ_MIN				 = 4_MHz;
+static constexpr auto HSE_CLK_FREQ_MAX				 = 25_MHz;
+static constexpr auto RECOMMEND_VCO_INPUT_FREQ = 2_MHz;
+static constexpr auto VCO_OUTPUT_FREQ_MIN			 = 100_MHz;
+static constexpr auto VCO_OUTPUT_FREQ_MAX			 = 432_MHz;
 
-/**@}*/
-
-/**
- * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
- * @{
- */
-
-#if !defined(DEVICE_VDD)
-#define DEVICE_VDD 3.3f
-#endif
-
-static constexpr auto STM32_VDD = DEVICE_VDD;
-// remove
-static_assert(1.8f <= STM32_VDD && STM32_VDD <= 3.6f);
-
-/**@}*/
-
-#if !defined(HSE_CLK_FREQ)
-#define HSE_CLK_FREQ (8000000U)
-#endif
-
-#if !defined(HSE_BYPASS_CLK_SRC)
-#define HSE_BYPASS_CLK_SRC false
-#endif
-
-static constexpr auto HSE_CLK_FREQ_MIN										 = 4_MHz;
-static constexpr auto HSE_CLK_FREQ_MAX										 = 25_MHz;
-static constexpr auto RECOMMEND_VCO_INPUT_FREQ						 = 2_MHz;
-static constexpr auto VCO_OUTPUT_FREQ_MIN									 = 100_MHz;
-static constexpr auto VCO_OUTPUT_FREQ_MAX									 = 432_MHz;
+// reference
 static constexpr auto AHB_VOS_SCALE1_MAX_FREQ							 = 120_MHz;
 static constexpr auto AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE = 144_MHz;
 static constexpr auto AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE		 = 168_MHz;
-static constexpr auto APB1_FREQ_MAX_NO_OVERDRIVE					 = 42_MHz;
-static constexpr auto APB1_FREQ_MAX_OVERDRIVE							 = 45_MHz;
-static constexpr auto APB2_FREQ_MAX_NO_OVERDRIVE					 = 84_MHz;
-static constexpr auto APB2_FREQ_MAX_OVERDRIVE							 = 90_MHz;
+
+// reference
+static constexpr auto APB1_FREQ_MAX_NO_OVERDRIVE = 42_MHz;
+static constexpr auto APB1_FREQ_MAX_OVERDRIVE		 = 45_MHz;
+static constexpr auto APB2_FREQ_MAX_NO_OVERDRIVE = 84_MHz;
+static constexpr auto APB2_FREQ_MAX_OVERDRIVE		 = 90_MHz;
 
 /* @todo Is this necessary? */
 struct ExternalClock {
@@ -97,89 +69,6 @@ using HSE_CLOCK = StrongType<ExternalClock, struct CPP_STM32_HSE_CLOCK>;
 using LSE_CLOCK = StrongType<ExternalClock, struct CPP_STM32_LSE_CLOCK>;
 
 /**
- * @class 	ClockFreq
- * @brief 	This class contains all the information that it needs to initialize the clocks
- */
-struct ClockFreq {
-	bool bypassHSE = false;
-	bool bypassLSE = false;
-
-	std::uint32_t freqHSE = HSE_DEFAULT_FREQ;
-	std::uint32_t freqLSE = LSE_DEFAULT_FREQ;
-
-	std::uint32_t freqSYS		= 180_M;
-	std::uint32_t AHB_FREQ	= 180_M;
-	std::uint32_t APB1_FREQ = 45_M;
-	std::uint32_t APB2_FREQ = 90_M;
-
-	std::optional<rcc::ClkSrc> PLL_SRC = std::nullopt;
-
-	// these two are fixed
-	static constexpr std::uint32_t HSI_FREQ = 16_M;
-	static constexpr std::uint32_t LSI_FREQ = 32_k;
-
-	static constexpr std::uint32_t HSE_DEFAULT_FREQ = 8_M;
-	static constexpr std::uint32_t LSE_DEFAULT_FREQ = 32.768_k;
-};
-
-/**
- * @class ClockBuilder
- * @brief This class is a builder class to handle complex initialization process of RCC
- */
-class ClockBuilder {
-	ClockFreq m_clock{};
-
- public:
-	constexpr ClockBuilder& setHSE(bool const t_bypass,
-																 std::uint32_t const t_freq = ClockFreq::HSE_DEFAULT_FREQ) noexcept {
-		m_clock.bypassHSE = t_bypass;
-		m_clock.freqHSE		= t_freq;
-		return *this;
-	}
-
-	constexpr ClockBuilder& setLSE(bool const t_bypass,
-																 std::uint32_t const t_freq = ClockFreq::LSE_DEFAULT_FREQ) noexcept {
-		m_clock.bypassLSE = t_bypass;
-		m_clock.freqLSE		= t_freq;
-		return *this;
-	}
-
-	constexpr ClockBuilder& setPLL(rcc::ClkSrc const t_src) noexcept {
-		m_clock.PLL_SRC = t_src;
-
-		return *this;
-	}
-
-	constexpr ClockBuilder& setSYS(std::uint32_t const t_freq) noexcept {
-		m_clock.freqSYS = t_freq;
-
-		return *this;
-	}
-
-	constexpr ClockBuilder& setAHB(std::uint32_t const t_freq) noexcept {
-		m_clock.AHB_FREQ = t_freq;
-		return *this;
-	}
-
-	constexpr ClockBuilder& setAPB1(std::uint32_t const t_freq) noexcept {
-		m_clock.APB1_FREQ = t_freq;
-		return *this;
-	}
-
-	constexpr ClockBuilder& setAPB2(std::uint32_t const t_freq) noexcept {
-		m_clock.APB2_FREQ = t_freq;
-		return *this;
-	}
-
-	constexpr ClockFreq buildClock() const noexcept { return this->m_clock; }
-};
-
-/**
- * @brief 	Default clock frequency
- */
-static constexpr auto CPP_STM32_CLOCK_DATA = ClockFreq{};
-
-/**
  * @brief 	This function calculate pll division factor with given input frequency and system frequency
  * @param		t_pll_freq Input clock frequency of PLL, possibly HSE or HSI, refer to the clock tree for further
  * 										 information.
@@ -188,8 +77,7 @@ static constexpr auto CPP_STM32_CLOCK_DATA = ClockFreq{};
  * @return  a tuple that contains the value of 5 divisino factors, i.e., pllm, plln, pllp, pllq, pllr
  */
 template <auto ClkSrcFreq, auto SysClkFreq>
-static constexpr auto CALC_PLL_DIV_FACTOR(Frequency<ClkSrcFreq> const t_pll_freq,
-																					Frequency<SysClkFreq> const t_sys_freq) {
+constexpr auto calc_pll_div_factor(Frequency<ClkSrcFreq> const t_pll_freq, Frequency<SysClkFreq> const t_sys_freq) {
 	using rcc::PllPChecker;
 
 	constexpr auto pllm						= static_cast<std::uint32_t>(std::ceil(t_pll_freq / RECOMMEND_VCO_INPUT_FREQ));
@@ -223,7 +111,7 @@ static constexpr auto CALC_PLL_DIV_FACTOR(Frequency<ClkSrcFreq> const t_pll_freq
  * @return Boolean that indicate if overdrive is needed or not
  */
 template <auto AHB, auto APB1, auto APB2>
-constexpr auto SYSTEM_NEED_OVERDRIVE(Frequency<AHB> const t_ahb, Frequency<APB1> const t_apb1,
+constexpr auto system_need_overdrive(Frequency<AHB> const t_ahb, Frequency<APB1> const t_apb1,
 																		 Frequency<APB2> const t_apb2) noexcept {
 	constexpr bool ahb_need_overdrive	= t_ahb >= AHB_VOS_SCALE2_MAX_FREQ_OVERDRIVE;
 	constexpr bool apb1_need_overdrive = t_apb1 >= APB1_FREQ_MAX_NO_OVERDRIVE;
@@ -241,7 +129,7 @@ constexpr auto SYSTEM_NEED_OVERDRIVE(Frequency<AHB> const t_ahb, Frequency<APB1>
  * @return tuple that contains the division factor, i.e., hpre, ppre1, ppre2
  */
 template <auto SYS, auto AHB, auto APB1, auto APB2>
-constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR(Frequency<SYS> const t_sys, Frequency<AHB> const t_ahb,
+constexpr auto calc_advance_bus_div_factor(Frequency<SYS> const t_sys, Frequency<AHB> const t_ahb,
 																					 Frequency<APB1> const t_apb1, Frequency<APB2> const t_apb2) noexcept {
 	constexpr auto hpre	= t_sys / t_ahb;
 	constexpr auto ppre1 = t_ahb / t_apb1;
@@ -257,7 +145,7 @@ constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR(Frequency<SYS> const t_sys, Frequency
  * @return SysClk
  */
 template <auto SYS, auto HSE, auto HSI>
-constexpr auto DETERMINE_SYS_CLK_SRC(Frequency<SYS> const t_sys, Frequency<HSE> const t_hse,
+constexpr auto determine_sys_clk_src(Frequency<SYS> const t_sys, Frequency<HSE> const t_hse,
 																		 Frequency<HSI> const t_hsi) noexcept {
 	using rcc::SysClk;
 	if constexpr (t_sys != t_hse && t_sys != t_hsi) {
@@ -276,7 +164,7 @@ constexpr auto DETERMINE_SYS_CLK_SRC(Frequency<SYS> const t_sys, Frequency<HSE> 
  * @return Voltage scale
  */
 template <auto NeedOverdrive, auto AHB>
-constexpr auto DETERMINE_VOLTAGE_SCALE(Frequency<AHB> const t_ahb) noexcept {
+constexpr auto determine_voltage_scale(Frequency<AHB> const t_ahb) noexcept {
 	if constexpr (NeedOverdrive || t_ahb >= AHB_VOS_SCALE2_MAX_FREQ_NO_OVERDRIVE) {
 		return pwr::VoltageScale::Scale1Mode;
 	} else if constexpr (t_ahb >= AHB_VOS_SCALE1_MAX_FREQ) {
@@ -290,22 +178,17 @@ constexpr auto DETERMINE_VOLTAGE_SCALE(Frequency<AHB> const t_ahb) noexcept {
  * @class   Clock
  * @brief
  */
-template <auto ClkData = &CPP_STM32_CLOCK_DATA>
+template <clock::ClockFreq const& ClkData = CPP_STM32_CLOCK_DATA>
 class Clock {
  private:
-	static constexpr auto CLOCK_DATA = []() {
-		if constexpr (std::is_pointer_v<decltype(ClkData)>) {	// before c++2a
-			return *ClkData;
-		} else {
-			return ClkData;	// since c++2a
-		}
-	}();
+	static constexpr clock::ClockFreq CLOCK_DATA = ClkData;
 
-	static constexpr auto AHB_CLK	= Frequency<CLOCK_DATA.AHB_FREQ>{};
-	static constexpr auto APB1_CLK = Frequency<CLOCK_DATA.APB1_FREQ>{};
-	static constexpr auto APB2_CLK = Frequency<CLOCK_DATA.APB2_FREQ>{};
+	static constexpr auto AHB_CLK	= Frequency<CLOCK_DATA.freqAHB>{};
+	static constexpr auto APB1_CLK = Frequency<CLOCK_DATA.freqAPB1>{};
+	static constexpr auto APB2_CLK = Frequency<CLOCK_DATA.freqAPB2>{};
 	static constexpr auto SYS_CLK	= Frequency<CLOCK_DATA.freqSYS>{};
 	static constexpr auto HSE_CLK	= Frequency<CLOCK_DATA.freqHSE>{};
+	static constexpr auto VDD			 = CLOCK_DATA.vdd;
 
 	// internal clock frequency is fixed
 	static constexpr auto HSI_CLK = Frequency<CLOCK_DATA.HSI_FREQ>{};
@@ -313,7 +196,7 @@ class Clock {
 
 	static constexpr auto GET_ADVANCE_BUS_DIV_FACTOR() noexcept {
 		using rcc::HPREChecker, rcc::PPREChecker, rcc::DivisionFactor_v;
-		constexpr auto bus_div = CALC_ADVANCE_BUS_DIV_FACTOR(SYS_CLK, AHB_CLK, APB1_CLK, APB2_CLK);
+		constexpr auto bus_div = calc_advance_bus_div_factor(SYS_CLK, AHB_CLK, APB1_CLK, APB2_CLK);
 		constexpr auto hpre		 = std::get<0>(bus_div);
 		constexpr auto ppre1	 = std::get<1>(bus_div);
 		constexpr auto ppre2	 = std::get<2>(bus_div);
@@ -329,7 +212,7 @@ class Clock {
 		using rcc::PllMChecker, rcc::PllNChecker, rcc::PllPChecker, rcc::PllQChecker, rcc::PllRChecker;
 
 		constexpr auto pll_input_clk = Frequency<(PllSrc == ClkSrc::Hse ? CLOCK_DATA.freqHSE : CLOCK_DATA.HSI_FREQ)>{};
-		constexpr auto result				 = CALC_PLL_DIV_FACTOR(pll_input_clk, SYS_CLK);
+		constexpr auto result				 = calc_pll_div_factor(pll_input_clk, SYS_CLK);
 
 		constexpr auto pllm = std::get<0>(result);
 		constexpr auto plln = std::get<1>(result);
@@ -342,25 +225,31 @@ class Clock {
 											PllRChecker{DivisionFactor_v<pllr>}};
 	}
 
+	constexpr auto check_sys_src_valid() noexcept {
+		if constexpr (CLOCK_DATA.srcSYS.has_value()) {
+			switch (CLOCK_DATA.srcSYS.value()) {}
+		}
+
+		return true;	// sys src is determined by our library
+	}
+
  public:
-	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(AHB_CLK);
-
-	static constexpr auto NEED_OVERDRIVE = SYSTEM_NEED_OVERDRIVE(AHB_CLK, APB1_CLK, APB2_CLK);
-
-	static constexpr auto VOLTAGE_SCALE = DETERMINE_VOLTAGE_SCALE<NEED_OVERDRIVE>(AHB_CLK);
-
-	static constexpr auto SYS_CLK_SRC = DETERMINE_SYS_CLK_SRC(SYS_CLK, HSE_CLK, HSI_CLK);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<VDD>(AHB_CLK);
+	static constexpr auto NEED_OVERDRIVE = system_need_overdrive(AHB_CLK, APB1_CLK, APB2_CLK);
+	static constexpr auto VOLTAGE_SCALE	= determine_voltage_scale<NEED_OVERDRIVE>(AHB_CLK);
+	static constexpr auto SYS_CLK_SRC		 = determine_sys_clk_src(SYS_CLK, HSE_CLK, HSI_CLK);
 
 	static constexpr auto IS_CLOCK_DATA_VALID() noexcept {
 		using rcc::SysClk;
 		constexpr auto SYS_CLK_SRC_IS_PLL = SYS_CLK_SRC == SysClk::Pllp || SYS_CLK_SRC == SysClk::Pllr;
-		constexpr auto CLK_SRC_IS_VALID		= (SYS_CLK_SRC_IS_PLL && CLOCK_DATA.PLL_SRC.has_value());
+		constexpr auto CLK_SRC_IS_VALID		= (SYS_CLK_SRC_IS_PLL && CLOCK_DATA.srcPLL.has_value());
 
 		constexpr auto HSE_FREQ_IS_VALID = HSE_CLK_FREQ_MIN <= HSE_CLK && HSE_CLK <= HSE_CLK_FREQ_MAX;
 		constexpr auto APB1_CLK_IS_VALID = APB1_CLK <= APB1_FREQ_MAX_OVERDRIVE;
+		constexpr auto VDD_IS_VALID			 = STM32_VDD_MIN <= VDD && VDD <= STM32_VDD_MAX;
 
 		// @todo other validity check...
-		return CLK_SRC_IS_VALID && HSE_FREQ_IS_VALID && APB1_CLK_IS_VALID;
+		return CLK_SRC_IS_VALID && HSE_FREQ_IS_VALID && APB1_CLK_IS_VALID && VDD_IS_VALID;
 	}
 
 	// template <rcc::ClkSrc PllSrc, rcc::RtcClk RtcSrc>
@@ -372,7 +261,7 @@ class Clock {
 	// 	rcc::release_reset_backup_domain();
 	//
 	// 	if constexpr (RtcSrc == rcc::RtcClk::Hse) {
-	// 		constexpr std::uint32_t rtc_prescaler = HSE_CLK_FREQ / rtc::HSE_CLK_FREQ_TO_RTC;
+	// 		constexpr std::uint32_t rtc_prescaler = HSE_FREQ / rtc::HSE_CLK_FREQ_TO_RTC;
 	// 		rcc::set_rtc_prescaler(rcc::RTCPRE{rcc::DivisionFactor_v<rtc_prescaler>});
 	// 	}
 	//
@@ -389,16 +278,16 @@ class Clock {
 		}
 
 		// enable PLL Clock Src, i.e., HSE or HSI
-		if constexpr (CLOCK_DATA.PLL_SRC.has_value()) {
-			rcc::enable_clk<CLOCK_DATA.PLL_SRC.value()>();
-			rcc::wait_osc_rdy<CLOCK_DATA.PLL_SRC.value()>();
-			rcc::set_sysclk<rcc::SysClk{to_underlying(CLOCK_DATA.PLL_SRC.value())}>();
+		if constexpr (CLOCK_DATA.srcPLL.has_value()) {
+			rcc::enable_clk<CLOCK_DATA.srcPLL.value()>();
+			rcc::wait_osc_rdy<CLOCK_DATA.srcPLL.value()>();
+			rcc::set_sysclk<rcc::SysClk{to_underlying(CLOCK_DATA.srcPLL.value())}>();
 
 			{	// operations that requires PLL off
-				auto const& [m, n, p, q, r] = GET_PLL_DIV_FACTOR<CLOCK_DATA.PLL_SRC.value()>();
+				auto const& [m, n, p, q, r] = GET_PLL_DIV_FACTOR<CLOCK_DATA.srcPLL.value()>();
 
 				rcc::disable_clk<ClkSrc::Pll>();
-				rcc::set_pllsrc_and_div_factor<CLOCK_DATA.PLL_SRC.value()>(m, n, p, q, r);
+				rcc::set_pllsrc_and_div_factor<CLOCK_DATA.srcPLL.value()>(m, n, p, q, r);
 				rcc::enable_periph_clk<PeriphClk::Pwr>();
 				pwr::set_voltage_scale(VOLTAGE_SCALE);
 			}
@@ -420,7 +309,7 @@ class Clock {
 		auto const& [ahb, apb1, apb2] = GET_ADVANCE_BUS_DIV_FACTOR();
 		rcc::config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		if constexpr (CLOCK_DATA.PLL_SRC.has_value()) {
+		if constexpr (CLOCK_DATA.srcPLL.has_value()) {
 			rcc::wait_osc_rdy<ClkSrc::Pll>();	// wait for PLL lock
 		}
 
@@ -428,6 +317,6 @@ class Clock {
 		rcc::set_sysclk<SYS_CLK_SRC>();
 		rcc::wait_sysclk_rdy<SYS_CLK_SRC>();
 	}
-};
+};	// namespace cpp_stm32::sys
 
 }	// namespace cpp_stm32::sys

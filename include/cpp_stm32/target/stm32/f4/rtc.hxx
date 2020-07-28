@@ -28,6 +28,7 @@
 #include <tuple>
 
 #include "cpp_stm32/common/rtc.hxx"
+#include "cpp_stm32/target/stm32/f4/clock.hxx"
 #include "cpp_stm32/target/stm32/f4/define/rtc.hxx"
 #include "cpp_stm32/target/stm32/f4/pwr.hxx"
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
@@ -308,7 +309,7 @@ constexpr void init_clock_src() noexcept {
 	rcc::release_reset_backup_domain();
 
 	if constexpr (RtcSrc == rcc::RtcClk::Hse) {
-		constexpr std::uint32_t rtc_prescaler = Frequency<HSE_CLK_FREQ>{} / HSE_CLK_FREQ_TO_RTC;
+		constexpr std::uint32_t rtc_prescaler = Frequency<HSE_FREQ>{} / HSE_CLK_FREQ_TO_RTC;
 		rcc::set_rtc_prescaler(rcc::RTCPRE{rcc::DivisionFactor_v<rtc_prescaler>});
 	}
 
@@ -349,7 +350,7 @@ constexpr void init(Year_t const t_y, Month const t_m, Weekday const t_w, Date_t
 	auto const init_section = create_init_section();
 
 	// set prescaler
-	constexpr std::tuple RTC_CLK_FREQ{LSE_CLK_FREQ, LSI_CLK_FREQ, HSE_CLK_FREQ_TO_RTC};
+	constexpr std::tuple RTC_CLK_FREQ{LSE_FREQ, clock::ClockFreq::LSI_FREQ, HSE_CLK_FREQ_TO_RTC};
 	constexpr std::uint16_t SYNC_PRESCALER_VAL =
 		std::get<to_underlying(RtcSrc) - 1>(RTC_CLK_FREQ) / (ASYNC_PRESCALER_MAX.get() + 1) - 1;
 	constexpr SyncPrescaler_t SYNC_PRESCALER{SYNC_PRESCALER_VAL};

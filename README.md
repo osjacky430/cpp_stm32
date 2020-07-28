@@ -28,16 +28,17 @@ cmake --build ./
 ```
 #### To build with your MCU:
 Set ```TARGET_BOARD``` variable to the name of your MCU. CMake will check if the MCU is supported or not. If not supported, it will issue a fatal error.
+Set ```CLOCK_FILE``` variable to let CMake generate project configuration header.
 ```
 export PATH="$PATH:/path/to/arm-none-eabi-gcc/bin"
 mkdir build && cd build
-cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" ..
+cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" -DCLOCK_DIR="clock_yaml/relative/to/clock_generator.py" ..
 cmake --build .
 ```
 #### Build Example
 Set ```BUILD_EXAMPLE``` option to ```ON```, then build the desire example by specifying the name of the example source file
 ```
-cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" -DBUILD_EXAMPLE=ON ..
+cmake -G "Unix Makefiles" -DTARGET_BOARD="stm32f446re" -DBUILD_EXAMPLE=ON -DCLOCK_DIR="clock_yaml/relative/to/clock_generator.py" ..
 cmale --build . --target example_name_1.elf example_name_2.bin
 ```
 
@@ -58,4 +59,6 @@ Currently Under construction...
 - Support for Clang/LLVM??
 
 ### System Clock Configuration File
-Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file, ```sys_info.hpp```. For more detail description, take a look at the examples. (todo: elaboration)
+Most of the projects have fix clock frequencies, and the clock frequencies are initialized at the beginning of ```main``` function. However, the initialization process is non-trivial, some manufactures provide code generator with GUI to config system clock, for cpp_stm32, this is done by providing system clock configuration file (see src/sys_info.yaml).
+#### How to write a clock configuration file
+todo: fill it

@@ -32,8 +32,6 @@
 #include "cpp_stm32/target/stm32/f4/register/i2c.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
-#include "sys_info.hpp"
-
 namespace cpp_stm32::i2c {
 
 /**
@@ -241,8 +239,8 @@ constexpr void wait_status(bool const t_desire) noexcept {
  */
 template <Port I2C>
 constexpr void write_periph_clk_freq() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
-		constexpr std::uint8_t frq = APB1_CLK_FREQ / 1000000;
+	if constexpr (FIX_CLK_FREQ) {
+		constexpr std::uint8_t frq = APB1_FREQ / 1000000;
 		reg::CR2<I2C>.template writeBit<reg::CR2Field::FREQ>(frq);
 	} else {
 		// @todo finish this
@@ -502,10 +500,10 @@ constexpr void config_scl_clock(Frequency<Hz> const /* unused */) noexcept {
 	using reg::CCR, reg::CCRField;
 	// static_assert
 
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	if constexpr (FIX_CLK_FREQ) {
 		constexpr std::uint16_t t_ccr = []() {
 			constexpr auto t_SCL = 1000000000 / Hz;	// to nano second
-			if constexpr (constexpr auto t_pclk = 1000000000 / APB1_CLK_FREQ; Mode == MasterMode::FM) {
+			if constexpr (constexpr auto t_pclk = 1000000000 / APB1_FREQ; Mode == MasterMode::FM) {
 				if constexpr (DC == DutyCycle::NineToSixteen) {
 					return t_SCL / (25 * t_pclk);
 				} else {
@@ -531,9 +529,9 @@ constexpr void config_scl_clock(Frequency<Hz> const /* unused */) noexcept {
  */
 template <Port I2C, MasterMode Mode>
 constexpr void write_max_rising_time() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
+	if constexpr (FIX_CLK_FREQ) {
 		constexpr std::uint8_t t_rise = []() {
-			if constexpr (constexpr auto t_pclk = 1000000000 / APB1_CLK_FREQ; Mode == MasterMode::FM) {
+			if constexpr (constexpr auto t_pclk = 1000000000 / APB1_FREQ; Mode == MasterMode::FM) {
 				return FM_MAX_TRISE / t_pclk + 1;
 			} else {
 				return SM_MAX_TRISE / t_pclk + 1;
@@ -558,8 +556,8 @@ constexpr void write_max_rising_time() noexcept {
  */
 template <Port I2C, MasterMode Mode, std::uint8_t DNF>
 constexpr void set_digital_noise_filter() noexcept {
-	if constexpr (CPP_STM32_FIX_CLK_FREQ) {
-		constexpr auto f_pclk = APB1_CLK_FREQ / 1000000;
+	if constexpr (FIX_CLK_FREQ) {
+		constexpr auto f_pclk = APB1_FREQ / 1000000;
 		static_assert(CHECK_DNF<Mode>(f_pclk, DNF));
 
 		reg::FLTR<I2C>.template writeBit<reg::FLTRField::DNF>(DNF);

@@ -9,15 +9,13 @@ function(add_binary)
     add_executable(${target}.elf ${target}.cpp)
     target_include_directories(${target}.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_link_libraries(${target}.elf PRIVATE cpp_stm32 project_options)
-    add_custom_target(${target}.bin ALL ${CMAKE_OBJCOPY} -Obinary
-                      ${target}.elf ${target}.bin DEPENDS ${target}.elf)
+    add_custom_target(
+      ${target}.bin ALL
+      ${CMAKE_OBJCOPY} -Obinary ${target}.elf ${target}.bin
+      DEPENDS ${target}.elf)
 
-    set_target_properties(${target}.bin
-                          PROPERTIES
-                          EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
-    set_target_properties(${target}.elf 
-                          PROPERTIES 
-                          EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
+    set_target_properties(${target}.bin PROPERTIES EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
+    set_target_properties(${target}.elf PROPERTIES EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
   endforeach()
 
 endfunction(add_binary)
