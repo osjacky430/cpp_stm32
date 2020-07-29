@@ -33,7 +33,7 @@
 
 namespace Driver = cpp_stm32::driver;
 namespace Gpio	 = cpp_stm32::gpio;
-namespace Usart	 = cpp_stm32::usart;
+namespace Usart	= cpp_stm32::usart;
 namespace Rcc		 = cpp_stm32::rcc;
 namespace Dma		 = cpp_stm32::dma;
 namespace Nvic	 = cpp_stm32::nvic;
@@ -106,7 +106,7 @@ constexpr void setup_dma() noexcept {
 }
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	setup_dma();
 
@@ -117,7 +117,7 @@ int main() {
 		}
 
 		if (packet_finish) {
-			packet_finish	 = false;
+			packet_finish	= false;
 			packet_tx_lock = true;
 
 			pc << processed_data << "\n\t";
@@ -134,7 +134,7 @@ int main() {
 template <auto State>
 constexpr void process_buffer() noexcept {
 	auto const current_pos = MAX_BUFFER_SIZE - Dma::get_tx_data_num<DMA, Str>();	// current dma buffer pointer position
-	std::int8_t const pos_diff = current_pos - old_pos;	 // buffer received since last time process
+	std::int8_t const pos_diff = current_pos - old_pos;	// buffer received since last time process
 
 	if (constexpr auto buffer_head = std::begin(buffer); pos_diff != 0) {
 		if (pos_diff > 0) {
@@ -161,7 +161,7 @@ constexpr void process_buffer() noexcept {
 	}
 
 	if constexpr (State == ReceiverState::Idle) {
-		packet_finish = true;	 // transfer maybe aborted, or transfer finished, start parsing data
+		packet_finish = true;	// transfer maybe aborted, or transfer finished, start parsing data
 	}
 }
 

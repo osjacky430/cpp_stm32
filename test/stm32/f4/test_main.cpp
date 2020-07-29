@@ -31,7 +31,7 @@ void OutBuff::put_str(const char* t_str, std::streamsize t_n) noexcept {
 }
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	pc << "test start: \n\r";
 

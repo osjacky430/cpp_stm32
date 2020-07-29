@@ -29,7 +29,7 @@
 
 namespace Driver = cpp_stm32::driver;
 namespace Gpio	 = cpp_stm32::gpio;
-namespace Usart	 = cpp_stm32::usart;
+namespace Usart	= cpp_stm32::usart;
 namespace Rcc		 = cpp_stm32::rcc;
 namespace Dma		 = cpp_stm32::dma;
 namespace Nvic	 = cpp_stm32::nvic;
@@ -75,7 +75,7 @@ constexpr void setup_dma() noexcept {
 }
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	setup_dma();
 

@@ -6,9 +6,10 @@ language: C++
 os:
     - linux
 
-install:
+before_install:
     - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
     - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+    - sudo apt-get update
     ####################################
     # install latest arm-none-eabi-gcc #
     ####################################
@@ -24,7 +25,16 @@ install:
     - mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
     - export PATH="${DEPS_DIR}/cmake/bin:${PATH}"
     - cmake --version
-
+    ####################################
+    # install PyYAML                   #
+    ####################################
+    - sudo apt-get install python3 python3-pip pyyaml
+addons:
+    apt:
+        sources:
+        - deadsnakes
+        packages:
+        - python3.8
 script:
     - cd $TRAVIS_BUILD_DIR
     - mkdir build && cd build

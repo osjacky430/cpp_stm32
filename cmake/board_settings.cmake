@@ -18,33 +18,6 @@ macro(import_board_setting target_board)
   endif()
 endmacro()
 
-# * Check the existence of the configuration file
-#
-# This function checks the configuration file (sys_info.hpp) cpp_stm32 needed to generate correct prescalers
-# for the clock system
-#
-# check_config_file([OVERWRITE] [BOARD <var>] [FILE_DIR <var>])
-#
-# If sys_info.hpp doesn't exist at FILE_DIR, it will create new one according to BOARD. If OVERWRITE is
-# present, cmake will overwrite the existing sys_info.hpp to the default values.
-function(check_config_file)
-  set(option_value OVERWRITE)
-  set(single_value_arg BOARD FILE_DIR)
-  set(multi_value_arg)
-  cmake_parse_arguments(CONFIG "${option_value}" "${single_value_arg}" "${multi_value_arg}" ${ARGN})
-
-  if(NOT ${CONFIG_BOARD} STREQUAL "" AND NOT ${CONFIG_FILE_DIR} STREQUAL "")
-    import_board_setting(${CONFIG_BOARD})
-    if(NOT EXISTS ${CONFIG_FILE_DIR}/sys_info.hpp)
-      message(STATUS "Missing sys_info.hpp in ${CONFIG_FILE_DIR}, creating one with default configuration")
-      file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
-    elseif(${CONFIG_OVERWRITE})
-      message(STATUS "Overwriting sys_info.hpp in ${CONFIG_FILE_DIR}")
-      file(WRITE ${CONFIG_FILE_DIR}/sys_info.hpp ${DEFAULT_SYS_CONFIG_FILE})
-    endif()
-  endif()
-endfunction()
-
 # * Check whether the peripheral is implemented/supported or not.
 #
 # This function checks whether the peripheral functionalities are supported by target board by checking
@@ -99,22 +72,21 @@ function(gen_project_config_file)
     message(FATAL_ERROR "clock file doesn't exist, aborted")
   endif()
 
+  find_package(Python3 COMPONENTS Interpreter)
+  if(${Python3_FOUND})
+    execute_process(
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tool/clock_generator/clock_generator.py ${__CLOCK_FILE}
+                ${__BOARD} ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tool/clock_generator)
+  else()
+    message(FATAL_ERROR "can't find python3 to generate clock info, aborted")
+  endif()
+
   file(READ ${CMAKE_SOURCE_DIR}/cmake/project_config.hxx.in CONFIG_H_IN)
+  file(READ ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx ORIGINAL_CONTENT)
   string(CONFIGURE "${CONFIG_H_IN}" CONFIG_H_TMP)
   file(
     GENERATE
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
-    CONTENT "${CONFIG_H_TMP}")
-
-  find_package(Python3 COMPONENTS Interpreter)
-  if(${Python3_FOUND})
-    add_custom_target(
-      gen_clk_info ALL
-      COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tool/clock_generator/clock_generator.py ${__CLOCK_FILE}
-              ${__BOARD} ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
-      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tool/clock_generator)
-  else()
-    message(FATAL_ERROR "can't find python3 to generate clock info, aborted")
-  endif()
+    CONTENT "${ORIGINAL_CONTENT}\n\n${CONFIG_H_TMP}")
 endfunction()

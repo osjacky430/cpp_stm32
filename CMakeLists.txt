@@ -37,7 +37,7 @@ import_board_setting(${TARGET_BOARD})
 # ############################################################################################################
 option(ENABLE_RUNTIME_FREQ_CONFIG
        "Set to ON if the project doesn't change the clock frequency after initialization" OFF)
-option(ENABLE_HARD_FLOAT "Use VFP extension" OFF)
+option(ENABLE_HARD_FLOAT "Use VFP extension" ON)
 
 # ############################################################################################################
 # Generate project configuration variables

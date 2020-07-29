@@ -39,8 +39,8 @@ struct I2cSDA {
 
 	static constexpr auto PORT = std::get<1>(PIN_DATA);
 	static constexpr auto AF	 = std::get<2>(PIN_DATA);
-	static constexpr auto RCC	 = std::get<3>(PIN_DATA);
-	static constexpr auto IRQ	 = std::get<4>(PIN_DATA);
+	static constexpr auto RCC	= std::get<3>(PIN_DATA);
+	static constexpr auto IRQ	= std::get<4>(PIN_DATA);
 };
 
 template <gpio::PinName SCL>
@@ -49,8 +49,8 @@ struct I2cSCL {
 
 	static constexpr auto PORT = std::get<1>(PIN_DATA);
 	static constexpr auto AF	 = std::get<2>(PIN_DATA);
-	static constexpr auto RCC	 = std::get<3>(PIN_DATA);
-	static constexpr auto IRQ	 = std::get<4>(PIN_DATA);
+	static constexpr auto RCC	= std::get<3>(PIN_DATA);
+	static constexpr auto IRQ	= std::get<4>(PIN_DATA);
 };
 
 template <gpio::PinName SDA, gpio::PinName SCL, std::uint32_t Hz>
@@ -58,8 +58,8 @@ class I2C {
  private:
 	static constexpr auto PORT = I2cSDA<SDA>::PORT;
 	static constexpr auto AF	 = I2cSDA<SDA>::AF;
-	static constexpr auto RCC	 = I2cSDA<SDA>::RCC;
-	static constexpr auto IRQ	 = I2cSDA<SDA>::IRQ;
+	static constexpr auto RCC	= I2cSDA<SDA>::RCC;
+	static constexpr auto IRQ	= I2cSDA<SDA>::IRQ;
 
 	static_assert(I2cSDA<SDA>::PORT == I2cSCL<SCL>::PORT);
 
@@ -80,8 +80,8 @@ class I2C {
 	}
 
 	template <std::uint8_t BC, std::size_t N, typename SlaveAddrType>
-	constexpr auto xfer(SlaveAddrType t_slave, ByteCount<BC> const t_bc,
-											std::array<std::uint8_t, N> const& t_val) const noexcept {
+	constexpr auto xfer(SlaveAddrType t_slave, ByteCount<BC> const t_bc, std::array<std::uint8_t, N> const& t_val) const
+		noexcept {
 		return i2c::xfer_blocking<PORT>(t_slave, t_bc, t_val.begin(), t_val.end());
 	}
 
@@ -102,4 +102,4 @@ class I2C {
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

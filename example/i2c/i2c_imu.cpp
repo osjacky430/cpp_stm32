@@ -89,7 +89,7 @@ constexpr void setup_i2c() noexcept {
 std::array<char, 10> str;
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	setup_led();
 	setup_i2c();

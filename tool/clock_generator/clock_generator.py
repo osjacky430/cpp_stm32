@@ -2,11 +2,24 @@ import yaml
 import re
 import argparse
 
+
 class ExtractClockData:
     def __init__(self, input_file: str, chip_name: str, output_file: str):
         self.input_file = input_file
         self.output_file = output_file
         self.chip_path = 'chip/' + chip_name + '.yaml'
+
+    # pragma once
+
+    # include "clock.hxx"
+    # include "define/rcc.hxx"
+    @staticmethod
+    def __define_guard():
+        return '#pragma once\n\n'
+
+    @staticmethod
+    def __include_header():
+        return '#include \"clock.hxx\"\n\r' + '#include \"define/rcc.hxx\"\n\r'
 
     @staticmethod
     def __start_comment():
@@ -93,10 +106,6 @@ class ExtractClockData:
         return ret_val, clock_data_class
 
     def generate_clock_file(self):
-        output = open(self.output_file, 'r')
-        original_content = output.read()
-        output.close()
-
         output = open(self.output_file, 'w')
 
         user_input_file = open(self.input_file)
@@ -106,7 +115,8 @@ class ExtractClockData:
         chip_clock_yml = yaml.load_all(chip_file, Loader=yaml.FullLoader)
 
         try:
-            output.write(original_content)
+            output.write(self.__define_guard())
+            output.write(self.__include_header())
             output.write(self.__start_comment())
             output.write(self.__namespace_start())
 

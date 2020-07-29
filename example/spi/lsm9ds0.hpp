@@ -44,24 +44,23 @@ class LSM9DS0 {
 		/* Accelerometer Register map */
 	};
 
-	using I2C_t	 = Driver::I2C<SDAPin, SCLPin, 400_k>;
-	using SPI_t	 = Driver::SPI<SDOPin, SDAPin, SCLPin>;
-	using COMM_t = std::conditional_t<SDOPin == Gpio::PinName::NC, I2C_t, SPI_t>;
+	// using I2C_t	= Driver::I2C<SDAPin, SCLPin, 400_k>;
+	// using SPI_t	= Driver::SPI<5000_k, SDOPin, SDAPin, SCLPin>;
+	// using COMM_t = std::conditional_t<SDOPin == Gpio::PinName::NC, I2C_t, SPI_t>;
 
 	static constexpr std::array<std::uint8_t, 2> SLAVE_ADDR{0b1101010, 0b0011110};
-	static constexpr auto IS_SPI_COMM = std::is_same_v<COMM_t, SPI_t>;
-	static constexpr auto IS_I2C_COMM = std::is_same_v<COMM_t, I2C_t>;
+	static constexpr bool IS_I2C_COMM = SDOPin == Gpio::PinName::NC;
 
 	static inline auto const COMM = []() {
 		Driver::GpioUtil<CsGyro, CsXm>::enableAllGpioClk();
 		Driver::GpioUtil<CsGyro, CsXm>::modeSetup(Gpio::Mode::Output, Gpio::Pupd::None);
 		Driver::GpioUtil<CsGyro, CsXm>::set();	// set high to enable i2c mode
 
-		if constexpr (std::is_same_v<COMM_t, I2C_t>) {
-			return COMM_t{Driver::I2cSDA<SDAPin>{}, Driver::I2cSCL<SCLPin>{}, 400_kHz};
+		if constexpr (IS_I2C_COMM) {
+			return Driver::I2C<SDAPin, SCLPin, 400_k>{Driver::I2cSDA<SDAPin>{}, Driver::I2cSCL<SCLPin>{}, 400_kHz};
 		} else {
-			return COMM_t{Driver::Miso<SDOPin>{}, Driver::Mosi<SDAPin>{}, Driver::Sclk<SCLPin>{},
-										Spi::Mode::Mode2,				cpp_stm32::size_c<8>,		5000_kHz};
+			return Driver::SPI(Driver::Miso<SDOPin>{}, Driver::Mosi<SDAPin>{}, Driver::Sclk<SCLPin>{}, Spi::Mode::Mode2,
+												 cpp_stm32::size_c<8>{}, 500_kHz);
 		}
 	}();
 
@@ -97,11 +96,12 @@ class LSM9DS0 {
 			return COMM.xfer(I2c::SlaveAddr7_t{SLAVE_ADDR[cpp_stm32::to_underlying(t_sensor)]}, 1_byte, val);
 		} else {
 			auto const comm_section = spiStartTransfer(t_sensor);
+			std::uint8_t tx_data		= (1U << 7) | cpp_stm32::to_underlying(RegisterMap::WHO_AM_I);
 
-			COMM.xfer(1_byte, (1 << 7) | cpp_stm32::to_underlying(RegisterMap::WHO_AM_I));
-			return COMM.xfer(1_byte, 0x00);
+			COMM.xfer(1_byte, tx_data);
+			return COMM.xfer(1_byte, Driver::DUMMY_SIGNAL<std::uint8_t>);
 		}
 	}
 };
 
-}	 // namespace Lsm9ds0
+}	// namespace Lsm9ds0

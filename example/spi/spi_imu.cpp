@@ -77,7 +77,7 @@ constexpr void setup_spi() noexcept {
 }
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	Driver::DigitalOut<Gpio::PinName::PB_10> const xm_ss;
 	Driver::DigitalOut<Gpio::PinName::PB_12> const gyro_ss;

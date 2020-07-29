@@ -1,5 +1,5 @@
 HSE:
-  - BYPASS: False
+  - BYPASS: True
     FREQ: 8e6
 LSE:
   - BYPASS: False

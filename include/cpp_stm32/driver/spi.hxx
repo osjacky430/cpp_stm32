@@ -31,6 +31,9 @@
 
 namespace cpp_stm32::driver {
 
+template <typename T>
+constexpr T DUMMY_SIGNAL(0x00);
+
 template <gpio::PinName MISO>
 struct Miso {};
 
@@ -113,14 +116,14 @@ class SPI {
 		// @todo implement
 	}
 
-	template <std::uint8_t BC>
-	constexpr auto xfer(ByteCount<BC> const t_bc, std::uint16_t const t_val) const noexcept {
-		std::array<std::uint16_t, 1> val{t_val};
+	template <typename DataType, std::uint8_t BC>
+	constexpr auto xfer(DataCount<DataType, BC> const t_bc, DataType const t_val) const noexcept {
+		std::array<DataType, 1> val{t_val};
 		return spi::xfer_blocking<PORT>(t_bc, val.begin(), val.end());
 	}
 
 	template <typename DataType, std::uint8_t BC, std::size_t N>
-	constexpr auto xfer(DataCount<DataType, BC> const t_bc, std::array<std::uint16_t, N> const& t_val) const noexcept {
+	constexpr auto xfer(DataCount<DataType, BC> const t_bc, std::array<DataType, N> const& t_val) const noexcept {
 		return spi::xfer_blocking<PORT>(t_bc, t_val.begin(), t_val.end());
 	}
 
@@ -141,4 +144,4 @@ class SPI {
 	}
 };
 
-}	 // namespace cpp_stm32::driver
+}	// namespace cpp_stm32::driver

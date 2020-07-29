@@ -16,6 +16,7 @@ function(add_binary)
 
     set_target_properties(${target}.bin PROPERTIES EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
     set_target_properties(${target}.elf PROPERTIES EXCLUDE_FROM_ALL ${TARGET_IS_EXAMPLE})
+
   endforeach()
 
 endfunction(add_binary)

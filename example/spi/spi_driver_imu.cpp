@@ -52,7 +52,7 @@ LSM9DS0 const imu{GyroCs<Gpio::PinName::PB_3>{}, XMCs<Gpio::PinName::PB_10>{}, S
 									SCL<Gpio::PinName::PB_13>{}, SDA<Gpio::PinName::PB_15>{}};
 
 int main() {
-	Sys::Clock::init<Rcc::ClkSrc::Hse>();
+	Sys::Clock<>::init();
 
 	while (true) {
 		constexpr auto SOME_INTERVAL = 1000000;

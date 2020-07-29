@@ -50,6 +50,7 @@ constexpr int decimal_pow() noexcept {
  * @param  Idx [description]
  * @return     [description]
  * @todo modify this, this should have same implementation detail with str_to_float
+ * @todo consider binary-like input of hexadecimal-like input scenario
  */
 template <std::size_t... Idx>
 constexpr auto str_to_int(std::array<char, sizeof...(Idx)> const& str, std::index_sequence<Idx...> const&) noexcept {
