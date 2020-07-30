@@ -5,7 +5,8 @@
 
 #include "cpp_stm32/target/stm32/l4/define/spi.hxx"
 #include "cpp_stm32/target/stm32/l4/register/spi.hxx"
-#include "sys_info.hpp"
+
+#include "project_config.hxx"
 
 namespace cpp_stm32::spi {
 
@@ -229,9 +230,9 @@ template <Port SPI, std::uint32_t HZ>
 constexpr void set_baudrate(Frequency<HZ> const /**/) noexcept {
 	constexpr auto division = []() {
 		if constexpr (SPI == Port::SPI1) {
-			return APB2_CLK_FREQ / HZ;
+			return APB2_FREQ / HZ;
 		} else if constexpr (SPI == Port::SPI2 || SPI == Port::SPI3) {
-			return APB1_CLK_FREQ / HZ;
+			return APB1_FREQ / HZ;
 		}
 	}();
 

@@ -1,3 +1,24 @@
+/**
+ * @file  stm32/l4/define/rcc.hxx
+ * @brief	Rcc class and enum define.
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #pragma once
 
 #include <array>
@@ -26,40 +47,48 @@ using MsiRange =
  *
  *
  */
-using HPRE = detail::KeyValTable<struct CPP_STM32_LUT_HPRE, /**/
-																 PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
-																 PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
+using HPRE = StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
+using HPREChecker =
+	detail::KeyValTable<HPRE, /**/
+											PAIR(1, 0b0000), PAIR(2, 0b1000), PAIR(4, 0b1001), PAIR(8, 0b1010), PAIR(16, 0b1011),
+											PAIR(64, 0b1100), PAIR(128, 0b1101), PAIR(256, 0b1110), PAIR(512, 0b1111)>;
 
 /**
  *
  *
  */
-using PPRE = detail::KeyValTable<struct CPP_STM32_LUT_PPRE, /**/
-																 PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
+using PPRE = StrongType<std::uint32_t, struct CPP_STM32_PPRE>;
+using PPREChecker =
+	detail::KeyValTable<PPRE, /**/
+											PAIR(1, 0b000), PAIR(2, 0b100), PAIR(4, 0b101), PAIR(8, 0b110), PAIR(16, 0b111)>;
 
 /**
  *
  *
  */
-using PllM = detail::KeyValTable<struct CPP_STM32_LUT_PLLM, /**/
-																 PAIR(1, 0b000), PAIR(2, 0b001), PAIR(3, 0b010), PAIR(4, 0b011), PAIR(5, 0b100),
-																 PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111)>;
+using PllM				= StrongType<std::uint32_t, struct CPP_STM32_PLLM>;
+using PllMChecker = detail::KeyValTable<PllM, /**/
+																				PAIR(1, 0b000), PAIR(2, 0b001), PAIR(3, 0b010), PAIR(4, 0b011), PAIR(5, 0b100),
+																				PAIR(6, 0b101), PAIR(7, 0b110), PAIR(8, 0b111)>;
 
 /**
  *
  *
  */
-using PllN = detail::KeyValTable<struct CPP_STM32_LUT_PLLN, 8, 86>;
+using PllN				= StrongType<std::uint32_t, struct CPP_STM32_PLLN>;
+using PllNChecker = detail::KeyValTable<PllN, 8, 86>;
 
 /**
  *
  *
  */
-using PllP = detail::KeyValTable<struct CPP_STM32_LUT_PLLP, PAIR(7, 0), PAIR(17, 1)>;
+using PllP				= StrongType<std::uint32_t, struct CPP_STM32_PLLP>;
+using PllPChecker = detail::KeyValTable<PllP, PAIR(7, 0), PAIR(17, 1)>;
 
 /**
  *
  */
+// using PllQ = StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
 using PllQ = detail::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
 																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
@@ -67,6 +96,7 @@ using PllQ = detail::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
  *
  *
  */
+// using PllR = StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
 using PllR = detail::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
 																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
@@ -95,14 +125,14 @@ enum class PeriphClk : std::uint32_t {
  * 					- HSE (High Speed External) oscillator clock, from 4 to 48 MHz
  * 					- PLL Clock
  */
-enum class SysClk : std::uint32_t { Msi, Hsi16, Hse, Pll };
+enum class SysClk : std::uint8_t { Msi, Hsi16, Hse, Pll };
 
 /**
  *  @enum 	ClkSrc
  *
  * @todo 		why 480 instead of 48?
  */
-enum class ClkSrc : std::uint32_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, Lsi };
+enum class ClkSrc : std::uint8_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, Lsi };
 
 /**
  * @brief		This function transform rcc enum to its equivalent sys enum
@@ -132,4 +162,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi160 || Clk == ClkSrc::Msi);
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc

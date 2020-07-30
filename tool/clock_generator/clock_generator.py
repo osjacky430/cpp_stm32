@@ -48,7 +48,7 @@ class ExtractClockData:
     @staticmethod
     def __declare_variable(var_name: str, val: str, var_type='auto'):
         float_prefix = 'f' if var_type == 'float' else ''
-        return 'constexpr ' + var_type + ' ' + var_name + ' = ' + val + float_prefix + ';\n\r'
+        return 'constexpr ' + var_type + ' ' + var_name + ' = ' + val + float_prefix + ';\n'
 
     @staticmethod
     def __gen_variable(user_input, chip_valid_clock_yaml):
@@ -126,6 +126,7 @@ class ExtractClockData:
             output.write(self.__namespace_end())
         except KeyError:
             # catch KeyError so that the file can be closed
+            print('KEY ERROR!')
             pass
 
         chip_file.close()
@@ -133,13 +134,14 @@ class ExtractClockData:
         output.close()
 
 
-arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('clock_file', help='system clock yaml file')
-arg_parser.add_argument('target', help='target micro-controller')
-arg_parser.add_argument('output', help='output directory')
-
-cmd_input = arg_parser.parse_args()
+# arg_parser = argparse.ArgumentParser()
+# arg_parser.add_argument('clock_file', help='system clock yaml file')
+# arg_parser.add_argument('target', help='target micro-controller')
+# arg_parser.add_argument('output', help='output directory')
+#
+# cmd_input = arg_parser.parse_args()
 
 if __name__ == '__main__':
-    extractor = ExtractClockData(cmd_input.clock_file, cmd_input.target.lower(), cmd_input.output)
+    # extractor = ExtractClockData(cmd_input.clock_file, cmd_input.target.lower(), cmd_input.output)
+    extractor = ExtractClockData('../../src/sys_info.yaml', 'stm32l432kc', '../../build/project_config.hxx')
     extractor.generate_clock_file()

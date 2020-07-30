@@ -36,7 +36,7 @@ namespace cpp_stm32::usart {
  */
 template <Port InputPort>
 constexpr void set_baudrate(Baudrate_t const t_baud) noexcept {
-	constexpr auto clk_freq = InputPort == Port::Usart1 ? APB2_CLK_FREQ : APB1_CLK_FREQ;
+	constexpr auto clk_freq = InputPort == Port::Usart1 ? APB2_FREQ : APB1_FREQ;
 
 	std::uint16_t const usart_div =
 		(clk_freq + t_baud.get() / 2) / t_baud.get();	 // round (avoiding floating point arithmetic)

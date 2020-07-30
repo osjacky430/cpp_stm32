@@ -21,6 +21,7 @@
 #include <cmath>
 #include <optional>
 
+#include "cpp_stm32/target/stm32/l4/clock.hxx"
 #include "cpp_stm32/target/stm32/l4/flash.hxx"
 #include "cpp_stm32/target/stm32/l4/pwr.hxx"
 #include "cpp_stm32/target/stm32/l4/rcc.hxx"
@@ -29,47 +30,12 @@
 #include "cpp_stm32/detail/tuple.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
-#include "sys_info.hpp"
+#include "project_config.hxx"
 
 namespace cpp_stm32::sys {
 
-/**
- * @defgroup DEVICE_VOLTAGE_DEF   Device voltage
- *
- * @todo REMOVE THIS, THIS IS MAKING THINGS WORSE
- * @{
- */
-#if !defined(DEVICE_VDD)
-#define DEVICE_VDD 3.3f
-#endif
-
-static constexpr auto STM32_VDD = DEVICE_VDD;
-
-static_assert(1.71f <= STM32_VDD && STM32_VDD <= 3.6f);
-
-/**@}*/
-
-/**
- * @defgroup	HSI_CLK_DEF		HSI Clock
- * @{
- */
-#if !defined(HSI_CLK_FREQ)
-static constexpr auto HSI_CLK_FREQ = 16_MHz;
-#endif
-
-static_assert(Frequency<HSI_CLK_FREQ>{} == 16_MHz);
-
-/**@}*/
-
-/**
- * @defgroup	MSI_CLK_DEF	 MSI Clock
- * @note maybe we can deduce MSI clk freq from other input?
- * @{
- */
-
-#if !defined(MSI_CLK_FREQ)
-static constexpr auto MSI_CLK_FREQ = 4_M;
-#endif
+constexpr auto STM32_VDD_MIN = 1.71f;
+constexpr auto STM32_VDD_MAX = 3.6f;
 
 static constexpr std::tuple MSI_FREQ_TABLE{
 	100_kHz, 200_kHz, 400_kHz, 800_kHz, 1_MHz, 2_MHz, 4_MHz, 8_MHz, 16_MHz, 24_MHz, 32_MHz, 48_MHz,
@@ -79,83 +45,29 @@ static constexpr std::tuple MSI_FREQ_TABLE{
 // static_assert(detail::find(MSI_FREQ_TABLE, Frequency<MSI_CLK_FREQ>{}) !=
 // std::tuple_size_v<decltype(MSI_FREQ_TABLE)>);
 
-/**@}*/
+constexpr auto HSE_CLK_FREQ_MIN = 4_MHz;
+constexpr auto HSE_CLK_FREQ_MAX = 48_MHz;
 
-/**
- * @defgroup HSE_CLK_DEF    HSE Clock
- * @{
- */
+constexpr auto VCO_INPUT_FREQ_MIN	 = 4_MHz;
+constexpr auto VCO_INPUT_FREQ_MAX	 = 16_MHz;
+constexpr auto VCO_OUTPUT_FREQ_MIN = 64_MHz;
+constexpr auto VCO_OUTPUT_FREQ_MAX = 344_MHz;
 
-static constexpr auto HSE_CLK_FREQ_MIN = 4_MHz;
-static constexpr auto HSE_CLK_FREQ_MAX = 48_MHz;
+constexpr auto APB1_FREQ_MAX_VOS_RANGE2 = 26_MHz;
+constexpr auto APB1_FREQ_MAX_VOS_RANGE1 = 80_MHz;
+constexpr auto APB2_FREQ_MAX_VOS_RANGE2 = 26_MHz;
+constexpr auto APB2_FREQ_MAX_VOS_RANGE1 = 80_MHz;
 
-#if !defined(HSE_CLK_FREQ)
+constexpr auto AHB_VOS_RANGE1_MAX_FREQ = 80_MHz;
+constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
 
-static constexpr auto HSE_CLK_FREQ	= 0_MHz;
-static constexpr auto HSE_CLK_VALID = false;
-
-#else
-
-static constexpr auto HSE_CLK_VALID = true;
-
-static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
-
-#endif
-
-#if !defined(HSE_BYPASS_CLK_SRC)
-static constexpr auto HSE_BYPASS_CLK_SRC = false;
-#endif
-
-/**@}*/
-
-/**
- * @defgroup PLL_VCO_DEF    PLL VCO
- * @{
- */
-
-static constexpr auto VCO_INPUT_FREQ_MIN	= 4_MHz;
-static constexpr auto VCO_INPUT_FREQ_MAX	= 16_MHz;
-static constexpr auto VCO_OUTPUT_FREQ_MIN = 64_MHz;
-static constexpr auto VCO_OUTPUT_FREQ_MAX = 344_MHz;
-
-/**@}*/
-
-static constexpr auto APB1_FREQ_MAX_VOS_RANGE2 = 26_MHz;
-static constexpr auto APB1_FREQ_MAX_VOS_RANGE1 = 80_MHz;
-static constexpr auto APB2_FREQ_MAX_VOS_RANGE2 = 26_MHz;
-static constexpr auto APB2_FREQ_MAX_VOS_RANGE1 = 80_MHz;
-
-static constexpr auto AHB_VOS_RANGE1_MAX_FREQ = 80_MHz;
-static constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
-
-static_assert(Frequency<AHB_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(Frequency<SYS_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(Frequency<APB1_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-static_assert(Frequency<APB2_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-
-/**
- *
- */
-struct ClockFreq {
-	bool bypassHSE = false;
-	bool bypassLSE = false;
-
-	std::uint32_t freqHSE = HSE_DEFAULT_FREQ;
-	std::uint32_t freqLSE = LSE_DEFAULT_FREQ;
-
-	std::uint32_t freqSYS	= 80_M;
-	std::uint32_t freqAHB	= 80_M;
-	std::uint32_t freqAPB1 = 80_M;
-	std::uint32_t freqAPB2 = 80_M;
-
-	rcc::ClkSrc clkSrc = rcc::ClkSrc::Msi;
-
-	static constexpr std::uint32_t HSI_FREQ = 16_M;
-	static constexpr std::uint32_t LSI_FREQ = 32_k;
-
-	static constexpr std::uint32_t HSE_DEFAULT_FREQ = 0_M;
-	static constexpr std::uint32_t LSE_DEFAULT_FREQ = 32.768_k;
-};
+// static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
+// static_assert(STM32_VDD_MIN <= STM32_VDD && STM32_VDD <= STM32_VDD_MAX);
+// static_assert(Frequency<HSI_CLK_FREQ>{} == 16_MHz);
+// static_assert(Frequency<AHB_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+// static_assert(Frequency<SYS_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+// static_assert(Frequency<APB1_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+// static_assert(Frequency<APB2_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
 
 /**
  * @brief	 This function calculates the division factor of the bus
@@ -167,9 +79,9 @@ struct ClockFreq {
  * @return tuple that contains the division factor, i.e., hpre, ppre1, ppre2
  */
 template <auto SYS, auto AHB, auto APB1, auto APB2>
-constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR(Frequency<SYS> const t_sys, Frequency<AHB> const t_ahb,
+constexpr auto calc_advance_bus_div_factor(Frequency<SYS> const t_sys, Frequency<AHB> const t_ahb,
 																					 Frequency<APB1> const t_apb1, Frequency<APB2> const t_apb2) noexcept {
-	constexpr auto hpre	= t_sys / t_ahb;
+	constexpr auto hpre	 = t_sys / t_ahb;
 	constexpr auto ppre1 = t_ahb / t_apb1;
 	constexpr auto ppre2 = t_ahb / t_apb2;
 	return std::tuple{hpre, ppre1, ppre2};
@@ -191,7 +103,7 @@ constexpr auto CALC_ADVANCE_BUS_DIV_FACTOR(Frequency<SYS> const t_sys, Frequency
  *
  */
 template <auto SYS, auto HSE, auto HSI, auto MSI>
-constexpr auto DETERMINE_SYS_CLK_SRC(Frequency<SYS> const t_sys, Frequency<HSE> const t_hse, Frequency<HSI> const t_hsi,
+constexpr auto determine_sys_clk_src(Frequency<SYS> const t_sys, Frequency<HSE> const t_hse, Frequency<HSI> const t_hsi,
 																		 Frequency<MSI> const t_msi) noexcept {
 	using rcc::SysClk;
 	if constexpr (t_sys != t_hse && t_sys != t_hsi && t_sys != t_msi) {
@@ -213,8 +125,8 @@ constexpr auto DETERMINE_SYS_CLK_SRC(Frequency<SYS> const t_sys, Frequency<HSE> 
  * 				consumption.
  */
 template <auto AHB>
-constexpr auto DETERMINE_VOLTAGE_SCALE(Frequency<AHB> const t_ahb) noexcept {
-	if constexpr (ahb > AHB_VOS_RANGE2_MAX_FREQ) {
+constexpr auto determine_voltage_scale(Frequency<AHB> const t_ahb) noexcept {
+	if constexpr (t_ahb > AHB_VOS_RANGE2_MAX_FREQ) {
 		return pwr::VoltageScale::Range1;
 	} else {
 		return pwr::VoltageScale::Range2;
@@ -225,30 +137,37 @@ constexpr auto DETERMINE_VOLTAGE_SCALE(Frequency<AHB> const t_ahb) noexcept {
  * @class Clock
  * @brief
  */
+template <clock::ClockFreq const& ClkData = CPP_STM32_CLOCK_DATA>
 class Clock {
  private:
-	static constexpr auto AHB_CLK	= Frequency<AHB_CLK_FREQ>{};
-	static constexpr auto APB1_CLK = Frequency<APB1_CLK_FREQ>{};
-	static constexpr auto APB2_CLK = Frequency<APB2_CLK_FREQ>{};
-	static constexpr auto SYS_CLK	= Frequency<SYS_CLK_FREQ>{};
-	static constexpr auto MSI_CLK	= Frequency<MSI_CLK_FREQ>{};
-	static constexpr auto HSE_CLK	= Frequency<HSE_CLK_FREQ>{};
-	static constexpr auto HSI_CLK	= Frequency<HSI_CLK_FREQ>{};
+	static constexpr clock::ClockFreq CLOCK_DATA = ClkData;
+
+	static constexpr auto AHB_CLK	 = Frequency<CLOCK_DATA.freqAHB>{};
+	static constexpr auto APB1_CLK = Frequency<CLOCK_DATA.freqAPB1>{};
+	static constexpr auto APB2_CLK = Frequency<CLOCK_DATA.freqAPB2>{};
+	static constexpr auto SYS_CLK	 = Frequency<CLOCK_DATA.freqSYS>{};
+	static constexpr auto MSI_CLK	 = Frequency<CLOCK_DATA.freqMSI>{};
+	static constexpr auto HSE_CLK	 = Frequency<CLOCK_DATA.freqHSE>{};
+	static constexpr auto VDD			 = CLOCK_DATA.vdd;
+
+	static constexpr auto HSI_CLK = Frequency<CLOCK_DATA.HSI_FREQ>{};
+	static constexpr auto LSI_CLK = Frequency<CLOCK_DATA.LSI_FREQ>{};
 
 	static constexpr auto GET_ADVANCE_BUS_DIV_FACTOR() noexcept {
-		using rcc::HPRE, rcc::PPRE, rcc::DivisionFactor_v;
-		constexpr auto bus_div = CALC_ADVANCE_BUS_DIV_FACTOR(SYS_CLK, AHB_CLK, APB1_CLK, APB2_CLK);
+		using rcc::HPREChecker, rcc::PPREChecker, rcc::DivisionFactor_v;
+		constexpr auto bus_div = calc_advance_bus_div_factor(SYS_CLK, AHB_CLK, APB1_CLK, APB2_CLK);
 		constexpr auto hpre		 = std::get<0>(bus_div);
 		constexpr auto ppre1	 = std::get<1>(bus_div);
 		constexpr auto ppre2	 = std::get<2>(bus_div);
 
-		return std::tuple{HPRE{DivisionFactor_v<hpre>}, PPRE{DivisionFactor_v<ppre1>}, PPRE{DivisionFactor_v<ppre2>}};
+		return std::tuple{HPREChecker{DivisionFactor_v<hpre>}, PPREChecker{DivisionFactor_v<ppre1>},
+											PPREChecker{DivisionFactor_v<ppre2>}};
 	}
 
 	template <std::size_t Idx>
 	static constexpr auto CHECK_PLL_MNR_IMPL(std::uint64_t const t_pll_input) noexcept {
 		constexpr auto pllr						= std::get<Idx>(rcc::PllR::KEY_VAL_MAP).key;
-		constexpr auto vco_freq				= pllr * SYS_CLK_FREQ;
+		constexpr auto vco_freq				= pllr * CLOCK_DATA.freqSYS;
 		constexpr auto vco_in_inrange = [](auto const t_vco_in) {
 			return VCO_INPUT_FREQ_MIN() <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX();
 		};
@@ -257,7 +176,7 @@ class Clock {
 		};
 
 		if constexpr (vco_out_inrange(vco_freq)) {
-			for (auto plln = rcc::PllN::MIN; plln <= rcc::PllN::MAX; ++plln) {
+			for (auto plln = rcc::PllNChecker::MIN; plln <= rcc::PllNChecker::MAX; ++plln) {
 				if (auto const vco_in_freq = vco_freq / plln; vco_in_inrange(vco_in_freq)) {
 					if (auto const pllm = t_pll_input / vco_in_freq; 1 <= pllm && pllm <= 7) {
 						return std::tuple{pllm, plln, pllr};
@@ -279,16 +198,16 @@ class Clock {
 
 	template <rcc::ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() noexcept {
-		using rcc::ClkSrc, rcc::PllM, rcc::PllN, rcc::PllP, rcc::PllQ, rcc::PllR;
+		using rcc::ClkSrc, rcc::PllMChecker, rcc::PllNChecker, rcc::PllP, rcc::PllQ, rcc::PllR;
 
 		constexpr auto pll_input_clk_freq = []() {
 			switch (PllSrc) {
 				case ClkSrc::Msi:
-					return std::uint64_t{MSI_CLK_FREQ};
+					return std::uint64_t{CLOCK_DATA.freqMSI};
 				case ClkSrc::Hse:
-					return std::uint64_t(HSE_CLK_FREQ);
+					return std::uint64_t(CLOCK_DATA.freqHSE);
 				case ClkSrc::Hsi160:
-					return std::uint64_t(HSI_CLK_FREQ);
+					return std::uint64_t(CLOCK_DATA.HSI_FREQ);
 				default:
 					break;
 			}
@@ -303,47 +222,59 @@ class Clock {
 		// {
 		//  ...
 		// } esle {
-		return std::tuple{PllM{rcc::DivisionFactor_v<pllm>}, PllN{rcc::DivisionFactor_v<plln>}, std::nullopt, std::nullopt,
-											PllR{rcc::DivisionFactor_v<pllr>}};
+		return std::tuple{PllMChecker{rcc::DivisionFactor_v<pllm>}, PllNChecker{rcc::DivisionFactor_v<plln>}, std::nullopt,
+											std::nullopt, PllR{rcc::DivisionFactor_v<pllr>}};
 		// }
-	}	// namespace cpp_stm32::sys
+	}	 // namespace cpp_stm32::sys
 
-	/**
-	 * @var 	CPU_WAIT_STATE
-	 * @brief	This is chosen base on AHB clock frequency
-	 */
-	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<STM32_VDD>(Frequency<AHB_CLK_FREQ>{});
-
-	static constexpr auto VOLTAGE_SCALE = DETERMINE_VOLTAGE_SCALE(AHB_CLK);
-	static constexpr auto SYS_CLK_SRC		= DETERMINE_SYS_CLK_SRC(SYS_CLK, HSE_CLK, HSI_CLK, MSI_CLK);
+	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<VDD>(AHB_CLK);
+	static constexpr auto NEED_OVERDRIVE = system_need_overdrive(AHB_CLK, APB1_CLK, APB2_CLK);
+	static constexpr auto VOLTAGE_SCALE	 = determine_voltage_scale(AHB_CLK);
+	static constexpr auto SYS_CLK_SRC		 = determine_sys_clk_src(SYS_CLK, HSE_CLK, HSI_CLK, MSI_CLK);
 
  public:
-	template <rcc::ClkSrc PllSrc,
-						typename = std::enable_if_t<SYS_CLK_SRC == rcc::SysClk::Pll && rcc::is_pll_clk_src<PllSrc>>>
+	static constexpr auto IS_CLOCK_DATA_VALID() noexcept {
+		using rcc::SysClk;
+		constexpr auto SYS_CLK_SRC_IS_PLL = SYS_CLK_SRC == SysClk::Pll;
+		constexpr auto CLK_SRC_IS_VALID		= (SYS_CLK_SRC_IS_PLL && CLOCK_DATA.srcPLL.has_value());
+
+		// constexpr auto HSE_FREQ_IS_VALID = HSE_CLK_FREQ_MIN <= HSE_CLK && HSE_CLK <= HSE_CLK_FREQ_MAX;
+		constexpr auto APB1_CLK_IS_VALID = APB1_CLK <= APB1_FREQ_MAX_VOS_RANGE1;
+		constexpr auto VDD_IS_VALID			 = STM32_VDD_MIN <= VDD && VDD <= STM32_VDD_MAX;
+
+		constexpr auto MSI_IS_VALID = detail::find_if(MSI_FREQ_TABLE, [](auto const t_in) { return t_in == MSI_CLK; }) !=
+																	std::tuple_size_v<decltype(MSI_FREQ_TABLE)>;
+		// @todo other validity check...
+		return CLK_SRC_IS_VALID && APB1_CLK_IS_VALID && VDD_IS_VALID && MSI_IS_VALID;
+	}
+
 	static constexpr void init() noexcept {
+		static_assert(IS_CLOCK_DATA_VALID());
 		using rcc::MsiRange, rcc::Frequency_v, rcc::PeriphClk, rcc::ClkSrc;
 
-		if constexpr (HSE_BYPASS_CLK_SRC) {
+		if constexpr (CLOCK_DATA.bypassHSE) {
 			rcc::bypass_clksrc<rcc::ClkSrc::Hse>();
 		}
 
 		// enable pll clock src, i.e., HSE, HSI or MSI
-		rcc::enable_clk<PllSrc>();
-		rcc::wait_osc_rdy<PllSrc>();
-		rcc::set_sysclk<rcc::to_sys_clk(PllSrc)>();
+		if constexpr (CLOCK_DATA.srcPLL.has_value()) {
+			rcc::enable_clk<CLOCK_DATA.srcPLL.value()>();
+			rcc::wait_osc_rdy<CLOCK_DATA.srcPLL.value()>();
+			rcc::set_sysclk<rcc::to_sys_clk(CLOCK_DATA.srcPLL.value())>();
 
-		if constexpr (PllSrc == ClkSrc::Msi) {
-			rcc::enable_msi_range();
-			rcc::set_msi_range(MsiRange{Frequency_v<MSI_CLK_FREQ>});
-		}
+			if constexpr (CLOCK_DATA.srcPLL.value() == ClkSrc::Msi) {
+				rcc::enable_msi_range();
+				rcc::set_msi_range(MsiRange{MSI_CLK});
+			}
 
-		{
-			const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<PllSrc>();
+			{
+				const auto& [m, n, p, q, r] = CALC_PLL_DIV_FACTOR<CLOCK_DATA.srcPLL.value()>();
 
-			rcc::disable_clk<ClkSrc::Pll>();
-			rcc::set_pllsrc_and_div_factor<PllSrc>(m, n, p, q, r);
-			rcc::enable_periph_clk<PeriphClk::Pwr>();
-			pwr::set_voltage_scale(VOLTAGE_SCALE);
+				rcc::disable_clk<ClkSrc::Pll>();
+				rcc::set_pllsrc_and_div_factor<CLOCK_DATA.srcPLL.value()>(m, n, p, q, r);
+				rcc::enable_periph_clk<PeriphClk::Pwr>();
+				pwr::set_voltage_scale(VOLTAGE_SCALE);
+			}
 		}
 
 		rcc::enable_clk<ClkSrc::Pll>();
@@ -354,11 +285,14 @@ class Clock {
 		auto const& [ahb, apb1, apb2] = GET_ADVANCE_BUS_DIV_FACTOR();
 		rcc::config_adv_bus_division_factor(ahb, apb1, apb2);
 
-		rcc::wait_osc_rdy<ClkSrc::Pll>();
+		if constexpr (CLOCK_DATA.srcPLL.has_value()) {
+			rcc::wait_osc_rdy<ClkSrc::Pll>();	 // wait for PLL lock
+		}
 
+		// switch sysclk and wait ready
 		rcc::set_sysclk<SYS_CLK_SRC>();
 		rcc::wait_sysclk_rdy<SYS_CLK_SRC>();
 	}
 };
 
-}	// namespace cpp_stm32::sys
+}	 // namespace cpp_stm32::sys

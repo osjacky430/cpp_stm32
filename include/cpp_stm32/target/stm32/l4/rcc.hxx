@@ -1,18 +1,24 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  stm32/l4/rcc.hxx
+ * @brief	Rcc setup API for stm32l4
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
@@ -132,7 +138,7 @@ constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln,
 }
 
 template <ClkSrc Clk>
-constexpr void set_pllsrc_and_div_factor(PllM const t_pllm, PllN const t_plln,
+constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln,
 																				 std::optional<PllP> const t_pllp = std::nullopt,
 																				 std::optional<PllQ> const t_pllq = std::nullopt,
 																				 std::optional<PllR> const t_pllr = std::nullopt) noexcept {
@@ -145,15 +151,18 @@ constexpr void set_pllsrc_and_div_factor(PllM const t_pllm, PllN const t_plln,
 	auto const pllp_val = t_pllp.value_or(PllP{DivisionFactor_v<7>});
 	auto const pllq_val = t_pllq.value_or(PllQ{DivisionFactor_v<2>});
 	auto const pllr_val = t_pllr.value_or(PllR{DivisionFactor_v<2>});
-	std::tuple const mod_val{Clk, t_pllm, t_plln, pllp_val, enable_pllp, pllq_val, enable_pllq, pllr_val, enable_pllr};
+	std::tuple const mod_val{Clk,			 t_pllm(),		t_plln(), pllp_val,		enable_pllp,
+													 pllq_val, enable_pllq, pllr_val, enable_pllr};
 
 	reg::PLLCFGR.writeBit<reg::PLLCFGRField::PLLSRC, reg::PLLCFGRField::PLLM, reg::PLLCFGRField::PLLN,
 												reg::PLLCFGRField::PLLP, reg::PLLCFGRField::PLLPEN, reg::PLLCFGRField::PLLQ,
 												reg::PLLCFGRField::PLLQEN, reg::PLLCFGRField::PLLR, reg::PLLCFGRField::PLLREN>(mod_val);
 }
 
-constexpr void config_adv_bus_division_factor(HPRE const t_hpre, PPRE const t_ppre1, PPRE const t_ppre2) {
-	reg::CFGR.writeBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(t_hpre, t_ppre1, t_ppre2);
+constexpr void config_adv_bus_division_factor(HPREChecker const t_hpre, PPREChecker const t_ppre1,
+																							PPREChecker const t_ppre2) noexcept {
+	reg::CFGR.writeBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(t_hpre(), t_ppre1(),
+																																												 t_ppre2());
 }
 
 constexpr void set_msi_range(MsiRange const t_msi_range) noexcept {
@@ -162,4 +171,12 @@ constexpr void set_msi_range(MsiRange const t_msi_range) noexcept {
 
 constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CRField::MSIRGSEL>(); }
 
-}	// namespace cpp_stm32::rcc
+/**
+ * @brief	This function returns divsion factors of the advanced buses
+ * @return division factors HPRE, PPRE1, and PPRE2
+ */
+[[nodiscard]] constexpr auto get_adv_bus_division_factor() noexcept {
+	return reg::CFGR.readBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(ValueOnly);
+}
+
+}	 // namespace cpp_stm32::rcc

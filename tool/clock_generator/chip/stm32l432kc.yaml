@@ -1,0 +1,51 @@
+%YAML 1.2
+---
+HSE:
+  -
+    FREQ:
+    - type: std::uint32_t
+    BYPASS:
+    - type: bool
+LSE:
+  -
+    FREQ:
+    - type: std::uint32_t
+    BYPASS:
+    - type: bool
+SYS:
+  -
+    FREQ:
+    - type: std::uint32_t
+    SRC:
+    - type: rcc::SysClk
+    - option: Msi, Hsi16, Hse, Pll
+PLL:
+  -
+    SRC:
+    - type: rcc::ClkSrc
+    - option: Hse, Hsi160, Msi
+AHB:
+  -
+    FREQ:
+    - type: std::uint32_t
+APB1:
+  -
+    FREQ:
+    - type: std::uint32_t
+APB2:
+  -
+    FREQ:
+    - type: std::uint32_t
+RTC:
+  -
+    SRC:
+    - type: rcc::RtcClk
+    - option: Hse, Lsi, Lse
+VDD:
+  -
+    VOLT:
+    - type: float
+MSI:
+  -
+    FREQ:
+    - type: float

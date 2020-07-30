@@ -36,42 +36,46 @@
 namespace cpp_stm32::rcc {
 
 // extend en and rst so that it takes template param pack
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 static constexpr void enable_periph_clk() noexcept {
-	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<enable_bit>();
 }
 
-template <PeriphClk PeriphClk>
+/**
+ * @brief		This function disables the peripheral clock
+ * @tparam	Clk	Peripheral clock @ref rcc::PeriphClk
+ */
+template <PeriphClk Clk>
 constexpr void disable_periph_clk() noexcept {
-	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<enable_bit>();
 }
 
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 static constexpr void pulse_reset_periph() noexcept {
-	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<rst_bit>();
 	CTL_REG.template clearBit<rst_bit>();
 }
 
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 static constexpr void release_reset_periph() noexcept {
-	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
 	CTL_REG.template clearBit<rst_bit>();
 }
 
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 static constexpr void hold_reset_periph() noexcept {
-	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<rst_bit>();
@@ -137,7 +141,7 @@ static constexpr void set_sysclk() noexcept {
 }
 
 static constexpr SysClk sysclk_in_use() noexcept {
-	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	//
+	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	 //
 }
 
 template <SysClk Clk>
@@ -240,19 +244,18 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  */
 [[nodiscard]] constexpr auto get_ahb_clock_freq() noexcept {
 	if constexpr (FIX_CLK_FREQ) {
+		return AHB_FREQ;
 	} else {
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		auto const sys_src							= sysclk_in_use();
+		auto const [m, n, p, q, r]			= get_pll_division_factor();
 
-		switch (sys_src) {
+		switch (auto const sys_src = sysclk_in_use(); sys_src) {
 			case rcc::SysClk::Pllp:
 			case rcc::SysClk::Pllr:
 			case rcc::SysClk::Hsi:
 			case rcc::SysClk::Hse:
 				break;
 		}
-
-		auto const [m, n, p, q, r] = get_pll_division_factor();
 	}
 }
 
@@ -262,10 +265,12 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  */
 [[nodiscard]] constexpr auto get_apb1_clock_freq() noexcept {
 	if constexpr (FIX_CLK_FREQ) {
+		return APB1_FREQ;
 	} else {
+		auto const ahb_clk_freq					= get_ahb_clock_freq();
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		auto const [m, n, p, q, r]			= get_pll_division_factor();
-		auto const sys_src							= sysclk_in_use();
+
+		return ahb_clk_freq / ppre1;
 	}
 }
 
@@ -275,11 +280,13 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
  */
 [[nodiscard]] constexpr auto get_apb2_clock_freq() noexcept {
 	if constexpr (FIX_CLK_FREQ) {
+		return APB2_FREQ;
 	} else {
+		auto const ahb_clk_freq					= get_ahb_clock_freq();
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
-		auto const [m, n, p, q, r]			= get_pll_division_factor();
-		auto const sys_src							= sysclk_in_use();
+
+		return ahb_clk_freq / ppre2;
 	}
 }
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc
