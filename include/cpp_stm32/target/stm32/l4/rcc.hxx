@@ -139,20 +139,20 @@ constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln,
 
 template <ClkSrc Clk>
 constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln,
-																				 std::optional<PllP> const t_pllp = std::nullopt,
-																				 std::optional<PllQ> const t_pllq = std::nullopt,
-																				 std::optional<PllR> const t_pllr = std::nullopt) noexcept {
+																				 std::optional<PllPChecker> const t_pllp = std::nullopt,
+																				 std::optional<PllQChecker> const t_pllq = std::nullopt,
+																				 std::optional<PllRChecker> const t_pllr = std::nullopt) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 
-	std::uint8_t const enable_pllp = static_cast<bool>(t_pllp);
-	std::uint8_t const enable_pllq = static_cast<bool>(t_pllq);
-	std::uint8_t const enable_pllr = static_cast<bool>(t_pllr);
+	auto const enable_pllp = static_cast<std::uint8_t>(t_pllp.has_value());
+	auto const enable_pllq = static_cast<std::uint8_t>(t_pllq.has_value());
+	auto const enable_pllr = static_cast<std::uint8_t>(t_pllr.has_value());
 
-	auto const pllp_val = t_pllp.value_or(PllP{DivisionFactor_v<7>});
-	auto const pllq_val = t_pllq.value_or(PllQ{DivisionFactor_v<2>});
-	auto const pllr_val = t_pllr.value_or(PllR{DivisionFactor_v<2>});
-	std::tuple const mod_val{Clk,			 t_pllm(),		t_plln(), pllp_val,		enable_pllp,
-													 pllq_val, enable_pllq, pllr_val, enable_pllr};
+	auto const pllp_val = t_pllp.value_or(PllPChecker{DivisionFactor_v<7>});
+	auto const pllq_val = t_pllq.value_or(PllQChecker{DivisionFactor_v<2>});
+	auto const pllr_val = t_pllr.value_or(PllRChecker{DivisionFactor_v<2>});
+	std::tuple const mod_val{Clk,				 t_pllm(),		t_plln(),		pllp_val(), enable_pllp,
+													 pllq_val(), enable_pllq, pllr_val(), enable_pllr};
 
 	reg::PLLCFGR.writeBit<reg::PLLCFGRField::PLLSRC, reg::PLLCFGRField::PLLM, reg::PLLCFGRField::PLLN,
 												reg::PLLCFGRField::PLLP, reg::PLLCFGRField::PLLPEN, reg::PLLCFGRField::PLLQ,

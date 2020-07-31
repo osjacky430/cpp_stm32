@@ -33,6 +33,8 @@
 #include "cpp_stm32/target/stm32/f4/rcc.hxx"
 #include "cpp_stm32/utility/literal_op.hxx"
 
+#include "project_config.hxx"
+
 namespace cpp_stm32::sys {
 
 // reference

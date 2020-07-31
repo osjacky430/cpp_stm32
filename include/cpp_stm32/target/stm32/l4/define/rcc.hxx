@@ -88,17 +88,17 @@ using PllPChecker = detail::KeyValTable<PllP, PAIR(7, 0), PAIR(17, 1)>;
 /**
  *
  */
-// using PllQ = StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
-using PllQ = detail::KeyValTable<struct CPP_STM32_LUT_PLLQ, /**/
-																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllQ				= StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
+using PllQChecker = detail::KeyValTable<PllQ, /**/
+																				PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
 /**
  *
  *
  */
-// using PllR = StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
-using PllR = detail::KeyValTable<struct CPP_STM32_LUT_PLLR, /**/
-																 PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
+using PllR				= StrongType<std::uint32_t, struct CPP_STM32_HPRE>;
+using PllRChecker = detail::KeyValTable<PllR, /**/
+																				PAIR(2, 0b00), PAIR(4, 0b01), PAIR(6, 0b10), PAIR(8, 0b11)>;
 
 /**
  * @enum 		PeriphClk
@@ -138,7 +138,7 @@ enum class ClkSrc : std::uint8_t { Hsi480, Msi, Hsi160, Hse, Pll, PllSai, Lse, L
  * @brief		This function transform rcc enum to its equivalent sys enum
  * @param 	t_rcc  see ::ClkSrc
  */
-static constexpr auto to_sys_clk = [](ClkSrc t_rcc) {
+static constexpr auto to_sys_clk(ClkSrc t_rcc) noexcept {
 	switch (t_rcc) {
 		case ClkSrc::Hsi160:
 			return SysClk::Hsi16;
@@ -151,7 +151,7 @@ static constexpr auto to_sys_clk = [](ClkSrc t_rcc) {
 		default:
 			break;
 	}
-};
+}
 
 /**
  *

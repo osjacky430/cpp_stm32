@@ -1,23 +1,27 @@
-// Copyright (c) 2020 by osjacky430.
-// All Rights Reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the Lesser GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// Lesser GNU General Public License for more details.
-//
-// You should have received a copy of the Lesser GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file  stm32/l4/sys_init.hxx
+ * @brief	System clock setup API for stm32l4
+ */
+
+/** Copyright (c) 2020 by osjacky430.
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the Lesser GNU General Public License
+ *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #pragma once
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <optional>
 
@@ -34,16 +38,12 @@
 
 namespace cpp_stm32::sys {
 
-constexpr auto STM32_VDD_MIN = 1.71f;
-constexpr auto STM32_VDD_MAX = 3.6f;
-
-static constexpr std::tuple MSI_FREQ_TABLE{
+constexpr std::tuple MSI_FREQ_TABLE{
 	100_kHz, 200_kHz, 400_kHz, 800_kHz, 1_MHz, 2_MHz, 4_MHz, 8_MHz, 16_MHz, 24_MHz, 32_MHz, 48_MHz,
 };
 
-// @todo fix this, use find_if?
-// static_assert(detail::find(MSI_FREQ_TABLE, Frequency<MSI_CLK_FREQ>{}) !=
-// std::tuple_size_v<decltype(MSI_FREQ_TABLE)>);
+constexpr auto STM32_VDD_MIN = 1.71f;
+constexpr auto STM32_VDD_MAX = 3.6f;
 
 constexpr auto HSE_CLK_FREQ_MIN = 4_MHz;
 constexpr auto HSE_CLK_FREQ_MAX = 48_MHz;
@@ -61,13 +61,51 @@ constexpr auto APB2_FREQ_MAX_VOS_RANGE1 = 80_MHz;
 constexpr auto AHB_VOS_RANGE1_MAX_FREQ = 80_MHz;
 constexpr auto AHB_VOS_RANGE2_MAX_FREQ = 26_MHz;
 
-// static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
-// static_assert(STM32_VDD_MIN <= STM32_VDD && STM32_VDD <= STM32_VDD_MAX);
-// static_assert(Frequency<HSI_CLK_FREQ>{} == 16_MHz);
-// static_assert(Frequency<AHB_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-// static_assert(Frequency<SYS_CLK_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-// static_assert(Frequency<APB1_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
-// static_assert(Frequency<APB2_FREQ>{} <= AHB_VOS_RANGE1_MAX_FREQ);
+/**
+ *
+ *
+ */
+template <auto PllSrcFreq, auto SysFreq>
+static constexpr auto calc_pll_div_factor(Frequency<SysFreq> const /* unused */) noexcept {
+	constexpr auto pll_satisfied_constraint = [](auto const t_pllr) {
+		constexpr auto vco_in_inrange = [](auto const t_vco_in) {
+			return VCO_INPUT_FREQ_MIN() <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX();
+		};
+
+		constexpr auto vco_out_inrange = [](auto const t_input) {
+			return VCO_OUTPUT_FREQ_MIN() <= t_input && t_input <= VCO_OUTPUT_FREQ_MAX();
+		};
+
+		std::uint32_t pllr = t_pllr.key;
+
+		if (auto const vco_out = pllr * SysFreq; vco_out_inrange(vco_out)) {
+			for (std::uint32_t plln = rcc::PllNChecker::MIN; plln <= rcc::PllNChecker::MAX; ++plln) {
+				std::uint32_t const vco_in_freq = vco_out / plln;
+				std::uint32_t const pllm				= PllSrcFreq / vco_in_freq;
+				if (vco_in_inrange(vco_in_freq) && 1 <= pllm && pllm <= 7) {
+					return detail::Tuple{pllm, plln, pllr};
+				}
+			}
+		}
+
+		return detail::Tuple{0UL, 0UL, 0UL};
+	};
+
+	constexpr auto iterate_pllr_to_find_div_factor = [pll_satisfied_constraint](auto... t_pllr) {
+		// use detail::Tuple cause operator= of std::tuple is not constexpr until c++2a
+		detail::Tuple ret_val{0UL, 0UL, 0UL};
+
+		// comma operator (return latter result. The return value of the assignment operator is discarded, but the
+		// assignment do take place) + short-circuit evaluation (if true, then the rest of the fold expression will not be
+		// evaluated) --> ret_val is updated if the latter evaluated to false.
+		// @todo this can be written in more understandable way...
+		if (((ret_val = pll_satisfied_constraint(t_pllr), detail::to_std_tuple(ret_val) != std::tuple{0, 0, 0}) || ...)) {
+			return detail::to_std_tuple(ret_val);
+		}
+	};
+
+	return std::apply(iterate_pllr_to_find_div_factor, rcc::PllRChecker::KEY_VAL_MAP);
+}
 
 /**
  * @brief	 This function calculates the division factor of the bus
@@ -164,41 +202,9 @@ class Clock {
 											PPREChecker{DivisionFactor_v<ppre2>}};
 	}
 
-	template <std::size_t Idx>
-	static constexpr auto CHECK_PLL_MNR_IMPL(std::uint64_t const t_pll_input) noexcept {
-		constexpr auto pllr						= std::get<Idx>(rcc::PllR::KEY_VAL_MAP).key;
-		constexpr auto vco_freq				= pllr * CLOCK_DATA.freqSYS;
-		constexpr auto vco_in_inrange = [](auto const t_vco_in) {
-			return VCO_INPUT_FREQ_MIN() <= t_vco_in && t_vco_in <= VCO_INPUT_FREQ_MAX();
-		};
-		constexpr auto vco_out_inrange = [](auto const t_vco_out) {
-			return VCO_OUTPUT_FREQ_MIN() <= t_vco_out && t_vco_out <= VCO_OUTPUT_FREQ_MAX();
-		};
-
-		if constexpr (vco_out_inrange(vco_freq)) {
-			for (auto plln = rcc::PllNChecker::MIN; plln <= rcc::PllNChecker::MAX; ++plln) {
-				if (auto const vco_in_freq = vco_freq / plln; vco_in_inrange(vco_in_freq)) {
-					if (auto const pllm = t_pll_input / vco_in_freq; 1 <= pllm && pllm <= 7) {
-						return std::tuple{pllm, plln, pllr};
-					}
-				}
-			}
-		}
-
-		if constexpr (Idx + 1 < rcc::PllR::KEY_VAL_NUM) {
-			return CHECK_PLL_MNR_IMPL<Idx + 1>(t_pll_input);
-		} else {
-			return std::tuple{0ULL, 0, 0};
-		}
-	}
-
-	static constexpr auto CHECK_PLL_MNR(std::uint64_t const t_pll_input) noexcept {
-		return CHECK_PLL_MNR_IMPL<0>(t_pll_input);
-	}
-
 	template <rcc::ClkSrc PllSrc>
 	static constexpr auto CALC_PLL_DIV_FACTOR() noexcept {
-		using rcc::ClkSrc, rcc::PllMChecker, rcc::PllNChecker, rcc::PllP, rcc::PllQ, rcc::PllR;
+		using rcc::ClkSrc, rcc::PllMChecker, rcc::PllNChecker, rcc::PllPChecker, rcc::PllQChecker, rcc::PllRChecker;
 
 		constexpr auto pll_input_clk_freq = []() {
 			switch (PllSrc) {
@@ -213,19 +219,20 @@ class Clock {
 			}
 		}();
 
-		constexpr auto pllm_n_r = CHECK_PLL_MNR(pll_input_clk_freq);
-		constexpr auto pllm			= std::get<0>(pllm_n_r);
-		constexpr auto plln			= std::get<1>(pllm_n_r);
-		constexpr auto pllr			= std::get<2>(pllm_n_r);
+		constexpr auto pllm_n_r = calc_pll_div_factor<pll_input_clk_freq>(SYS_CLK);
+
+		constexpr auto pllm = std::get<0>(pllm_n_r);
+		constexpr auto plln = std::get<1>(pllm_n_r);
+		constexpr auto pllr = std::get<2>(pllm_n_r);
 
 		// if constexpr (need to calculate pllp, pllq)
 		// {
 		//  ...
 		// } esle {
 		return std::tuple{PllMChecker{rcc::DivisionFactor_v<pllm>}, PllNChecker{rcc::DivisionFactor_v<plln>}, std::nullopt,
-											std::nullopt, PllR{rcc::DivisionFactor_v<pllr>}};
+											std::nullopt, PllRChecker{rcc::DivisionFactor_v<pllr>}};
 		// }
-	}	 // namespace cpp_stm32::sys
+	}
 
 	static constexpr auto CPU_WAIT_STATE = flash::WaitTable::getWaitState<VDD>(AHB_CLK);
 	static constexpr auto NEED_OVERDRIVE = system_need_overdrive(AHB_CLK, APB1_CLK, APB2_CLK);
@@ -239,13 +246,22 @@ class Clock {
 		constexpr auto CLK_SRC_IS_VALID		= (SYS_CLK_SRC_IS_PLL && CLOCK_DATA.srcPLL.has_value());
 
 		// constexpr auto HSE_FREQ_IS_VALID = HSE_CLK_FREQ_MIN <= HSE_CLK && HSE_CLK <= HSE_CLK_FREQ_MAX;
+		constexpr auto SYS_CLK_IS_VALID	 = SYS_CLK <= AHB_VOS_RANGE1_MAX_FREQ;
+		constexpr auto AHB_CLK_IS_VALID	 = AHB_CLK <= AHB_VOS_RANGE1_MAX_FREQ;
 		constexpr auto APB1_CLK_IS_VALID = APB1_CLK <= APB1_FREQ_MAX_VOS_RANGE1;
+		constexpr auto APB2_CLK_IS_VALID = APB2_CLK <= APB2_FREQ_MAX_VOS_RANGE1;
 		constexpr auto VDD_IS_VALID			 = STM32_VDD_MIN <= VDD && VDD <= STM32_VDD_MAX;
 
 		constexpr auto MSI_IS_VALID = detail::find_if(MSI_FREQ_TABLE, [](auto const t_in) { return t_in == MSI_CLK; }) !=
 																	std::tuple_size_v<decltype(MSI_FREQ_TABLE)>;
+
+		// @todo std::optional<std::uint32_t> HSE?
+		// static_assert(HSE_CLK_FREQ_MIN <= Frequency<HSE_CLK_FREQ>{} && Frequency<HSE_CLK_FREQ>{} <= HSE_CLK_FREQ_MAX);
+
 		// @todo other validity check...
-		return CLK_SRC_IS_VALID && APB1_CLK_IS_VALID && VDD_IS_VALID && MSI_IS_VALID;
+		// @todo static_assert each or static_assert all && ?
+		return CLK_SRC_IS_VALID && VDD_IS_VALID && MSI_IS_VALID && AHB_CLK_IS_VALID && APB1_CLK_IS_VALID &&
+					 APB2_CLK_IS_VALID && SYS_CLK_IS_VALID;
 	}
 
 	static constexpr void init() noexcept {

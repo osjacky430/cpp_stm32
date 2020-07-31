@@ -38,7 +38,7 @@ class ExtractClockData:
         return var_name + ' = ' + val
 
     @staticmethod
-    def __clock_member_var_name(clock:str, param: str):
+    def __clock_member_var_name(clock: str, param: str):
         return param.lower() + clock.upper()
 
     @staticmethod

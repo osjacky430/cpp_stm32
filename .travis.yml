@@ -29,8 +29,9 @@ before_install:
     # install PyYAML                   #
     ####################################
     - sudo apt-get install python3 python3-pip
-    - pip3 install --upgrade pip
+    - pip3 install --upgrade pip3
     - pip3 install pyyaml
+    - python3 --version
 addons:
     apt:
         sources:
