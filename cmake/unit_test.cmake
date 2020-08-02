@@ -5,7 +5,7 @@
 # add_unit_test_lib()
 #
 # Since Catch2 is downloaded from github, git and internet connection are required.
-macro(add_unit_test_lib)
+macro(add_unit_test_lib target)
 
   include(ExternalProject)
 
@@ -26,6 +26,7 @@ macro(add_unit_test_lib)
   set(CATCH_INCLUDE_DIR
       ${source_dir}/single_include
       CACHE INTERNAL "Path to include folder for Catch")
+  add_dependencies(${target} catch)
   # set(CATCH_MODULE_DIR ${source_dir}/contrib CACHE INTERNAL "Path to include CMake Catch2 integration")
 endmacro()
 
@@ -50,11 +51,6 @@ function(build_test_binary)
   foreach(target IN LISTS TARGET_TARGET_NAME)
     message(STATUS "Configuring build files for test file ${target}")
     add_executable(${target}.elf ${target}.cpp)
-
-    # target_include_directories(${target}.elf PRIVATE ${CMAKE_SOURCE_DIR})
-    # target_include_directories(${target}.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}) # sys_info
-    # target_include_directories(${target}.elf PRIVATE ${CATCH_INCLUDE_DIR}) # catch
-
     target_link_libraries(${target}.elf PRIVATE ${TARGET_TEST_MAIN} cpp_stm32 project_options)
 
     add_custom_target(

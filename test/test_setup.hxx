@@ -1,3 +1,5 @@
+#pragma once
+
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_DISABLE_EXCEPTIONS
 #define CATCH_CONFIG_NO_POSIX_SIGNALS
@@ -39,4 +41,4 @@ std::ostream& clog() {
 }
 std::ostream& cerr() { return clog(); }
 
-}	// namespace Catch
+}	 // namespace Catch

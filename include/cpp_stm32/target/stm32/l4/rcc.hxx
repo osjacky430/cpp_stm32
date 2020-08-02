@@ -30,22 +30,24 @@
 #include "cpp_stm32/target/stm32/l4/pin_map/rcc.hxx"
 #include "cpp_stm32/target/stm32/l4/register/rcc.hxx"
 
+#include "project_config.hxx"
+
 namespace cpp_stm32::rcc {
 
 /**
  * [enable_periph_clk description]
  */
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 constexpr void enable_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphEnReg<PeriphClk>();
+	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphEnReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const enable_bit		= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<enable_bit>();
 }
 
-template <PeriphClk PeriphClk>
+template <PeriphClk Clk>
 constexpr void reset_periph_clk() noexcept {
-	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphRstReg<PeriphClk>();
+	constexpr auto const reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto const CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto const rst_bit			= std::get<1>(reg_bit_pair);
 	CTL_REG.template setBit<rst_bit>();
@@ -113,9 +115,13 @@ constexpr void wait_sysclk_rdy() noexcept {
 }
 
 template <ClkSrc Clk>
-constexpr void set_pllsrc() {
+constexpr void set_pllsrc() noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 	reg::PLLCFGR.template writeBit<reg::PLLCFGRField::PLLSRC>(Clk);
+}
+
+[[nodiscard]] constexpr auto get_pllsrc() noexcept {
+	return reg::PLLCFGR.readBit<reg::PLLCFGRField::PLLSRC>(ValueOnly);
 }
 
 constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln,
@@ -137,6 +143,15 @@ constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln,
 			mod_val);
 }
 
+/**
+ * 	@brief 	This function set pll clock source and division factor
+ * 	@tparam Clk  		Pll clock source
+ * 	@param 	t_pllm 	PllMChecker struct, which checks the validity of PllM division factor at compile time
+ *  @param 	t_plln 	PllNChecker struct, which checks the validity of PllN division factor at compile time
+ *  @param 	t_pllp	optional PllPChecker, this parameter is optional cause it can be enabled by rcc
+ *  @param 	t_pllq 	optional PllQChecker, this parameter is optional cause it can be enabled by rcc
+ *  @param 	t_pllr 	optional PllRChecker, this parameter is optional cause it can be enabled by rcc
+ */
 template <ClkSrc Clk>
 constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln,
 																				 std::optional<PllPChecker> const t_pllp = std::nullopt,
@@ -177,6 +192,83 @@ constexpr void enable_msi_range() noexcept { reg::CR.setBit<reg::CRField::MSIRGS
  */
 [[nodiscard]] constexpr auto get_adv_bus_division_factor() noexcept {
 	return reg::CFGR.readBit<reg::CFGRField::HPRE, reg::CFGRField::PPRE1, reg::CFGRField::PPRE2>(ValueOnly);
+}
+
+/**
+ *
+ */
+[[nodiscard]] constexpr auto get_pll_division_factor() noexcept {
+	return reg::PLLCFGR.readBit<reg::PLLCFGRField::PLLM, reg::PLLCFGRField::PLLN, reg::PLLCFGRField::PLLP,
+															reg::PLLCFGRField::PLLQ, reg::PLLCFGRField::PLLR>(ValueOnly);
+}
+
+// @todo implement
+[[nodiscard]] constexpr auto get_hse_freq() noexcept { return 0UL; }
+
+[[nodiscard]] constexpr auto get_ahb_clock_freq() noexcept {
+	if constexpr (FIX_CLK_FREQ) {
+		return AHB_FREQ;
+	} else {
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+		auto const [m, n, p, q, r]			= get_pll_division_factor();
+
+		auto const vco_freq = [m, n]() {
+			auto const pll_src_freq = []() {
+				if (auto const [pll_src] = get_pllsrc(); pll_src == rcc::ClkSrc::Hse) {
+					return get_hse_freq();
+				} else {
+					return clock::ClockFreq::HSI_FREQ;
+				}
+			}();
+
+			return pll_src_freq * n.get() / m.get();
+		};
+
+		auto const sys_freq = [p, r, vco_freq]() {
+			switch (auto const sys_src = sysclk_in_use(); sys_src) {
+				case rcc::SysClk::Pll:
+					return vco_freq() / r.get();
+				case rcc::SysClk::Msi:
+					return MSI_FREQ;
+				case rcc::SysClk::Hsi16:
+					return clock::ClockFreq::HSI_FREQ;
+				case rcc::SysClk::Hse:
+					return get_hse_freq();
+			}
+		}();
+
+		return sys_freq / hpre.get();
+	}
+}
+
+/**
+ * @brief	This function returns the apb1 clock frequency
+ * @return APB1 clock frequency
+ */
+[[nodiscard]] constexpr auto get_apb1_clock_freq() noexcept {
+	if constexpr (FIX_CLK_FREQ) {
+		return APB1_FREQ;
+	} else {
+		auto const ahb_clk_freq					= get_ahb_clock_freq();
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+
+		return ahb_clk_freq / ppre1.get();
+	}
+}
+
+/**
+ * @brief	This function returns the apb2 clock frequency
+ * @return APB2 clock frequency
+ */
+[[nodiscard]] constexpr auto get_apb2_clock_freq() noexcept {
+	if constexpr (FIX_CLK_FREQ) {
+		return APB2_FREQ;
+	} else {
+		auto const ahb_clk_freq					= get_ahb_clock_freq();
+		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
+
+		return ahb_clk_freq / ppre2.get();
+	}
 }
 
 }	 // namespace cpp_stm32::rcc

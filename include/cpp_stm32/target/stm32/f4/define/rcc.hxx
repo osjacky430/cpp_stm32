@@ -43,6 +43,7 @@ using PllMChecker = detail::KeyValTable<PllM, 2, 63>;
  * @class		PllN
  * @brief		Utility class used to check whether division factor is reasonable.
  * @note		PllN valid number lies between 50 and 432
+ * @note 		PllN valid number differs between chips, 50 ~ 432 appears to be the most common range for f4
  */
 using PllN				= StrongType<std::uint32_t, struct CPP_STM32_PLLN>;
 using PllNChecker = detail::KeyValTable<PllN, 50, 432>;
@@ -162,4 +163,4 @@ static constexpr bool is_ext_clk = (Clk == ClkSrc::Hse || Clk == ClkSrc::Lse);
 template <ClkSrc Clk>
 static constexpr bool is_pll_clk_src = (Clk == ClkSrc::Hse || Clk == ClkSrc::Hsi);
 
-}	// namespace cpp_stm32::rcc
+}	 // namespace cpp_stm32::rcc

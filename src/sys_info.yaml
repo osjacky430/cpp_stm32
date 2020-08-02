@@ -1,44 +1,45 @@
-# HSE:
-#   - BYPASS: True
-#     FREQ: 8e6
-# LSE:
-#   - BYPASS: False
-#     FREQ: 32.768e3
-# SYS:
-#   - SRC: PLLP
-#     FREQ: 180e6
-# AHB:
-#   - FREQ: 180e6
-# APB1:
-#   - FREQ: 45e6
-# APB2:
-#   - FREQ: 90e6
-# PLL:
-#   - SRC: HSE
-# VDD:
-#   - VOLT: 3.3
-MSI:
-  -
-    FREQ: 4e6
+HSE:
+  - BYPASS: True
+    FREQ: 8e6
 LSE:
-  -
-    BYPASS: False
+  - BYPASS: False
     FREQ: 32.768e3
 SYS:
-  -
-    FREQ: 80e6
-PLL:
-  -
-    SRC: MSI
+  - SRC: PLLP
+    FREQ: 180e6
 AHB:
-  -
-    FREQ: 80e6
+  - FREQ: 180e6
 APB1:
-  -
-    FREQ: 80e6
+  - FREQ: 45e6
 APB2:
-  -
-    FREQ: 80e6
+  - FREQ: 90e6
+PLL:
+  - SRC: HSE
 VDD:
-  -
-    VOLT: 3.3
+  - VOLT: 3.3
+
+# MSI:
+#   -
+#     FREQ: 4e6
+# LSE:
+#   -
+#     BYPASS: False
+#     FREQ: 32.768e3
+# SYS:
+#   -
+#     FREQ: 80e6
+# PLL:
+#   -
+#     SRC: MSI
+# AHB:
+#   -
+#     FREQ: 80e6
+# APB1:
+#   -
+#     FREQ: 80e6
+# APB2:
+#   -
+#     FREQ: 80e6
+# VDD:
+#   -
+#     VOLT: 3.3

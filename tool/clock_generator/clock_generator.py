@@ -134,14 +134,15 @@ class ExtractClockData:
         output.close()
 
 
-# arg_parser = argparse.ArgumentParser()
-# arg_parser.add_argument('clock_file', help='system clock yaml file')
-# arg_parser.add_argument('target', help='target micro-controller')
-# arg_parser.add_argument('output', help='output directory')
-#
-# cmd_input = arg_parser.parse_args()
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument('clock_file', help='system clock yaml file')
+arg_parser.add_argument('target', help='target micro-controller')
+arg_parser.add_argument('output', help='output directory')
+
+cmd_input = arg_parser.parse_args()
 
 if __name__ == '__main__':
-    # extractor = ExtractClockData(cmd_input.clock_file, cmd_input.target.lower(), cmd_input.output)
-    extractor = ExtractClockData('../../src/sys_info.yaml', 'stm32l432kc', '../../build/project_config.hxx')
+    extractor = ExtractClockData(cmd_input.clock_file, cmd_input.target.lower(), cmd_input.output)
+    # extractor = ExtractClockData('../../src/sys_info.yaml', 'stm32l432kc', '../../build/project_config.hxx')
+    # extractor = ExtractClockData('../../src/sys_info.yaml', 'stm32f446re', '../../build/project_config.hxx')
     extractor.generate_clock_file()

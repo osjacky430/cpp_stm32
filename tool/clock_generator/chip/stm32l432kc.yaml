@@ -48,4 +48,4 @@ VDD:
 MSI:
   -
     FREQ:
-    - type: float
+    - type: std::uint32_t

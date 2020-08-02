@@ -37,7 +37,7 @@ namespace cpp_stm32::rcc {
 
 // extend en and rst so that it takes template param pack
 template <PeriphClk Clk>
-static constexpr void enable_periph_clk() noexcept {
+constexpr void enable_periph_clk() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphEnReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
@@ -57,7 +57,7 @@ constexpr void disable_periph_clk() noexcept {
 }
 
 template <PeriphClk Clk>
-static constexpr void pulse_reset_periph() noexcept {
+constexpr void pulse_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -66,7 +66,7 @@ static constexpr void pulse_reset_periph() noexcept {
 }
 
 template <PeriphClk Clk>
-static constexpr void release_reset_periph() noexcept {
+constexpr void release_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -74,7 +74,7 @@ static constexpr void release_reset_periph() noexcept {
 }
 
 template <PeriphClk Clk>
-static constexpr void hold_reset_periph() noexcept {
+constexpr void hold_reset_periph() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getPeriphRstReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rst_bit			= std::get<1>(reg_bit_pair);
@@ -82,7 +82,7 @@ static constexpr void hold_reset_periph() noexcept {
 }
 
 template <ClkSrc Clk>
-static constexpr void enable_clk() noexcept {
+constexpr void enable_clk() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
@@ -90,7 +90,7 @@ static constexpr void enable_clk() noexcept {
 }
 
 template <ClkSrc Clk>
-static constexpr void disable_clk() noexcept {
+constexpr void disable_clk() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getOscOnReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto enable_bit		= std::get<1>(reg_bit_pair);
@@ -98,7 +98,7 @@ static constexpr void disable_clk() noexcept {
 }
 
 template <ClkSrc Clk>
-static constexpr bool is_osc_rdy() noexcept {
+constexpr bool is_osc_rdy() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getOscRdyReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto rdy_bit			= std::get<1>(reg_bit_pair);
@@ -106,7 +106,7 @@ static constexpr bool is_osc_rdy() noexcept {
 }
 
 template <ClkSrc Clk>
-static constexpr void wait_osc_rdy() noexcept {
+constexpr void wait_osc_rdy() noexcept {
 	while (!is_osc_rdy<Clk>()) {
 	}
 }
@@ -116,7 +116,7 @@ static constexpr void wait_osc_rdy() noexcept {
  * @note 		The clock can only be HSE or LSE
  */
 template <ClkSrc Clk>
-static constexpr void bypass_clksrc() noexcept {
+constexpr void bypass_clksrc() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto bypass_bit		= std::get<1>(reg_bit_pair);
@@ -128,7 +128,7 @@ static constexpr void bypass_clksrc() noexcept {
  * @note 		The clock can only be HSE or LSE
  */
 template <ClkSrc Clk>
-static constexpr void no_bypass() noexcept {
+constexpr void no_bypass() noexcept {
 	constexpr auto reg_bit_pair = ClkRegMap::template getExtBypassReg<Clk>();
 	constexpr auto CTL_REG			= std::get<0>(reg_bit_pair);
 	constexpr auto bypass_bit		= std::get<1>(reg_bit_pair);
@@ -136,28 +136,30 @@ static constexpr void no_bypass() noexcept {
 }
 
 template <SysClk Clk>
-static constexpr void set_sysclk() noexcept {
+constexpr void set_sysclk() noexcept {
 	reg::CFGR.template writeBit<reg::CfgBit::SW>(Clk);
 }
 
-static constexpr SysClk sysclk_in_use() noexcept {
+constexpr SysClk sysclk_in_use() noexcept {
 	return std::get<0>(reg::CFGR.readBit<reg::CfgBit::SWS>(ValueOnly));	 //
 }
 
 template <SysClk Clk>
-static constexpr void wait_sysclk_rdy() noexcept {
+constexpr void wait_sysclk_rdy() noexcept {
 	while (sysclk_in_use() != Clk) {
 	}
 }
 
 template <ClkSrc Clk>
-static constexpr void set_pllsrc() {
+constexpr void set_pllsrc() {
 	static_assert(is_pll_clk_src<Clk>);
 	reg::PLLCFGR.template writeBit<reg::PllCfgBit::PLLSRC>(Clk);
 }
 
-static constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln, PllP const t_pllp,
-																								 PllQ const t_pllq, PllR const t_pllr) noexcept {
+[[nodiscard]] constexpr auto get_pllsrc() noexcept { return reg::PLLCFGR.readBit<reg::PllCfgBit::PLLSRC>(ValueOnly); }
+
+constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t_plln, PllP const t_pllp, PllQ const t_pllq,
+																					PllR const t_pllr) noexcept {
 	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP, reg::PllCfgBit::PLLQ,
 												reg::PllCfgBit::PLLR>(t_pllm, t_plln, t_pllp, t_pllq, t_pllr);
 }
@@ -171,9 +173,8 @@ static constexpr void config_pll_division_factor(PllM const t_pllm, PllN const t
  * @param t_pllr Division factor PLLR
  */
 template <ClkSrc Clk>
-static constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln,
-																								PllPChecker const t_pllp, PllQChecker const t_pllq,
-																								PllRChecker const t_pllr) noexcept {
+constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNChecker const t_plln, PllPChecker const t_pllp,
+																				 PllQChecker const t_pllq, PllRChecker const t_pllr) noexcept {
 	static_assert(is_pll_clk_src<Clk>);
 	reg::PLLCFGR.writeBit<reg::PllCfgBit::PLLSRC, reg::PllCfgBit::PLLM, reg::PllCfgBit::PLLN, reg::PllCfgBit::PLLP,
 												reg::PllCfgBit::PLLQ, reg::PllCfgBit::PLLR>(Clk, t_pllm(), t_plln(), t_pllp(), t_pllq(),
@@ -186,8 +187,8 @@ static constexpr void set_pllsrc_and_div_factor(PllMChecker const t_pllm, PllNCh
  * @param t_ppre1 Division factor PPRE1
  * @param t_ppre2 Division factor PPRE2
  */
-static constexpr void config_adv_bus_division_factor(HPREChecker const t_hpre, PPREChecker const t_ppre1,
-																										 PPREChecker const t_ppre2) {
+constexpr void config_adv_bus_division_factor(HPREChecker const t_hpre, PPREChecker const t_ppre1,
+																							PPREChecker const t_ppre2) {
 	reg::CFGR.writeBit<reg::CfgBit::HPRE, reg::CfgBit::PPRE1, reg::CfgBit::PPRE2>(t_hpre(), t_ppre1(), t_ppre2());
 }
 
@@ -240,6 +241,16 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
 }
 
 /**
+ *	@brief 	This function returns the HSE clock frequency generated from project_config.hxx. For boards that have
+ *					built-in external oscillator, calling this function is identical to using HSE_FREQ directly. However, for
+ *					those that don't have built-in external oscillator, using HSE_FREQ directly may cause some problems. All in
+ *					all, this function is the preferred way to interface HSE clock frequency.
+ *
+ *	@return HSE clock frequency
+ */
+[[nodiscard]] constexpr auto get_hse_freq() noexcept { return HSE_FREQ; }
+
+/**
  *
  */
 [[nodiscard]] constexpr auto get_ahb_clock_freq() noexcept {
@@ -249,13 +260,32 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
 		auto const [m, n, p, q, r]			= get_pll_division_factor();
 
-		switch (auto const sys_src = sysclk_in_use(); sys_src) {
-			case rcc::SysClk::Pllp:
-			case rcc::SysClk::Pllr:
-			case rcc::SysClk::Hsi:
-			case rcc::SysClk::Hse:
-				break;
-		}
+		const auto vco_freq = [m, n]() {
+			auto const pll_src_freq = []() {
+				if (auto const [pll_src] = get_pllsrc(); pll_src == rcc::ClkSrc::Hse) {
+					return get_hse_freq();
+				} else {
+					return clock::ClockFreq::HSI_FREQ;
+				}
+			}();
+
+			return pll_src_freq * n.get() / m.get();
+		};
+
+		auto const sys_freq = [p, r, vco_freq]() {
+			switch (auto const sys_src = sysclk_in_use(); sys_src) {
+				case rcc::SysClk::Pllp:
+					return vco_freq() / p.get();
+				case rcc::SysClk::Pllr:
+					return vco_freq() / r.get();
+				case rcc::SysClk::Hsi:
+					return clock::ClockFreq::HSI_FREQ;
+				case rcc::SysClk::Hse:
+					return get_hse_freq();
+			}
+		}();
+
+		return sys_freq / hpre.get();
 	}
 }
 
@@ -270,7 +300,7 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
 		auto const ahb_clk_freq					= get_ahb_clock_freq();
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
 
-		return ahb_clk_freq / ppre1;
+		return ahb_clk_freq / ppre1.get();
 	}
 }
 
@@ -285,7 +315,7 @@ constexpr void release_reset_backup_domain() noexcept { reg::BDCR.clearBit<reg::
 		auto const ahb_clk_freq					= get_ahb_clock_freq();
 		auto const [hpre, ppre1, ppre2] = get_adv_bus_division_factor();
 
-		return ahb_clk_freq / ppre2;
+		return ahb_clk_freq / ppre2.get();
 	}
 }
 

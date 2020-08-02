@@ -68,16 +68,19 @@ function(gen_project_config_file)
   set(multi_value_arg)
   cmake_parse_arguments("_" "${option_arg}" "${single_value_arg}" "${multi_value_arg}" ${ARGN})
 
-  if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tool/clock_generator/${__CLOCK_FILE})
+  set(CLOCK_FILE_ABS_DIR ${CMAKE_SOURCE_DIR}/tool/clock_generator/${__CLOCK_FILE})
+  if (NOT EXISTS ${CLOCK_FILE_ABS_DIR})
     message(FATAL_ERROR "clock file doesn't exist, aborted")
   endif()
 
   find_package(Python3 COMPONENTS Interpreter)
   if(${Python3_FOUND})
+    message(STATUS "Generating project_config.hxx")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CLOCK_FILE_ABS_DIR})
     execute_process(
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tool/clock_generator/clock_generator.py ${__CLOCK_FILE}
                 ${__BOARD} ${CMAKE_CURRENT_BINARY_DIR}/project_config.hxx
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tool/clock_generator)
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tool/clock_generator)
   else()
     message(FATAL_ERROR "can't find python3 to generate clock info, aborted")
   endif()

@@ -10,7 +10,7 @@
 namespace Rcc		 = cpp_stm32::rcc;
 namespace Gpio	 = cpp_stm32::gpio;
 namespace Sys		 = cpp_stm32::sys;
-namespace Usart	= cpp_stm32::usart;
+namespace Usart	 = cpp_stm32::usart;
 namespace Driver = cpp_stm32::driver;
 
 using Usart::operator"" _Baud;
